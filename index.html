@@ -278,10 +278,54 @@ input::placeholder{color:var(--b2)}
 .mvp-av{width:34px;height:34px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0}
 .mvp-av img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%)}
 .mvp-av-init{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+
+/* LOGIN MODAL */
+#login-overlay{
+  position:fixed;inset:0;z-index:1000;
+  background:#07090d;
+  display:flex;align-items:center;justify-content:center;
+}
+.login-box{
+  background:var(--card);border:1px solid var(--b2);
+  border-radius:8px;padding:32px 28px;
+  max-width:360px;width:90%;text-align:center;
+  animation:fadeUp .4s ease both;
+}
+.login-logo{font-family:'Anton',sans-serif;font-size:28px;letter-spacing:3px;color:var(--txt);margin-bottom:4px}
+.login-sub{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:28px}
+.login-divider{display:flex;align-items:center;gap:10px;margin:20px 0;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--b1)}
+.login-input{
+  width:100%;padding:11px 14px;font-size:14px;
+  background:var(--faint);border:1px solid var(--b1);
+  border-radius:4px;color:var(--txt);outline:none;
+  font-family:'Barlow',sans-serif;text-align:center;
+  letter-spacing:3px;margin-bottom:8px;transition:border-color .2s
+}
+.login-input:focus{border-color:var(--gold)}
+.login-input::placeholder{letter-spacing:1px;color:var(--b2)}
+.login-btn{
+  width:100%;padding:11px;font-size:12px;font-weight:700;
+  border:none;border-radius:4px;cursor:pointer;
+  font-family:'Anton',sans-serif;letter-spacing:2px;
+  text-transform:uppercase;transition:all .2s;margin-bottom:8px
+}
+.login-btn.primary{background:var(--gold);color:#000}
+.login-btn.primary:hover{background:#ffe44d}
+.login-btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--b2);letter-spacing:1.5px;font-size:11px}
+.login-btn.ghost:hover{border-color:var(--b2);color:var(--txt)}
+.login-err{font-size:11px;color:var(--r);margin-bottom:8px;min-height:16px}
+.login-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px;
+  text-transform:uppercase;letter-spacing:.5px;margin-left:10px;vertical-align:middle
+}
+.badge-selger{background:rgba(255,215,0,.15);color:var(--gold);border:1px solid rgba(255,215,0,.3)}
+.badge-tilskuer{background:rgba(90,120,152,.15);color:var(--muted);border:1px solid var(--b1)}
 </style>
 </head>
 <body>
-<div id="intro-overlay">
+<div id="intro-overlay" style="display:none">
   <!-- Background lines -->
   <div class="intro-bg-lines" id="intro-lines"></div>
 
@@ -314,6 +358,24 @@ input::placeholder{color:var(--b2)}
 
 <div class="page">
 
+<div id="login-overlay">
+  <div class="login-box">
+    <div class="login-logo">VCSO</div>
+    <div class="login-sub">Championship 2026</div>
+
+    <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6">
+      Logg inn med selger-passord for å registrere salg,<br>eller fortsett som tilskuer for å følge med.
+    </div>
+
+    <input class="login-input" type="password" id="pw-input" placeholder="Passord" onkeydown="if(event.key==='Enter')tryLogin()">
+    <div class="login-err" id="pw-err"></div>
+    <button class="login-btn primary" onclick="tryLogin()">Logg inn som selger</button>
+
+    <div class="login-divider">eller</div>
+
+    <button class="login-btn ghost" onclick="enterAsGuest()">&#128065; Fortsett som tilskuer</button>
+  </div>
+</div>
 <div class="konfetti-wrap hide" id="konfetti"></div>
 <div id="status-bar"></div>
 
@@ -323,7 +385,7 @@ input::placeholder{color:var(--b2)}
       <div class="crest">&#9917;</div>
       <div>
         <div class="t1">VCSO CHAMPIONSHIP</div>
-        <div class="t2">Mai &amp; Juni 2026 &middot; 3 poeng per salg &middot; Levering innen 30. juni</div>
+        <div class="t2">Mai &amp; Juni 2026 &middot; 3 poeng per salg &middot; Levering innen 30. juni <span class="login-badge" id="role-badge"></span></div>
       </div>
     </div>
     <div class="cd-row">
@@ -485,7 +547,7 @@ input::placeholder{color:var(--b2)}
   <div class="scoring-grid" id="scoring-grid"></div>
 </div>
 
-<div class="reg-outer">
+<div class="reg-outer" id="reg-outer">
   <div class="reg-card">
     <div class="fg2">
       <select id="sel-selger"><option value="">Selger...</option></select>
@@ -1120,11 +1182,12 @@ function closeIntro(){
   setTimeout(function(){ov.style.display='none';},800);
 }
 
-populateSelgers();
-fetchSales();
+// populateSelgers og fetchSales kalles nå fra login-funksjonene
 countdown();
 setInterval(countdown,1000);
-setInterval(autoRefresh,120000); // hvert 2. minutt = ~43k req/mnd
+setInterval(function(){
+  if(userRole) autoRefresh(); // bare refresh om innlogget
+},120000);
 
 // ─── KONFETTI ────────────────────────────────────────────────────────
 function launchKonfetti(color){
@@ -1240,6 +1303,89 @@ function sendPushNotification(selger,modell,loc){
   window.addEventListener('load',function(){
     requestPushPermission();
   });
+})();
+
+// ─── PASSORD OG TILGANGSKONTROLL ─────────────────────────────────────
+// Endre passordet her:
+var SELGER_PASSWORD = 'vcso2026';
+
+var userRole = null; // 'selger' eller 'tilskuer'
+
+function tryLogin(){
+  var pw = document.getElementById('pw-input').value;
+  if(pw === SELGER_PASSWORD){
+    enterAsSelger();
+  } else {
+    var err = document.getElementById('pw-err');
+    err.textContent = 'Feil passord – prøv igjen';
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-input').focus();
+    setTimeout(function(){ err.textContent = ''; }, 3000);
+  }
+}
+
+function enterAsSelger(){
+  userRole = 'selger';
+  sessionStorage.setItem('vcso-role','selger');
+  document.getElementById('login-overlay').style.display = 'none';
+  document.getElementById('intro-overlay').style.display = 'flex';
+  document.getElementById('reg-outer').style.display = 'block';
+  updateRoleBadge();
+  populateSelgers();
+  fetchSales();
+  requestPushPermission();
+}
+
+function enterAsGuest(){
+  userRole = 'tilskuer';
+  sessionStorage.setItem('vcso-role','tilskuer');
+  document.getElementById('login-overlay').style.display = 'none';
+  document.getElementById('intro-overlay').style.display = 'flex';
+  document.getElementById('reg-outer').style.display = 'none';
+  updateRoleBadge();
+  populateSelgers();
+  fetchSales();
+}
+
+function updateRoleBadge(){
+  var badge = document.getElementById('role-badge');
+  if(!badge) return;
+  if(userRole === 'selger'){
+    badge.className = 'login-badge badge-selger';
+    badge.textContent = '⚽ Selger';
+  } else {
+    badge.className = 'login-badge badge-tilskuer';
+    badge.textContent = '👁 Tilskuer';
+  }
+}
+
+// Hide slett-knapp for guests in renderScoring
+var _origRenderScoring = renderScoring;
+renderScoring = function(){
+  _origRenderScoring();
+  if(userRole === 'tilskuer'){
+    document.querySelectorAll('.score-del').forEach(function(el){
+      el.style.display = 'none';
+    });
+  }
+};
+
+// Block reg() for guests (extra safety)
+var _origReg2 = reg;
+reg = function(){
+  if(userRole !== 'selger'){
+    toast('Du m\u00e5 logge inn som selger for \u00e5 registrere salg.');
+    return;
+  }
+  _origReg2();
+};
+
+// Check if already logged in this session
+(function(){
+  var saved = sessionStorage.getItem('vcso-role');
+  if(saved === 'selger') { enterAsSelger(); }
+  else if(saved === 'tilskuer') { enterAsGuest(); }
+  // else: stay on login screen
 })();
 
 </script>
