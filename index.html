@@ -997,6 +997,12 @@ function reg(){
     document.getElementById('reg-btn').textContent='Registrer scoring — +3 poeng!';
     if(err){ toast('Feil ved lagring: '+err.message); return; }
 
+    // Konfetti, push og MVP
+    var sObj2=SELGERE.find(function(x){return x.navn===selger;})||{};
+    launchKonfetti(LC[sObj2.loc]||'#ffd700');
+    sendPushNotification(selger,modell,sObj2.loc);
+    updateMVP();
+
     document.getElementById('sel-selger').value='';
     document.getElementById('sel-modell').value='';
     document.getElementById('chk-fin').checked=false;
@@ -1031,6 +1037,7 @@ function renderAll(){
   else if(curTab==='team')    renderTeam();
   else if(curTab==='stats')   renderStats();
   else if(curTab==='scoring') renderScoring();
+  updateMVP();
 }
 function countdown(){
   var diff=new Date('2026-06-30T23:59:59')-new Date();
@@ -1213,38 +1220,7 @@ function sendPushNotification(selger,modell,loc){
   } catch(e){}
 }
 
-// ─── PATCH renderAll OG reg() ─────────────────────────────────────────
-// Wrap the existing renderAll to also update MVP
-var _origRenderAll=renderAll;
-renderAll=function(){
-  _origRenderAll();
-  updateMVP();
-};
 
-// Wrap reg() to fire konfetti + push + MVP on success
-var _origReg=reg;
-reg=function(){
-  // Capture selger/loc before calling original
-  var selger=document.getElementById('sel-selger').value;
-  var modell=document.getElementById('sel-modell').value;
-  var sObj=SELGERE.find(function(x){return x.navn===selger;})||{};
-  var color=LC[sObj.loc]||'#ffd700';
-
-  // Override insertSale callback by patching temporarily
-  var _origInsert=insertSale;
-  insertSale=function(obj,cb){
-    _origInsert(obj,function(err){
-      if(!err){
-        launchKonfetti(color);
-        sendPushNotification(obj.selger,obj.modell,obj.loc);
-        updateMVP();
-      }
-      cb(err);
-    });
-  };
-  _origReg();
-  insertSale=_origInsert;
-};
 
 // ─── PUSH KNAPP I HEADER ─────────────────────────────────────────────
 (function(){
