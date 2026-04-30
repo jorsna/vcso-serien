@@ -149,9 +149,148 @@ input::placeholder{color:var(--b2)}
 
 .fin-active{border-color:var(--gold)!important;background:rgba(255,215,0,0.07)!important}
 .fin-box-active{border-color:var(--gold)!important;background:rgba(255,215,0,0.15)!important}
+
+/* INTRO ANIMATION */
+#intro-overlay{
+  position:fixed;inset:0;z-index:999;
+  background:#000;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  overflow:hidden;
+  transition:opacity .8s ease;
+}
+#intro-overlay.fade-out{opacity:0;pointer-events:none;}
+
+.intro-bg-lines{
+  position:absolute;inset:0;overflow:hidden;
+}
+.intro-line{
+  position:absolute;left:50%;width:1px;background:linear-gradient(to bottom,transparent,rgba(255,215,0,0.4),transparent);
+  transform-origin:top center;
+  animation:none;opacity:.4;height:100vh;
+}
+@keyframes lineGrow{from{height:0;opacity:0}to{height:100vh;opacity:1}}
+
+.intro-hexagons{position:absolute;inset:0;overflow:hidden}
+.intro-hex{
+  position:absolute;border:1px solid rgba(255,215,0,0.15);
+  width:120px;height:120px;transform:rotate(45deg);
+  animation:hexPulse 3s ease-in-out infinite;opacity:.15;
+}
+@keyframes hexPulse{0%,100%{opacity:.1;transform:rotate(45deg) scale(1)}50%{opacity:.3;transform:rotate(45deg) scale(1.05)}}
+
+.intro-logo{
+  position:relative;z-index:2;
+  font-family:'Anton',sans-serif;font-size:48px;letter-spacing:6px;
+  color:transparent;
+  background:linear-gradient(135deg,#fff 0%,var(--gold) 50%,#fff 100%);
+  background-size:200% auto;
+  -webkit-background-clip:text;background-clip:text;
+  animation:logoShine 3s linear infinite;
+  text-align:center;line-height:1;
+}
+@keyframes logoReveal{from{opacity:0;transform:translateY(20px) scale(.95)}to{opacity:1;transform:none}}
+@keyframes logoShine{to{background-position:200% center}}
+
+.intro-sub{
+  position:relative;z-index:2;
+  font-size:13px;letter-spacing:4px;text-transform:uppercase;
+  color:rgba(255,255,255,0.5);margin-top:10px;
+  opacity:1;
+  text-align:center;
+}
+.intro-season{
+  position:relative;z-index:2;
+  font-family:'Anton',sans-serif;font-size:18px;letter-spacing:3px;
+  color:var(--gold);margin-top:24px;
+  opacity:1;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+.intro-divider{
+  position:relative;z-index:2;
+  width:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  margin:20px auto;
+  width:260px;
+}
+@keyframes dividerGrow{from{width:0}to{width:260px}}
+
+.intro-teams{
+  position:relative;z-index:2;
+  display:flex;gap:32px;margin-top:8px;
+  animation:fadeUp .6s ease 1.4s both;
+}
+.intro-team{text-align:center}
+.intro-team-name{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:4px}
+.intro-team-goal{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:1px}
+
+.intro-countdown-wrap{
+  position:relative;z-index:2;margin-top:32px;
+  opacity:1;
+}
+.intro-countdown{
+  font-family:'Anton',sans-serif;font-size:72px;color:var(--gold);
+  text-align:center;line-height:1;letter-spacing:4px;
+  animation:countPulse .4s ease;
+}
+@keyframes countPulse{from{transform:scale(1.3);opacity:.5}to{transform:scale(1);opacity:1}}
+
+.intro-ready{
+  position:relative;z-index:2;margin-top:28px;
+  font-family:'Anton',sans-serif;font-size:14px;letter-spacing:4px;text-transform:uppercase;
+  color:#fff;opacity:0;transition:opacity .4s;
+  cursor:pointer;padding:12px 32px;
+  border:1px solid rgba(255,215,0,0.4);
+  background:rgba(255,215,0,0.1);
+  border-radius:3px;
+}
+.intro-ready:hover{background:rgba(255,215,0,0.2);}
+.intro-ready.show{opacity:1;}
+
+.intro-particles{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.intro-particle{
+  position:absolute;width:3px;height:3px;border-radius:50%;background:var(--gold);
+  animation:particleFly linear infinite;opacity:0;
+}
+@keyframes particleFly{
+  0%{opacity:0;transform:translateY(100vh) rotate(0deg)}
+  10%{opacity:.8}
+  90%{opacity:.8}
+  100%{opacity:0;transform:translateY(-20px) rotate(720deg)}
+}
 </style>
 </head>
 <body>
+<div id="intro-overlay">
+  <!-- Background lines -->
+  <div class="intro-bg-lines" id="intro-lines"></div>
+
+  <!-- Hexagon pattern -->
+  <div class="intro-hexagons" id="intro-hexagons"></div>
+
+  <!-- Particles -->
+  <div class="intro-particles" id="intro-particles"></div>
+
+  <!-- Content -->
+  <div class="intro-logo">VCSO</div>
+  <div class="intro-logo" style="font-size:32px;margin-top:-4px;animation-delay:.5s">CHAMPIONSHIP</div>
+  <div class="intro-sub">Volvo Car Stor Oslo &nbsp;&middot;&nbsp; Season 2026</div>
+
+
+
+  <div class="intro-countdown-wrap">
+    <div class="intro-countdown" id="intro-num">3</div>
+  </div>
+
+  <div style="display:flex;gap:12px;margin-top:28px;animation:none">
+    <button class="intro-ready show" onclick="closeIntro()" style="opacity:1;margin-top:0">
+      &#9654; &nbsp; Til tabellen
+    </button>
+    <button class="intro-ready show" onclick="closeIntro();setTimeout(function(){document.getElementById('help-modal').classList.add('show');},400)" style="opacity:1;margin-top:0;background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.2);color:rgba(255,255,255,0.7)">
+      &#9432; &nbsp; Slik fungerer det
+    </button>
+  </div>
+</div>
+
 <div class="page">
 
 <div id="status-bar"></div>
@@ -173,6 +312,53 @@ input::placeholder{color:var(--b2)}
       <div class="cd-box"><div class="cd-n" id="cdm">--</div><div class="cd-l">m</div></div>
       <div class="cd-sep">:</div>
       <div class="cd-box"><div class="cd-n" id="cds">--</div><div class="cd-l">s</div></div>
+    </div>
+    <button onclick="document.getElementById('help-modal').classList.add('show')" style="margin-left:10px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.35);border-radius:4px;padding:0 10px;height:28px;color:var(--gold);font-size:11px;cursor:pointer;font-weight:700;flex-shrink:0;transition:all .2s;display:flex;align-items:center;gap:5px;letter-spacing:.5px;white-space:nowrap" title="Hjelp">
+      <span style="font-size:13px">?</span> Slik fungerer det
+    </button>
+  </div>
+</div>
+
+<!-- HELP MODAL -->
+<div class="modal-overlay" id="help-modal">
+  <div class="modal" style="max-width:480px;text-align:left">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div class="modal-title" style="color:var(--gold);margin:0">&#9432; Slik bruker du VCSO Championship</div>
+      <button onclick="document.getElementById('help-modal').classList.remove('show')" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1">&times;</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;font-size:13px;color:var(--muted);line-height:1.6">
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="font-family:'Anton',sans-serif;font-size:20px;color:var(--gold);flex-shrink:0;line-height:1">1</div>
+        <div><strong style="color:var(--txt)">Registrer et salg</strong><br>Velg selger og modell i skjemaet nederst. Trykk den gule knappen. Salget lagres automatisk og vises for alle med lenken.</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="font-family:'Anton',sans-serif;font-size:20px;color:var(--gold);flex-shrink:0;line-height:1">2</div>
+        <div><strong style="color:var(--txt)">Finansiert</strong><br>Huk av "Finansiert" om kunden valgte finansiering. Bilen får da et gyllent &#9670; FINANSIERT-stempel i Scoringer-fanen.</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="font-family:'Anton',sans-serif;font-size:20px;color:var(--gold);flex-shrink:0;line-height:1">3</div>
+        <div><strong style="color:var(--txt)">Fanene</strong><br>
+          <strong style="color:var(--txt)">Selgere</strong> – individuell poengrangering med form siste 5 dager.<br>
+          <strong style="color:var(--txt)">Avdelinger</strong> – Ryen, Fornebu og Lillestrøm mot sine mål.<br>
+          <strong style="color:var(--txt)">Statistikk</strong> – toppscorere og aktivitet.<br>
+          <strong style="color:var(--txt)">Scoringer</strong> – alle solgte biler med bilde.
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="font-family:'Anton',sans-serif;font-size:20px;color:var(--gold);flex-shrink:0;line-height:1">4</div>
+        <div><strong style="color:var(--txt)">Slett et salg</strong><br>Gå til Scoringer-fanen, hold musen over en bil og trykk "Slett".</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="font-family:'Anton',sans-serif;font-size:20px;color:var(--gold);flex-shrink:0;line-height:1">5</div>
+        <div><strong style="color:var(--txt)">Poeng</strong><br>1 salg = 3 poeng. Bilen må leveres innen 30. juni for å telle.</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="font-family:'Anton',sans-serif;font-size:20px;color:var(--gold);flex-shrink:0;line-height:1">6</div>
+        <div><strong style="color:var(--txt)">Live-oppdatering</strong><br>Siden oppdateres automatisk hvert 2. minutt og henter siste salg fra alle avdelinger. Du trenger ikke refreshe manuelt.</div>
+      </div>
+      <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.2);border-radius:4px;padding:10px 12px;font-size:11px">
+        &#128308; Rød form-prikk = ingen salg den dagen &nbsp;&nbsp; &#128994; Grønn = solgt bil &nbsp;&nbsp; &#128993; Gul = solgt, men ikke i rute
+      </div>
     </div>
   </div>
 </div>
@@ -799,6 +985,15 @@ function autoRefresh(){
   fetchSales();
 }
 
+// Keepalive: ping Supabase hvert 5. min for å hindre pause-modus
+// Bruker HEAD request (teller ikke som data-forespørsel)
+setInterval(function(){
+  fetch(SUPABASE_URL + '/rest/v1/', {
+    method:'HEAD',
+    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}
+  }).catch(function(){});
+}, 300000);
+
 function toggleFin(){
   var chk=document.getElementById('chk-fin');
   chk.checked=!chk.checked;
@@ -808,11 +1003,80 @@ function toggleFin(){
   document.getElementById('chk-box').classList.toggle('fin-box-active',on);
   document.getElementById('fin-label').classList.toggle('fin-active',on);
 }
+// ─── INTRO ANIMATION ─────────────────────────────────────────────────
+(function(){
+
+
+  // Background lines
+  var lines=document.getElementById('intro-lines');
+  for(var i=0;i<12;i++){
+    var l=document.createElement('div');
+    l.className='intro-line';
+    l.style.left=(8+i*7.5)+'%';
+    l.style.animationDelay=(i*0.08)+'s';
+    l.style.height=(40+Math.random()*60)+'vh';
+    l.style.top=Math.random()*20+'vh';
+    lines.appendChild(l);
+  }
+
+  // Hexagons
+  var hexWrap=document.getElementById('intro-hexagons');
+  [[10,10],[80,5],[5,70],[85,75],[45,5],[50,85],[15,45],[75,40]].forEach(function(pos){
+    var h=document.createElement('div');
+    h.className='intro-hex';
+    h.style.left=pos[0]+'%'; h.style.top=pos[1]+'%';
+    h.style.animationDelay=(Math.random()*2)+'s';
+    h.style.width=(60+Math.random()*80)+'px';
+    h.style.height=(60+Math.random()*80)+'px';
+    hexWrap.appendChild(h);
+  });
+
+  // Particles
+  var partWrap=document.getElementById('intro-particles');
+  for(var p=0;p<20;p++){
+    var pt=document.createElement('div');
+    pt.className='intro-particle';
+    pt.style.left=(Math.random()*100)+'%';
+    pt.style.animationDuration=(3+Math.random()*4)+'s';
+    pt.style.animationDelay=(Math.random()*3)+'s';
+    pt.style.width=pt.style.height=(1+Math.random()*3)+'px';
+    partWrap.appendChild(pt);
+  }
+
+  // Countdown 3-2-1-GO
+  var nums=['3','2','1','GO!'];
+  var idx=0;
+  var el=document.getElementById('intro-num');
+  var btn=document.getElementById('intro-ready-btn');
+
+  function tick(){
+    if(idx>=nums.length){
+      return;
+    }
+    el.textContent=nums[idx];
+    el.style.animation='none';
+    void el.offsetWidth; // reflow
+    el.style.animation='countPulse .4s ease';
+    el.style.color=idx===nums.length-1?'#fff':'var(--gold)';
+    if(idx===nums.length-1) el.style.fontSize='48px';
+    idx++;
+    setTimeout(tick, idx===nums.length?600:900);
+  }
+
+  setTimeout(tick, 400);
+})();
+
+function closeIntro(){
+  var ov=document.getElementById('intro-overlay');
+  ov.classList.add('fade-out');
+  setTimeout(function(){ov.style.display='none';},800);
+}
+
 populateSelgers();
 fetchSales();
 countdown();
 setInterval(countdown,1000);
-setInterval(autoRefresh,30000);
+setInterval(autoRefresh,120000); // hvert 2. minutt = ~43k req/mnd
 
 </script>
 </body>
