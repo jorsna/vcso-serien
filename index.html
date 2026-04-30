@@ -159,7 +159,7 @@ input::placeholder{color:var(--b2)}
       <div class="crest">&#9917;</div>
       <div>
         <div class="t1">VCSO CHAMPIONSHIP</div>
-        <div class="t2">Mai &amp; Juni 2026 &middot; 3 poeng per salg</div>
+        <div class="t2">Mai &amp; Juni 2026 &middot; 3 poeng per salg &middot; Levering innen 30. juni</div>
       </div>
     </div>
     <div class="cd-row">
@@ -266,7 +266,6 @@ input::placeholder{color:var(--b2)}
       </div>
       <div id="fin-badge" style="margin-left:auto;font-family:'Anton',sans-serif;font-size:11px;letter-spacing:1.5px;color:var(--gold);opacity:0;transition:opacity .2s">&#9670; FINANSIERT</div>
     </label>
-    <input type="hidden" id="sel-loc" value="">
     <button id="reg-btn" onclick="reg()">Registrer scoring &mdash; +3 poeng!</button>
     <div class="toast" id="toast"></div>
   </div>
@@ -713,10 +712,7 @@ function populateSelgers(){
   });
 }
 
-document.getElementById('sel-selger').addEventListener('change',function(){
-  var sObj=SELGERE.find(function(x){return x.navn===this.value;}.bind(this));
-  if(sObj) document.getElementById('sel-loc').value=sObj.loc;
-}.bind(document.getElementById('sel-selger')));
+
 
 function reg(){
   var selger=document.getElementById('sel-selger').value;
@@ -735,7 +731,7 @@ function reg(){
          String(now.getHours()).padStart(2,'0')+':'+
          String(now.getMinutes()).padStart(2,'0')+':00';
 
-  var sObj=SELGERE.find(function(x){return x.navn===selger;})||{};
+  var sObj=SELGERE.find(function(x){return x.navn===selger;})||{loc:''};
 
   var finansiert=document.getElementById('chk-fin').checked;
   var obj={selger:selger, modell:modell, loc:sObj.loc||'', mnd:mnd, ts:ts, finansiert:finansiert};
@@ -750,7 +746,6 @@ function reg(){
 
     document.getElementById('sel-selger').value='';
     document.getElementById('sel-modell').value='';
-    document.getElementById('sel-loc').value='';
     document.getElementById('chk-fin').checked=false;
     document.getElementById('fin-badge').style.opacity='0';
     document.getElementById('fin-label').style.borderColor='var(--b1)';
