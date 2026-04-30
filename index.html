@@ -717,7 +717,8 @@ function reg(){
 
   var now=new Date();
   var mo=now.getMonth()+1;
-  var mnd=mo===5?'mai':mo===6?'jun':'';
+  // april (4) telles som 'mai' for testformål – fjernes før lansering
+  var mnd=mo===5?'mai':mo===6?'jun':mo===4?'mai':'';
   if(!mnd){toast('Konkurransen gjelder mai og juni. Feil måned!');return;}
 
   var ts=now.getFullYear()+'-'+String(mo).padStart(2,'0')+'-'+
