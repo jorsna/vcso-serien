@@ -1151,13 +1151,25 @@ function launchKonfetti(color){
 
 // ─── STREAK BEREGNING ────────────────────────────────────────────────
 function streakCount(navn){
-  // Teller antall sammenhengende dager bakover fra i dag med minst ett salg
+  // Teller sammenhengende arbeidsdager med salg bakover.
+  // Helgedager (lørdag=6, søndag=0) hoppes over HVIS ingen salg den dagen.
+  // Hvis det ER registrert salg i helgen, teller de positivt.
   var streak=0;
-  for(var i=0;i<30;i++){
-    var d=daysAgo(i);
-    var hadSale=sales.some(function(s){return s.selger===navn&&tsDate(s.ts)===d;});
-    if(hadSale) streak++;
-    else if(i>0) break; // hull i streaken = stopp (i dag uten salg er ok)
+  var d=new Date();
+  for(var i=0;i<60;i++){
+    var dateStr2=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    var dow=d.getDay(); // 0=søn, 6=lør
+    var hadSale=sales.some(function(s){return s.selger===navn&&tsDate(s.ts)===dateStr2;});
+    if(hadSale){
+      streak++; // Solgt denne dagen – teller alltid
+    } else if(dow===0||dow===6){
+      // Helg uten salg – hopp over, ikke bryt streaken
+    } else if(i===0){
+      // I dag (hverdag) uten salg – ok, ikke bryt ennå
+    } else {
+      break; // Hverdag uten salg = brutt streak
+    }
+    d.setDate(d.getDate()-1); // gå én dag tilbake
   }
   return streak;
 }
