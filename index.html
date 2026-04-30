@@ -279,12 +279,7 @@ input::placeholder{color:var(--b2)}
 .mvp-av img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%)}
 .mvp-av-init{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
 
-/* LOGIN MODAL */
-#login-overlay{
-  position:fixed;inset:0;z-index:1000;
-  background:#07090d;
-  display:flex;align-items:center;justify-content:center;
-}
+/* LOGIN merged into intro-overlay */
 .login-box{
   background:var(--card);border:1px solid var(--b2);
   border-radius:8px;padding:32px 28px;
@@ -325,55 +320,63 @@ input::placeholder{color:var(--b2)}
 </style>
 </head>
 <body>
-<div id="intro-overlay" style="display:none">
-  <!-- Background lines -->
+<div id="intro-overlay" style="display:flex">
+  <!-- Background decorations (static) -->
   <div class="intro-bg-lines" id="intro-lines"></div>
-
-  <!-- Hexagon pattern -->
   <div class="intro-hexagons" id="intro-hexagons"></div>
-
-  <!-- Particles -->
   <div class="intro-particles" id="intro-particles"></div>
 
-  <!-- Content -->
+  <!-- LOGO -->
   <div class="intro-logo">VCSO</div>
-  <div class="intro-logo" style="font-size:32px;margin-top:-4px;animation-delay:.5s">CHAMPIONSHIP</div>
+  <div class="intro-logo" style="font-size:32px;margin-top:-4px">CHAMPIONSHIP</div>
   <div class="intro-sub">Volvo Car Stor Oslo &nbsp;&middot;&nbsp; Season 2026</div>
 
+  <div class="intro-divider" style="width:260px;margin:20px auto"></div>
 
-
+  <!-- TAGLINE -->
   <div class="intro-countdown-wrap">
-    <div style="font-family:'Anton',sans-serif;font-size:22px;letter-spacing:3px;color:#fff;text-align:center;text-transform:uppercase;opacity:.9;margin-top:8px">La kampen om lagerbilene begynne</div>
+    <div style="font-family:'Anton',sans-serif;font-size:20px;letter-spacing:3px;color:#fff;text-align:center;text-transform:uppercase;opacity:.9">La kampen om lagerbilene begynne</div>
   </div>
 
-  <div style="display:flex;gap:12px;margin-top:28px;animation:none">
-    <button class="intro-ready show" onclick="closeIntro()" style="opacity:1;margin-top:0">
-      &#9654; &nbsp; Til tabellen
+  <!-- PASSWORD FIELD -->
+  <div id="login-section" style="margin-top:28px;width:100%;max-width:320px;display:flex;flex-direction:column;gap:10px;align-items:center">
+    <input
+      class="login-input"
+      type="password"
+      id="pw-input"
+      placeholder="Skriv inn passord"
+      onkeydown="if(event.key==='Enter')tryLogin()"
+      style="width:100%;text-align:center;font-size:15px;padding:14px;letter-spacing:4px"
+    >
+    <div class="login-err" id="pw-err" style="min-height:14px;font-size:11px"></div>
+
+    <!-- Selger button -->
+    <button onclick="tryLogin()" style="
+      width:100%;padding:16px;
+      font-family:'Anton',sans-serif;font-size:16px;letter-spacing:3px;text-transform:uppercase;
+      background:var(--gold);color:#000;border:none;border-radius:5px;cursor:pointer;
+      transition:background .2s;
+    " onmouseover="this.style.background='#ffe44d'" onmouseout="this.style.background='var(--gold)'">
+      &#9917; &nbsp; Logg inn som selger
     </button>
-    <button class="intro-ready show" onclick="closeIntro();setTimeout(function(){document.getElementById('help-modal').classList.add('show');},400)" style="opacity:1;margin-top:0;background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.2);color:rgba(255,255,255,0.7)">
-      &#9432; &nbsp; Slik fungerer det
-    </button>
-  </div>
-</div>
 
-<div class="page">
-
-<div id="login-overlay">
-  <div class="login-box">
-    <div class="login-logo">VCSO</div>
-    <div class="login-sub">Championship 2026</div>
-
-    <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6">
-      Logg inn med selger-passord for å registrere salg,<br>eller fortsett som tilskuer for å følge med.
+    <!-- Divider -->
+    <div style="display:flex;align-items:center;gap:10px;width:100%;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">
+      <div style="flex:1;height:1px;background:var(--b1)"></div>
+      eller
+      <div style="flex:1;height:1px;background:var(--b1)"></div>
     </div>
 
-    <input class="login-input" type="password" id="pw-input" placeholder="Passord" onkeydown="if(event.key==='Enter')tryLogin()">
-    <div class="login-err" id="pw-err"></div>
-    <button class="login-btn primary" onclick="tryLogin()">Logg inn som selger</button>
-
-    <div class="login-divider">eller</div>
-
-    <button class="login-btn ghost" onclick="enterAsGuest()">&#128065; Fortsett som tilskuer</button>
+    <!-- Tilskuer button -->
+    <button onclick="enterAsGuest()" style="
+      width:100%;padding:14px;
+      font-family:'Anton',sans-serif;font-size:14px;letter-spacing:3px;text-transform:uppercase;
+      background:transparent;color:var(--muted);
+      border:1px solid var(--b2);border-radius:5px;cursor:pointer;
+      transition:all .2s;
+    " onmouseover="this.style.borderColor='var(--silver)';this.style.color='var(--txt)'" onmouseout="this.style.borderColor='var(--b2)';this.style.color='var(--muted)'">
+      &#128065; &nbsp; Tilskuer
+    </button>
   </div>
 </div>
 <div class="konfetti-wrap hide" id="konfetti"></div>
@@ -1325,11 +1328,10 @@ function tryLogin(){
 }
 
 function enterAsSelger(){
-  userRole = 'selger';
+  userRole='selger';
   sessionStorage.setItem('vcso-role','selger');
-  document.getElementById('login-overlay').style.display = 'none';
-  document.getElementById('intro-overlay').style.display = 'flex';
-  document.getElementById('reg-outer').style.display = 'block';
+  closeIntro();
+  document.getElementById('reg-outer').style.display='block';
   updateRoleBadge();
   populateSelgers();
   fetchSales();
@@ -1337,11 +1339,10 @@ function enterAsSelger(){
 }
 
 function enterAsGuest(){
-  userRole = 'tilskuer';
+  userRole='tilskuer';
   sessionStorage.setItem('vcso-role','tilskuer');
-  document.getElementById('login-overlay').style.display = 'none';
-  document.getElementById('intro-overlay').style.display = 'flex';
-  document.getElementById('reg-outer').style.display = 'none';
+  closeIntro();
+  document.getElementById('reg-outer').style.display='none';
   updateRoleBadge();
   populateSelgers();
   fetchSales();
@@ -1382,10 +1383,10 @@ reg = function(){
 
 // Check if already logged in this session
 (function(){
-  var saved = sessionStorage.getItem('vcso-role');
-  if(saved === 'selger') { enterAsSelger(); }
-  else if(saved === 'tilskuer') { enterAsGuest(); }
-  // else: stay on login screen
+  var saved=sessionStorage.getItem('vcso-role');
+  if(saved==='selger'){ enterAsSelger(); }
+  else if(saved==='tilskuer'){ enterAsGuest(); }
+  // else: show the combined intro/login screen
 })();
 
 </script>
