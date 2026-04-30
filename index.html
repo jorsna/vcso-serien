@@ -158,8 +158,8 @@ input::placeholder{color:var(--b2)}
     <div class="brand">
       <div class="crest">&#9917;</div>
       <div>
-        <div class="t1">VCSO SERIEN</div>
-        <div class="t2">Season 2026 &middot; Mai &amp; Juni &middot; 3 poeng per salg</div>
+        <div class="t1">VCSO CHAMPIONSHIP</div>
+        <div class="t2">Mai &amp; Juni 2026 &middot; 3 poeng per salg</div>
       </div>
     </div>
     <div class="cd-row">
@@ -184,7 +184,7 @@ input::placeholder{color:var(--b2)}
 <div class="mbar">
   <div>
     <div class="mbar-l">Periode</div>
-    <div class="mbar-v" id="mbar-v">Mai + Juni 2026</div>
+    <div class="mbar-v" id="mbar-v">VCSO Championship 2026</div>
   </div>
   <div class="mtabs">
     <button class="mt on" onclick="setMonth('all',this)">Begge</button>
@@ -679,7 +679,7 @@ function setMonth(m,btn){
   curMonth=m;
   document.querySelectorAll('.mt').forEach(function(t){t.classList.remove('on');});
   btn.classList.add('on');
-  var labels={all:'Mai + Juni 2026',mai:'Mai 2026',jun:'Juni 2026'};
+  var labels={all:'VCSO Championship 2026',mai:'Mai 2026',jun:'Juni 2026'};
   document.getElementById('mbar-v').textContent=labels[m]||m;
   renderAll();
 }
