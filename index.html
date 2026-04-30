@@ -257,6 +257,27 @@ input::placeholder{color:var(--b2)}
   90%{opacity:.8}
   100%{opacity:0;transform:translateY(-20px) rotate(720deg)}
 }
+
+/* KONFETTI */
+.konfetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:998;overflow:hidden}
+.konfetti-wrap.hide{display:none}
+.kbit{position:absolute;top:-10px;width:8px;height:8px;border-radius:2px;opacity:0;animation:kfall linear forwards}
+@keyframes kfall{
+  0%{transform:translateY(0) rotate(0deg);opacity:1}
+  80%{opacity:1}
+  100%{transform:translateY(105vh) rotate(720deg);opacity:0}
+}
+
+/* MVP BANNER */
+.mvp-banner{display:none;padding:10px 16px;background:linear-gradient(135deg,rgba(255,215,0,.12),rgba(255,215,0,.05));border-bottom:1px solid rgba(255,215,0,.25);align-items:center;gap:12px}
+.mvp-banner.show{display:flex}
+.mvp-crown{font-size:22px;flex-shrink:0}
+.mvp-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gold)}
+.mvp-name{font-size:15px;font-weight:700;color:var(--txt)}
+.mvp-stat{font-size:11px;color:var(--muted)}
+.mvp-av{width:34px;height:34px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0}
+.mvp-av img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%)}
+.mvp-av-init{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
 </style>
 </head>
 <body>
@@ -293,6 +314,7 @@ input::placeholder{color:var(--b2)}
 
 <div class="page">
 
+<div class="konfetti-wrap hide" id="konfetti"></div>
 <div id="status-bar"></div>
 
 <div class="hdr">
@@ -354,7 +376,19 @@ input::placeholder{color:var(--b2)}
       </div>
       <div style="display:flex;gap:12px;align-items:flex-start">
         <div style="font-family:'Anton',sans-serif;font-size:20px;color:var(--gold);flex-shrink:0;line-height:1">6</div>
-        <div><strong style="color:var(--txt)">Live-oppdatering</strong><br>Siden oppdateres automatisk hvert 2. minutt og henter siste salg fra alle avdelinger. Du trenger ikke refreshe manuelt.</div>
+        <div><strong style="color:var(--txt)">Dagens MVP &#128081;</strong><br>Den selgeren med flest salg i dag vises øverst med krone og profilbilde. Oppdateres automatisk gjennom dagen.</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="font-family:'Anton',sans-serif;font-size:20px;color:var(--gold);flex-shrink:0;line-height:1">7</div>
+        <div><strong style="color:var(--txt)">Streak &#128293;</strong><br>Selgere som har solgt bil flere dager på rad får et &#128293;-ikon ved siden av navnet. 3 dager på rad eller mer vises som en aktiv streak.</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="font-family:'Anton',sans-serif;font-size:20px;color:var(--gold);flex-shrink:0;line-height:1">8</div>
+        <div><strong style="color:var(--txt)">Varsler &#128276;</strong><br>Første gang du åpner siden spør nettleseren om lov til å sende varsler. Godtar du får du en push-notifikasjon hver gang noen scorer.</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="font-family:'Anton',sans-serif;font-size:20px;color:var(--gold);flex-shrink:0;line-height:1">9</div>
+        <div><strong style="color:var(--txt)">Live-oppdatering</strong><br>Siden oppdateres automatisk hvert 2. minutt. Du trenger ikke refreshe manuelt.</div>
       </div>
       <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.2);border-radius:4px;padding:10px 12px;font-size:11px">
         &#128308; Rød form-prikk = ingen salg den dagen &nbsp;&nbsp; &#128994; Grønn = solgt bil &nbsp;&nbsp; &#128993; Gul = solgt, men ikke i rute
@@ -382,6 +416,16 @@ input::placeholder{color:var(--b2)}
   </div>
 </div>
 
+<!-- MVP BANNER -->
+<div class="mvp-banner" id="mvp-banner">
+  <div class="mvp-crown">&#128081;</div>
+  <div class="mvp-av" id="mvp-av"><div class="mvp-av-init" id="mvp-av-init"></div></div>
+  <div>
+    <div class="mvp-label">Dagens MVP</div>
+    <div class="mvp-name" id="mvp-name">–</div>
+    <div class="mvp-stat" id="mvp-stat"></div>
+  </div>
+</div>
 <div class="view on" id="view-ind">
   <div class="tbl-head">
     <div>#</div><div></div><div>Spiller</div>
@@ -724,7 +768,7 @@ function renderInd(){
       '<div class="pos-n" style="color:'+pc+'">'+(i+1)+'</div>'+
       '<div><div class=\"av\" style=\"background:'+r.bg+';color:'+r.color+';overflow:hidden;padding:0\">'+(SELGER_PHOTOS[r.id]?'<img src=\"'+SELGER_PHOTOS[r.id]+'\" style=\"width:100%;height:100%;object-fit:cover;filter:grayscale(100%)\" alt=\"'+r.initials+'\">':r.initials)+'</div></div>'+
       '<div class="name-c">'+
-        '<div class="name-main">'+r.navn+'</div>'+
+        '<div class="name-main">'+r.navn+(streakCount(r.navn)>=3?' <span title="'+streakCount(r.navn)+' dager p\u00e5 rad!" style="font-size:13px">\uD83D\uDD25</span>':'')+'</div>'+
         '<div class="name-sub">'+(LL[r.loc]||r.loc)+'</div>'+
       '</div>'+
       '<div class="sc">'+r.g+'</div>'+
@@ -1074,6 +1118,141 @@ fetchSales();
 countdown();
 setInterval(countdown,1000);
 setInterval(autoRefresh,120000); // hvert 2. minutt = ~43k req/mnd
+
+// ─── KONFETTI ────────────────────────────────────────────────────────
+function launchKonfetti(color){
+  var wrap=document.getElementById('konfetti');
+  wrap.classList.remove('hide');
+  wrap.innerHTML='';
+  var colors=color
+    ?[color,'#ffffff',color+'99']
+    :['#ffd700','#ffffff','#3b82f6','#10b981','#f59e0b'];
+  for(var i=0;i<90;i++){
+    var bit=document.createElement('div');
+    bit.className='kbit';
+    bit.style.left=(Math.random()*100)+'%';
+    bit.style.background=colors[Math.floor(Math.random()*colors.length)];
+    bit.style.width=(6+Math.random()*8)+'px';
+    bit.style.height=(6+Math.random()*8)+'px';
+    bit.style.borderRadius=Math.random()>.5?'50%':'2px';
+    bit.style.animationDuration=(1.5+Math.random()*2)+'s';
+    bit.style.animationDelay=(Math.random()*1)+'s';
+    wrap.appendChild(bit);
+  }
+  setTimeout(function(){wrap.classList.add('hide');},3500);
+}
+
+// ─── STREAK BEREGNING ────────────────────────────────────────────────
+function streakCount(navn){
+  // Teller antall sammenhengende dager bakover fra i dag med minst ett salg
+  var streak=0;
+  for(var i=0;i<30;i++){
+    var d=daysAgo(i);
+    var hadSale=sales.some(function(s){return s.selger===navn&&tsDate(s.ts)===d;});
+    if(hadSale) streak++;
+    else if(i>0) break; // hull i streaken = stopp (i dag uten salg er ok)
+  }
+  return streak;
+}
+
+// ─── MVP BANNER ──────────────────────────────────────────────────────
+function updateMVP(){
+  var today=todayStr();
+  // Tell salg per selger i dag
+  var counts={};
+  sales.forEach(function(s){
+    if(tsDate(s.ts)===today){
+      counts[s.selger]=(counts[s.selger]||0)+1;
+    }
+  });
+  var best=null,bestN=0;
+  Object.keys(counts).forEach(function(navn){
+    if(counts[navn]>bestN){bestN=counts[navn];best=navn;}
+  });
+  var banner=document.getElementById('mvp-banner');
+  if(!best||bestN===0){banner.classList.remove('show');return;}
+  banner.classList.add('show');
+  document.getElementById('mvp-name').textContent=best;
+  document.getElementById('mvp-stat').textContent=bestN+' bil'+(bestN>1?' i dag':')+' i dag') ;
+  // Avatar
+  var sObj=SELGERE.find(function(x){return x.navn===best;})||{};
+  var avInit=document.getElementById('mvp-av-init');
+  avInit.style.background=sObj.bg||'rgba(255,215,0,.2)';
+  avInit.style.color=sObj.color||'var(--gold)';
+  if(typeof SELGER_PHOTOS!=='undefined'&&SELGER_PHOTOS[sObj.id]){
+    document.getElementById('mvp-av').innerHTML='<img src="'+SELGER_PHOTOS[sObj.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">';
+  } else {
+    avInit.textContent=sObj.initials||'?';
+  }
+}
+
+// ─── PUSH-VARSLER ────────────────────────────────────────────────────
+var pushEnabled=false;
+
+function requestPushPermission(){
+  if(!('Notification' in window)){return;}
+  if(Notification.permission==='granted'){pushEnabled=true;return;}
+  if(Notification.permission!=='denied'){
+    Notification.requestPermission().then(function(p){
+      pushEnabled=(p==='granted');
+    });
+  }
+}
+
+function sendPushNotification(selger,modell,loc){
+  if(!pushEnabled||Notification.permission!=='granted') return;
+  var lbl=LL[loc]||loc||'';
+  var streak=streakCount(selger);
+  var name=selger.split(' ')[0];
+  var body=lbl+' · '+modell+(streak>=3?' 🔥 '+streak+' dager på rad!':'');
+  try{
+    new Notification('⚽ '+name+' scorer!',{
+      body:body,
+      icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">⚽</text></svg>'
+    });
+  } catch(e){}
+}
+
+// ─── PATCH renderAll OG reg() ─────────────────────────────────────────
+// Wrap the existing renderAll to also update MVP
+var _origRenderAll=renderAll;
+renderAll=function(){
+  _origRenderAll();
+  updateMVP();
+};
+
+// Wrap reg() to fire konfetti + push + MVP on success
+var _origReg=reg;
+reg=function(){
+  // Capture selger/loc before calling original
+  var selger=document.getElementById('sel-selger').value;
+  var modell=document.getElementById('sel-modell').value;
+  var sObj=SELGERE.find(function(x){return x.navn===selger;})||{};
+  var color=LC[sObj.loc]||'#ffd700';
+
+  // Override insertSale callback by patching temporarily
+  var _origInsert=insertSale;
+  insertSale=function(obj,cb){
+    _origInsert(obj,function(err){
+      if(!err){
+        launchKonfetti(color);
+        sendPushNotification(obj.selger,obj.modell,obj.loc);
+        updateMVP();
+      }
+      cb(err);
+    });
+  };
+  _origReg();
+  insertSale=_origInsert;
+};
+
+// ─── PUSH KNAPP I HEADER ─────────────────────────────────────────────
+(function(){
+  // Add push toggle button after page load
+  window.addEventListener('load',function(){
+    requestPushPermission();
+  });
+})();
 
 </script>
 </body>
