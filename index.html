@@ -146,6 +146,9 @@ input::placeholder{color:var(--b2)}
 .modal-btns{display:flex;gap:8px}
 .modal-cancel{flex:1;padding:9px;font-size:12px;font-weight:700;background:transparent;color:var(--muted);border:1px solid var(--b2);border-radius:4px;cursor:pointer;font-family:'Barlow',sans-serif}
 .modal-confirm{flex:1;padding:9px;font-size:12px;font-weight:700;background:var(--r);color:#fff;border:none;border-radius:4px;cursor:pointer;font-family:'Barlow',sans-serif}
+
+.fin-active{border-color:var(--gold)!important;background:rgba(255,215,0,0.07)!important}
+.fin-box-active{border-color:var(--gold)!important;background:rgba(255,215,0,0.15)!important}
 </style>
 </head>
 <body>
@@ -258,7 +261,7 @@ input::placeholder{color:var(--b2)}
       <select id="sel-selger"><option value="">Selger...</option></select>
       <select id="sel-modell"><option value="">Modell...</option><option>EX30</option><option>EX40</option><option>EX60</option><option>EX90</option><option>EC40</option><option>ES90</option><option>XC40</option><option>XC60</option><option>XC90</option></select>
     </div>
-    <label id="fin-label" style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--faint);border:1px solid var(--b1);border-radius:4px;cursor:pointer;margin-bottom:6px;transition:border-color .2s" onmouseenter="this.style.borderColor='var(--gold)'" onmouseleave="this.style.borderColor='var(--b1)'">
+    <label id="fin-label" style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--faint);border:1px solid var(--b1);border-radius:4px;cursor:pointer;margin-bottom:6px;transition:border-color .2s" >
       <div id="chk-box" onclick="toggleFin()" style="width:22px;height:22px;border:2px solid var(--b2);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;cursor:pointer">
         <span id="chk-cross" style="font-size:14px;font-weight:900;color:var(--gold);display:none;line-height:1">&#10003;</span>
       </div>
@@ -751,11 +754,9 @@ function reg(){
     document.getElementById('sel-modell').value='';
     document.getElementById('chk-fin').checked=false;
     document.getElementById('chk-cross').style.display='none';
-    document.getElementById('chk-box').style.borderColor='var(--b2)';
-    document.getElementById('chk-box').style.background='transparent';
     document.getElementById('fin-badge').style.opacity='0';
-    document.getElementById('fin-label').style.borderColor='var(--b1)';
-    document.getElementById('fin-label').style.background='var(--faint)';
+    document.getElementById('chk-box').classList.remove('fin-box-active');
+    document.getElementById('fin-label').classList.remove('fin-active');
 
     var total=sales.filter(function(s){return s.selger===selger;}).length;
     var name=selger.split(' ')[0];
@@ -803,11 +804,9 @@ function toggleFin(){
   chk.checked=!chk.checked;
   var on=chk.checked;
   document.getElementById('chk-cross').style.display=on?'block':'none';
-  document.getElementById('chk-box').style.borderColor=on?'var(--gold)':'var(--b2)';
-  document.getElementById('chk-box').style.background=on?'rgba(255,215,0,0.15)':'transparent';
   document.getElementById('fin-badge').style.opacity=on?'1':'0';
-  document.getElementById('fin-label').style.borderColor=on?'var(--gold)':'var(--b1)';
-  document.getElementById('fin-label').style.background=on?'rgba(255,215,0,0.07)':'var(--faint)';
+  document.getElementById('chk-box').classList.toggle('fin-box-active',on);
+  document.getElementById('fin-label').classList.toggle('fin-active',on);
 }
 populateSelgers();
 fetchSales();
