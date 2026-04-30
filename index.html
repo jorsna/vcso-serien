@@ -254,11 +254,19 @@ input::placeholder{color:var(--b2)}
 
 <div class="reg-outer">
   <div class="reg-card">
-    <div class="fg3">
-      <select id="sel-loc"><option value="">Avdeling...</option><option value="ryen">Ryen</option><option value="lillestrom">Lillestr&oslash;m</option><option value="fornebu">Fornebu</option></select>
+    <div class="fg2">
       <select id="sel-selger"><option value="">Selger...</option></select>
       <select id="sel-modell"><option value="">Modell...</option><option>EX30</option><option>EX40</option><option>EX60</option><option>EX90</option><option>EC40</option><option>ES90</option><option>XC40</option><option>XC60</option><option>XC90</option></select>
     </div>
+    <label id="fin-label" style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--faint);border:1px solid var(--b1);border-radius:4px;cursor:pointer;margin-bottom:6px;transition:border-color .2s" onmouseenter="this.style.borderColor='var(--gold)'" onmouseleave="this.style.borderColor='var(--b1)'">
+      <input type="checkbox" id="chk-fin" style="width:18px;height:18px;accent-color:var(--gold);cursor:pointer;flex-shrink:0">
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--txt)">Finansiert</div>
+        <div style="font-size:10px;color:var(--muted)">Kunden har valgt finansiering</div>
+      </div>
+      <div id="fin-badge" style="margin-left:auto;font-family:'Anton',sans-serif;font-size:11px;letter-spacing:1.5px;color:var(--gold);opacity:0;transition:opacity .2s">&#9670; FINANSIERT</div>
+    </label>
+    <input type="hidden" id="sel-loc" value="">
     <button id="reg-btn" onclick="reg()">Registrer scoring &mdash; +3 poeng!</button>
     <div class="toast" id="toast"></div>
   </div>
@@ -637,6 +645,7 @@ function renderScoring(){
       (isNew?'<div class="score-new">NY</div>':'')+
       imgHtml+
       '<div class="score-modell">'+s.modell+'</div>'+
+      (s.finansiert?'<div style="font-family:Anton,sans-serif;font-size:10px;letter-spacing:2px;color:var(--gold);margin-top:3px;display:flex;align-items:center;gap:4px"><span style="font-size:8px">&#9670;</span> FINANSIERT</div>':'')+
       '<div class="score-selger">'+s.selger+'</div>'+
       '<div class="score-tid">'+lbl+' &middot; '+dateShow+' '+tp+'</div>'+
       '<div class="score-loc-bar" style="background:'+col+'"></div>'+
@@ -728,7 +737,8 @@ function reg(){
 
   var sObj=SELGERE.find(function(x){return x.navn===selger;})||{};
 
-  var obj={selger:selger, modell:modell, loc:sObj.loc||'', mnd:mnd, ts:ts};
+  var finansiert=document.getElementById('chk-fin').checked;
+  var obj={selger:selger, modell:modell, loc:sObj.loc||'', mnd:mnd, ts:ts, finansiert:finansiert};
 
   document.getElementById('reg-btn').disabled=true;
   document.getElementById('reg-btn').textContent='Lagrer...';
@@ -741,6 +751,10 @@ function reg(){
     document.getElementById('sel-selger').value='';
     document.getElementById('sel-modell').value='';
     document.getElementById('sel-loc').value='';
+    document.getElementById('chk-fin').checked=false;
+    document.getElementById('fin-badge').style.opacity='0';
+    document.getElementById('fin-label').style.borderColor='var(--b1)';
+    document.getElementById('fin-label').style.background='var(--faint)';
 
     var total=sales.filter(function(s){return s.selger===selger;}).length;
     var name=selger.split(' ')[0];
@@ -783,6 +797,11 @@ function autoRefresh(){
   fetchSales();
 }
 
+document.getElementById('chk-fin').addEventListener('change', function(){
+  document.getElementById('fin-badge').style.opacity = this.checked ? '1' : '0';
+  document.getElementById('fin-label').style.borderColor = this.checked ? 'var(--gold)' : 'var(--b1)';
+  document.getElementById('fin-label').style.background = this.checked ? 'rgba(255,215,0,0.07)' : 'var(--faint)';
+});
 populateSelgers();
 fetchSales();
 countdown();
