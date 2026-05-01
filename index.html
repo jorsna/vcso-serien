@@ -325,11 +325,22 @@ input::placeholder{color:var(--b2)}
 <!-- REGISTER -->
 <div class="reg-outer">
   <div class="reg-card">
-    <div class="fg3">
-      <select id="sel-loc"><option value="">Avdeling...</option><option value="ryen">Ryen</option><option value="lillestrom">Lillestr&oslash;m</option><option value="fornebu">Fornebu</option></select>
+    <input type="hidden" id="sel-loc" value="">
+    <div class="fg2">
       <select id="sel-selger"><option value="">Selger...</option></select>
       <select id="sel-modell"><option value="">Modell...</option><option>EX30</option><option>EX40</option><option>EX60</option><option>EX90</option><option>EC40</option><option>ES90</option><option>XC40</option><option>XC60</option><option>XC90</option></select>
     </div>
+    <label id="fin-label" style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--faint);border:1px solid var(--b1);border-radius:4px;cursor:pointer;margin-bottom:6px;transition:border-color .2s">
+      <div id="chk-box" onclick="toggleFin()" style="width:22px;height:22px;border:2px solid var(--b2);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;cursor:pointer">
+        <span id="chk-cross" style="font-size:15px;font-weight:900;color:var(--gold);display:none;line-height:1">&#10003;</span>
+      </div>
+      <input type="checkbox" id="chk-fin" style="display:none">
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--txt)">Finansiert</div>
+        <div style="font-size:10px;color:var(--muted)">Kunden har valgt finansiering</div>
+      </div>
+      <div id="fin-badge" style="margin-left:auto;font-family:'Anton',sans-serif;font-size:11px;letter-spacing:1.5px;color:var(--gold);opacity:0;transition:opacity .15s">&#9670; FINANSIERT</div>
+    </label>
     <button class="reg-btn" onclick="reg()">Registrer scoring &#8212; +3 poeng!</button>
     <div class="toast" id="toast"></div>
   </div>
@@ -860,6 +871,19 @@ function setLocFilter(loc,btn){
 }
 
 // ─── REGISTER ────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function(){
+  var selSelger = document.getElementById('sel-selger');
+  if(selSelger){
+    selSelger.addEventListener('change', function(){
+      var sObj = SELGERE.find(function(x){ return x.navn === this.value; }, this);
+      if(sObj){
+        var locField = document.getElementById('sel-loc');
+        if(locField) locField.value = sObj.loc;
+      }
+    });
+  }
+});
+
 function populateSelgers(){
   var sel=document.getElementById('sel-selger');
   if(sel.options.length>1) return;
