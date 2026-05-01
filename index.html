@@ -398,33 +398,31 @@ function closeIntro(){
   if(!ov) return;
   ov.style.opacity='0';
   ov.style.pointerEvents='none';
-  setTimeout(function(){ov.style.display='none';},800);
+  setTimeout(function(){ov.style.display='none';},300);
 }
 
 function enterAsSelger(){
   userRole='selger';
   sessionStorage.setItem('vcso-role','selger');
-  var ov=document.getElementById('intro-overlay');
-  ov.classList.add('fade-out');
-  setTimeout(function(){ov.style.display='none';},800);
+  closeIntro();
   document.getElementById('reg-outer').style.display='block';
   var eb=document.getElementById('export-btn');if(eb)eb.style.display='inline-flex';
   updateRoleBadge();
   populateSelgers();
-  fetchSales();
+  renderAll(); // Vis selgere umiddelbart fra hardkodet liste
+  fetchSales(); // Hent data fra Supabase i bakgrunnen
   if(typeof requestPushPermission==='function') requestPushPermission();
 }
 
 function enterAsGuest(){
   userRole='tilskuer';
   sessionStorage.setItem('vcso-role','tilskuer');
-  var ov=document.getElementById('intro-overlay');
-  ov.classList.add('fade-out');
-  setTimeout(function(){ov.style.display='none';},800);
+  closeIntro();
   document.getElementById('reg-outer').style.display='none';
   updateRoleBadge();
   populateSelgers();
-  fetchSales();
+  renderAll(); // Vis selgere umiddelbart
+  fetchSales(); // Hent data fra Supabase i bakgrunnen
 }
 
 function updateRoleBadge(){
