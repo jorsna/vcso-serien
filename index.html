@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VCSO Serien 2026</title>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<title>VCSO Championship 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -18,53 +18,127 @@
 html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);min-height:100vh}
 .page{max-width:800px;margin:0 auto}
 
+/* INTRO/LOGIN OVERLAY */
+#intro-overlay{
+  position:fixed;inset:0;z-index:999;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  overflow:hidden;transition:opacity .4s ease
+}
+#intro-overlay.fade-out{opacity:0;pointer-events:none}
+.intro-logo{font-family:'Anton',sans-serif;font-size:52px;letter-spacing:6px;
+  background:linear-gradient(135deg,#fff 0%,var(--gold) 50%,#fff 100%);
+  background-size:200% auto;-webkit-background-clip:text;background-clip:text;
+  color:transparent;text-align:center;line-height:1;
+  animation:logoShine 3s linear infinite}
+@keyframes logoShine{to{background-position:200% center}}
+.intro-sub{font-size:11px;letter-spacing:4px;text-transform:uppercase;
+  color:rgba(255,255,255,.5);margin-top:10px;text-align:center}
+.intro-divider{width:260px;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  margin:22px auto}
+.intro-tagline{font-family:'Anton',sans-serif;font-size:18px;letter-spacing:3px;
+  color:#fff;text-align:center;text-transform:uppercase;opacity:.9;margin-bottom:28px}
+.login-section{position:relative;z-index:2;width:100%;max-width:300px;
+  display:flex;flex-direction:column;gap:10px;align-items:center;padding:0 20px}
+.login-input{width:100%;padding:14px;font-size:15px;text-align:center;
+  letter-spacing:4px;background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,215,0,.3);border-radius:5px;color:#fff;
+  outline:none;font-family:'Barlow',sans-serif;transition:border-color .2s}
+.login-input:focus{border-color:rgba(255,215,0,.8)}
+.login-input::placeholder{letter-spacing:1px;color:rgba(255,255,255,.3)}
+.login-err{min-height:14px;font-size:11px;color:var(--r);text-align:center}
+.btn-selger{width:100%;padding:16px;font-family:'Anton',sans-serif;font-size:16px;
+  letter-spacing:3px;text-transform:uppercase;background:var(--gold);color:#000;
+  border:none;border-radius:5px;cursor:pointer;transition:background .2s}
+.btn-selger:hover{background:#ffe44d}
+.btn-divider{display:flex;align-items:center;gap:10px;width:100%;
+  font-size:10px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.5px}
+.btn-divider::before,.btn-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.1)}
+.btn-tilskuer{width:100%;padding:14px;font-family:'Anton',sans-serif;font-size:14px;
+  letter-spacing:2px;text-transform:uppercase;background:transparent;
+  color:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.15);
+  border-radius:5px;cursor:pointer;transition:all .2s}
+.btn-tilskuer:hover{border-color:rgba(255,255,255,.4);color:rgba(255,255,255,.8)}
+
+/* KONFETTI */
+.konfetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:998;overflow:hidden}
+.konfetti-wrap.hide{display:none}
+.kbit{position:absolute;top:-10px;border-radius:2px;opacity:0;animation:kfall linear forwards}
+@keyframes kfall{0%{transform:translateY(0) rotate(0deg);opacity:1}80%{opacity:1}100%{transform:translateY(105vh) rotate(720deg);opacity:0}}
+
+/* STATUS BAR */
+#status-bar{display:none;padding:8px 16px;font-size:11px;font-weight:600;text-align:center;border-bottom:1px solid var(--b1)}
+
 /* HEADER */
 .hdr{background:var(--card);border-bottom:3px solid var(--gold);padding:0 18px}
-.hdr-in{display:flex;justify-content:space-between;align-items:center;padding:13px 0}
-.brand{display:flex;align-items:center;gap:12px}
-.crest{width:44px;height:44px;border-radius:50%;background:#1a3060;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.t1{font-family:'Anton',sans-serif;font-size:20px;letter-spacing:2px;line-height:1}
-.t2{font-size:10px;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-top:1px}
+.hdr-in{display:flex;justify-content:space-between;align-items:center;padding:13px 0;gap:10px}
+.brand{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.crest{width:44px;height:44px;border-radius:50%;background:#1a3060;border:2px solid var(--gold);
+  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.t1{font-family:'Anton',sans-serif;font-size:18px;letter-spacing:2px;line-height:1;white-space:nowrap}
+.t2{font-size:10px;color:var(--gold);letter-spacing:.8px;text-transform:uppercase;margin-top:1px}
+.hdr-right{display:flex;gap:6px;align-items:center;flex-shrink:0}
 .cd-row{display:flex;gap:4px;align-items:center}
-.cd-box{background:rgba(0,0,0,.4);border:1px solid rgba(255,215,0,.3);border-radius:3px;padding:4px 8px;min-width:36px;text-align:center}
+.cd-box{background:rgba(0,0,0,.4);border:1px solid rgba(255,215,0,.3);border-radius:3px;
+  padding:4px 8px;min-width:36px;text-align:center}
 .cd-n{font-family:'Anton',sans-serif;font-size:17px;line-height:1;color:var(--gold)}
 .cd-l{font-size:7px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
 .cd-sep{font-family:'Anton',sans-serif;font-size:14px;color:rgba(255,215,0,.3)}
+.login-badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;
+  border-radius:8px;vertical-align:middle;margin-left:6px}
+.badge-selger{background:rgba(255,215,0,.15);color:var(--gold);border:1px solid rgba(255,215,0,.3)}
+.badge-tilskuer{background:rgba(90,120,152,.15);color:var(--muted);border:1px solid var(--b1)}
+.hdr-btn{background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.35);border-radius:4px;
+  padding:0 10px;height:28px;color:var(--gold);font-size:11px;cursor:pointer;font-weight:700;
+  flex-shrink:0;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.hdr-btn:hover{background:rgba(255,215,0,.2)}
 
 /* TABS */
 .tabs{display:flex;background:var(--card);border-bottom:1px solid var(--b1)}
-.tab{flex:1;padding:10px 0;font-size:11px;font-weight:700;border:none;background:transparent;color:var(--muted);cursor:pointer;font-family:'Barlow',sans-serif;border-bottom:3px solid transparent;transition:all .2s;text-transform:uppercase;letter-spacing:.5px}
+.tab{flex:1;padding:10px 0;font-size:11px;font-weight:700;border:none;background:transparent;
+  color:var(--muted);cursor:pointer;font-family:'Barlow',sans-serif;
+  border-bottom:3px solid transparent;transition:all .2s;text-transform:uppercase;letter-spacing:.5px}
 .tab.on{color:var(--gold);border-bottom-color:var(--gold)}
 
 /* MATCHDAY BAR */
-.mbar{background:var(--card);border-bottom:1px solid var(--b1);padding:9px 16px;display:flex;justify-content:space-between;align-items:center}
+.mbar{background:var(--card);border-bottom:1px solid var(--b1);padding:9px 16px;
+  display:flex;justify-content:space-between;align-items:center}
 .mbar-l{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
 .mbar-v{font-family:'Anton',sans-serif;font-size:14px;color:var(--txt);letter-spacing:1px}
 .mtabs{display:flex;gap:3px}
-.mt{padding:4px 9px;font-size:10px;font-weight:700;border:1px solid var(--b1);background:transparent;color:var(--muted);border-radius:3px;cursor:pointer;font-family:'Barlow',sans-serif;transition:all .2s;text-transform:uppercase}
+.mt{padding:4px 9px;font-size:10px;font-weight:700;border:1px solid var(--b1);
+  background:transparent;color:var(--muted);border-radius:3px;cursor:pointer;
+  font-family:'Barlow',sans-serif;transition:all .2s;text-transform:uppercase}
 .mt.on{background:var(--gold);color:#000;border-color:var(--gold)}
 
 .view{display:none}.view.on{display:block}
 
+/* MVP BANNER */
+#mvp-banner{padding:10px 16px;background:linear-gradient(135deg,rgba(255,215,0,.1),rgba(255,215,0,.04));
+  border-bottom:1px solid rgba(255,215,0,.2);align-items:center;gap:12px}
+
 /* TABLE */
-.tbl-head{display:grid;grid-template-columns:26px 28px 1fr 36px 40px 90px 40px;gap:0;padding:7px 12px;font-size:8.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;background:var(--card2);border-bottom:1px solid var(--b1)}
+.tbl-head{display:grid;grid-template-columns:26px 28px 1fr 36px 40px 90px 40px;
+  padding:7px 12px;font-size:8.5px;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.6px;background:var(--card2);border-bottom:1px solid var(--b1)}
 .tbl-head>*{text-align:center}
 .tbl-head>*:nth-child(3){text-align:left}
-.trow{display:grid;grid-template-columns:26px 28px 1fr 36px 40px 90px 40px;gap:0;padding:8px 12px;align-items:center;border-bottom:1px solid var(--b1);transition:background .15s;position:relative;animation:fadeIn .35s ease both}
+.trow{display:grid;grid-template-columns:26px 28px 1fr 36px 40px 90px 40px;
+  padding:8px 12px;align-items:center;border-bottom:1px solid var(--b1);
+  transition:background .15s;animation:fadeIn .35s ease both}
 .trow>*{text-align:center}
 .trow>*:nth-child(3){text-align:left}
 @keyframes fadeIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
 .trow:hover{background:var(--faint)}
 .trow.zt{border-left:3px solid var(--g)}.trow.zb{border-left:3px solid var(--r)}.trow.zm{border-left:3px solid transparent}
 .pos-n{font-family:'Anton',sans-serif;font-size:13px;line-height:1}
-.av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+.av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:9px;font-weight:700}
 .name-c{display:flex;flex-direction:column;gap:1px;padding:0 6px;align-items:flex-start}
 .name-main{font-size:13px;font-weight:700}
 .name-sub{font-size:9px;color:var(--muted)}
 .sc{font-size:12px}
 .sc.pts{font-family:'Anton',sans-serif;font-size:14px;color:var(--gold)}
-
-/* PROGRESS BAR IN TABLE */
 .prog-wrap{display:flex;flex-direction:column;gap:2px;width:100%}
 .prog-bg{height:7px;background:var(--faint);border-radius:3px;overflow:hidden}
 .prog-fill{height:100%;border-radius:3px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
@@ -72,144 +146,150 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 
 /* FORM DOTS */
 .form-dots{display:flex;gap:3px;justify-content:center;align-items:center}
-.fd{width:13px;height:13px;border-radius:50%;position:relative;cursor:default;flex-shrink:0}
+.fd{width:13px;height:13px;border-radius:50%;cursor:default;flex-shrink:0}
 .fd.sold{background:var(--g)}.fd.empty{background:var(--r)}.fd.future{background:var(--b1)}
 .fd.pace-good{background:var(--g)}.fd.pace-partial{background:var(--y)}.fd.pace-miss{background:var(--r)}
-
-.form-legend{display:flex;gap:12px;padding:8px 12px;background:var(--card2);border-top:1px solid var(--b1);font-size:9px;color:var(--muted);flex-wrap:wrap}
+.form-legend{display:flex;gap:12px;padding:8px 12px;background:var(--card2);
+  border-top:1px solid var(--b1);font-size:9px;color:var(--muted);flex-wrap:wrap}
 .fl{display:flex;align-items:center;gap:4px}
 .fl-dot{width:10px;height:10px;border-radius:50%}
-.zone-legend{display:flex;gap:14px;padding:8px 12px;background:var(--card);border-top:1px solid var(--b1);font-size:9px;color:var(--muted)}
+.zone-legend{display:flex;gap:14px;padding:8px 12px;background:var(--card);
+  border-top:1px solid var(--b1);font-size:9px;color:var(--muted)}
 .zl{display:flex;align-items:center;gap:4px}
 .zl-bar{width:3px;height:12px;border-radius:1px}
 
-/* STATS VIEW */
+/* STATS */
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--b1)}
 .stat-card{background:var(--card);padding:12px 14px}
 .stat-card.full{grid-column:1/-1}
-.stat-title{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;display:flex;align-items:center;gap:5px}
-.stat-title::before{content:'';display:block;width:3px;height:12px;border-radius:1px;background:var(--gold);flex-shrink:0}
+.stat-title{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.8px;margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.stat-title::before{content:'';display:block;width:3px;height:12px;border-radius:1px;
+  background:var(--gold);flex-shrink:0}
 .sc-row{display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--b1)}
 .sc-row:last-child{border:none}
-.sc-pos{font-family:'Anton',sans-serif;font-size:11px;color:var(--muted);width:14px;flex-shrink:0;text-align:center}
-.sc-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.sc-pos{font-family:'Anton',sans-serif;font-size:11px;color:var(--muted);width:14px;
+  flex-shrink:0;text-align:center}
+.sc-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
 .sc-name{flex:1;font-size:12px;font-weight:600}
 .sc-sub{font-size:9px;color:var(--muted)}
 .sc-n{font-family:'Anton',sans-serif;font-size:15px;color:var(--gold);flex-shrink:0}
-.bar-row{margin-bottom:10px}
-.bar-lbl{display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;align-items:baseline}
-.bar-lbl span:last-child{font-size:10px;color:var(--muted)}
-.bar-bg{height:10px;background:var(--faint);border-radius:4px;overflow:hidden;position:relative}
-.bar-fill{height:100%;border-radius:4px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
-.bar-goal{position:absolute;top:0;bottom:0;width:1.5px;background:rgba(255,255,255,0.3)}
+.bar-row{margin-bottom:8px}
+.bar-lbl{display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px}
+.bar-bg{height:7px;background:var(--faint);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
 
-/* SCORINGER VIEW */
-.scoring-header{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:var(--card);border-bottom:1px solid var(--b1);flex-wrap:wrap;gap:8px}
+/* SCORINGER */
+.scoring-header{display:flex;justify-content:space-between;align-items:center;
+  padding:10px 16px;background:var(--card);border-bottom:1px solid var(--b1);
+  flex-wrap:wrap;gap:8px}
 .scoring-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
 .scoring-sub{font-size:10px;color:var(--muted)}
 .loc-filter{display:flex;gap:4px;flex-wrap:wrap}
-.lf-btn{padding:4px 10px;font-size:10px;font-weight:700;border:1px solid var(--b1);background:transparent;color:var(--muted);border-radius:3px;cursor:pointer;font-family:'Barlow',sans-serif;transition:all .2s;text-transform:uppercase}
+.lf-btn{padding:4px 10px;font-size:10px;font-weight:700;border:1px solid var(--b1);
+  background:transparent;color:var(--muted);border-radius:3px;cursor:pointer;
+  font-family:'Barlow',sans-serif;transition:all .2s;text-transform:uppercase}
 .lf-btn.on{background:var(--gold);color:#000;border-color:var(--gold)}
 .scoring-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:0}
-.score-card{background:var(--card);border:1px solid var(--b1);margin:-1px 0 0 -1px;padding:10px 12px;transition:background .15s;position:relative;overflow:hidden}
+.score-card{background:var(--card);border:1px solid var(--b1);margin:-1px 0 0 -1px;
+  padding:10px 12px;transition:background .15s;position:relative;overflow:hidden}
 .score-card:hover{background:var(--card2)}
 .score-car-img{width:100%;height:70px;object-fit:contain;display:block;margin-bottom:6px}
-.score-car-placeholder{width:100%;height:70px;display:flex;align-items:center;justify-content:center;background:var(--faint);border-radius:4px;margin-bottom:6px;font-family:'Anton',sans-serif;font-size:14px;color:var(--muted)}
+.score-car-placeholder{width:100%;height:70px;display:flex;align-items:center;
+  justify-content:center;background:var(--faint);border-radius:4px;margin-bottom:6px;
+  font-family:'Anton',sans-serif;font-size:14px;color:var(--muted)}
 .score-modell{font-family:'Anton',sans-serif;font-size:14px;color:var(--txt);letter-spacing:.5px}
 .score-selger{font-size:11px;font-weight:600;color:var(--txt);margin-top:4px}
 .score-tid{font-size:9px;color:var(--muted);margin-top:1px}
 .score-loc-bar{position:absolute;bottom:0;left:0;right:0;height:3px}
-.score-new{position:absolute;top:6px;right:6px;background:var(--gold);color:#000;font-size:7px;font-weight:700;padding:1px 5px;border-radius:2px;text-transform:uppercase;letter-spacing:.5px}
-.score-del{position:absolute;top:6px;left:6px;background:rgba(239,68,68,0.15);color:var(--r);border:1px solid rgba(239,68,68,0.3);font-size:8px;font-weight:700;padding:1px 6px;border-radius:3px;cursor:pointer;opacity:0;transition:opacity .2s;text-transform:uppercase}
+.score-new{position:absolute;top:6px;right:6px;background:var(--gold);color:#000;
+  font-size:7px;font-weight:700;padding:1px 5px;border-radius:2px;text-transform:uppercase}
+.score-del{position:absolute;top:6px;left:6px;background:rgba(239,68,68,.15);
+  color:var(--r);border:1px solid rgba(239,68,68,.3);font-size:8px;font-weight:700;
+  padding:1px 6px;border-radius:3px;cursor:pointer;opacity:0;transition:opacity .2s;text-transform:uppercase}
 .score-card:hover .score-del{opacity:1}
 .scoring-empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:13px;font-style:italic}
 
 /* REGISTER */
 .reg-outer{padding:12px 14px 18px}
-.reg-card{background:var(--card);border:1px solid var(--b1);border-radius:5px;padding:13px 14px;position:relative}
-.reg-card::before{content:'REGISTRER';position:absolute;top:-9px;left:14px;font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--gold);background:var(--card);padding:0 6px;text-transform:uppercase}
-.fg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px}
+.reg-card{background:var(--card);border:1px solid var(--b1);border-radius:5px;
+  padding:13px 14px;position:relative}
+.reg-card::before{content:'REGISTRER';position:absolute;top:-9px;left:14px;font-size:9px;
+  font-weight:700;letter-spacing:1.5px;color:var(--gold);background:var(--card);padding:0 6px;text-transform:uppercase}
 .fg2{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px}
-select,input{width:100%;padding:8px 10px;font-size:13px;background:var(--faint);border:1px solid var(--b1);border-radius:4px;color:var(--txt);outline:none;font-family:'Barlow',sans-serif;-webkit-appearance:none;transition:border-color .2s}
+select,input[type=text]{width:100%;padding:8px 10px;font-size:13px;background:var(--faint);
+  border:1px solid var(--b1);border-radius:4px;color:var(--txt);outline:none;
+  font-family:'Barlow',sans-serif;-webkit-appearance:none;transition:border-color .2s}
 select option{background:#0e1825}
-select:focus,input:focus{border-color:var(--gold)}
-input::placeholder{color:var(--b2)}
-.reg-btn{width:100%;padding:11px;font-size:12px;font-weight:700;background:var(--gold);color:#000;border:none;border-radius:4px;cursor:pointer;font-family:'Anton',sans-serif;letter-spacing:2px;text-transform:uppercase;transition:all .2s}
+select:focus,input[type=text]:focus{border-color:var(--gold)}
+
+/* FINANSIERT */
+.fin-label{display:flex;align-items:center;gap:10px;padding:9px 12px;
+  background:var(--faint);border:1px solid var(--b1);border-radius:4px;
+  cursor:pointer;margin-bottom:6px;transition:all .15s}
+.fin-label.fin-active{border-color:var(--gold);background:rgba(255,215,0,.07)}
+.fin-box{width:22px;height:22px;border:2px solid var(--b2);border-radius:4px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:all .15s;cursor:pointer}
+.fin-box.fin-box-active{border-color:var(--gold);background:rgba(255,215,0,.15)}
+.fin-check{font-size:15px;font-weight:900;color:var(--gold);display:none;line-height:1}
+.fin-badge{margin-left:auto;font-family:'Anton',sans-serif;font-size:11px;
+  letter-spacing:1.5px;color:var(--gold);opacity:0;transition:opacity .15s}
+
+.reg-btn{width:100%;padding:11px;font-size:12px;font-weight:700;background:var(--gold);
+  color:#000;border:none;border-radius:4px;cursor:pointer;font-family:'Anton',sans-serif;
+  letter-spacing:2px;text-transform:uppercase;transition:all .2s}
 .reg-btn:hover{background:#ffe44d}
-.toast{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.35);color:var(--g);padding:8px 12px;border-radius:4px;font-size:11px;opacity:0;transition:opacity .3s;margin-top:7px;text-align:center;font-weight:600;letter-spacing:.3px}
+.reg-btn:disabled{opacity:.5;cursor:not-allowed}
+.toast{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.35);color:var(--g);
+  padding:8px 12px;border-radius:4px;font-size:11px;opacity:0;transition:opacity .3s;
+  margin-top:7px;text-align:center;font-weight:600}
 .toast.show{opacity:1}
 
-/* DELETE CONFIRM MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+/* MODALS */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .2s}
 .modal-overlay.show{opacity:1;pointer-events:all}
-.modal{background:var(--card);border:1px solid var(--b2);border-radius:8px;padding:24px 28px;max-width:340px;width:90%;text-align:center}
-.modal-title{font-family:'Anton',sans-serif;font-size:18px;letter-spacing:1px;margin-bottom:8px;color:var(--r)}
+.modal{background:var(--card);border:1px solid var(--b2);border-radius:8px;
+  padding:24px 28px;max-width:480px;width:90%}
+.modal-title{font-family:'Anton',sans-serif;font-size:18px;letter-spacing:1px;
+  margin-bottom:8px;color:var(--r)}
 .modal-body{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.5}
 .modal-btns{display:flex;gap:8px}
-.modal-cancel{flex:1;padding:9px;font-size:12px;font-weight:700;background:transparent;color:var(--muted);border:1px solid var(--b2);border-radius:4px;cursor:pointer;font-family:'Barlow',sans-serif}
-.modal-confirm{flex:1;padding:9px;font-size:12px;font-weight:700;background:var(--r);color:#fff;border:none;border-radius:4px;cursor:pointer;font-family:'Barlow',sans-serif}
+.modal-cancel{flex:1;padding:9px;font-size:12px;font-weight:700;background:transparent;
+  color:var(--muted);border:1px solid var(--b2);border-radius:4px;cursor:pointer;font-family:'Barlow',sans-serif}
+.modal-confirm{flex:1;padding:9px;font-size:12px;font-weight:700;background:var(--r);
+  color:#fff;border:none;border-radius:4px;cursor:pointer;font-family:'Barlow',sans-serif}
 </style>
 </head>
 <body>
-<div id="intro-overlay" style="position:fixed;inset:0;z-index:999;background:#07090d;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;transition:opacity .8s ease">
 
-  <!-- Background decoration -->
-  <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none" id="intro-lines"></div>
-  <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none" id="intro-hexagons"></div>
-  <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none" id="intro-particles"></div>
+<!-- INTRO / LOGIN -->
+<div id="intro-overlay">
+  <div class="intro-logo">VCSO</div>
+  <div class="intro-logo" style="font-size:30px;margin-top:-4px">CHAMPIONSHIP</div>
+  <div class="intro-sub">Volvo Car Stor Oslo &nbsp;&middot;&nbsp; Season 2026</div>
+  <div class="intro-divider"></div>
+  <div class="intro-tagline">La kampen om lagerbilene begynne</div>
 
-  <!-- Logo -->
-  <div style="position:relative;z-index:2;font-family:'Anton',sans-serif;font-size:52px;letter-spacing:6px;background:linear-gradient(135deg,#fff 0%,#ffd700 50%,#fff 100%);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;text-align:center;line-height:1;animation:logoShine 3s linear infinite">VCSO</div>
-  <div style="position:relative;z-index:2;font-family:'Anton',sans-serif;font-size:30px;letter-spacing:4px;background:linear-gradient(135deg,#fff 0%,#ffd700 50%,#fff 100%);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;text-align:center;margin-top:-4px;animation:logoShine 3s linear infinite">CHAMPIONSHIP</div>
-  <div style="position:relative;z-index:2;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-top:10px;text-align:center">Volvo Car Stor Oslo &nbsp;&middot;&nbsp; Season 2026</div>
-
-  <div style="position:relative;z-index:2;width:260px;height:2px;background:linear-gradient(90deg,transparent,#ffd700,transparent);margin:22px auto"></div>
-
-  <div style="position:relative;z-index:2;font-family:'Anton',sans-serif;font-size:18px;letter-spacing:3px;color:#fff;text-align:center;text-transform:uppercase;opacity:.9;margin-bottom:28px">La kampen om lagerbilene begynne</div>
-
-  <!-- Login section -->
-  <div style="position:relative;z-index:2;width:100%;max-width:300px;display:flex;flex-direction:column;gap:10px;align-items:center;padding:0 20px">
-
-    <input type="password" id="pw-input" placeholder="Skriv inn passord"
-      onkeydown="if(event.key==='Enter')tryLogin()"
-      style="width:100%;padding:14px;font-size:15px;text-align:center;letter-spacing:4px;
-             background:rgba(255,255,255,0.06);border:1px solid rgba(255,215,0,0.3);
-             border-radius:5px;color:#fff;outline:none;font-family:'Barlow',sans-serif;
-             transition:border-color .2s"
-      onfocus="this.style.borderColor='rgba(255,215,0,0.8)'"
-      onblur="this.style.borderColor='rgba(255,215,0,0.3)'"
-    >
-    <div id="pw-err" style="min-height:14px;font-size:11px;color:#ef4444;text-align:center"></div>
-
-    <button onclick="tryLogin()"
-      style="width:100%;padding:16px;font-family:'Anton',sans-serif;font-size:16px;
-             letter-spacing:3px;text-transform:uppercase;background:#ffd700;color:#000;
-             border:none;border-radius:5px;cursor:pointer;transition:background .2s"
-      onmouseover="this.style.background='#ffe44d'"
-      onmouseout="this.style.background='#ffd700'">
-      &#9917;&nbsp; Logg inn som selger
-    </button>
-
-    <div style="display:flex;align-items:center;gap:10px;width:100%;font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:.5px">
-      <div style="flex:1;height:1px;background:rgba(255,255,255,0.1)"></div>
-      eller
-      <div style="flex:1;height:1px;background:rgba(255,255,255,0.1)"></div>
-    </div>
-
-    <button onclick="enterAsGuest()"
-      style="width:100%;padding:14px;font-family:'Anton',sans-serif;font-size:14px;
-             letter-spacing:2px;text-transform:uppercase;background:transparent;
-             color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.15);
-             border-radius:5px;cursor:pointer;transition:all .2s"
-      onmouseover="this.style.borderColor='rgba(255,255,255,0.4)';this.style.color='rgba(255,255,255,0.8)'"
-      onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='rgba(255,255,255,0.4)'">
-      &#128065;&nbsp; Tilskuer
-    </button>
+  <div class="login-section">
+    <input class="login-input" type="password" id="pw-input"
+      placeholder="Skriv inn passord"
+      onkeydown="if(event.key==='Enter')tryLogin()">
+    <div class="login-err" id="pw-err"></div>
+    <button class="btn-selger" onclick="tryLogin()">&#9917;&nbsp; Logg inn som selger</button>
+    <div class="btn-divider">eller</div>
+    <button class="btn-tilskuer" onclick="enterAsGuest()">&#128065;&nbsp; Tilskuer</button>
   </div>
 </div>
 
+<!-- KONFETTI -->
 <div class="konfetti-wrap hide" id="konfetti"></div>
-<div id="status-bar" style="display:none;padding:8px 16px;font-size:11px;font-weight:600;text-align:center;border-bottom:1px solid var(--b1)"></div>
+<!-- STATUS -->
+<div id="status-bar"></div>
+
 <div class="page">
 
 <!-- HEADER -->
@@ -219,27 +299,31 @@ input::placeholder{color:var(--b2)}
       <div class="crest">&#9917;</div>
       <div>
         <div class="t1">VCSO CHAMPIONSHIP</div>
-        <div class="t2">Mai &amp; Juni 2026 &middot; 3 poeng per salg &middot; Levering innen 30. juni <span class="login-badge" id="role-badge"></span></div>
+        <div class="t2">Mai &amp; Juni 2026 &middot; 3 poeng per salg &middot; Levering innen 30. juni
+          <span class="login-badge" id="role-badge"></span>
+        </div>
       </div>
     </div>
-    <div class="cd-row">
-      <div class="cd-box"><div class="cd-n" id="cdd">--</div><div class="cd-l">dag</div></div>
-      <div class="cd-sep">:</div>
-      <div class="cd-box"><div class="cd-n" id="cdh">--</div><div class="cd-l">t</div></div>
-      <div class="cd-sep">:</div>
-      <div class="cd-box"><div class="cd-n" id="cdm">--</div><div class="cd-l">m</div></div>
-      <div class="cd-sep">:</div>
-      <div class="cd-box"><div class="cd-n" id="cds">--</div><div class="cd-l">s</div></div>
-    </div>
-    <div style="display:flex;gap:6px;align-items:center;margin-left:10px;flex-shrink:0">
-      <button onclick="(function(){var m=document.getElementById('help-modal');if(m)m.classList.add('show');})()" style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.35);border-radius:4px;padding:0 10px;height:28px;color:var(--gold);font-size:11px;cursor:pointer;font-weight:700;transition:all .2s;display:flex;align-items:center;gap:5px;letter-spacing:.5px;white-space:nowrap">
-        <span style="font-size:13px">?</span> Slik fungerer det
+    <div class="hdr-right">
+      <div class="cd-row">
+        <div class="cd-box"><div class="cd-n" id="cdd">--</div><div class="cd-l">dag</div></div>
+        <div class="cd-sep">:</div>
+        <div class="cd-box"><div class="cd-n" id="cdh">--</div><div class="cd-l">t</div></div>
+        <div class="cd-sep">:</div>
+        <div class="cd-box"><div class="cd-n" id="cdm">--</div><div class="cd-l">m</div></div>
+        <div class="cd-sep">:</div>
+        <div class="cd-box"><div class="cd-n" id="cds">--</div><div class="cd-l">s</div></div>
+      </div>
+      <button class="hdr-btn" onclick="showHelp()">? Slik fungerer det</button>
+      <button id="export-btn" class="hdr-btn" onclick="exportCSV()"
+        style="display:none;color:#22c55e;border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.1)">
+        &#8659; Backup
       </button>
-      <button id="export-btn" onclick="exportCSV()" style="display:none;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.35);border-radius:4px;padding:0 10px;height:28px;color:#22c55e;font-size:11px;cursor:pointer;font-weight:700;white-space:nowrap">&#8659; Backup</button>
     </div>
   </div>
 </div>
 
+<!-- TABS -->
 <div class="tabs">
   <button class="tab on" onclick="setTab('ind',this)">Selgere</button>
   <button class="tab" onclick="setTab('team',this)">Avdelinger</button>
@@ -247,6 +331,7 @@ input::placeholder{color:var(--b2)}
   <button class="tab" onclick="setTab('scoring',this)">Scoringer</button>
 </div>
 
+<!-- MATCHDAY BAR -->
 <div class="mbar">
   <div>
     <div class="mbar-l">Periode</div>
@@ -261,8 +346,8 @@ input::placeholder{color:var(--b2)}
 
 <!-- MVP BANNER -->
 <div id="mvp-banner" style="display:none;padding:10px 16px;background:linear-gradient(135deg,rgba(255,215,0,.1),rgba(255,215,0,.04));border-bottom:1px solid rgba(255,215,0,.2);align-items:center;gap:12px">
-  <div style="font-size:22px;flex-shrink:0">&#128081;</div>
-  <div id="mvp-av" style="width:34px;height:34px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:rgba(255,215,0,.2);color:var(--gold)"></div>
+  <div style="font-size:22px">&#128081;</div>
+  <div id="mvp-av" style="width:34px;height:34px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700"></div>
   <div>
     <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gold)">Dagens MVP</div>
     <div id="mvp-name" style="font-size:15px;font-weight:700;color:var(--txt)">&#8211;</div>
@@ -270,25 +355,24 @@ input::placeholder{color:var(--b2)}
   </div>
 </div>
 
-<!-- INDIVIDUAL TABLE -->
+<!-- SELGERE VIEW -->
 <div class="view on" id="view-ind">
   <div class="tbl-head">
     <div>#</div><div></div><div>Spiller</div>
-    <div>Maal</div><div>Poeng</div><div>Siste 5 dager</div><div>P</div>
+    <div>M&#229;l</div><div>Poeng</div><div>Siste 5 dager</div><div>P</div>
   </div>
   <div id="tbl-ind"></div>
   <div class="form-legend">
     <div class="fl"><div class="fl-dot" style="background:var(--g)"></div>Solgt bil</div>
     <div class="fl"><div class="fl-dot" style="background:var(--r)"></div>Ingen salg</div>
-    <div class="fl"><div class="fl-dot" style="background:var(--b1)"></div>Fremtid</div>
   </div>
 </div>
 
-<!-- TEAM TABLE -->
+<!-- AVDELINGER VIEW -->
 <div class="view" id="view-team">
   <div class="tbl-head">
     <div>#</div><div></div><div>Avdeling</div>
-    <div>Maal</div><div>Poeng</div><div>Siste 5 dager</div><div>P</div>
+    <div>M&#229;l</div><div>Poeng</div><div>Siste 5 dager</div><div>P</div>
   </div>
   <div id="tbl-team"></div>
   <div class="form-legend">
@@ -298,21 +382,12 @@ input::placeholder{color:var(--b2)}
   </div>
 </div>
 
-<!-- STATS VIEW -->
+<!-- STATISTIKK VIEW -->
 <div class="view" id="view-stats">
   <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-title">Toppscorere</div>
-      <div id="top-scorers"></div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-title">Siste 5 dager</div>
-      <div id="top-form"></div>
-    </div>
-    <div class="stat-card full">
-      <div class="stat-title">Avdeling mot maal</div>
-      <div id="team-bars"></div>
-    </div>
+    <div class="stat-card"><div class="stat-title">Toppscorere</div><div id="top-scorers"></div></div>
+    <div class="stat-card"><div class="stat-title">Siste 5 dager</div><div id="top-form"></div></div>
+    <div class="stat-card full"><div class="stat-title">Avdeling mot m&#229;l</div><div id="team-bars"></div></div>
   </div>
 </div>
 
@@ -333,103 +408,60 @@ input::placeholder{color:var(--b2)}
   <div class="scoring-grid" id="scoring-grid"></div>
 </div>
 
-<!-- REGISTER -->
-<div class="reg-outer">
+<!-- REGISTER (hidden for guests) -->
+<div class="reg-outer" id="reg-outer" style="display:none">
   <div class="reg-card">
     <input type="hidden" id="sel-loc" value="">
     <div class="fg2">
       <select id="sel-selger"><option value="">Selger...</option></select>
-      <select id="sel-modell"><option value="">Modell...</option><option>EX30</option><option>EX40</option><option>EX60</option><option>EX90</option><option>EC40</option><option>ES90</option><option>XC40</option><option>XC60</option><option>XC90</option></select>
+      <select id="sel-modell">
+        <option value="">Modell...</option>
+        <option>EX30</option><option>EX40</option><option>EX60</option>
+        <option>EX90</option><option>EC40</option><option>ES90</option>
+        <option>XC40</option><option>XC60</option><option>XC90</option>
+      </select>
     </div>
-    <label id="fin-label" style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--faint);border:1px solid var(--b1);border-radius:4px;cursor:pointer;margin-bottom:6px;transition:border-color .2s">
-      <div id="chk-box" onclick="toggleFin()" style="width:22px;height:22px;border:2px solid var(--b2);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;cursor:pointer">
-        <span id="chk-cross" style="font-size:15px;font-weight:900;color:var(--gold);display:none;line-height:1">&#10003;</span>
+    <div class="fin-label" id="fin-label" onclick="toggleFin()">
+      <div class="fin-box" id="chk-box">
+        <span class="fin-check" id="chk-cross">&#10003;</span>
       </div>
       <input type="checkbox" id="chk-fin" style="display:none">
       <div>
         <div style="font-size:13px;font-weight:700;color:var(--txt)">Finansiert</div>
         <div style="font-size:10px;color:var(--muted)">Kunden har valgt finansiering</div>
       </div>
-      <div id="fin-badge" style="margin-left:auto;font-family:'Anton',sans-serif;font-size:11px;letter-spacing:1.5px;color:var(--gold);opacity:0;transition:opacity .15s">&#9670; FINANSIERT</div>
-    </label>
-    <button class="reg-btn" onclick="reg()">Registrer scoring &#8212; +3 poeng!</button>
+      <div class="fin-badge" id="fin-badge">&#9670; FINANSIERT</div>
+    </div>
+    <button class="reg-btn" id="reg-btn" onclick="reg()">Registrer scoring &#8212; +3 poeng!</button>
     <div class="toast" id="toast"></div>
   </div>
 </div>
 
-</div>
+</div><!-- end .page -->
 
-<!-- DELETE MODAL -->
-<div class="modal-overlay" id="modal">
-  <div class="modal">
-    <div class="modal-title">Slett scoring?</div>
-    <div class="modal-body" id="modal-body">Er du sikker?</div>
-    <div class="modal-btns">
-      <button class="modal-cancel" onclick="closeModal()">Avbryt</button>
-      <button class="modal-confirm" onclick="confirmDelete()">Slett</button>
-    </div>
-  </div>
-</div>
-
-
-<!-- HELP MODAL -->
-<div class="modal-overlay" id="help-modal">
-  <div class="modal" style="max-width:480px;text-align:left">
+<!-- HJELP MODAL -->
+<div class="modal-overlay" id="help-modal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal" style="text-align:left">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div class="modal-title" style="color:var(--gold);margin:0">&#9432; Slik bruker du VCSO Championship</div>
-      <button onclick="(function(){var m=document.getElementById('help-modal');if(m)m.classList.remove('show');})()" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1">&times;</button>
+      <div style="font-family:'Anton',sans-serif;font-size:18px;color:var(--gold)">Slik bruker du siden</div>
+      <button onclick="document.getElementById('help-modal').classList.remove('show')"
+        style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer">&times;</button>
     </div>
     <div style="display:flex;flex-direction:column;gap:12px;font-size:13px;color:var(--muted);line-height:1.6">
-      <div style="display:flex;gap:12px;align-items:flex-start">
-        <div style="font-family:'Anton',sans-serif;font-size:18px;color:var(--gold);flex-shrink:0;line-height:1;width:20px">1</div>
-        <div><strong style="color:var(--txt)">Registrer et salg</strong><br>Velg selger og modell i skjemaet nederst. Trykk den gule knappen – salget lagres for alle.</div>
-      </div>
-      <div style="display:flex;gap:12px;align-items:flex-start">
-        <div style="font-family:'Anton',sans-serif;font-size:18px;color:var(--gold);flex-shrink:0;line-height:1;width:20px">2</div>
-        <div><strong style="color:var(--txt)">Finansiert</strong><br>Huk av om kunden valgte finansiering. Bilen f&#229;r et gyllent &#9670; FINANSIERT-stempel i Scoringer-fanen.</div>
-      </div>
-      <div style="display:flex;gap:12px;align-items:flex-start">
-        <div style="font-family:'Anton',sans-serif;font-size:18px;color:var(--gold);flex-shrink:0;line-height:1;width:20px">3</div>
-        <div><strong style="color:var(--txt)">Fanene</strong><br>
-          <strong style="color:var(--txt)">Selgere</strong> &#8211; individuell poengrangering med form og streak.<br>
-          <strong style="color:var(--txt)">Avdelinger</strong> &#8211; Ryen, Fornebu og Lillestr&#248;m mot sine m&#229;l.<br>
-          <strong style="color:var(--txt)">Statistikk</strong> &#8211; toppscorere og aktivitet.<br>
-          <strong style="color:var(--txt)">Scoringer</strong> &#8211; alle solgte biler med bilde og tidspunkt.
-        </div>
-      </div>
-      <div style="display:flex;gap:12px;align-items:flex-start">
-        <div style="font-family:'Anton',sans-serif;font-size:18px;color:var(--gold);flex-shrink:0;line-height:1;width:20px">4</div>
-        <div><strong style="color:var(--txt)">Slett scoring</strong><br>G&#229; til Scoringer-fanen, hold musen over en bil og trykk &quot;Slett&quot;.</div>
-      </div>
-      <div style="display:flex;gap:12px;align-items:flex-start">
-        <div style="font-family:'Anton',sans-serif;font-size:18px;color:var(--gold);flex-shrink:0;line-height:1;width:20px">5</div>
-        <div><strong style="color:var(--txt)">Poeng</strong><br>1 salg = 3 poeng. Bilen m&#229; leveres innen 30. juni for &#229; telle.</div>
-      </div>
-      <div style="display:flex;gap:12px;align-items:flex-start">
-        <div style="font-family:'Anton',sans-serif;font-size:18px;color:var(--gold);flex-shrink:0;line-height:1;width:20px">6</div>
-        <div><strong style="color:var(--txt)">Dagens MVP &#128081;</strong><br>Den selgeren med flest salg i dag vises &#248;verst med krone. Oppdateres automatisk.</div>
-      </div>
-      <div style="display:flex;gap:12px;align-items:flex-start">
-        <div style="font-family:'Anton',sans-serif;font-size:18px;color:var(--gold);flex-shrink:0;line-height:1;width:20px">7</div>
-        <div><strong style="color:var(--txt)">Streak &#128293;</strong><br>Selgere som selger bil 3+ hverdager p&#229; rad f&#229;r et flamme-ikon. Bevares over helger.</div>
-      </div>
-      <div style="display:flex;gap:12px;align-items:flex-start">
-        <div style="font-family:'Anton',sans-serif;font-size:18px;color:var(--gold);flex-shrink:0;line-height:1;width:20px">8</div>
-        <div><strong style="color:var(--txt)">Varsler &#128276;</strong><br>Godtar du push-varsler f&#229;r du en notifikasjon hver gang noen scorer.</div>
-      </div>
-      <div style="display:flex;gap:12px;align-items:flex-start">
-        <div style="font-family:'Anton',sans-serif;font-size:18px;color:var(--gold);flex-shrink:0;line-height:1;width:20px">9</div>
-        <div><strong style="color:var(--txt)">Live-oppdatering</strong><br>Siden oppdateres automatisk hvert 2. minutt. Du trenger ikke refreshe manuelt.</div>
-      </div>
-      <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.2);border-radius:4px;padding:10px 12px;font-size:11px">
-        &#128308; R&#248;d prikk = ingen salg &nbsp;&nbsp; &#128994; Gr&#248;nn = solgt bil &nbsp;&nbsp; &#128993; Gul = solgt men ikke i rute (avdeling)
-      </div>
+      <div><strong style="color:var(--txt)">1. Registrer salg</strong><br>Velg selger og modell. Huk av Finansiert om aktuelt. Trykk gul knapp.</div>
+      <div><strong style="color:var(--txt)">2. Finansiert &#9670;</strong><br>Finansierte biler f&#229;r gyllent stempel i Scoringer-fanen.</div>
+      <div><strong style="color:var(--txt)">3. Slett scoring</strong><br>G&#229; til Scoringer &rarr; hold over bilde &rarr; trykk Slett.</div>
+      <div><strong style="color:var(--txt)">4. Form-prikker</strong><br>Gr&#248;nn = solgt bil. R&#248;d = ingen salg. For avdeling: gul = solgt men ikke i rute.</div>
+      <div><strong style="color:var(--txt)">5. MVP &#128081;</strong><br>Selgeren med flest salg i dag vises &#248;verst. Oppdateres automatisk.</div>
+      <div><strong style="color:var(--txt)">6. Streak &#128293;</strong><br>3+ hverdager p&#229; rad gir flamme-ikon. Bevares over helger.</div>
+      <div><strong style="color:var(--txt)">7. Live-oppdatering</strong><br>Siden henter nye data automatisk hvert 2. minutt.</div>
+      <div><strong style="color:var(--txt)">8. Backup (selgere)</strong><br>Trykk den gr&#248;nne Backup-knappen i headeren for &#229; laste ned CSV.</div>
     </div>
   </div>
 </div>
 
-<!-- DELETE MODAL -->
-<div class="modal-overlay" id="modal">
+<!-- SLETT MODAL -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <div class="modal-title">Slett scoring?</div>
     <div class="modal-body" id="modal-body">Er du sikker?</div>
@@ -439,6 +471,7 @@ input::placeholder{color:var(--b2)}
     </div>
   </div>
 </div>
+
 
 <script>
 const CAR_IMAGES={
@@ -471,633 +504,695 @@ const SELGER_PHOTOS={
   "andreas_lydersen":"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAcFBQYFBAcGBgYIBwcICxILCwoKCxYPEA0SGhYbGhkWGRgcICgiHB4mHhgZIzAkJiorLS4tGyIyNTEsNSgsLSz/wAALCAB4AHgBAREA/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/9oACAEBAAA/APVaKKQ0lJuFL2oPCljwoGSewpI3WWMSRsHQ9GXkGlpaSiiinUUUhphf0rzrxj8YdB8Mtd2ds/8AaGpwjaIYwdiv0wzdOMcgc9vXHkFt8UvGtxJfyR6yLJLqUzySbB+7zgBUyCQMAYA56+pqhrGueIb6zM2t6vqN0khBjhkm2B/QlB0qjB4r8Ux+W1prN/HyNiR3DY9gBn26V0MPxl8YQ6W2nm7WWR+DO8f70Ens3b8q9L+GXxGN2um+H78mS7kRis3Lb+Sf8etesUlFFOxRSUx2xXiXxa+Kl3pt/d+G9H821uoHQTXQx0K7iq+nVefrXhTM0js7sWZjkknJJ9auWst4JoDFG8hi/wBWoXOM960n0fWNR2zNazAchnbkkkcn/wCt6VowaPeqkcMdlIxik3RtjrjHB/GsvUdA1kb7i4tZHYn5mC+1U4dUu9PvrS5t5GiuLQgo3cEc19jaBqH9r+HNO1HO77XbRzEgYyWUE/rWhRSU+immuZ8deIF8M+EdQ1IvskSMrD05kPC4yR9fwr5DuLie7nae5mknmflpJGLM31Jr0LwP4UtLjT47y+j3+ac4I6L2/OvX9B8MaQH81bSLJHp0rsrXw5pkkW0WUQzzwKvReDNMM0NyLeMYH3QOD/nFTXHh3TiWDWMB3dflrw34y/Dazt9Lm1zS4PKlt8NNGnQp0J/Cu3+EF/DffDDSxFOZjbKYHz1Rgc7fwBrt6SinUhpDXjn7Q+oCHw1plgHG64uTIVzyVVeuPq1eA2sXn3UUX95gK9j8IXkRU2IPEP3R9K9D0VtrbFPzDqM4rtdJmkAAkiwAOua31mKqFDcdKjuHZhnPSsDWrKLUdPuLeZd0csTRuD3BBB/nXlfwJebT7jxH4fnDn7JOsqtn5eflOB+ANev0UlOpDSGvFf2jJol0jRIdgMrzyOGx0UKBj82/SvCLXd9qj2LubdwK9C8Jw3Sa7EQC5k4bHTFe06ZbNGzPKEJJ4y3aursdTsreJUfABHUHIrWM0OEKvgcY5p7XkR/dg7ifQ1Uvl/0V9p42mvLvhpMD8QPEsXlbWMaux9Dvx+teoUlFLSUnXivnL45+IbHxDqFimnSGVNMea3mbjG8leg64+UjNec6DAZdSVsZCc/jXdaVqE1jqTtCmNqYGR371tTeLYJIRFNcSF3bapVtvzeg7n8AaoQa/f2FwzRXEyKTkJI+9XHsfx6cHmva/Cssus+GhPM2JAuV9BXnOreLbm01DyZNQlgjZyqJAPmPPqT+grofD/jm1uFW1W/lldlO0TDJcexHB6/WpvAWmzW/xA8V3pB8mQQoM+vLfyr0M0UUUlCnawb0Oa+P/ABdpF5o/jjWrK4GPJndix6MjMWU/iCDUHhaaOG+bPzFiAM1694a8H2+t6BJy4nuGLKoYHb9Djj86htvg/bQbba+0e6vGBJE0Zcbh6ZHH8q6jXPCFoYY7i8sIrZyiwKhkydqrheAcZA46k11nw8MH/CPSWsWSseVO7rWF4g+FukasgnOmy3eW3ssM2yRD0yuT7dKtWfw2026mtJzp11YNZqqIzkDIUYUEZ5475resNIj02/vpgSZLhlz82RhVwK0aKKKSkrxH9oLQlCWOtRRkPORaysvdlyUz+BYfgK8OtpGiuVK5U5Ar3rwJqSRGICRsIqjg4xxXrtvqMclvvdxgD+I1w3jXWra81C006a5W3imy+8cYA7g/Uirfwy1ywS0mtXvYpZImZSy8ZGe9amq+L7fQr4XSz+fZSsVlwQVibOPwzXS2uu2d/aK8MysrDOQarW8vneY27cAxANT0tJRmikrl/iF4el8VeCrzTLfZ9oJWWEOcBmU5wT2yM818q6pot7oOttp+oxeTcxkF4y6sVz0zgnBxzXS6DrUumbXJbD8/Wu0tvHcE0WySZginGwPgufTPasXxlcXPie2gEEbhoCfL8vsCOlYvhPRvEkOp+Xb288G5/LZ8HJ/PtXpJhj8OeDls54lMTuTJ53zO+485J/z0rL8P63d6bcSWlsWkgjI2nOcKeley+HWaTQbeV/vSAufxJrTpaSikLUxmrmPG3iuHwl4budUlAZ0+SGPOPMkP3V/mT7A18mPdS3N9Jc3EjSzTOXkdjksxOST75rsNLaNLCzvGUPEkqrICM8ZxzUt14Gkl1e+W1vDBGshMKnng88/yqXR9A1OyvfL1Sa/aAMDmyfexBz0HB9DXd6Hb6TcRNA934nuGMany1hkj2tnnLEAfrUV38Lpb1b6/m1e/jsUAMNs85fOOpbPb2/WpLKNNL0220u0iLXFyQxbhjycKB+NeyWlstnZQ2y9IkCfkKmooprGmE1FI+FNfOnxy8TJqniaDR7abfDpqnzQDx5zdR77QFH1yK8vHWum8L3KStPpVyx8q6X5Dno3auz0+WfULK0uUlPnwL5EqnjJBxx39/wAa2bXUZYJf3kJ3J9a2rLxjcFvLihJwejHjFdHLfTz6FNM67Vk+Un+6vc/lXAWfi/T9D8YaVd6pbP8AYZZHX7Vj5IpMAKT64DAkdQGzzXuEUyyxrIjK6OAyspyCDyCD3FS5HrRmioyaidsDNYfiTxLpfhnTGv8AVrgQRL91P45T/dRepP6DvivknVb+TVdYvNQlGJLuZ5mGc4LMTj9aq0+KVoZFdSQVOQa6HRfE8mn60szhTGzhjnkA9zXuunahp2rwwXSxRN5ije393ituzttHtJGkjgiRnG7a2OawPF+uecsGjacUE93mPg8L6s3sAf5Vn654IXUPAHinT7NGlOmRx3luxGWZov8AWH6sjt+npVL4BeK769ivPDt3IZoLOIT2xb7yLuAZM+mSCPTmvaQaUGnA8Vi+IPEukeGrL7Vq1/FaRnO0Ocs/sqjlvwrw/wAZfHLUNQka18Mq+n2w4NzIAZn+g5CD8z7jpXld3e3V/cNcXlzNczN1klcux/E81DRRT/LZhlPmH8q6HQ7/AF/TvlsyWjP8DMMfzrpbTUvFl4Uj3RQe7vuP5CumTSJNM8N6hez3UlxqEkeTO/BBBBCj0GRXt3wyjS9sJZpEDG6hLSg/7e04P4V8u3l3qXwm+K2sxaYsQa0mktwkqblaFiGUdf7u016f4b+POiX6LDrtu+lXHA8yMGWFvf8AvL+v1r1CxvrTUbWO5srqG6glXcjxOGDD14qxmvivV9Z1HxBqkl/qd1Jd3UvV37DsAOgA9BxUAspyASuM+tNkh8s4Jz9BURGKKUAsvAzj/P8ASprORo7hcDIPGK77RtKurm2EqlI4lH/LTOQfQY6/Suw0nRJIWSWQb1Y8OvKn2z6+3Wr3iPmGy05RzdTKrf7uef0zXdQfEW08E3senQaX9skvkNyWEvl7EB2IMYOSQpNeL/HC+s9a8YQa/aQtbjU7XbNE+NyTRcZyOoKlOfrXmkJCxBtu4Nwyn19RVqI3Wm3aXFldzW0iHcjxsUKn2INeg6F8bfFOmXMS6ssOr2vRwVEcpHqGA6/UGv/Z"
 };
 
-// ─── PASSORD & TILGANG ────────────────────────────────────────────────
-var SELGER_PASSWORD='vcso2026';
-var userRole=null;
-
-function tryLogin(){
-  var pw=document.getElementById('pw-input').value;
-  if(pw===SELGER_PASSWORD){enterAsSelger();}
-  else{
-    var err=document.getElementById('pw-err');
-    err.textContent='Feil passord \u2013 pr\u00f8v igjen';
-    document.getElementById('pw-input').value='';
-    document.getElementById('pw-input').focus();
-    setTimeout(function(){err.textContent='';},3000);
-  }
-}
-
-
-function closeIntro(){
-  var ov=document.getElementById('intro-overlay');
-  if(!ov) return;
-  ov.style.opacity='0';
-  ov.style.pointerEvents='none';
-  setTimeout(function(){ov.style.display='none';},300);
-}
-
-function enterAsSelger(){
-  userRole='selger';
-  sessionStorage.setItem('vcso-role','selger');
-  closeIntro();
-  document.getElementById('reg-outer').style.display='block';
-  var eb=document.getElementById('export-btn');if(eb)eb.style.display='inline-flex';
-  updateRoleBadge();
-  populateSelgers();
-  // Render immediately then re-render when Supabase data arrives
-  fetchSales(); // Fetch real data - renderAll() called inside when done
-  setTimeout(renderInd, 100); // Also render immediately after short delay
-  if(typeof requestPushPermission==='function') requestPushPermission();
-}
-
-function enterAsGuest(){
-  userRole='tilskuer';
-  sessionStorage.setItem('vcso-role','tilskuer');
-  closeIntro();
-  document.getElementById('reg-outer').style.display='none';
-  updateRoleBadge();
-  populateSelgers();
-  fetchSales();
-  setTimeout(renderInd, 100);
-}
-
-function updateRoleBadge(){
-  var badge=document.getElementById('role-badge');
-  if(!badge) return;
-  if(userRole==='selger'){
-    badge.className='login-badge badge-selger';
-    badge.textContent='\u26bd Selger';
-  } else {
-    badge.className='login-badge badge-tilskuer';
-    badge.textContent='\u2022 Tilskuer';
-  }
-}
-
 // ─── KONFIGURASJON ───────────────────────────────────────────────────
-var PTS=3;
-var GOALS={
-  mai:{ryen:80,lillestrom:40,fornebu:80},
-  jun:{ryen:112,lillestrom:96,fornebu:112}
-};
-var DAILY_GOALS={
-  mai:{ryen:80/22,lillestrom:40/22,fornebu:80/22},
-  jun:{ryen:112/22,lillestrom:96/22,fornebu:112/22}
-};
-var LC={ryen:'#3b82f6',lillestrom:'#f59e0b',fornebu:'#10b981'};
-var LL={ryen:'Ryen',lillestrom:'Lillestr\u00f8m',fornebu:'Fornebu'};
-var SCOLS=['#e8001a','#00aaff','#00cc66','#ff8800','#cc44ff','#ffd700','#00d4ff','#ff4488','#44ffaa','#ffaa00','#aa44ff','#88ff44','#ff6644','#44aaff','#aaff44'];
+var SUPABASE_URL = 'https://jffhdlmwvurnojoapcvs.supabase.co';
+var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmZmhkbG13dnVybm9qb2FwY3ZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MzIzNjcsImV4cCI6MjA5MzEwODM2N30.Mc_eKMsfR04kLmwfBeH5INn3NTYapv62Fnt0wMpBpMw';
+var API = SUPABASE_URL + '/rest/v1/sales';
 
-var SELGERE=[
-  {navn:'Thomas Dokken',           loc:'ryen'},
-  {navn:'Emma Valen',              loc:'ryen'},
-  {navn:'William \u00d8stby',      loc:'ryen'},
-  {navn:'Norman Elton',            loc:'ryen'},
-  {navn:'Alexander Karlsen',       loc:'ryen'},
-  {navn:'Fabian Bredal-J\u00f8rgensen',loc:'fornebu'},
-  {navn:'Henrik \u00d8stby',       loc:'fornebu'},
-  {navn:'Johan Kalenius',          loc:'fornebu'},
-  {navn:'Odd Bjarne Bj\u00f8rvik', loc:'fornebu'},
-  {navn:'Ask Herlofsen',           loc:'fornebu'},
-  {navn:'Emanuel Bereket',         loc:'fornebu'},
-  {navn:'Daniel K. Johansen',      loc:'lillestrom'},
-  {navn:'Linn Askmann-Olsen',      loc:'lillestrom'},
-  {navn:'Simen Olsen',             loc:'lillestrom'},
-  {navn:'Andreas Lydersen',        loc:'lillestrom'},
-].map(function(s,i){
-  var col=SCOLS[i%SCOLS.length];
-  // Convert hex to rgba for background
-  var h=col.replace('#','');
-  var rv=parseInt(h.substring(0,2),16),gv=parseInt(h.substring(2,4),16),bv=parseInt(h.substring(4,6),16);
-  return Object.assign({},s,{
-    id:s.navn.toLowerCase().replace(/\s+/g,'_').replace(/[\u00e6]/g,'ae').replace(/[\u00f8]/g,'o').replace(/[\u00e5]/g,'aa').replace(/[^a-z0-9_]/g,''),
-    initials:s.navn.split(' ').map(function(x){return x[0];}).join('').substring(0,2).toUpperCase(),
-    color:col,
-    bg:'rgba('+rv+','+gv+','+bv+',.18)'
-  });
-});
-
-var TEAMS=[
-  {id:'ryen',       navn:'Ryen',           initials:'RY',color:'#3b82f6',bg:'rgba(59,130,246,.2)'},
-  {id:'fornebu',    navn:'Fornebu',        initials:'FN',color:'#10b981',bg:'rgba(16,185,129,.2)'},
-  {id:'lillestrom', navn:'Lillestr\u00f8m',initials:'LS',color:'#f59e0b',bg:'rgba(245,158,11,.2)'},
+var PTS = 3;
+var GOALS = {
+  mai: { ryen: 80,  lillestrom: 40,  fornebu: 80  },
+  jun: { ryen: 112, lillestrom: 96,  fornebu: 112 }
+};
+var DAILY = {
+  mai: { ryen: 80/22,  lillestrom: 40/22,  fornebu: 80/22  },
+  jun: { ryen: 112/22, lillestrom: 96/22,  fornebu: 112/22 }
+};
+var LC = { ryen: '#3b82f6', lillestrom: '#f59e0b', fornebu: '#10b981' };
+var LL = { ryen: 'Ryen', lillestrom: 'Lillestr\u00f8m', fornebu: 'Fornebu' };
+var SCOLS = [
+  '#e8001a','#00aaff','#00cc66','#ff8800','#cc44ff','#ffd700',
+  '#00d4ff','#ff4488','#44ffaa','#ffaa00','#aa44ff','#88ff44',
+  '#ff6644','#44aaff','#aaff44'
 ];
 
-// ─── SUPABASE ─────────────────────────────────────────────────────────
-var SUPABASE_URL='https://jffhdlmwvurnojoapcvs.supabase.co';
-var SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmZmhkbG13dnVybm9qb2FwY3ZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MzIzNjcsImV4cCI6MjA5MzEwODM2N30.Mc_eKMsfR04kLmwfBeH5INn3NTYapv62Fnt0wMpBpMw';
-var API=SUPABASE_URL+'/rest/v1/sales';
-var sales=[];
-var curTab='ind',curMonth='all',locFilter='all',pendingDelete=null;
+// ─── SELGERE ─────────────────────────────────────────────────────────
+var SELGERE_RAW = [
+  { navn: 'Thomas Dokken',              loc: 'ryen'       },
+  { navn: 'Emma Valen',                 loc: 'ryen'       },
+  { navn: 'William \u00d8stby',         loc: 'ryen'       },
+  { navn: 'Norman Elton',               loc: 'ryen'       },
+  { navn: 'Alexander Karlsen',          loc: 'ryen'       },
+  { navn: 'Fabian Bredal-J\u00f8rgensen', loc: 'fornebu'  },
+  { navn: 'Henrik \u00d8stby',          loc: 'fornebu'    },
+  { navn: 'Johan Kalenius',             loc: 'fornebu'    },
+  { navn: 'Odd Bjarne Bj\u00f8rvik',    loc: 'fornebu'    },
+  { navn: 'Ask Herlofsen',              loc: 'fornebu'    },
+  { navn: 'Emanuel Bereket',            loc: 'fornebu'    },
+  { navn: 'Daniel K. Johansen',         loc: 'lillestrom' },
+  { navn: 'Linn Askmann-Olsen',         loc: 'lillestrom' },
+  { navn: 'Simen Olsen',                loc: 'lillestrom' },
+  { navn: 'Andreas Lydersen',           loc: 'lillestrom' }
+];
 
-function sbHeaders(){
-  return {'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':'return=representation'};
+var SELGERE = SELGERE_RAW.map(function(s, i) {
+  var col = SCOLS[i % SCOLS.length];
+  var h = col.replace('#', '');
+  var rv = parseInt(h.slice(0,2), 16);
+  var gv = parseInt(h.slice(2,4), 16);
+  var bv = parseInt(h.slice(4,6), 16);
+  var id = s.navn.toLowerCase()
+    .replace(/\s+/g, '_')
+    .replace(/\u00e6/g, 'ae').replace(/\u00f8/g, 'o').replace(/\u00e5/g, 'aa')
+    .replace(/[^a-z0-9_]/g, '');
+  var initials = s.navn.split(' ').map(function(x) { return x[0]; }).join('').slice(0,2).toUpperCase();
+  return { navn: s.navn, loc: s.loc, id: id, initials: initials, color: col, bg: 'rgba('+rv+','+gv+','+bv+',.18)' };
+});
+
+var TEAMS = [
+  { id: 'ryen',       navn: 'Ryen',              initials: 'RY', color: '#3b82f6', bg: 'rgba(59,130,246,.2)'  },
+  { id: 'fornebu',    navn: 'Fornebu',            initials: 'FN', color: '#10b981', bg: 'rgba(16,185,129,.2)'  },
+  { id: 'lillestrom', navn: 'Lillestr\u00f8m',   initials: 'LS', color: '#f59e0b', bg: 'rgba(245,158,11,.2)'  }
+];
+
+// ─── STATE ───────────────────────────────────────────────────────────
+var sales       = [];
+var curTab      = 'ind';
+var curMonth    = 'all';
+var locFilter   = 'all';
+var userRole    = null;   // 'selger' | 'tilskuer'
+var pushEnabled = false;
+var pendingDel  = null;
+var PASSORD     = 'vcso2026';
+
+// ─── SUPABASE ────────────────────────────────────────────────────────
+function sbH() {
+  return {
+    'apikey': SUPABASE_KEY,
+    'Authorization': 'Bearer ' + SUPABASE_KEY,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=representation'
+  };
 }
 
-function showStatus(msg,isErr){
-  var el=document.getElementById('status-bar');
-  if(!el) return;
-  el.textContent=msg;
-  el.style.background=isErr?'rgba(239,68,68,.15)':'rgba(255,215,0,.1)';
-  el.style.color=isErr?'#ef4444':'#ffd700';
-  el.style.display='block';
-}
-function hideStatus(){var el=document.getElementById('status-bar');if(el)el.style.display='none';}
-
-function fetchSales(){
+function fetchSales() {
   showStatus('Henter data...');
-  fetch(API+'?order=ts.desc&limit=1000&deleted=is.false',{headers:sbHeaders()})
-    .then(function(r){return r.json();})
-    .then(function(data){
-      sales=Array.isArray(data)?data:[];
+  fetch(API + '?order=ts.desc&limit=1000&deleted=is.false', { headers: sbH() })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      sales = Array.isArray(data) ? data : [];
       hideStatus();
       renderAll();
+      updateMVP();
     })
-    .catch(function(e){showStatus('Feil: '+e.message,true);});
+    .catch(function(e) { showStatus('Feil: ' + e.message, true); });
 }
 
-function insertSale(obj,cb){
-  fetch(API,{method:'POST',headers:sbHeaders(),body:JSON.stringify(obj)})
-    .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
-    .then(function(data){var ins=Array.isArray(data)?data[0]:data;if(ins)sales.unshift(ins);cb(null);})
-    .catch(function(e){cb(e);});
+function insertSale(obj, cb) {
+  fetch(API, { method: 'POST', headers: sbH(), body: JSON.stringify(obj) })
+    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(function(d)  { var ins = Array.isArray(d) ? d[0] : d; if (ins) sales.unshift(ins); cb(null); })
+    .catch(function(e) { cb(e); });
 }
 
-function deleteSale(id,cb){
-  fetch(API+'?id=eq.'+id,{method:'PATCH',headers:sbHeaders(),body:JSON.stringify({deleted:true})})
-    .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);sales=sales.filter(function(s){return s.id!==id;});cb(null);})
-    .catch(function(e){cb(e);});
+function deleteSale(id, cb) {
+  fetch(API + '?id=eq.' + id, { method: 'PATCH', headers: sbH(), body: JSON.stringify({ deleted: true }) })
+    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); sales = sales.filter(function(s) { return s.id !== id; }); cb(null); })
+    .catch(function(e) { cb(e); });
 }
 
-// ─── DATO ─────────────────────────────────────────────────────────────
-function todayStr(){
-  var d=new Date();
-  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+function showStatus(msg, isErr) {
+  var el = document.getElementById('status-bar');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.background = isErr ? 'rgba(239,68,68,.15)' : 'rgba(255,215,0,.1)';
+  el.style.color = isErr ? '#ef4444' : '#ffd700';
+  el.style.display = 'block';
 }
-function daysAgo(n){
-  var d=new Date();d.setDate(d.getDate()-n);
-  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+function hideStatus() {
+  var el = document.getElementById('status-bar');
+  if (el) el.style.display = 'none';
 }
-function dayLabel(n){
-  if(n===0) return 'I dag';if(n===1) return 'I g\u00e5r';
-  var d=new Date();d.setDate(d.getDate()-n);
-  return ['\u00d8n','Man','Tir','Ons','Tor','Fre','L\u00f8r'][d.getDay()]+' '+d.getDate()+'.'+(d.getMonth()+1);
-}
-function tsDate(ts){return (ts||'').substring(0,10);}
 
-// ─── FORM DOTS ────────────────────────────────────────────────────────
-function selgerFormDots(navn){
-  return [0,1,2,3,4].map(function(i){
-    var d=daysAgo(i),lbl=dayLabel(i);
-    var count=sales.filter(function(s){return s.selger===navn&&tsDate(s.ts)===d;}).length;
-    return '<div class="fd '+(count>0?'sold':'empty')+'" title="'+lbl+': '+(count?count+' bil':'Ingen salg')+'"></div>';
+// ─── DATO-HJELPER ────────────────────────────────────────────────────
+function pad(n) { return String(n).padStart(2, '0'); }
+function todayStr() {
+  var d = new Date();
+  return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+}
+function daysAgo(n) {
+  var d = new Date(); d.setDate(d.getDate() - n);
+  return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+}
+function dayLabel(n) {
+  if (n === 0) return 'I dag'; if (n === 1) return 'I g\u00e5r';
+  var d = new Date(); d.setDate(d.getDate() - n);
+  return ['S\u00f8n','Man','Tir','Ons','Tor','Fre','L\u00f8r'][d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth()+1);
+}
+function tsDate(ts) { return (ts || '').substring(0, 10); }
+
+// ─── KALKULASJONER ───────────────────────────────────────────────────
+function goalsFor(navn, m) {
+  return sales.filter(function(s) {
+    if (m !== 'all' && s.mnd !== m) return false;
+    return s.selger === navn;
+  }).length;
+}
+function teamGoalsFor(teamId, m) {
+  return sales.filter(function(s) {
+    if (m !== 'all' && s.mnd !== m) return false;
+    var sObj = SELGERE.find(function(x) { return x.navn === s.selger; });
+    return sObj && sObj.loc === teamId;
+  }).length;
+}
+function teamGoal(teamId, m) {
+  if (m === 'all') return (GOALS.mai[teamId] || 0) + (GOALS.jun[teamId] || 0);
+  return (GOALS[m] && GOALS[m][teamId]) || 0;
+}
+
+// ─── FORM DOTS ───────────────────────────────────────────────────────
+function selgerDots(navn) {
+  return [0,1,2,3,4].map(function(i) {
+    var d = daysAgo(i), lbl = dayLabel(i);
+    var n = sales.filter(function(s) { return s.selger === navn && tsDate(s.ts) === d; }).length;
+    return '<div class="fd ' + (n > 0 ? 'sold' : 'empty') + '" title="' + lbl + ': ' + (n ? n + ' bil' : 'Ingen') + '"></div>';
   }).join('');
 }
-
-function teamFormDots(teamId){
-  return [0,1,2,3,4].map(function(i){
-    var d=daysAgo(i),lbl=dayLabel(i);
-    var mo=parseInt(d.split('-')[1]);
-    var mndKey=mo===5?'mai':'jun';
-    var goal=(DAILY_GOALS[mndKey]&&DAILY_GOALS[mndKey][teamId])||1;
-    var count=sales.filter(function(s){
-      var sObj=SELGERE.find(function(x){return x.navn===s.selger;});
-      return sObj&&sObj.loc===teamId&&tsDate(s.ts)===d;
+function teamDots(teamId) {
+  return [0,1,2,3,4].map(function(i) {
+    var d = daysAgo(i), lbl = dayLabel(i);
+    var mo = parseInt(d.split('-')[1]) === 5 ? 'mai' : 'jun';
+    var goal = (DAILY[mo] && DAILY[mo][teamId]) || 1;
+    var n = sales.filter(function(s) {
+      var sObj = SELGERE.find(function(x) { return x.navn === s.selger; });
+      return sObj && sObj.loc === teamId && tsDate(s.ts) === d;
     }).length;
-    var cls=count>=Math.ceil(goal)?'pace-good':count>0?'pace-partial':'pace-miss';
-    return '<div class="fd '+cls+'" title="'+lbl+': '+(count?count+' bil':'Ingen salg')+'"></div>';
+    var cls = n >= Math.ceil(goal) ? 'pace-good' : n > 0 ? 'pace-partial' : 'pace-miss';
+    return '<div class="fd ' + cls + '" title="' + lbl + ': ' + (n ? n + ' bil' : 'Ingen') + '"></div>';
   }).join('');
 }
 
-// ─── STREAK ───────────────────────────────────────────────────────────
-function streakCount(navn){
-  var streak=0;
-  var d=new Date();
-  for(var i=0;i<60;i++){
-    var ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    var dow=d.getDay();
-    var hadSale=sales.some(function(s){return s.selger===navn&&tsDate(s.ts)===ds;});
-    if(hadSale){streak++;}
-    else if(dow===0||dow===6){}
-    else if(i===0){}
-    else{break;}
-    d.setDate(d.getDate()-1);
+// ─── STREAK ──────────────────────────────────────────────────────────
+function streakCount(navn) {
+  var streak = 0, d = new Date();
+  for (var i = 0; i < 60; i++) {
+    var ds = d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+    var dow = d.getDay();
+    var had = sales.some(function(s) { return s.selger === navn && tsDate(s.ts) === ds; });
+    if (had)              { streak++; }
+    else if (dow===0||dow===6) { /* helg uten salg – hopp over */ }
+    else if (i === 0)     { /* i dag hverdag – ok */ }
+    else                  { break; }
+    d.setDate(d.getDate() - 1);
   }
   return streak;
 }
 
-// ─── KALKULASJONER ───────────────────────────────────────────────────
-function goalsFor(navn,m){
-  return sales.filter(function(s){
-    if(m!=='all'&&s.mnd!==m) return false;
-    return s.selger===navn;
-  }).length;
-}
-function teamGoalsFor(teamId,m){
-  return sales.filter(function(s){
-    if(m!=='all'&&s.mnd!==m) return false;
-    var sObj=SELGERE.find(function(x){return x.navn===s.selger;});
-    return sObj&&sObj.loc===teamId;
-  }).length;
-}
-function teamGoal(teamId,m){
-  if(m==='all') return (GOALS.mai[teamId]||0)+(GOALS.jun[teamId]||0);
-  return (GOALS[m]&&GOALS[m][teamId])||0;
-}
-
-// ─── RENDER SELGERE ──────────────────────────────────────────────────
-function renderInd(){
-  var el=document.getElementById('tbl-ind');
-  if(!el) return; // safety check
-  var m=curMonth;
-  var rows=SELGERE.map(function(s){
-    return Object.assign({},s,{g:goalsFor(s.navn,m),pts:goalsFor(s.navn,m)*PTS});
-  }).sort(function(a,b){return b.pts-a.pts||b.g-a.g;});
-  var pc=['var(--gold)','var(--silver)','var(--bronze)'];
-  document.getElementById('tbl-ind').innerHTML=rows.map(function(r,i){
-    var col=i<3?pc[i]:'var(--muted)';
-    var hasPhoto=typeof SELGER_PHOTOS!=='undefined'&&SELGER_PHOTOS[r.id];
-    var avInner=hasPhoto?'<img src="'+SELGER_PHOTOS[r.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">':r.initials;
-    var sk=streakCount(r.navn);
-    return '<div class="trow zm" style="animation-delay:'+(i*0.03)+'s">'+
-      '<div class="pos-n" style="color:'+col+'">'+(i+1)+'</div>'+
-      '<div><div class="av" style="background:'+r.bg+';color:'+r.color+';overflow:hidden;padding:0">'+avInner+'</div></div>'+
-      '<div class="name-c">'+
-        '<div class="name-main">'+r.navn+(sk>=3?' \uD83D\uDD25':'')+'</div>'+
-        '<div class="name-sub">'+(LL[r.loc]||r.loc)+'</div>'+
-      '</div>'+
-      '<div class="sc">'+r.g+'</div>'+
-      '<div class="sc pts">'+r.pts+'</div>'+
-      '<div><div class="form-dots">'+selgerFormDots(r.navn)+'</div></div>'+
-      '<div class="sc pts">'+r.pts+'</div>'+
-    '</div>';
-  }).join('');
+// ─── MVP ─────────────────────────────────────────────────────────────
+function updateMVP() {
+  var today = todayStr(), counts = {}, best = null, bestN = 0;
+  sales.forEach(function(s) { if (tsDate(s.ts) === today) counts[s.selger] = (counts[s.selger]||0) + 1; });
+  Object.keys(counts).forEach(function(n) { if (counts[n] > bestN) { bestN = counts[n]; best = n; } });
+  var banner = document.getElementById('mvp-banner');
+  if (!banner) return;
+  if (!best || bestN === 0) { banner.style.display = 'none'; return; }
+  banner.style.display = 'flex';
+  document.getElementById('mvp-name').textContent = best;
+  document.getElementById('mvp-stat').textContent = bestN + (bestN > 1 ? ' biler i dag' : ' bil i dag');
+  var sObj = SELGERE.find(function(x) { return x.navn === best; }) || {};
+  var av = document.getElementById('mvp-av');
+  if (av) {
+    if (typeof SELGER_PHOTOS !== 'undefined' && SELGER_PHOTOS[sObj.id]) {
+      av.innerHTML = '<img src="' + SELGER_PHOTOS[sObj.id] + '" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">';
+    } else {
+      av.style.background = sObj.bg || 'rgba(255,215,0,.2)';
+      av.style.color = sObj.color || 'var(--gold)';
+      av.textContent = sObj.initials || '?';
+    }
+  }
 }
 
-// ─── RENDER AVDELINGER ───────────────────────────────────────────────
-function renderTeam(){
-  var m=curMonth;
-  var rows=TEAMS.map(function(t){
-    var g=teamGoalsFor(t.id,m),goal=teamGoal(t.id,m);
-    return Object.assign({},t,{g:g,goal:goal,pts:g*PTS,pct:goal>0?Math.min(g/goal*100,100):0});
-  }).sort(function(a,b){return b.pts-a.pts||b.g-a.g;});
-  var pc=['var(--gold)','var(--silver)','var(--bronze)'];
-  document.getElementById('tbl-team').innerHTML=rows.map(function(r,i){
-    var col=i<3?pc[i]:'var(--muted)';
-    var bc=r.pct>=100?'var(--g)':r.pct>=60?'var(--y)':'var(--r)';
-    var members=SELGERE.filter(function(s){return s.loc===r.id;}).length;
-    return '<div class="trow zm" style="animation-delay:'+(i*0.06)+'s">'+
-      '<div class="pos-n" style="color:'+col+'">'+(i+1)+'</div>'+
-      '<div><div class="av" style="background:'+r.bg+';color:'+r.color+'">'+r.initials+'</div></div>'+
-      '<div class="name-c">'+
-        '<div class="name-main">'+r.navn+'</div>'+
-        '<div class="name-sub">'+members+' selgere \u00b7 M\u00e5l: '+r.goal+'</div>'+
-        '<div class="prog-wrap" style="margin-top:4px">'+
-          '<div class="prog-bg"><div class="prog-fill" style="width:'+r.pct.toFixed(1)+'%;background:'+bc+'"></div></div>'+
-          '<div class="prog-lbl"><span style="color:'+bc+'">'+r.g+' / '+r.goal+'</span><span>'+Math.round(r.pct)+'%</span></div>'+
-        '</div>'+
-      '</div>'+
-      '<div class="sc">'+r.g+'</div>'+
-      '<div class="sc pts">'+r.pts+'</div>'+
-      '<div><div class="form-dots">'+teamFormDots(r.id)+'</div></div>'+
-      '<div class="sc pts">'+r.pts+'</div>'+
-    '</div>';
+// ─── KONFETTI ────────────────────────────────────────────────────────
+function launchKonfetti(color) {
+  var wrap = document.getElementById('konfetti');
+  if (!wrap) return;
+  wrap.classList.remove('hide');
+  wrap.innerHTML = '';
+  var cols = color ? [color, '#fff', color] : ['#ffd700','#fff','#3b82f6','#10b981','#f59e0b'];
+  for (var i = 0; i < 80; i++) {
+    var bit = document.createElement('div');
+    bit.className = 'kbit';
+    bit.style.left = (Math.random()*100) + '%';
+    bit.style.background = cols[Math.floor(Math.random()*cols.length)];
+    var sz = 6 + Math.random()*8;
+    bit.style.width = sz + 'px'; bit.style.height = sz + 'px';
+    bit.style.borderRadius = Math.random() > .5 ? '50%' : '2px';
+    bit.style.animationDuration = (1.5 + Math.random()*2) + 's';
+    bit.style.animationDelay = (Math.random()*0.8) + 's';
+    wrap.appendChild(bit);
+  }
+  setTimeout(function() { wrap.classList.add('hide'); }, 3500);
+}
+
+// ─── PUSH ────────────────────────────────────────────────────────────
+function requestPush() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'granted') { pushEnabled = true; return; }
+  if (Notification.permission !== 'denied') {
+    Notification.requestPermission().then(function(p) { pushEnabled = (p === 'granted'); });
+  }
+}
+function sendPush(selger, modell, loc) {
+  if (!pushEnabled || Notification.permission !== 'granted') return;
+  var streak = streakCount(selger);
+  try {
+    new Notification(selger.split(' ')[0] + ' scorer! +3 poeng', {
+      body: (LL[loc]||loc) + ' - ' + modell + (streak >= 3 ? ' - ' + streak + ' dager pa rad!' : '')
+    });
+  } catch(e) {}
+}
+
+// ─── RENDER: SELGERE ─────────────────────────────────────────────────
+function renderInd() {
+  var el = document.getElementById('tbl-ind');
+  if (!el) return;
+  var m = curMonth;
+  var rows = SELGERE.map(function(s) {
+    var g = goalsFor(s.navn, m);
+    return { navn:s.navn, loc:s.loc, id:s.id, initials:s.initials, color:s.color, bg:s.bg, g:g, pts:g*PTS };
+  }).sort(function(a,b) { return b.pts-a.pts || b.g-a.g; });
+  var gold='var(--gold)', silver='var(--silver)', bronze='var(--bronze)';
+  el.innerHTML = rows.map(function(r,i) {
+    var pc = i===0?gold : i===1?silver : i===2?bronze : 'var(--muted)';
+    var sk = streakCount(r.navn);
+    var hasPhoto = typeof SELGER_PHOTOS !== 'undefined' && SELGER_PHOTOS[r.id];
+    var avHtml = hasPhoto
+      ? '<img src="'+SELGER_PHOTOS[r.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">'
+      : r.initials;
+    return '<div class="trow zm" style="animation-delay:'+(i*0.03)+'s">'
+      + '<div class="pos-n" style="color:'+pc+'">'+(i+1)+'</div>'
+      + '<div><div class="av" style="background:'+r.bg+';color:'+r.color+';overflow:hidden;padding:0">'+avHtml+'</div></div>'
+      + '<div class="name-c">'
+        + '<div class="name-main">'+r.navn+(sk>=3?' \uD83D\uDD25':'')+'</div>'
+        + '<div class="name-sub">'+(LL[r.loc]||r.loc)+'</div>'
+      + '</div>'
+      + '<div class="sc">'+r.g+'</div>'
+      + '<div class="sc pts">'+r.pts+'</div>'
+      + '<div><div class="form-dots">'+selgerDots(r.navn)+'</div></div>'
+      + '<div class="sc pts">'+r.pts+'</div>'
+    + '</div>';
   }).join('');
 }
 
-// ─── RENDER STATS ─────────────────────────────────────────────────────
-function renderStats(){
-  var m=curMonth;
-  var scorers=SELGERE.map(function(s){return Object.assign({},s,{g:goalsFor(s.navn,m)});}).sort(function(a,b){return b.g-a.g;});
-  var maxG=scorers[0]?scorers[0].g:1;
-  var today=todayStr();
-  document.getElementById('top-scorers').innerHTML=scorers.slice(0,8).map(function(s,i){
-    var hasPhoto=typeof SELGER_PHOTOS!=='undefined'&&SELGER_PHOTOS[s.id];
-    var avInner=hasPhoto?'<img src="'+SELGER_PHOTOS[s.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">':s.initials;
-    return '<div class="sc-row">'+
-      '<div class="sc-pos">'+(i+1)+'</div>'+
-      '<div class="sc-av" style="background:'+s.bg+';color:'+s.color+';overflow:hidden;padding:0">'+avInner+'</div>'+
-      '<div style="flex:1"><div class="sc-name">'+s.navn+'</div><div class="sc-sub">'+(LL[s.loc]||s.loc)+'</div>'+
-        '<div style="height:4px;background:var(--faint);border-radius:2px;margin-top:3px;overflow:hidden">'+
-          '<div style="width:'+Math.round(s.g/maxG*100)+'%;height:100%;background:'+s.color+';border-radius:2px;transition:width 1.2s cubic-bezier(.4,0,.2,1)"></div>'+
-        '</div></div>'+
-      '<div class="sc-n">'+s.g+'</div>'+
-    '</div>';
+// ─── RENDER: AVDELINGER ──────────────────────────────────────────────
+function renderTeam() {
+  var el = document.getElementById('tbl-team');
+  if (!el) return;
+  var m = curMonth;
+  var rows = TEAMS.map(function(t) {
+    var g = teamGoalsFor(t.id, m);
+    var goal = teamGoal(t.id, m);
+    var pct = goal > 0 ? Math.min(g/goal*100, 100) : 0;
+    return { id:t.id, navn:t.navn, initials:t.initials, color:t.color, bg:t.bg, g:g, goal:goal, pts:g*PTS, pct:pct };
+  }).sort(function(a,b) { return b.pts-a.pts || b.g-a.g; });
+  var gold='var(--gold)', silver='var(--silver)', bronze='var(--bronze)';
+  el.innerHTML = rows.map(function(r,i) {
+    var pc = i===0?gold : i===1?silver : i===2?bronze : 'var(--muted)';
+    var barCol = r.pct>=100?'var(--g)' : r.pct>=60?'var(--y)' : 'var(--r)';
+    var members = SELGERE.filter(function(s) { return s.loc===r.id; }).length;
+    return '<div class="trow zm" style="animation-delay:'+(i*0.06)+'s">'
+      + '<div class="pos-n" style="color:'+pc+'">'+(i+1)+'</div>'
+      + '<div><div class="av" style="background:'+r.bg+';color:'+r.color+'">'+r.initials+'</div></div>'
+      + '<div class="name-c">'
+        + '<div class="name-main">'+r.navn+'</div>'
+        + '<div class="name-sub">'+members+' selgere &middot; M\u00e5l: '+r.goal+'</div>'
+        + '<div class="prog-wrap" style="margin-top:4px">'
+          + '<div class="prog-bg"><div class="prog-fill" style="width:'+r.pct.toFixed(1)+'%;background:'+barCol+'"></div></div>'
+          + '<div class="prog-lbl"><span style="color:'+barCol+'">'+r.g+' / '+r.goal+'</span><span>'+Math.round(r.pct)+'%</span></div>'
+        + '</div>'
+      + '</div>'
+      + '<div class="sc">'+r.g+'</div>'
+      + '<div class="sc pts">'+r.pts+'</div>'
+      + '<div><div class="form-dots">'+teamDots(r.id)+'</div></div>'
+      + '<div class="sc pts">'+r.pts+'</div>'
+    + '</div>';
   }).join('');
-  document.getElementById('top-form').innerHTML=SELGERE.map(function(s,i){
-    var todaySales=sales.filter(function(x){return x.selger===s.navn&&tsDate(x.ts)===today;}).length;
-    var hasPhoto=typeof SELGER_PHOTOS!=='undefined'&&SELGER_PHOTOS[s.id];
-    var avInner=hasPhoto?'<img src="'+SELGER_PHOTOS[s.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">':s.initials;
-    return '<div class="sc-row">'+
-      '<div class="sc-pos">'+(i+1)+'</div>'+
-      '<div class="sc-av" style="background:'+s.bg+';color:'+s.color+';overflow:hidden;padding:0">'+avInner+'</div>'+
-      '<div style="flex:1"><div class="sc-name">'+s.navn+'</div>'+
-        '<div style="display:flex;gap:3px;margin-top:4px">'+selgerFormDots(s.navn)+'</div></div>'+
-      '<div class="sc-n" style="color:'+(todaySales>0?'var(--g)':'var(--muted)')+'">'+
-        (todaySales>0?'+'+todaySales:'&ndash;')+'</div>'+
-    '</div>';
+}
+
+// ─── RENDER: STATISTIKK ──────────────────────────────────────────────
+function renderStats() {
+  var m = curMonth;
+  var scorers = SELGERE.map(function(s) {
+    return { navn:s.navn, loc:s.loc, id:s.id, initials:s.initials, color:s.color, bg:s.bg, g:goalsFor(s.navn,m) };
+  }).sort(function(a,b) { return b.g-a.g; });
+  var maxG = scorers[0] ? scorers[0].g : 1;
+
+  var el1 = document.getElementById('top-scorers');
+  if (el1) el1.innerHTML = scorers.slice(0,8).map(function(s,i) {
+    var hasPhoto = typeof SELGER_PHOTOS !== 'undefined' && SELGER_PHOTOS[s.id];
+    var avHtml = hasPhoto ? '<img src="'+SELGER_PHOTOS[s.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">' : s.initials;
+    return '<div class="sc-row">'
+      + '<div class="sc-pos">'+(i+1)+'</div>'
+      + '<div class="sc-av" style="background:'+s.bg+';color:'+s.color+';overflow:hidden;padding:0">'+avHtml+'</div>'
+      + '<div style="flex:1"><div class="sc-name">'+s.navn+'</div>'
+        + '<div class="sc-sub">'+(LL[s.loc]||s.loc)+'</div>'
+        + '<div style="height:4px;background:var(--faint);border-radius:2px;margin-top:3px;overflow:hidden">'
+          + '<div style="width:'+Math.round(s.g/Math.max(maxG,1)*100)+'%;height:100%;background:'+s.color+';border-radius:2px;transition:width 1.2s"></div>'
+        + '</div>'
+      + '</div>'
+      + '<div class="sc-n">'+s.g+'</div>'
+    + '</div>';
   }).join('');
-  var teams=TEAMS.map(function(t){
-    var g=teamGoalsFor(t.id,m),goal=teamGoal(t.id,m);
-    return Object.assign({},t,{g:g,goal:goal,pct:goal>0?Math.min(g/goal*100,100):0});
+
+  var today = todayStr();
+  var el2 = document.getElementById('top-form');
+  if (el2) el2.innerHTML = SELGERE.map(function(s,i) {
+    var td = sales.filter(function(x) { return x.selger===s.navn && tsDate(x.ts)===today; }).length;
+    var hasPhoto = typeof SELGER_PHOTOS !== 'undefined' && SELGER_PHOTOS[s.id];
+    var avHtml = hasPhoto ? '<img src="'+SELGER_PHOTOS[s.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">' : s.initials;
+    return '<div class="sc-row">'
+      + '<div class="sc-pos">'+(i+1)+'</div>'
+      + '<div class="sc-av" style="background:'+s.bg+';color:'+s.color+';overflow:hidden;padding:0">'+avHtml+'</div>'
+      + '<div style="flex:1"><div class="sc-name">'+s.navn+'</div>'
+        + '<div style="display:flex;gap:3px;margin-top:4px">'+selgerDots(s.navn)+'</div>'
+      + '</div>'
+      + '<div class="sc-n" style="color:'+(td>0?'var(--g)':'var(--muted)')+'">'+( td>0?'+'+td:'&ndash;')+'</div>'
+    + '</div>';
+  }).join('');
+
+  var el3 = document.getElementById('team-bars');
+  if (el3) el3.innerHTML = TEAMS.map(function(t) {
+    var g = teamGoalsFor(t.id, m), goal = teamGoal(t.id, m);
+    var pct = goal > 0 ? Math.min(g/goal*100, 100) : 0;
+    var barCol = pct>=100?'var(--g)' : pct>=60?'var(--y)' : 'var(--r)';
+    return '<div class="bar-row">'
+      + '<div class="bar-lbl"><span style="color:'+t.color+'">'+t.navn+'</span>'
+        + '<span>'+g+' / '+goal+' biler &middot; '+Math.round(pct)+'%</span></div>'
+      + '<div class="bar-bg"><div class="bar-fill" style="width:'+pct.toFixed(1)+'%;background:'+barCol+'"></div></div>'
+    + '</div>';
+  }).join('');
+}
+
+// ─── RENDER: SCORINGER ───────────────────────────────────────────────
+function renderScoring() {
+  var all = locFilter === 'all' ? sales : sales.filter(function(s) {
+    var sObj = SELGERE.find(function(x) { return x.navn === s.selger; });
+    return sObj && sObj.loc === locFilter;
   });
-  document.getElementById('team-bars').innerHTML=teams.map(function(t){
-    var bc=t.pct>=100?'var(--g)':t.pct>=60?'var(--y)':'var(--r)';
-    return '<div class="bar-row">'+
-      '<div class="bar-lbl"><span style="color:'+t.color+'">'+t.navn+'</span><span>'+t.g+' / '+t.goal+' biler &middot; '+Math.round(t.pct)+'%</span></div>'+
-      '<div class="bar-bg"><div class="bar-fill" style="width:'+t.pct.toFixed(1)+'%;background:'+bc+'"></div></div>'+
-    '</div>';
+  var cnt = document.getElementById('scoring-count');
+  if (cnt) cnt.textContent = all.length;
+  var grid = document.getElementById('scoring-grid');
+  if (!grid) return;
+  if (!all.length) { grid.innerHTML = '<div class="scoring-empty">Ingen scoringer registrert enn\u00e5</div>'; return; }
+  var today = todayStr();
+  var sorted = all.slice().sort(function(a,b) { return (b.ts||'').localeCompare(a.ts||''); });
+  grid.innerHTML = sorted.map(function(s, i) {
+    var sObj = SELGERE.find(function(x) { return x.navn === s.selger; }) || {};
+    var col = LC[sObj.loc] || '#3b82f6';
+    var lbl = LL[sObj.loc] || sObj.loc || '';
+    var isNew = tsDate(s.ts) === today;
+    var dp = (s.ts||'').substring(0,10), tp = (s.ts||'').substring(11,16);
+    var dArr = dp.split('-');
+    var dateShow = dArr[2] ? dArr[2]+'.'+dArr[1]+'.' : dp;
+    var imgHtml = typeof CAR_IMAGES !== 'undefined' && CAR_IMAGES[s.modell]
+      ? '<img class="score-car-img" src="'+CAR_IMAGES[s.modell]+'" alt="'+s.modell+'">'
+      : '<div class="score-car-placeholder">'+s.modell+'</div>';
+    return '<div class="score-card" style="animation-delay:'+(i*0.02)+'s">'
+      + (userRole==='selger'?'<div class="score-del" onclick="askDel(\''+s.id+'\',\''+s.selger+' \u2013 '+s.modell+'\')">Slett</div>':'')
+      + (isNew?'<div class="score-new">NY</div>':'')
+      + imgHtml
+      + '<div class="score-modell">'+s.modell+'</div>'
+      + (s.finansiert?'<div style="font-family:Anton,sans-serif;font-size:10px;letter-spacing:2px;color:var(--gold);margin-top:3px">\u25c6 FINANSIERT</div>':'')
+      + '<div class="score-selger">'+s.selger+'</div>'
+      + '<div class="score-tid">'+lbl+' &middot; '+dateShow+' '+tp+'</div>'
+      + '<div class="score-loc-bar" style="background:'+col+'"></div>'
+    + '</div>';
   }).join('');
 }
 
-// ─── RENDER SCORINGER ─────────────────────────────────────────────────
-function renderScoring(){
-  var all=sales;
-  var filtered=locFilter==='all'?all:all.filter(function(s){
-    var sObj=SELGERE.find(function(x){return x.navn===s.selger;});
-    return sObj&&sObj.loc===locFilter;
-  });
-  document.getElementById('scoring-count').textContent=filtered.length;
-  if(!filtered.length){document.getElementById('scoring-grid').innerHTML='<div class="scoring-empty">Ingen scoringer registrert enn\u00e5</div>';return;}
-  var today=todayStr();
-  document.getElementById('scoring-grid').innerHTML=filtered.map(function(s,i){
-    var sObj=SELGERE.find(function(x){return x.navn===s.selger;})||{};
-    var col=LC[sObj.loc]||'#3b82f6',lbl=LL[sObj.loc]||sObj.loc||'';
-    var isNew=tsDate(s.ts)===today;
-    var ts=s.ts||'',dp=ts.substring(0,10),tp=ts.substring(11,16);
-    var da=dp.split('-');
-    var dateShow=da[2]?da[2]+'.'+da[1]+'.':dp;
-    var imgHtml=typeof CAR_IMAGES!=='undefined'&&CAR_IMAGES[s.modell]
-      ?'<img class="score-car-img" src="'+CAR_IMAGES[s.modell]+'" alt="'+s.modell+'">'
-      :'<div class="score-car-placeholder">'+s.modell+'</div>';
-    var canDel=userRole==='selger';
-    return '<div class="score-card" style="animation-delay:'+(i*0.03)+'s">'+
-      (canDel?'<div class="score-del" onclick="askDelete(\''+s.id+'\',\''+s.selger+' \u2013 '+s.modell+'\')">Slett</div>':'')+
-      (isNew?'<div class="score-new">NY</div>':'')+
-      imgHtml+
-      '<div class="score-modell">'+s.modell+'</div>'+
-      (s.finansiert?'<div style="font-family:Anton,sans-serif;font-size:10px;letter-spacing:2px;color:var(--gold);margin-top:3px">\u25c6 FINANSIERT</div>':'')+
-      '<div class="score-selger">'+s.selger+'</div>'+
-      '<div class="score-tid">'+lbl+' \u00b7 '+dateShow+' '+tp+'</div>'+
-      '<div class="score-loc-bar" style="background:'+col+'"></div>'+
-    '</div>';
-  }).join('');
+function renderAll() {
+  if      (curTab==='ind')     renderInd();
+  else if (curTab==='team')    renderTeam();
+  else if (curTab==='stats')   renderStats();
+  else if (curTab==='scoring') renderScoring();
+  updateMVP();
 }
 
-// ─── DELETE ───────────────────────────────────────────────────────────
-function askDelete(id,label){
-  pendingDelete=id;
-  document.getElementById('modal-body').textContent='Vil du slette: '+label+'?';
-  document.getElementById('modal').classList.add('show');
-}
-function closeModal(){document.getElementById('modal').classList.remove('show');pendingDelete=null;}
-function confirmDelete(){
-  if(!pendingDelete){closeModal();return;}
-  var id=pendingDelete;closeModal();
-  deleteSale(id,function(err){
-    if(err){toast('Feil ved sletting!');return;}
-    toast('Scoring slettet.');renderAll();
-  });
-}
-document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
-document.getElementById('help-modal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show');});
-
-// ─── TAB / MONTH / FILTER ────────────────────────────────────────────
-function setTab(tab,btn){
-  curTab=tab;
-  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+// ─── NAVIGASJON ──────────────────────────────────────────────────────
+function setTab(tab, btn) {
+  curTab = tab;
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('on'); });
   btn.classList.add('on');
-  document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');});
+  document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('on'); });
   document.getElementById('view-'+tab).classList.add('on');
   renderAll();
 }
-function setMonth(m,btn){
-  curMonth=m;
-  document.querySelectorAll('.mt').forEach(function(t){t.classList.remove('on');});
+function setMonth(m, btn) {
+  curMonth = m;
+  document.querySelectorAll('.mt').forEach(function(t) { t.classList.remove('on'); });
   btn.classList.add('on');
-  var labels={all:'Mai + Juni 2026',mai:'Mai 2026',jun:'Juni 2026'};
-  document.getElementById('mbar-v').textContent=labels[m]||m;
+  document.getElementById('mbar-v').textContent = {all:'Mai + Juni 2026',mai:'Mai 2026',jun:'Juni 2026'}[m]||m;
   renderAll();
 }
-function setLocFilter(loc,btn){
-  locFilter=loc;
-  document.querySelectorAll('.lf-btn').forEach(function(b){b.classList.remove('on');});
+function setLocFilter(loc, btn) {
+  locFilter = loc;
+  document.querySelectorAll('.lf-btn').forEach(function(b) { b.classList.remove('on'); });
   btn.classList.add('on');
   renderScoring();
 }
 
-// ─── REGISTER ────────────────────────────────────────────────────────
-function populateSelgers(){
-  var sel=document.getElementById('sel-selger');
-  if(!sel) return;
-  // Clear and rebuild
-  sel.innerHTML='<option value="">Selger...</option>';
-  var groups={ryen:[],fornebu:[],lillestrom:[]};
-  SELGERE.forEach(function(s){if(groups[s.loc])groups[s.loc].push(s);});
-  [['ryen','Ryen'],['fornebu','Fornebu'],['lillestrom','Lillestrøm']].forEach(function(pair){
-    var og=document.createElement('optgroup');og.label=pair[1];
-    groups[pair[0]].forEach(function(s){
-      var o=document.createElement('option');o.value=s.navn;o.textContent=s.navn;og.appendChild(o);
+// ─── REGISTRERING ────────────────────────────────────────────────────
+function buildSelgerDropdown() {
+  var sel = document.getElementById('sel-selger');
+  if (!sel) return;
+  // Always rebuild fresh
+  sel.innerHTML = '<option value="">Selger...</option>';
+  var groups = { ryen: [], fornebu: [], lillestrom: [] };
+  SELGERE.forEach(function(s) { if (groups[s.loc]) groups[s.loc].push(s); });
+  [['ryen','Ryen'],['fornebu','Fornebu'],['lillestrom','Lillestr\u00f8m']].forEach(function(pair) {
+    var og = document.createElement('optgroup');
+    og.label = pair[1];
+    groups[pair[0]].forEach(function(s) {
+      var o = document.createElement('option');
+      o.value = s.navn;
+      o.textContent = s.navn;
+      og.appendChild(o);
     });
     sel.appendChild(og);
   });
-  // Auto-set hidden loc field when selger is chosen
-  sel.onchange = function(){
-    var sObj=SELGERE.find(function(x){return x.navn===sel.value;});
-    var locField=document.getElementById('sel-loc');
-    if(sObj&&locField) locField.value=sObj.loc;
+  // Auto-set hidden loc field on change
+  sel.onchange = function() {
+    var sObj = SELGERE.find(function(x) { return x.navn === sel.value; });
+    var locEl = document.getElementById('sel-loc');
+    if (locEl) locEl.value = sObj ? sObj.loc : '';
   };
 }
 
-function reg(){
-  if(userRole!=='selger'){toast('Du m\u00e5 logge inn som selger!');return;}
-  var selger=document.getElementById('sel-selger').value;
-  var modell=document.getElementById('sel-modell').value;
-  var finansiert=document.getElementById('chk-fin').checked;
-  if(!selger){toast('Velg selger!');return;}
-  if(!modell){toast('Velg modell!');return;}
-  var now=new Date();
-  var mo=now.getMonth()+1;
-  var mnd=mo===5?'mai':mo===6?'jun':'';
-  if(!mnd){toast('Konkurransen gjelder mai og juni!');return;}
-  var ts=now.getFullYear()+'-'+String(mo).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+'T'+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')+':00';
-  var sObj=SELGERE.find(function(x){return x.navn===selger;})||{};
-  var obj={selger:selger,modell:modell,loc:sObj.loc||'',mnd:mnd,ts:ts,finansiert:finansiert};
-  document.getElementById('reg-btn').disabled=true;
-  document.getElementById('reg-btn').textContent='Lagrer...';
-  insertSale(obj,function(err){
-    document.getElementById('reg-btn').disabled=false;
-    document.getElementById('reg-btn').textContent='Registrer scoring \u2014 +3 poeng!';
-    if(err){toast('Feil: '+err.message);return;}
-    document.getElementById('sel-selger').value='';
-    document.getElementById('sel-modell').value='';
-    document.getElementById('chk-fin').checked=false;
-    document.getElementById('fin-badge').style.opacity='0';
-    document.getElementById('chk-box').classList.remove('fin-box-active');
-    document.getElementById('fin-label').classList.remove('fin-active');
-    var total=sales.filter(function(s){return s.selger===selger;}).length;
-    var name=selger.split(' ')[0];
-    var sk=streakCount(selger);
-    var quips=[name+' SCORER! +3 poeng! '+total+' m\u00e5l!','M\u00c5L! '+name+' leverer!',name+' er varm! '+total+' biler.','Fantastisk! '+name+' scorer igjen!'];
-    toast(quips[total%quips.length]+(sk>=3?' \uD83D\uDD25 '+sk+' dager p\u00e5 rad!':''));
-    launchKonfetti(LC[sObj.loc]||'#ffd700');
-    updateMVP();
+function toggleFin() {
+  var chk = document.getElementById('chk-fin');
+  if (!chk) return;
+  chk.checked = !chk.checked;
+  var on = chk.checked;
+  var cross = document.getElementById('chk-cross');
+  var box   = document.getElementById('chk-box');
+  var badge = document.getElementById('fin-badge');
+  var label = document.getElementById('fin-label');
+  if (cross) cross.style.display = on ? 'block' : 'none';
+  if (box)   box.classList.toggle('fin-box-active', on);
+  if (badge) badge.style.opacity = on ? '1' : '0';
+  if (label) label.classList.toggle('fin-active', on);
+}
+
+function reg() {
+  if (userRole !== 'selger') { toast('Logg inn som selger for \u00e5 registrere salg.'); return; }
+  var selger = document.getElementById('sel-selger').value;
+  var modell  = document.getElementById('sel-modell').value;
+  if (!selger) { toast('Velg selger!'); return; }
+  if (!modell)  { toast('Velg modell!'); return; }
+
+  var now = new Date(), mo = now.getMonth() + 1;
+  var mnd = mo===5?'mai' : mo===6?'jun' : '';
+  if (!mnd) { toast('Konkurransen gjelder mai og juni!'); return; }
+
+  var sObj = SELGERE.find(function(x) { return x.navn === selger; }) || {};
+  var ts = now.getFullYear()+'-'+pad(mo)+'-'+pad(now.getDate())+'T'+pad(now.getHours())+':'+pad(now.getMinutes())+':00';
+  var finansiert = document.getElementById('chk-fin').checked;
+
+  var btn = document.getElementById('reg-btn');
+  btn.disabled = true; btn.textContent = 'Lagrer...';
+
+  insertSale({ selger:selger, modell:modell, loc:sObj.loc||'', mnd:mnd, ts:ts, finansiert:finansiert }, function(err) {
+    btn.disabled = false; btn.textContent = 'Registrer scoring \u2014 +3 poeng!';
+    if (err) { toast('Feil ved lagring: ' + err.message); return; }
+
+    // Reset form
+    document.getElementById('sel-selger').value = '';
+    document.getElementById('sel-modell').value = '';
+    document.getElementById('sel-loc').value = '';
+    document.getElementById('chk-fin').checked = false;
+    var cross = document.getElementById('chk-cross');
+    var box   = document.getElementById('chk-box');
+    var badge = document.getElementById('fin-badge');
+    var label = document.getElementById('fin-label');
+    if (cross) cross.style.display = 'none';
+    if (box)   box.classList.remove('fin-box-active');
+    if (badge) badge.style.opacity = '0';
+    if (label) label.classList.remove('fin-active');
+
+    var total = sales.filter(function(s) { return s.selger === selger; }).length;
+    var name = selger.split(' ')[0];
+    toast(name + ' SCORER! +3 poeng! ' + total + ' m\u00e5l totalt!');
+    launchKonfetti(LC[sObj.loc] || '#ffd700');
+    sendPush(selger, modell, sObj.loc);
     renderAll();
-    if(curTab!=='scoring') setTimeout(function(){setTab('scoring',document.querySelectorAll('.tab')[3]);},1000);
+    // Switch to scoringer tab
+    setTimeout(function() {
+      setTab('scoring', document.querySelectorAll('.tab')[3]);
+    }, 900);
   });
 }
 
-function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},4500);}
-
-function renderAll(){
-  if(curTab==='ind')          renderInd();
-  else if(curTab==='team')    renderTeam();
-  else if(curTab==='stats')   renderStats();
-  else if(curTab==='scoring') renderScoring();
-  updateMVP();
+function toast(msg) {
+  var t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 4500);
 }
 
-// ─── KONFETTI ────────────────────────────────────────────────────────
-function launchKonfetti(color){
-  var wrap=document.getElementById('konfetti');
-  wrap.classList.remove('hide');wrap.innerHTML='';
-  var colors=color?[color,'#ffffff',color+'99']:['#ffd700','#ffffff','#3b82f6','#10b981','#f59e0b'];
-  for(var i=0;i<90;i++){
-    var bit=document.createElement('div');bit.className='kbit';
-    bit.style.left=(Math.random()*100)+'%';
-    bit.style.background=colors[Math.floor(Math.random()*colors.length)];
-    bit.style.width=(6+Math.random()*8)+'px';bit.style.height=(6+Math.random()*8)+'px';
-    bit.style.borderRadius=Math.random()>.5?'50%':'2px';
-    bit.style.animationDuration=(1.5+Math.random()*2)+'s';
-    bit.style.animationDelay=(Math.random()*0.8)+'s';
-    wrap.appendChild(bit);
-  }
-  setTimeout(function(){wrap.classList.add('hide');},3500);
+// ─── SLETT ───────────────────────────────────────────────────────────
+function askDel(id, label) {
+  pendingDel = id;
+  var mb = document.getElementById('modal-body');
+  if (mb) mb.textContent = 'Vil du slette: ' + label + '?';
+  var mo = document.getElementById('modal');
+  if (mo) mo.classList.add('show');
 }
-
-// ─── MVP ──────────────────────────────────────────────────────────────
-function updateMVP(){
-  var today=todayStr();
-  var counts={};
-  sales.forEach(function(s){if(tsDate(s.ts)===today)counts[s.selger]=(counts[s.selger]||0)+1;});
-  var best=null,bestN=0;
-  Object.keys(counts).forEach(function(n){if(counts[n]>bestN){bestN=counts[n];best=n;}});
-  var banner=document.getElementById('mvp-banner');
-  if(!banner) return;
-  if(!best||bestN===0){banner.style.display='none';return;}
-  banner.style.display='flex';
-  document.getElementById('mvp-name').textContent=best;
-  document.getElementById('mvp-stat').textContent=bestN+(bestN>1?' biler i dag':' bil i dag');
-  var sObj=SELGERE.find(function(x){return x.navn===best;})||{};
-  var avEl=document.getElementById('mvp-av');
-  if(typeof SELGER_PHOTOS!=='undefined'&&SELGER_PHOTOS[sObj.id]){
-    avEl.innerHTML='<img src="'+SELGER_PHOTOS[sObj.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">';
-  } else {
-    var init=document.getElementById('mvp-av-init');
-    if(init){init.style.background=sObj.bg||'';init.style.color=sObj.color||'var(--gold)';init.textContent=sObj.initials||'?';}
-  }
+function closeModal() {
+  var mo = document.getElementById('modal');
+  if (mo) mo.classList.remove('show');
+  pendingDel = null;
 }
-
-// ─── PUSH ─────────────────────────────────────────────────────────────
-var pushEnabled=false;
-function requestPushPermission(){
-  if(!('Notification' in window)) return;
-  if(Notification.permission==='granted'){pushEnabled=true;return;}
-  if(Notification.permission!=='denied'){
-    Notification.requestPermission().then(function(p){pushEnabled=(p==='granted');});
-  }
-}
-
-// ─── FINANSIERT TOGGLE ────────────────────────────────────────────────
-function toggleFin(){
-  var chk=document.getElementById('chk-fin');
-  chk.checked=!chk.checked;
-  var on=chk.checked;
-  document.getElementById('chk-cross').style.display=on?'block':'none';
-  document.getElementById('fin-badge').style.opacity=on?'1':'0';
-  document.getElementById('chk-box').classList.toggle('fin-box-active',on);
-  document.getElementById('fin-label').classList.toggle('fin-active',on);
-}
-
-// ─── COUNTDOWN ────────────────────────────────────────────────────────
-function countdown(){
-  var diff=new Date('2026-06-30T23:59:59')-new Date();
-  if(diff<=0) return;
-  document.getElementById('cdd').textContent=String(Math.floor(diff/86400000)).padStart(2,'0');
-  document.getElementById('cdh').textContent=String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
-  document.getElementById('cdm').textContent=String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
-  document.getElementById('cds').textContent=String(Math.floor((diff%60000)/1000)).padStart(2,'0');
-}
-
-// ─── INTRO BACKGROUND ────────────────────────────────────────────────
-(function(){
-  var lines=document.getElementById('intro-lines');
-  if(lines){
-    for(var i=0;i<12;i++){
-      var l=document.createElement('div');l.className='intro-line';
-      l.style.left=(8+i*7.5)+'%';l.style.opacity='.4';l.style.height=(40+Math.random()*60)+'vh';
-      l.style.top=Math.random()*20+'vh';lines.appendChild(l);
-    }
-  }
-  var hexWrap=document.getElementById('intro-hexagons');
-  if(hexWrap){
-    [[10,10],[80,5],[5,70],[85,75],[45,5],[50,85],[15,45],[75,40]].forEach(function(pos){
-      var h=document.createElement('div');h.className='intro-hex';
-      h.style.left=pos[0]+'%';h.style.top=pos[1]+'%';
-      h.style.animationDelay=(Math.random()*2)+'s';
-      h.style.width=(60+Math.random()*80)+'px';h.style.height=(60+Math.random()*80)+'px';
-      hexWrap.appendChild(h);
-    });
-  }
-})();
-
-// ─── AUTOREFRESH & SESSION RESTORE ───────────────────────────────────
-function autoRefresh(){if(userRole) fetchSales();}
-countdown();
-setInterval(countdown,1000);
-setInterval(autoRefresh,120000);
-
-// Keepalive
-setInterval(function(){
-  fetch(SUPABASE_URL+'/rest/v1/',{method:'HEAD',headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}}).catch(function(){});
-},300000);
-
-// Session restore
-(function(){
-  var saved=sessionStorage.getItem('vcso-role');
-  if(saved==='selger'){enterAsSelger();}
-  else if(saved==='tilskuer'){enterAsGuest();}
-})();
-
-
-// ─── CSV BACKUP EKSPORT ───────────────────────────────────────────────
-function exportCSV(){
-  if(!sales.length){ toast('Ingen salg å eksportere!'); return; }
-  var header='Tid,Selger,Modell,Avdeling,Maaned,Finansiert';
-  var rows=sales.map(function(s){
-    var loc=(function(){
-      var sObj=SELGERE.find(function(x){return x.navn===s.selger;});
-      return sObj?({ryen:'Ryen',lillestrom:'Lillestrom',fornebu:'Fornebu'}[sObj.loc]||sObj.loc):'';
-    })();
-    return [
-      s.ts||'',
-      s.selger||'',
-      s.modell||'',
-      loc,
-      s.mnd||'',
-      s.finansiert?'Ja':'Nei'
-    ].map(function(v){ return '"'+String(v).replace(/"/g,'""')+'"'; }).join(',');
+function confirmDelete() {
+  if (!pendingDel) { closeModal(); return; }
+  var id = pendingDel;
+  closeModal();
+  deleteSale(id, function(err) {
+    if (err) { toast('Feil ved sletting!'); return; }
+    toast('Scoring slettet.');
+    renderAll();
   });
-  var csv=header+'\n'+rows.join('\n');
-  var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
-  var url=URL.createObjectURL(blob);
-  var a=document.createElement('a');
-  a.href=url;
-  var d=new Date();
-  a.download='vcso_salg_backup_'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'.csv';
+}
+
+// ─── HJELP MODAL ─────────────────────────────────────────────────────
+function showHelp() {
+  var m = document.getElementById('help-modal');
+  if (m) m.classList.add('show');
+}
+
+// ─── CSV BACKUP ──────────────────────────────────────────────────────
+function exportCSV() {
+  if (!sales.length) { toast('Ingen salg \u00e5 eksportere!'); return; }
+  var header = 'Tid,Selger,Modell,Avdeling,Maaned,Finansiert';
+  var rows = sales.map(function(s) {
+    var sObj = SELGERE.find(function(x) { return x.navn === s.selger; }) || {};
+    var loc = LL[sObj.loc] || sObj.loc || '';
+    return [s.ts||'', s.selger||'', s.modell||'', loc, s.mnd||'', s.finansiert?'Ja':'Nei']
+      .map(function(v) { return '"'+String(v).replace(/"/g,'""')+'"'; }).join(',');
+  });
+  var csv = header + '\n' + rows.join('\n');
+  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  var d = new Date();
+  a.download = 'vcso_backup_' + d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()) + '.csv';
   a.click();
   URL.revokeObjectURL(url);
-  toast('Backup lastet ned! '+sales.length+' salg eksportert.');
+  toast('Backup lastet ned \u2013 ' + sales.length + ' salg.');
 }
+
+// ─── NEDTELLING ──────────────────────────────────────────────────────
+function countdown() {
+  var diff = new Date('2026-06-30T23:59:59') - new Date();
+  if (diff <= 0) return;
+  document.getElementById('cdd').textContent = pad(Math.floor(diff/86400000));
+  document.getElementById('cdh').textContent = pad(Math.floor((diff%86400000)/3600000));
+  document.getElementById('cdm').textContent = pad(Math.floor((diff%3600000)/60000));
+  document.getElementById('cds').textContent = pad(Math.floor((diff%60000)/1000));
+}
+
+// ─── INNLOGGING ──────────────────────────────────────────────────────
+function closeIntro() {
+  var ov = document.getElementById('intro-overlay');
+  if (!ov) return;
+  ov.style.opacity = '0';
+  ov.style.pointerEvents = 'none';
+  setTimeout(function() { ov.style.display = 'none'; }, 400);
+}
+
+function updateRoleBadge() {
+  var b = document.getElementById('role-badge');
+  if (!b) return;
+  if (userRole === 'selger') {
+    b.className = 'login-badge badge-selger';
+    b.textContent = '\u26bd Selger';
+  } else {
+    b.className = 'login-badge badge-tilskuer';
+    b.textContent = '\uD83D\uDC41 Tilskuer';
+  }
+}
+
+function enterAsSelger() {
+  userRole = 'selger';
+  sessionStorage.setItem('vcso-role', 'selger');
+  closeIntro();
+  // Show register form and backup button
+  var ro = document.getElementById('reg-outer');
+  if (ro) ro.style.display = 'block';
+  var eb = document.getElementById('export-btn');
+  if (eb) eb.style.display = 'flex';
+  updateRoleBadge();
+  buildSelgerDropdown();
+  renderInd();
+  fetchSales();
+  requestPush();
+}
+
+function enterAsGuest() {
+  userRole = 'tilskuer';
+  sessionStorage.setItem('vcso-role', 'tilskuer');
+  closeIntro();
+  var ro = document.getElementById('reg-outer');
+  if (ro) ro.style.display = 'none';
+  var eb = document.getElementById('export-btn');
+  if (eb) eb.style.display = 'none';
+  updateRoleBadge();
+  renderInd();
+  fetchSales();
+}
+
+function tryLogin() {
+  var pw = document.getElementById('pw-input').value;
+  if (pw === PASSORD) {
+    enterAsSelger();
+  } else {
+    var err = document.getElementById('pw-err');
+    if (err) {
+      err.textContent = 'Feil passord – pr\u00f8v igjen';
+      setTimeout(function() { err.textContent = ''; }, 3000);
+    }
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-input').focus();
+  }
+}
+
+// ─── AUTO-REFRESH OG KEEPALIVE ───────────────────────────────────────
+setInterval(function() { if (userRole) fetchSales(); }, 120000);
+setInterval(function() {
+  fetch(SUPABASE_URL + '/rest/v1/', { method: 'HEAD', headers: { 'apikey': SUPABASE_KEY } }).catch(function(){});
+}, 300000);
+
+// ─── START ───────────────────────────────────────────────────────────
+countdown();
+setInterval(countdown, 1000);
+
+// Restore session
+(function() {
+  var saved = sessionStorage.getItem('vcso-role');
+  if (saved === 'selger')    { enterAsSelger(); }
+  else if (saved === 'tilskuer') { enterAsGuest(); }
+  // else: show intro/login screen
+})();
 
 </script>
 </body>
