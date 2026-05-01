@@ -707,7 +707,21 @@ function updateMVP() {
   var bestN = 0;
   Object.keys(counts).forEach(function(n) { if (counts[n] > bestN) bestN = counts[n]; });
   if (bestN === 0) { banner.style.display = 'none'; return; }
-  var winners = Object.keys(counts).filter(function(n) { return counts[n] === bestN; });
+
+  // Tiebreaker: tell finansierte salg i dag for selgere med likt antall
+  var tied = Object.keys(counts).filter(function(n) { return counts[n] === bestN; });
+  var finCounts = {};
+  tied.forEach(function(navn) {
+    finCounts[navn] = sales.filter(function(s) {
+      return s.selger === navn && tsDate(s.ts) === today && s.finansiert;
+    }).length;
+  });
+  var bestFin = 0;
+  tied.forEach(function(n) { if (finCounts[n] > bestFin) bestFin = finCounts[n]; });
+
+  // Winners = de med høyest finansiert-tall blant de som er likt på salg
+  // Hvis alle har 0 finansiert, er de fortsatt likt -> alle vises
+  var winners = tied.filter(function(n) { return finCounts[n] === bestFin; });
   var delt = winners.length > 1;
   banner.style.display = 'flex';
   banner.innerHTML = '<div style="font-size:22px;flex-shrink:0">&#128081;</div>';
