@@ -232,7 +232,7 @@ input::placeholder{color:var(--b2)}
       <div class="cd-box"><div class="cd-n" id="cds">--</div><div class="cd-l">s</div></div>
     </div>
     <div style="display:flex;gap:6px;align-items:center;margin-left:10px;flex-shrink:0">
-      <button onclick="document.getElementById('help-modal').classList.add('show')" style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.35);border-radius:4px;padding:0 10px;height:28px;color:var(--gold);font-size:11px;cursor:pointer;font-weight:700;transition:all .2s;display:flex;align-items:center;gap:5px;letter-spacing:.5px;white-space:nowrap">
+      <button onclick="(function(){var m=document.getElementById('help-modal');if(m)m.classList.add('show');})()" style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.35);border-radius:4px;padding:0 10px;height:28px;color:var(--gold);font-size:11px;cursor:pointer;font-weight:700;transition:all .2s;display:flex;align-items:center;gap:5px;letter-spacing:.5px;white-space:nowrap">
         <span style="font-size:13px">?</span> Slik fungerer det
       </button>
       <button id="export-btn" onclick="exportCSV()" style="display:none;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.35);border-radius:4px;padding:0 10px;height:28px;color:#22c55e;font-size:11px;cursor:pointer;font-weight:700;white-space:nowrap">&#8659; Backup</button>
@@ -256,6 +256,17 @@ input::placeholder{color:var(--b2)}
     <button class="mt on" onclick="setMonth('all',this)">Begge</button>
     <button class="mt" onclick="setMonth('mai',this)">Mai</button>
     <button class="mt" onclick="setMonth('jun',this)">Juni</button>
+  </div>
+</div>
+
+<!-- MVP BANNER -->
+<div id="mvp-banner" style="display:none;padding:10px 16px;background:linear-gradient(135deg,rgba(255,215,0,.1),rgba(255,215,0,.04));border-bottom:1px solid rgba(255,215,0,.2);align-items:center;gap:12px">
+  <div style="font-size:22px;flex-shrink:0">&#128081;</div>
+  <div id="mvp-av" style="width:34px;height:34px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:rgba(255,215,0,.2);color:var(--gold)"></div>
+  <div>
+    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gold)">Dagens MVP</div>
+    <div id="mvp-name" style="font-size:15px;font-weight:700;color:var(--txt)">&#8211;</div>
+    <div id="mvp-stat" style="font-size:11px;color:var(--muted)"></div>
   </div>
 </div>
 
@@ -366,7 +377,7 @@ input::placeholder{color:var(--b2)}
   <div class="modal" style="max-width:480px;text-align:left">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
       <div class="modal-title" style="color:var(--gold);margin:0">&#9432; Slik bruker du VCSO Championship</div>
-      <button onclick="document.getElementById('help-modal').classList.remove('show')" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1">&times;</button>
+      <button onclick="(function(){var m=document.getElementById('help-modal');if(m)m.classList.remove('show');})()" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1">&times;</button>
     </div>
     <div style="display:flex;flex-direction:column;gap:12px;font-size:13px;color:var(--muted);line-height:1.6">
       <div style="display:flex;gap:12px;align-items:flex-start">
@@ -494,8 +505,8 @@ function enterAsSelger(){
   updateRoleBadge();
   populateSelgers();
   // Render immediately then re-render when Supabase data arrives
-  setTimeout(function(){ renderAll(); }, 50);
-  fetchSales();
+  fetchSales(); // Fetch real data - renderAll() called inside when done
+  setTimeout(renderInd, 100); // Also render immediately after short delay
   if(typeof requestPushPermission==='function') requestPushPermission();
 }
 
@@ -506,8 +517,8 @@ function enterAsGuest(){
   document.getElementById('reg-outer').style.display='none';
   updateRoleBadge();
   populateSelgers();
-  setTimeout(function(){ renderAll(); }, 50);
   fetchSales();
+  setTimeout(renderInd, 100);
 }
 
 function updateRoleBadge(){
@@ -553,13 +564,15 @@ var SELGERE=[
   {navn:'Simen Olsen',             loc:'lillestrom'},
   {navn:'Andreas Lydersen',        loc:'lillestrom'},
 ].map(function(s,i){
-  var hex=SCOLS[i%SCOLS.length].replace('#','');
-  var r=parseInt(hex.substring(0,2),16),g=parseInt(hex.substring(2,4),16),b=parseInt(hex.substring(4,6),16);
+  var col=SCOLS[i%SCOLS.length];
+  // Convert hex to rgba for background
+  var h=col.replace('#','');
+  var rv=parseInt(h.substring(0,2),16),gv=parseInt(h.substring(2,4),16),bv=parseInt(h.substring(4,6),16);
   return Object.assign({},s,{
     id:s.navn.toLowerCase().replace(/\s+/g,'_').replace(/[\u00e6]/g,'ae').replace(/[\u00f8]/g,'o').replace(/[\u00e5]/g,'aa').replace(/[^a-z0-9_]/g,''),
     initials:s.navn.split(' ').map(function(x){return x[0];}).join('').substring(0,2).toUpperCase(),
-    color:SCOLS[i%SCOLS.length],
-    bg:'rgba('+r+','+g+','+b+',.18)'
+    color:col,
+    bg:'rgba('+rv+','+gv+','+bv+',.18)'
   });
 });
 
@@ -693,6 +706,8 @@ function teamGoal(teamId,m){
 
 // ─── RENDER SELGERE ──────────────────────────────────────────────────
 function renderInd(){
+  var el=document.getElementById('tbl-ind');
+  if(!el) return; // safety check
   var m=curMonth;
   var rows=SELGERE.map(function(s){
     return Object.assign({},s,{g:goalsFor(s.navn,m),pts:goalsFor(s.navn,m)*PTS});
@@ -871,31 +886,26 @@ function setLocFilter(loc,btn){
 }
 
 // ─── REGISTER ────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', function(){
-  var selSelger = document.getElementById('sel-selger');
-  if(selSelger){
-    selSelger.addEventListener('change', function(){
-      var sObj = SELGERE.find(function(x){ return x.navn === this.value; }, this);
-      if(sObj){
-        var locField = document.getElementById('sel-loc');
-        if(locField) locField.value = sObj.loc;
-      }
-    });
-  }
-});
-
 function populateSelgers(){
   var sel=document.getElementById('sel-selger');
-  if(sel.options.length>1) return;
+  if(!sel) return;
+  // Clear and rebuild
+  sel.innerHTML='<option value="">Selger...</option>';
   var groups={ryen:[],fornebu:[],lillestrom:[]};
   SELGERE.forEach(function(s){if(groups[s.loc])groups[s.loc].push(s);});
-  [['ryen','Ryen'],['fornebu','Fornebu'],['lillestrom','Lillestr\u00f8m']].forEach(function(pair){
+  [['ryen','Ryen'],['fornebu','Fornebu'],['lillestrom','Lillestrøm']].forEach(function(pair){
     var og=document.createElement('optgroup');og.label=pair[1];
     groups[pair[0]].forEach(function(s){
       var o=document.createElement('option');o.value=s.navn;o.textContent=s.navn;og.appendChild(o);
     });
     sel.appendChild(og);
   });
+  // Auto-set hidden loc field when selger is chosen
+  sel.onchange = function(){
+    var sObj=SELGERE.find(function(x){return x.navn===sel.value;});
+    var locField=document.getElementById('sel-loc');
+    if(sObj&&locField) locField.value=sObj.loc;
+  };
 }
 
 function reg(){
@@ -972,8 +982,9 @@ function updateMVP(){
   var best=null,bestN=0;
   Object.keys(counts).forEach(function(n){if(counts[n]>bestN){bestN=counts[n];best=n;}});
   var banner=document.getElementById('mvp-banner');
-  if(!best||bestN===0){banner.classList.remove('show');return;}
-  banner.classList.add('show');
+  if(!banner) return;
+  if(!best||bestN===0){banner.style.display='none';return;}
+  banner.style.display='flex';
   document.getElementById('mvp-name').textContent=best;
   document.getElementById('mvp-stat').textContent=bestN+(bestN>1?' biler i dag':' bil i dag');
   var sObj=SELGERE.find(function(x){return x.navn===best;})||{};
