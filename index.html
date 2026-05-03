@@ -2,7 +2,7 @@
 <html lang="no">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <title>VCSO Championship 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -272,6 +272,32 @@ select:focus,input[type=text]:focus{border-color:var(--gold)}
   color:var(--muted);border:1px solid var(--b2);border-radius:4px;cursor:pointer;font-family:'Barlow',sans-serif}
 .modal-confirm{flex:1;padding:9px;font-size:12px;font-weight:700;background:var(--r);
   color:#fff;border:none;border-radius:4px;cursor:pointer;font-family:'Barlow',sans-serif}
+
+/* MOBIL-FIKS */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+.page {
+  overflow-x: hidden;
+  width: 100%;
+}
+/* Prevent any element from causing horizontal scroll */
+* {
+  max-width: 100%;
+}
+/* Prevent table overflow on mobile */
+.tbl-head, .trow {
+  grid-template-columns: 22px 26px 1fr 32px 36px 80px 36px;
+}
+@media (max-width: 400px) {
+  .tbl-head, .trow {
+    grid-template-columns: 20px 24px 1fr 28px 32px 70px 32px;
+  }
+  .name-main { font-size: 12px; }
+  .cd-n { font-size: 14px; }
+}
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6NJ95NHF98"></script>
