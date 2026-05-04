@@ -303,6 +303,21 @@ html, body {
 #view-team .trow {
   grid-template-columns: 26px 28px 1fr 40px;
 }
+
+/* UKEMÅL OVERSKREDET */
+@keyframes goldShimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes barGlow {
+  0%,100% { box-shadow: 0 0 6px var(--gold); }
+  50%      { box-shadow: 0 0 16px var(--gold), 0 0 30px rgba(255,215,0,.4); }
+}
+.week-bar-over {
+  background: linear-gradient(180deg, #ffd700, #22c55e) !important;
+  background-size: 200% auto !important;
+  animation: goldShimmer 1.5s linear infinite, barGlow 1s ease-in-out infinite !important;
+}
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6NJ95NHF98"></script>
@@ -938,17 +953,53 @@ function renderInd() {
   var rows = SELGERE.map(function(s) {
     var g = goalsFor(s.navn, m);
     return { navn:s.navn, loc:s.loc, id:s.id, initials:s.initials, color:s.color, bg:s.bg, g:g, pts:g*PTS };
-  }).sort(function(a,b) { return b.pts-a.pts || b.g-a.g; });
+  }).map(function(s) {
+    // Tell finansierte salg for tiebreaker
+    var fin = sales.filter(function(x) {
+      return x.selger === s.navn && x.finansiert &&
+        (m === 'all' || x.mnd === m);
+    }).length;
+    return Object.assign({}, s, { fin: fin });
+  }).sort(function(a,b) {
+    // 1. Flest poeng, 2. Flest finansiert (tiebreaker), 3. Navn alfabetisk
+    return b.pts - a.pts || b.fin - a.fin || a.navn.localeCompare(b.navn);
+  });
   var gold='var(--gold)', silver='var(--silver)', bronze='var(--bronze)';
+  // Sjekk om noen avdeling har overskredet ukemål – trigger konfetti
+  var thisWeek = getWeekNum(new Date());
+  var thisMonthStr = (new Date().getMonth()+1)===5?'mai':'jun';
+  rows.forEach(function(r) {
+    var wgoal = (WEEKLY_GOALS[thisMonthStr] && WEEKLY_GOALS[thisMonthStr][r.id]) || 20;
+    var sold  = teamSalesInWeek(r.id, thisWeek);
+    if (sold > 0 && sold >= wgoal && !window['_celebrated_'+r.id+'_'+thisWeek]) {
+      window['_celebrated_'+r.id+'_'+thisWeek] = true;
+      setTimeout(function(){ launchKonfetti(r.color); }, 300);
+    }
+  });
+
+  // Delt plass - samme rang hvis like poeng og like finansiering
+  var ranks = [];
+  rows.forEach(function(r, i) {
+    if (i === 0) { ranks.push(1); }
+    else if (r.pts === rows[i-1].pts && r.fin === rows[i-1].fin) { ranks.push(ranks[i-1]); }
+    else { ranks.push(i + 1); }
+  });
+  // Tell hvor mange som deler hver plass
+  var rankCount = {};
+  ranks.forEach(function(r) { rankCount[r] = (rankCount[r]||0) + 1; });
+
   el.innerHTML = rows.map(function(r,i) {
-    var pc = i===0?gold : i===1?silver : i===2?bronze : 'var(--muted)';
+    var rank = ranks[i];
+    var isTied = rankCount[rank] > 1;
+    var rankLabel = isTied ? 'T'+rank : String(rank);
+    var pc = rank===1?gold : rank===2?silver : rank===3?bronze : 'var(--muted)';
     var sk = streakCount(r.navn);
     var hasPhoto = typeof SELGER_PHOTOS !== 'undefined' && SELGER_PHOTOS[r.id];
     var avHtml = hasPhoto
       ? '<img src="'+SELGER_PHOTOS[r.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">'
       : r.initials;
     return '<div class="trow zm" style="animation-delay:'+(i*0.03)+'s">'
-      + '<div class="pos-n" style="color:'+pc+'">'+(i+1)+'</div>'
+      + '<div class="pos-n" style="color:'+pc+';font-size:'+(isTied?'11px':'13px')+'">'+(rankLabel)+'</div>'
       + '<div><div class="av" style="background:'+r.bg+';color:'+r.color+';overflow:hidden;padding:0">'+avHtml+'</div></div>'
       + '<div class="name-c">'
         + '<div class="name-main">'+r.navn+(sk>=3?' \uD83D\uDD25':'')+'</div>'
@@ -987,7 +1038,8 @@ function getWeeksForMonth(mnd) {
   var now = new Date();
   var mo = mnd === 'mai' ? 5 : 6;
   var year = 2026;
-  var first = new Date(year, mo-1, 1);
+  // Start from May 4th (competition start), not May 1st
+  var first = mnd === 'mai' ? new Date(2026, 4, 4) : new Date(year, mo-1, 1);
   var last  = new Date(year, mo, 0);
   if (last > now) last = now;
   var weeks = [], seen = {};
@@ -1040,12 +1092,15 @@ function renderTeam() {
         var pct  = Math.min(sold / wgoal * 100, 100);
         var col  = pct >= 100 ? 'var(--g)' : pct >= 50 ? 'var(--y)' : sold > 0 ? 'var(--y)' : 'var(--b1)';
         var isNow = getWeekNum(new Date()) === w.week;
+        var isOver = pct >= 100;
+        var overPct = sold > 0 ? (sold / wgoal * 100).toFixed(0) : 0;
         weekBarsHtml += '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">'
-          + '<div style="font-size:8px;color:'+(pct>=100?'var(--g)':'var(--muted)')+'">'+sold+'</div>'
-          + '<div style="width:100%;height:28px;background:var(--faint);border-radius:3px;overflow:hidden;position:relative'+(isNow?';outline:1px solid '+r.color:'') +'">'
-          + '<div style="position:absolute;bottom:0;left:0;right:0;background:'+col+';height:'+pct.toFixed(0)+'%;border-radius:2px;transition:height 1s cubic-bezier(.4,0,.2,1)"></div>'
+          + '<div style="font-size:8px;color:'+(isOver?'var(--gold)':pct>=50?'var(--g)':'var(--muted)')+';font-weight:'+(isOver?'700':'400')+'">'+(isOver?'🔥':'')+sold+'</div>'
+          + '<div style="width:100%;height:28px;background:var(--faint);border-radius:3px;overflow:hidden;position:relative'+(isNow?';outline:1px solid '+r.color:'')+(isOver?';box-shadow:0 0 8px var(--gold)':'')+'">'
+          + '<div class="'+(isOver?'week-bar-over':'')+'" style="position:absolute;bottom:0;left:0;right:0;background:'+(isOver?'linear-gradient(180deg,var(--gold),var(--g))':col)+';height:'+Math.min(parseFloat(pct),100).toFixed(0)+'%;border-radius:2px;transition:height 1s cubic-bezier(.4,0,.2,1)"></div>'
+          + (isOver?'<div style="position:absolute;top:2px;left:0;right:0;text-align:center;font-size:9px;font-weight:700;color:#000;text-shadow:none">+'+Math.round(sold-wgoal)+'</div>':'')
           + '</div>'
-          + '<div style="font-size:7px;color:var(--muted)">U'+w.week+'</div>'
+          + '<div style="font-size:7px;color:'+(isOver?'var(--gold)':'var(--muted)')+'">U'+w.week+'</div>'
           + '</div>';
       });
       weekBarsHtml += '</div></div>';
