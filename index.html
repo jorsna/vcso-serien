@@ -1152,21 +1152,7 @@ function renderInd() {
         + heiaHtml(r.navn, r.id)
 
 
-        + '<div style="display:flex;align-items:center;gap:4px;margin-top:2px">'
-          + (function(){
-              var sid=r.id.replace(/[^a-zA-Z0-9]/g,'_');
-              var already=hasHeia(r.navn);
-              var cnt=getHeiaCount(r.navn);
-              return '<button id="heia-btn-'+sid+'" '
-                +'onclick="toggleHeia(''+r.navn.replace(/'/g,"\'")+'\',this)" '
-                +'title="'+(already?'Du har heia!':'Klikk for \u00e5 heie!')+'" '
-                +'style="background:none;border:none;padding:0;font-size:15px;line-height:1;cursor:'+(already?'default':'pointer')+';'
-                +'filter:'+(already?'none':'grayscale(1) opacity(.5)')+';transition:transform .2s,filter .15s">'
-                +'\uD83D\uDE4C'
-                +'</button>'
-                +'<span id="hc-'+sid+'" title="'+cnt+' heiarop fra tilskuerne" '
-                +'style="font-size:10px;color:'+(cnt>0?'var(--gold)':'var(--muted)')+'">'+cnt+'</span>';
-            })()
+
         + '</div>'
       + '</div>'
       + '<div class="sc">'+r.g+'</div>'
@@ -1698,6 +1684,7 @@ setInterval(countdown, 1000);
   else if (saved === 'tilskuer') { enterAsGuest(); }
   // else: show intro/login screen
 })();
+
 
 
 
