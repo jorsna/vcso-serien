@@ -273,10 +273,6 @@ select:focus,input[type=text]:focus{border-color:var(--gold)}
 .modal-confirm{flex:1;padding:9px;font-size:12px;font-weight:700;background:var(--r);
   color:#fff;border:none;border-radius:4px;cursor:pointer;font-family:'Barlow',sans-serif}
 
-/* SELGERE - custom grid */
-#view-ind .trow {
-  grid-template-columns: 26px 28px 1fr auto 40px;
-}
 /* MOBIL-FIKS */
 html, body {
   overflow-x: hidden;
@@ -429,9 +425,9 @@ html, body {
 
 <!-- SELGERE VIEW -->
 <div class="view on" id="view-ind">
-  <div class="tbl-head" style="grid-template-columns:26px 28px 1fr auto 40px">
+  <div class="tbl-head">
     <div>#</div><div></div><div>Spiller</div>
-    <div style="text-align:right;padding-right:8px">&#128588;</div><div>P</div>
+    <div>M&#229;l</div><div>Poeng</div><div>Siste 5 dager</div><div>P</div>
   </div>
   <div id="tbl-ind"></div>
   <div class="form-legend">
@@ -954,44 +950,6 @@ function sendPush(selger, modell, loc) {
 }
 
 // ─── RENDER: SELGERE ─────────────────────────────────────────────────
-
-// ─── HEIA ────────────────────────────────────────────────────────────
-function getHeiaCount(navn) {
-  return JSON.parse(localStorage.getItem('vcso_heia_counts') || '{}')[navn] || 0;
-}
-function hasHeia(navn) {
-  return !!JSON.parse(localStorage.getItem('vcso_my_heias') || '{}')[navn];
-}
-function heiaClick(id) {
-  var sObj = SELGERE.find(function(s) { return s.id === id; });
-  if (!sObj || hasHeia(sObj.navn)) return;
-  var mine = JSON.parse(localStorage.getItem('vcso_my_heias') || '{}');
-  mine[sObj.navn] = true;
-  localStorage.setItem('vcso_my_heias', JSON.stringify(mine));
-  var counts = JSON.parse(localStorage.getItem('vcso_heia_counts') || '{}');
-  counts[sObj.navn] = (counts[sObj.navn] || 0) + 1;
-  localStorage.setItem('vcso_heia_counts', JSON.stringify(counts));
-  fetch(SUPABASE_URL + '/rest/v1/heia', {
-    method: 'POST', headers: sbH(), body: JSON.stringify({ selger: sObj.navn })
-  }).catch(function(){});
-  var btn = document.getElementById('hb-' + id);
-  var cnt = document.getElementById('hn-' + id);
-  if (btn) { btn.style.opacity = '1'; btn.title = 'Du har heia!'; btn.style.cursor = 'default'; btn.style.transform = 'scale(1.4)'; setTimeout(function(){ btn.style.transform = 'scale(1)'; }, 250); }
-  if (cnt) cnt.textContent = counts[sObj.navn];
-  launchKonfetti('#ffd700');
-}
-function fetchHeias() {
-  fetch(SUPABASE_URL + '/rest/v1/heia?select=selger', { headers: sbH() })
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      if (!Array.isArray(data)) return;
-      var counts = {};
-      data.forEach(function(h) { counts[h.selger] = (counts[h.selger] || 0) + 1; });
-      localStorage.setItem('vcso_heia_counts', JSON.stringify(counts));
-      if (curTab === 'ind') renderInd();
-    }).catch(function(){});
-}
-
 function renderInd() {
   var el = document.getElementById('tbl-ind');
   if (!el) return;
@@ -1048,20 +1006,12 @@ function renderInd() {
       + '<div class="pos-n" style="color:'+pc+';font-size:'+(isTied?'11px':'13px')+'">'+(rankLabel)+'</div>'
       + '<div><div class="av" style="background:'+r.bg+';color:'+r.color+';overflow:hidden;padding:0">'+avHtml+'</div></div>'
       + '<div class="name-c">'
-        + '<div class="name-main">'+r.navn+(sk>=3?' &#128293;':'')+'</div>'
-        + '<div style="display:flex;align-items:center;gap:8px">'
-          + '<div class="name-sub">'+(LL[r.loc]||r.loc)+'</div>'
-          + '<div class="form-dots">'+selgerDots(r.navn)+'</div>'
-        + '</div>'
+        + '<div class="name-main">'+r.navn+(sk>=3?' \uD83D\uDD25':'')+'</div>'
+        + '<div class="name-sub">'+(LL[r.loc]||r.loc)+'</div>'
       + '</div>'
-      + (function(){
-          var already=hasHeia(r.navn);
-          var cnt=getHeiaCount(r.navn);
-          return '<div style="display:flex;align-items:center;gap:3px;padding:1px 6px;border-radius:20px;border:0.5px solid var(--b1);background:var(--faint);flex-shrink:0;margin-right:4px">'
-            + '<button id="hb-'+r.id+'" onclick="heiaClick(\'' + r.id + '\')" title="'+(already?'Du har heia!':'Klikk for å heie!')+'" style="background:none;border:none;padding:0;font-size:13px;cursor:'+(already?'default':'pointer')+';opacity:'+(already?'1':'0.3')+';transition:all .2s;line-height:1">&#128588;</button>'
-            + '<span id="hn-'+r.id+'" style="font-size:10px;color:var(--muted);min-width:8px">'+(cnt||'')+'</span>'
-          + '</div>';
-        })()
+      + '<div class="sc">'+r.g+'</div>'
+      + '<div class="sc pts">'+r.pts+'</div>'
+      + '<div><div class="form-dots">'+selgerDots(r.navn)+'</div></div>'
       + '<div class="sc pts">'+r.pts+'</div>'
     + '</div>';
   }).join('');
@@ -1573,7 +1523,6 @@ function enterAsSelger() {
   buildSelgerDropdown();
   renderInd();
   fetchSales();
-  fetchHeias();
   requestPush();
 }
 
