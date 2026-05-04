@@ -455,7 +455,7 @@ html, body {
   <div class="stats-grid">
     <div class="stat-card"><div class="stat-title">Toppscorere</div><div id="top-scorers"></div></div>
     <div class="stat-card"><div class="stat-title">Siste 5 dager</div><div id="top-form"></div></div>
-    <div class="stat-card full"><div class="stat-title">Avdeling mot m&#229;l</div><div id="team-bars"></div></div>
+    <div class="stat-card full"><div class="stat-title">Ukesvinner</div><div id="team-bars"></div></div>
   </div>
 </div>
 
@@ -664,6 +664,7 @@ const SELGER_PHOTOS={
   "andreas_lydersen":"data:image/jpeg;base64,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"
 };
 
+// ─── KONFIGURASJON ───────────────────────────────────────────────────
 
 // ─── KONFIGURASJON ───────────────────────────────────────────────────
 var SUPABASE_URL = 'https://jffhdlmwvurnojoapcvs.supabase.co';
@@ -1194,24 +1195,44 @@ function renderStats() {
       return parseInt(b.split('_')[0]) - parseInt(a.split('_')[0]);
     });
 
+    var thisWeek = getWeekNum(new Date());
+
+    // Alltid vis en åpen rute for inneværende uke
+    var currentBox = '<div style="margin-bottom:14px;padding:10px 12px;background:var(--card2);border-radius:5px;border:1px solid var(--b1)">'
+      + '<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:8px">Vinner uke '+thisWeek+'</div>'
+      + '<div style="font-size:11px;color:var(--muted);font-style:italic;padding:6px 0">Kåres søndag kl. 23:59</div>'
+      + '</div>';
+
     if (!weekKeys.length) {
-      el3.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:12px;font-style:italic">Ingen salg registrert ennå</div>';
+      el3.innerHTML = currentBox;
     } else {
-      var thisWeek = getWeekNum(new Date());
-      el3.innerHTML = weekKeys.map(function(key) {
+      // Vis kun avsluttede uker (ikke inneværende)
+      var pastKeys = weekKeys.filter(function(k){ return parseInt(k.split('_')[0]) !== thisWeek; });
+      el3.innerHTML = currentBox + pastKeys.map(function(key) {
         var wd = allWeeks[key];
-        var isCurrent = wd.week === thisWeek;
+        var isCurrent = false;
         var bestN = 0;
         Object.keys(wd.sales).forEach(function(n){ if(wd.sales[n]>bestN) bestN=wd.sales[n]; });
-        var winners = SELGERE.filter(function(s){ return (wd.sales[s.navn]||0)===bestN; });
-        var borderCol = isCurrent ? 'var(--gold)' : 'var(--b1)';
-        var label = isCurrent ? 'Inneværende uke – Uke '+wd.week : 'Uke '+wd.week;
-        var labelCol = isCurrent ? 'var(--gold)' : 'var(--muted)';
-        var imgSize = isCurrent ? '54px' : '40px';
-        var crownSize = isCurrent ? '20px' : '15px';
-        var nameSize = isCurrent ? '13px' : '11px';
-        var numSize = isCurrent ? '22px' : '15px';
-        var numCol = isCurrent ? 'var(--gold)' : 'var(--muted)';
+        // Tiebreaker: finansierte salg denne uken
+        var tied = SELGERE.filter(function(s){ return (wd.sales[s.navn]||0)===bestN; });
+        var finCounts = {};
+        tied.forEach(function(s) {
+          finCounts[s.navn] = sales.filter(function(x) {
+            return x.selger===s.navn && x.finansiert && getWeekNum(new Date(x.ts))===wd.week;
+          }).length;
+        });
+        var bestFin = 0;
+        tied.forEach(function(s){ if(finCounts[s.navn]>bestFin) bestFin=finCounts[s.navn]; });
+        // Hvis alle har 0 finansiert – alle vises. Ellers kun de med flest.
+        var winners = tied.filter(function(s){ return finCounts[s.navn]===bestFin; });
+        var borderCol = 'var(--b1)';
+        var label = 'Vinner uke '+wd.week;
+        var labelCol = 'var(--gold)';
+        var imgSize = '44px';
+        var crownSize = '16px';
+        var nameSize = '12px';
+        var numSize = '18px';
+        var numCol = 'var(--gold)';
 
         return '<div style="margin-bottom:14px;padding:10px 12px;background:var(--card2);border-radius:5px;border:1px solid '+borderCol+'">'
           + '<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:'+labelCol+';margin-bottom:10px">'+label+'</div>'
