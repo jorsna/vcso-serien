@@ -553,7 +553,7 @@ html, body {
           </div>
           <div style="display:flex;gap:10px">
             <div style="background:var(--b1);color:var(--gold);font-family:'Anton',sans-serif;font-size:10px;padding:2px 8px;border-radius:3px;flex-shrink:0;white-space:nowrap;height:fit-content;margin-top:2px">AVDELINGER</div>
-            <div>Ryen, Fornebu og Lillestr&#248;m med fremgangsbar mot m&#229;let. Gr&#248;nn = i rute, gul = bak, r&#248;d = langt bak. Form-prikker viser om avdelingen selger nok daglig.</div>
+            <div>Ryen, Fornebu og Lillestr&#248;m med ukebarer mot ukemålet. Hver bar viser antall solgte biler den uken. Gr&#248;nn = i rute, gul = under tempo. Overskredet ukemål gir gullglød og konfetti &#127882;. Innrammet bar = innev&#230;rende uke.</div>
           </div>
           <div style="display:flex;gap:10px">
             <div style="background:var(--b1);color:var(--gold);font-family:'Anton',sans-serif;font-size:10px;padding:2px 8px;border-radius:3px;flex-shrink:0;white-space:nowrap;height:fit-content;margin-top:2px">STATISTIKK</div>
@@ -750,6 +750,7 @@ function fetchSales() {
     .then(function(data) {
       sales = Array.isArray(data) ? data : [];
       hideStatus();
+      fetchHeias();
       renderAll();
       updateMVP();
     })
@@ -946,6 +947,127 @@ function sendPush(selger, modell, loc) {
 }
 
 // ─── RENDER: SELGERE ─────────────────────────────────────────────────
+
+// ─── HEIA-SYSTEM ─────────────────────────────────────────────────────
+function getHeiaCount(navn) {
+  var counts = JSON.parse(localStorage.getItem('vcso_heia_counts') || '{}');
+  return counts[navn] || 0;
+}
+function hasHeia(navn) {
+  var mine = JSON.parse(localStorage.getItem('vcso_my_heias') || '{}');
+  return !!mine[navn];
+}
+function toggleHeia(navn, btn) {
+  if (hasHeia(navn)) return;
+  var mine = JSON.parse(localStorage.getItem('vcso_my_heias') || '{}');
+  mine[navn] = true;
+  localStorage.setItem('vcso_my_heias', JSON.stringify(mine));
+  var counts = JSON.parse(localStorage.getItem('vcso_heia_counts') || '{}');
+  counts[navn] = (counts[navn] || 0) + 1;
+  localStorage.setItem('vcso_heia_counts', JSON.stringify(counts));
+  fetch(SUPABASE_URL + '/rest/v1/heia', {
+    method:'POST', headers:sbH(), body:JSON.stringify({selger:navn})
+  }).catch(function(){});
+  var safeId = navn.replace(/[^a-zA-Z0-9]/g,'_');
+  var countEl = document.getElementById('hc-'+safeId);
+  var newC = counts[navn];
+  if (countEl) { countEl.textContent = newC; countEl.title = newC + ' heiarop fra tilskuerne'; }
+  if (btn) {
+    btn.style.filter = 'none';
+    btn.title = 'Du har heia!';
+    btn.style.cursor = 'default';
+    btn.style.transform = 'scale(1.6)';
+    setTimeout(function(){ btn.style.transform = 'scale(1)'; }, 300);
+  }
+  var wrap = document.getElementById('konfetti');
+  if (wrap) {
+    wrap.classList.remove('hide'); wrap.innerHTML = '';
+    var rect = btn ? btn.getBoundingClientRect() : {left:window.innerWidth/2, top:200, width:0, height:0};
+    for (var i=0;i<22;i++) {
+      var bit = document.createElement('div');
+      bit.className = 'kbit';
+      bit.style.left = (rect.left + rect.width/2) + 'px';
+      bit.style.width = bit.style.height = (5+Math.random()*5)+'px';
+      bit.style.background = ['#ffd700','#22c55e','#3b82f6','#f59e0b','#ff4488'][Math.floor(Math.random()*5)];
+      bit.style.borderRadius = '50%';
+      bit.style.animationDuration = (0.8+Math.random()*0.7)+'s';
+      bit.style.animationDelay = (Math.random()*0.25)+'s';
+      wrap.appendChild(bit);
+    }
+    setTimeout(function(){ wrap.classList.add('hide'); wrap.innerHTML=''; }, 1600);
+  }
+}
+function fetchHeias() {
+  fetch(SUPABASE_URL + '/rest/v1/heia?select=selger', {headers:sbH()})
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if (!Array.isArray(data)) return;
+      var counts = {};
+      data.forEach(function(h){ counts[h.selger] = (counts[h.selger]||0)+1; });
+      localStorage.setItem('vcso_heia_counts', JSON.stringify(counts));
+      if (curTab==='ind') renderInd();
+    }).catch(function(){});
+}
+
+
+// ─── HEIA-SYSTEM ─────────────────────────────────────────────────────
+function safeId(navn) {
+  return navn.replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,'');
+}
+function getHeiaCount(navn) {
+  return JSON.parse(localStorage.getItem('vcso_heia_counts')||'{}')[navn] || 0;
+}
+function hasHeia(navn) {
+  return !!JSON.parse(localStorage.getItem('vcso_my_heias')||'{}')[navn];
+}
+function toggleHeia(navn, btn) {
+  if (hasHeia(navn)) return;
+  var mine = JSON.parse(localStorage.getItem('vcso_my_heias')||'{}');
+  mine[navn] = true;
+  localStorage.setItem('vcso_my_heias', JSON.stringify(mine));
+  var counts = JSON.parse(localStorage.getItem('vcso_heia_counts')||'{}');
+  counts[navn] = (counts[navn]||0) + 1;
+  localStorage.setItem('vcso_heia_counts', JSON.stringify(counts));
+  fetch(SUPABASE_URL+'/rest/v1/heia',{method:'POST',headers:sbH(),body:JSON.stringify({selger:navn})}).catch(function(){});
+  var sid = safeId(navn);
+  var countEl = document.getElementById('hc-'+sid);
+  var c = counts[navn];
+  if (countEl) { countEl.textContent = '('+c+' heiarop fra tilskuerne)'; }
+  if (btn) {
+    btn.style.filter='none'; btn.title='Du har heia!'; btn.style.cursor='default';
+    btn.style.transform='scale(1.5)';
+    setTimeout(function(){btn.style.transform='scale(1)';},300);
+  }
+  // Mini konfetti-burst
+  var wrap=document.getElementById('konfetti');
+  if(wrap){
+    wrap.classList.remove('hide');
+    for(var i=0;i<22;i++){
+      var bit=document.createElement('div'); bit.className='kbit';
+      var rect=btn?btn.getBoundingClientRect():{left:window.innerWidth/2,top:0,width:0,height:0};
+      bit.style.left=(rect.left+rect.width/2)+'px';
+      bit.style.width=bit.style.height=(5+Math.random()*5)+'px';
+      bit.style.background=['#ffd700','#22c55e','#3b82f6','#f59e0b'][Math.floor(Math.random()*4)];
+      bit.style.borderRadius='50%';
+      bit.style.animationDuration=(0.8+Math.random()*0.7)+'s';
+      bit.style.animationDelay=(Math.random()*0.2)+'s';
+      wrap.appendChild(bit);
+    }
+    setTimeout(function(){wrap.classList.add('hide');wrap.innerHTML='';},1500);
+  }
+}
+function fetchHeias() {
+  fetch(SUPABASE_URL+'/rest/v1/heia?select=selger',{headers:sbH()})
+    .then(function(r){return r.json();})
+    .then(function(data){
+      if(!Array.isArray(data))return;
+      var counts={};
+      data.forEach(function(h){counts[h.selger]=(counts[h.selger]||0)+1;});
+      localStorage.setItem('vcso_heia_counts',JSON.stringify(counts));
+      if(curTab==='ind')renderInd();
+    }).catch(function(){});
+}
+
 function renderInd() {
   var el = document.getElementById('tbl-ind');
   if (!el) return;
@@ -1004,6 +1126,39 @@ function renderInd() {
       + '<div class="name-c">'
         + '<div class="name-main">'+r.navn+(sk>=3?' \uD83D\uDD25':'')+'</div>'
         + '<div class="name-sub">'+(LL[r.loc]||r.loc)+'</div>'
+        + (function(){
+            var sid=safeId(r.navn);
+            var already=hasHeia(r.navn);
+            var cnt=getHeiaCount(r.navn);
+            return '<div style="display:flex;align-items:center;gap:5px;margin-top:2px">'
+              + '<button id="heia-btn-'+sid+'" onclick="toggleHeia(''+r.navn+'',this)"'
+                + ' title="'+(already?'Du har heia!':'Klikk for \u00e5 heie!')+'"'
+                + ' style="background:none;border:none;padding:0;font-size:15px;line-height:1;cursor:'+(already?'default':'pointer')+';transition:transform .2s;filter:'+(already?'none':'grayscale(1)')+'">'
+                + '\uD83D\uDE4C'
+              + '</button>'
+              + '<span id="hc-'+sid+'"'
+                + ' title="'+cnt+' heiarop fra tilskuerne"'
+                + ' style="font-size:9px;color:var(--muted)">'
+                + (cnt > 0 ? '('+cnt+' heiarop fra tilskuerne)' : '')
+              + '</span>'
+            + '</div>';
+          })()
+        + '<div style="display:flex;align-items:center;gap:4px;margin-top:2px">'
+          + (function(){
+              var sid=r.id.replace(/[^a-zA-Z0-9]/g,'_');
+              var already=hasHeia(r.navn);
+              var cnt=getHeiaCount(r.navn);
+              return '<button id="heia-btn-'+sid+'" '
+                +'onclick="toggleHeia(''+r.navn.replace(/'/g,"\'")+'\',this)" '
+                +'title="'+(already?'Du har heia!':'Klikk for \u00e5 heie!')+'" '
+                +'style="background:none;border:none;padding:0;font-size:15px;line-height:1;cursor:'+(already?'default':'pointer')+';'
+                +'filter:'+(already?'none':'grayscale(1) opacity(.5)')+';transition:transform .2s,filter .15s">'
+                +'\uD83D\uDE4C'
+                +'</button>'
+                +'<span id="hc-'+sid+'" title="'+cnt+' heiarop fra tilskuerne" '
+                +'style="font-size:10px;color:'+(cnt>0?'var(--gold)':'var(--muted)')+'">'+cnt+'</span>';
+            })()
+        + '</div>'
       + '</div>'
       + '<div class="sc">'+r.g+'</div>'
       + '<div class="sc pts">'+r.pts+'</div>'
@@ -1438,6 +1593,7 @@ function enterAsSelger() {
   buildSelgerDropdown();
   renderInd();
   fetchSales();
+  fetchHeias();
   requestPush();
 }
 
@@ -1486,6 +1642,7 @@ setInterval(countdown, 1000);
   else if (saved === 'tilskuer') { enterAsGuest(); }
   // else: show intro/login screen
 })();
+
 
 </script>
 </body>
