@@ -553,7 +553,7 @@ html, body {
           </div>
           <div style="display:flex;gap:10px">
             <div style="background:var(--b1);color:var(--gold);font-family:'Anton',sans-serif;font-size:10px;padding:2px 8px;border-radius:3px;flex-shrink:0;white-space:nowrap;height:fit-content;margin-top:2px">AVDELINGER</div>
-            <div>Ryen, Fornebu og Lillestr&#248;m med fremgangsbar mot m&#229;let. Gr&#248;nn = i rute, gul = bak, r&#248;d = langt bak. Form-prikker viser om avdelingen selger nok daglig.</div>
+            <div>Ryen, Fornebu og Lillestr&#248;m med ukebarer mot ukemålet. Hver bar viser antall solgte biler den uken. Gr&#248;nn = i rute, gul = under tempo. Overskredet ukemål gir gullglød og konfetti &#127882;. Innrammet bar = innev&#230;rende uke.</div>
           </div>
           <div style="display:flex;gap:10px">
             <div style="background:var(--b1);color:var(--gold);font-family:'Anton',sans-serif;font-size:10px;padding:2px 8px;border-radius:3px;flex-shrink:0;white-space:nowrap;height:fit-content;margin-top:2px">STATISTIKK</div>
@@ -750,6 +750,7 @@ function fetchSales() {
     .then(function(data) {
       sales = Array.isArray(data) ? data : [];
       hideStatus();
+      fetchHeias();
       renderAll();
       updateMVP();
     })
@@ -946,6 +947,150 @@ function sendPush(selger, modell, loc) {
 }
 
 // ─── RENDER: SELGERE ─────────────────────────────────────────────────
+
+// ─── HEIA-SYSTEM ─────────────────────────────────────────────────────
+function getHeiaCount(navn) {
+  var counts = JSON.parse(localStorage.getItem('vcso_heia_counts') || '{}');
+  return counts[navn] || 0;
+}
+function hasHeia(navn) {
+  var mine = JSON.parse(localStorage.getItem('vcso_my_heias') || '{}');
+  return !!mine[navn];
+}
+function toggleHeia(navn, btn) {
+  if (hasHeia(navn)) return;
+  var mine = JSON.parse(localStorage.getItem('vcso_my_heias') || '{}');
+  mine[navn] = true;
+  localStorage.setItem('vcso_my_heias', JSON.stringify(mine));
+  var counts = JSON.parse(localStorage.getItem('vcso_heia_counts') || '{}');
+  counts[navn] = (counts[navn] || 0) + 1;
+  localStorage.setItem('vcso_heia_counts', JSON.stringify(counts));
+  fetch(SUPABASE_URL + '/rest/v1/heia', {
+    method:'POST', headers:sbH(), body:JSON.stringify({selger:navn})
+  }).catch(function(){});
+  var safeId = navn.replace(/[^a-zA-Z0-9]/g,'_');
+  var countEl = document.getElementById('hc-'+safeId);
+  var newC = counts[navn];
+  if (countEl) { countEl.textContent = newC; countEl.title = newC + ' heiarop fra tilskuerne'; }
+  if (btn) {
+    btn.style.filter = 'none';
+    btn.title = 'Du har heia!';
+    btn.style.cursor = 'default';
+    btn.style.transform = 'scale(1.6)';
+    setTimeout(function(){ btn.style.transform = 'scale(1)'; }, 300);
+  }
+  var wrap = document.getElementById('konfetti');
+  if (wrap) {
+    wrap.classList.remove('hide'); wrap.innerHTML = '';
+    var rect = btn ? btn.getBoundingClientRect() : {left:window.innerWidth/2, top:200, width:0, height:0};
+    for (var i=0;i<22;i++) {
+      var bit = document.createElement('div');
+      bit.className = 'kbit';
+      bit.style.left = (rect.left + rect.width/2) + 'px';
+      bit.style.width = bit.style.height = (5+Math.random()*5)+'px';
+      bit.style.background = ['#ffd700','#22c55e','#3b82f6','#f59e0b','#ff4488'][Math.floor(Math.random()*5)];
+      bit.style.borderRadius = '50%';
+      bit.style.animationDuration = (0.8+Math.random()*0.7)+'s';
+      bit.style.animationDelay = (Math.random()*0.25)+'s';
+      wrap.appendChild(bit);
+    }
+    setTimeout(function(){ wrap.classList.add('hide'); wrap.innerHTML=''; }, 1600);
+  }
+}
+function fetchHeias() {
+  fetch(SUPABASE_URL + '/rest/v1/heia?select=selger', {headers:sbH()})
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if (!Array.isArray(data)) return;
+      var counts = {};
+      data.forEach(function(h){ counts[h.selger] = (counts[h.selger]||0)+1; });
+      localStorage.setItem('vcso_heia_counts', JSON.stringify(counts));
+      if (curTab==='ind') renderInd();
+    }).catch(function(){});
+}
+
+
+// ─── HEIA-SYSTEM ─────────────────────────────────────────────────────
+function safeId(navn) {
+  return navn.replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,'');
+}
+function getHeiaCount(navn) {
+  return JSON.parse(localStorage.getItem('vcso_heia_counts')||'{}')[navn] || 0;
+}
+function hasHeia(navn) {
+  return !!JSON.parse(localStorage.getItem('vcso_my_heias')||'{}')[navn];
+}
+function toggleHeia(navn, btn) {
+  if (hasHeia(navn)) return;
+  var mine = JSON.parse(localStorage.getItem('vcso_my_heias')||'{}');
+  mine[navn] = true;
+  localStorage.setItem('vcso_my_heias', JSON.stringify(mine));
+  var counts = JSON.parse(localStorage.getItem('vcso_heia_counts')||'{}');
+  counts[navn] = (counts[navn]||0) + 1;
+  localStorage.setItem('vcso_heia_counts', JSON.stringify(counts));
+  fetch(SUPABASE_URL+'/rest/v1/heia',{method:'POST',headers:sbH(),body:JSON.stringify({selger:navn})}).catch(function(){});
+  var sid = safeId(navn);
+  var countEl = document.getElementById('hc-'+sid);
+  var c = counts[navn];
+  if (countEl) { countEl.textContent = '('+c+' heiarop fra tilskuerne)'; }
+  if (btn) {
+    btn.style.filter='none'; btn.title='Du har heia!'; btn.style.cursor='default';
+    btn.style.transform='scale(1.5)';
+    setTimeout(function(){btn.style.transform='scale(1)';},300);
+  }
+  // Mini konfetti-burst
+  var wrap=document.getElementById('konfetti');
+  if(wrap){
+    wrap.classList.remove('hide');
+    for(var i=0;i<22;i++){
+      var bit=document.createElement('div'); bit.className='kbit';
+      var rect=btn?btn.getBoundingClientRect():{left:window.innerWidth/2,top:0,width:0,height:0};
+      bit.style.left=(rect.left+rect.width/2)+'px';
+      bit.style.width=bit.style.height=(5+Math.random()*5)+'px';
+      bit.style.background=['#ffd700','#22c55e','#3b82f6','#f59e0b'][Math.floor(Math.random()*4)];
+      bit.style.borderRadius='50%';
+      bit.style.animationDuration=(0.8+Math.random()*0.7)+'s';
+      bit.style.animationDelay=(Math.random()*0.2)+'s';
+      wrap.appendChild(bit);
+    }
+    setTimeout(function(){wrap.classList.add('hide');wrap.innerHTML='';},1500);
+  }
+}
+function fetchHeias() {
+  fetch(SUPABASE_URL+'/rest/v1/heia?select=selger',{headers:sbH()})
+    .then(function(r){return r.json();})
+    .then(function(data){
+      if(!Array.isArray(data))return;
+      var counts={};
+      data.forEach(function(h){counts[h.selger]=(counts[h.selger]||0)+1;});
+      localStorage.setItem('vcso_heia_counts',JSON.stringify(counts));
+      if(curTab==='ind')renderInd();
+    }).catch(function(){});
+}
+
+
+function heiaHtml(navn, id) {
+  var already = hasHeia(navn);
+  var cnt = getHeiaCount(navn);
+  var tip = already ? 'Du har heia!' : 'Klikk for å heie!';
+  var opa = already ? '1' : '0.35';
+  var cur = already ? 'default' : 'pointer';
+  var cntTxt = cnt > 0 ? '(' + cnt + ' heiarop fra tilskuerne)' : '';
+  return '<div style="display:flex;align-items:center;gap:5px;margin-top:2px">'
+    + '<button data-navn="' + id + '" onclick="heiaClick(this)" title="' + tip + '" '
+    + 'style="background:none;border:none;padding:0;font-size:14px;cursor:' + cur + ';opacity:' + opa + ';transition:all .2s">&#128588;</button>'
+    + '<span id="hc-' + id + '" style="font-size:9px;color:var(--muted)">' + cntTxt + '</span>'
+    + '</div>';
+}
+
+function heiaClick(btn) {
+  event.stopPropagation();
+  var id = btn.getAttribute('data-navn');
+  var navn = SELGERE.find(function(s){ return s.id === id; });
+  if (!navn) return;
+  toggleHeia(navn.navn, btn);
+}
+
 function renderInd() {
   var el = document.getElementById('tbl-ind');
   if (!el) return;
@@ -1004,6 +1149,25 @@ function renderInd() {
       + '<div class="name-c">'
         + '<div class="name-main">'+r.navn+(sk>=3?' \uD83D\uDD25':'')+'</div>'
         + '<div class="name-sub">'+(LL[r.loc]||r.loc)+'</div>'
+        + heiaHtml(r.navn, r.id)
+
+
+        + '<div style="display:flex;align-items:center;gap:4px;margin-top:2px">'
+          + (function(){
+              var sid=r.id.replace(/[^a-zA-Z0-9]/g,'_');
+              var already=hasHeia(r.navn);
+              var cnt=getHeiaCount(r.navn);
+              return '<button id="heia-btn-'+sid+'" '
+                +'onclick="toggleHeia(''+r.navn.replace(/'/g,"\'")+'\',this)" '
+                +'title="'+(already?'Du har heia!':'Klikk for \u00e5 heie!')+'" '
+                +'style="background:none;border:none;padding:0;font-size:15px;line-height:1;cursor:'+(already?'default':'pointer')+';'
+                +'filter:'+(already?'none':'grayscale(1) opacity(.5)')+';transition:transform .2s,filter .15s">'
+                +'\uD83D\uDE4C'
+                +'</button>'
+                +'<span id="hc-'+sid+'" title="'+cnt+' heiarop fra tilskuerne" '
+                +'style="font-size:10px;color:'+(cnt>0?'var(--gold)':'var(--muted)')+'">'+cnt+'</span>';
+            })()
+        + '</div>'
       + '</div>'
       + '<div class="sc">'+r.g+'</div>'
       + '<div class="sc pts">'+r.pts+'</div>'
@@ -1164,17 +1328,64 @@ function renderStats() {
     + '</div>';
   }).join('');
 
+  // ─── UKEVINNERE (alle uker) ──────────────────────────────────────────
   var el3 = document.getElementById('team-bars');
-  if (el3) el3.innerHTML = TEAMS.map(function(t) {
-    var g = teamGoalsFor(t.id, m), goal = teamGoal(t.id, m);
-    var pct = goal > 0 ? Math.min(g/goal*100, 100) : 0;
-    var barCol = pct>=100?'var(--g)' : pct>=60?'var(--y)' : 'var(--r)';
-    return '<div class="bar-row">'
-      + '<div class="bar-lbl"><span style="color:'+t.color+'">'+t.navn+'</span>'
-        + '<span>'+g+' biler · '+Math.round(pct)+'%</span></div>'
-      + '<div class="bar-bg"><div class="bar-fill" style="width:'+pct.toFixed(1)+'%;background:'+barCol+'"></div></div>'
-    + '</div>';
-  }).join('');
+  if (el3) {
+    // Finn alle uker det finnes salg i
+    var allWeeks = {};
+    sales.forEach(function(s) {
+      var d = new Date(s.ts);
+      var wn = getWeekNum(d);
+      var mnd = (d.getMonth()+1)===5?'mai':'jun';
+      var key = wn + '_' + d.getFullYear();
+      if (!allWeeks[key]) allWeeks[key] = { week: wn, year: d.getFullYear(), mnd: mnd, sales: {} };
+      allWeeks[key].sales[s.selger] = (allWeeks[key].sales[s.selger]||0) + 1;
+    });
+
+    var weekKeys = Object.keys(allWeeks).sort(function(a,b) {
+      return parseInt(b.split('_')[0]) - parseInt(a.split('_')[0]);
+    });
+
+    if (!weekKeys.length) {
+      el3.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-style:italic;font-size:12px">Ingen salg registrert ennå</div>';
+    } else {
+      var thisWeek = getWeekNum(new Date());
+      el3.innerHTML = weekKeys.map(function(key, ki) {
+        var wd = allWeeks[key];
+        var bestN = 0;
+        Object.keys(wd.sales).forEach(function(n){ if(wd.sales[n]>bestN) bestN=wd.sales[n]; });
+        var winners = SELGERE.filter(function(s){ return (wd.sales[s.navn]||0)===bestN; });
+        var isCurrent = wd.week === thisWeek;
+        var label = isCurrent ? 'Inneværende uke – Uke '+wd.week : 'Uke '+wd.week;
+        var borderCol = isCurrent ? 'var(--gold)' : 'var(--b1)';
+        var crownCol = isCurrent ? '#ffd700' : '#94a3b8';
+
+        return '<div style="margin-bottom:16px;padding:10px 12px;background:var(--card2);border-radius:5px;border:1px solid '+borderCol+'">'
+          + '<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:'+(isCurrent?'var(--gold)':'var(--muted)')+';margin-bottom:10px">'+label+'</div>'
+          + '<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end">'
+          + winners.map(function(s) {
+              var hasPhoto = typeof SELGER_PHOTOS!=='undefined' && SELGER_PHOTOS[s.id];
+              var avHtml = hasPhoto
+                ? '<img src="'+SELGER_PHOTOS[s.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">'
+                : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:'+s.color+'">'+s.initials+'</div>';
+              var sold = wd.sales[s.navn];
+              return '<div style="display:flex;align-items:center;gap:10px">'
+                + '<div style="position:relative;flex-shrink:0">'
+                  + '<div style="width:'+(isCurrent?'52':'40')+'px;height:'+(isCurrent?'52':'40')+'px;border-radius:50%;overflow:hidden;border:2px solid '+borderCol+'">'+avHtml+'</div>'
+                  + '<div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:'+(isCurrent?'18':'14')+'px;color:'+crownCol+'">&#128081;</div>'
+                + '</div>'
+                + '<div>'
+                  + '<div style="font-size:'+(isCurrent?'13':'11')+'px;font-weight:700;color:var(--txt)">'+s.navn+'</div>'
+                  + '<div style="font-family:Anton,sans-serif;font-size:'+(isCurrent?'20':'15')+'px;color:'+(isCurrent?'var(--gold)':'var(--muted)')+'">'+sold+' bil'+(sold>1?'er':'')+'</div>'
+                  + '<div style="font-size:9px;color:var(--muted)">'+(LL[s.loc]||s.loc)+'</div>'
+                + '</div>'
+              + '</div>';
+            }).join('')
+          + '</div>'
+        + '</div>';
+      }).join('');
+    }
+  }
 }
 
 function renderScoring() {
@@ -1438,6 +1649,7 @@ function enterAsSelger() {
   buildSelgerDropdown();
   renderInd();
   fetchSales();
+  fetchHeias();
   requestPush();
 }
 
@@ -1486,6 +1698,8 @@ setInterval(countdown, 1000);
   else if (saved === 'tilskuer') { enterAsGuest(); }
   // else: show intro/login screen
 })();
+
+
 
 </script>
 </body>
