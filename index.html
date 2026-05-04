@@ -298,6 +298,11 @@ html, body {
   .name-main { font-size: 12px; }
   .cd-n { font-size: 14px; }
 }
+
+/* AVDELINGER - custom grid */
+#view-team .trow {
+  grid-template-columns: 26px 28px 1fr 40px;
+}
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6NJ95NHF98"></script>
@@ -418,15 +423,15 @@ html, body {
 
 <!-- AVDELINGER VIEW -->
 <div class="view" id="view-team">
-  <div class="tbl-head">
-    <div>#</div><div></div><div>Avdeling</div>
-    <div>M&#229;l</div><div>Poeng</div><div>Siste 5 dager</div><div>P</div>
+  <div class="tbl-head" style="grid-template-columns:26px 28px 1fr 40px">
+    <div>#</div><div></div><div>Avdeling</div><div>P</div>
   </div>
   <div id="tbl-team"></div>
   <div class="form-legend">
-    <div class="fl"><div class="fl-dot" style="background:var(--g)"></div>I rute</div>
-    <div class="fl"><div class="fl-dot" style="background:var(--y)"></div>Solgt, men ikke nok</div>
-    <div class="fl"><div class="fl-dot" style="background:var(--r)"></div>Ingen salg</div>
+    <div class="fl"><div class="fl-dot" style="background:var(--g)"></div>I rute (100%+)</div>
+    <div class="fl"><div class="fl-dot" style="background:var(--y)"></div>Solgt, men under tempo</div>
+    <div class="fl"><div class="fl-dot" style="background:var(--b1)"></div>Ingen salg denne uken</div>
+    <div class="fl" style="margin-left:auto;font-size:9px;color:var(--muted)">Innrammet = innev&#230;rende uke</div>
   </div>
 </div>
 
@@ -958,95 +963,106 @@ function renderInd() {
 }
 
 // ─── RENDER: AVDELINGER ──────────────────────────────────────────────
+// ─── UKEMÅL ───────────────────────────────────────────────────────────
+var WEEKLY_GOALS = {
+  mai: { ryen: 20, fornebu: 20, lillestrom: 10 },
+  jun: { ryen: 28, fornebu: 28, lillestrom: 24 }
+};
+
+function getWeekNum(d) {
+  var date = new Date(d);
+  date.setHours(0,0,0,0);
+  date.setDate(date.getDate() + 3 - (date.getDay()+6)%7);
+  var week1 = new Date(date.getFullYear(), 0, 4);
+  return 1 + Math.round(((date.getTime()-week1.getTime())/86400000 - 3 + (week1.getDay()+6)%7)/7);
+}
+
+function weekStartDate(year, week) {
+  var jan4 = new Date(year, 0, 4);
+  var dow = (jan4.getDay() + 6) % 7;
+  return new Date(jan4.getTime() - dow*86400000 + (week-1)*7*86400000);
+}
+
+function getWeeksForMonth(mnd) {
+  var now = new Date();
+  var mo = mnd === 'mai' ? 5 : 6;
+  var year = 2026;
+  var first = new Date(year, mo-1, 1);
+  var last  = new Date(year, mo, 0);
+  if (last > now) last = now;
+  var weeks = [], seen = {};
+  var d = new Date(first);
+  while (d <= last) {
+    var wn = getWeekNum(d);
+    if (!seen[wn]) { seen[wn] = true; weeks.push({ week: wn }); }
+    d.setDate(d.getDate() + 1);
+  }
+  return weeks;
+}
+
+function teamSalesInWeek(teamId, weekNum) {
+  return sales.filter(function(s) {
+    var sObj = SELGERE.find(function(x) { return x.navn === s.selger; });
+    if (!sObj || sObj.loc !== teamId) return false;
+    return getWeekNum(new Date(s.ts)) === weekNum;
+  }).length;
+}
+
 function renderTeam() {
   var el = document.getElementById('tbl-team');
   if (!el) return;
   var m = curMonth;
+
   var rows = TEAMS.map(function(t) {
     var g = teamGoalsFor(t.id, m);
-    var goal = teamGoal(t.id, m);
-    var pct = goal > 0 ? Math.min(g/goal*100, 100) : 0;
-    return { id:t.id, navn:t.navn, initials:t.initials, color:t.color, bg:t.bg, g:g, goal:goal, pts:g*PTS, pct:pct };
+    return { id:t.id, navn:t.navn, initials:t.initials, color:t.color, bg:t.bg, g:g, pts:g*PTS };
   }).sort(function(a,b) { return b.pts-a.pts || b.g-a.g; });
+
   var gold='var(--gold)', silver='var(--silver)', bronze='var(--bronze)';
+  var months = m === 'all' ? ['mai','jun'] : [m];
+
   el.innerHTML = rows.map(function(r,i) {
     var pc = i===0?gold : i===1?silver : i===2?bronze : 'var(--muted)';
-    var barCol = r.pct>=100?'var(--g)' : r.pct>=60?'var(--y)' : 'var(--r)';
     var members = SELGERE.filter(function(s) { return s.loc===r.id; }).length;
+
+    // Bygg ukebarer
+    var weekBarsHtml = '';
+    months.forEach(function(mnd) {
+      var weeks = getWeeksForMonth(mnd);
+      if (!weeks.length) return;
+      var wgoal = (WEEKLY_GOALS[mnd] && WEEKLY_GOALS[mnd][r.id]) || 20;
+      weekBarsHtml += '<div style="margin-top:6px">';
+      weekBarsHtml += '<div style="font-size:8px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px;font-weight:700">'
+        + (mnd==='mai'?'Mai':'Juni') + ' – ukemål: ' + wgoal + ' biler</div>';
+      weekBarsHtml += '<div style="display:flex;gap:4px;align-items:flex-end">';
+      weeks.forEach(function(w) {
+        var sold = teamSalesInWeek(r.id, w.week);
+        var pct  = Math.min(sold / wgoal * 100, 100);
+        var col  = pct >= 100 ? 'var(--g)' : pct >= 50 ? 'var(--y)' : sold > 0 ? 'var(--y)' : 'var(--b1)';
+        var isNow = getWeekNum(new Date()) === w.week;
+        weekBarsHtml += '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">'
+          + '<div style="font-size:8px;color:'+(pct>=100?'var(--g)':'var(--muted)')+'">'+sold+'</div>'
+          + '<div style="width:100%;height:28px;background:var(--faint);border-radius:3px;overflow:hidden;position:relative'+(isNow?';outline:1px solid '+r.color:'') +'">'
+          + '<div style="position:absolute;bottom:0;left:0;right:0;background:'+col+';height:'+pct.toFixed(0)+'%;border-radius:2px;transition:height 1s cubic-bezier(.4,0,.2,1)"></div>'
+          + '</div>'
+          + '<div style="font-size:7px;color:var(--muted)">U'+w.week+'</div>'
+          + '</div>';
+      });
+      weekBarsHtml += '</div></div>';
+    });
+
     return '<div class="trow zm" style="animation-delay:'+(i*0.06)+'s">'
       + '<div class="pos-n" style="color:'+pc+'">'+(i+1)+'</div>'
       + '<div><div class="av" style="background:'+r.bg+';color:'+r.color+'">'+r.initials+'</div></div>'
-      + '<div class="name-c">'
+      + '<div class="name-c" style="width:100%">'
         + '<div class="name-main">'+r.navn+'</div>'
-        + '<div class="name-sub">'+members+' selgere &middot; M\u00e5l: '+r.goal+'</div>'
-        + '<div class="prog-wrap" style="margin-top:4px">'
-          + '<div class="prog-bg"><div class="prog-fill" style="width:'+r.pct.toFixed(1)+'%;background:'+barCol+'"></div></div>'
-          + '<div class="prog-lbl"><span style="color:'+barCol+'">'+r.g+' / '+r.goal+'</span><span>'+Math.round(r.pct)+'%</span></div>'
-        + '</div>'
+        + '<div class="name-sub">'+members+' selgere · '+r.g+' biler totalt</div>'
+        + weekBarsHtml
       + '</div>'
-      + '<div class="sc">'+r.g+'</div>'
-      + '<div class="sc pts">'+r.pts+'</div>'
-      + '<div><div class="form-dots">'+teamDots(r.id)+'</div></div>'
       + '<div class="sc pts">'+r.pts+'</div>'
     + '</div>';
   }).join('');
 }
-
-// ─── RENDER: STATISTIKK ──────────────────────────────────────────────
-function renderStats() {
-  var m = curMonth;
-  var scorers = SELGERE.map(function(s) {
-    return { navn:s.navn, loc:s.loc, id:s.id, initials:s.initials, color:s.color, bg:s.bg, g:goalsFor(s.navn,m) };
-  }).sort(function(a,b) { return b.g-a.g; });
-  var maxG = scorers[0] ? scorers[0].g : 1;
-
-  var el1 = document.getElementById('top-scorers');
-  if (el1) el1.innerHTML = scorers.slice(0,8).map(function(s,i) {
-    var hasPhoto = typeof SELGER_PHOTOS !== 'undefined' && SELGER_PHOTOS[s.id];
-    var avHtml = hasPhoto ? '<img src="'+SELGER_PHOTOS[s.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">' : s.initials;
-    return '<div class="sc-row">'
-      + '<div class="sc-pos">'+(i+1)+'</div>'
-      + '<div class="sc-av" style="background:'+s.bg+';color:'+s.color+';overflow:hidden;padding:0">'+avHtml+'</div>'
-      + '<div style="flex:1"><div class="sc-name">'+s.navn+'</div>'
-        + '<div class="sc-sub">'+(LL[s.loc]||s.loc)+'</div>'
-        + '<div style="height:4px;background:var(--faint);border-radius:2px;margin-top:3px;overflow:hidden">'
-          + '<div style="width:'+Math.round(s.g/Math.max(maxG,1)*100)+'%;height:100%;background:'+s.color+';border-radius:2px;transition:width 1.2s"></div>'
-        + '</div>'
-      + '</div>'
-      + '<div class="sc-n">'+s.g+'</div>'
-    + '</div>';
-  }).join('');
-
-  var today = todayStr();
-  var el2 = document.getElementById('top-form');
-  if (el2) el2.innerHTML = SELGERE.map(function(s,i) {
-    var td = sales.filter(function(x) { return x.selger===s.navn && tsDate(x.ts)===today; }).length;
-    var hasPhoto = typeof SELGER_PHOTOS !== 'undefined' && SELGER_PHOTOS[s.id];
-    var avHtml = hasPhoto ? '<img src="'+SELGER_PHOTOS[s.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">' : s.initials;
-    return '<div class="sc-row">'
-      + '<div class="sc-pos">'+(i+1)+'</div>'
-      + '<div class="sc-av" style="background:'+s.bg+';color:'+s.color+';overflow:hidden;padding:0">'+avHtml+'</div>'
-      + '<div style="flex:1"><div class="sc-name">'+s.navn+'</div>'
-        + '<div style="display:flex;gap:3px;margin-top:4px">'+selgerDots(s.navn)+'</div>'
-      + '</div>'
-      + '<div class="sc-n" style="color:'+(td>0?'var(--g)':'var(--muted)')+'">'+( td>0?'+'+td:'&ndash;')+'</div>'
-    + '</div>';
-  }).join('');
-
-  var el3 = document.getElementById('team-bars');
-  if (el3) el3.innerHTML = TEAMS.map(function(t) {
-    var g = teamGoalsFor(t.id, m), goal = teamGoal(t.id, m);
-    var pct = goal > 0 ? Math.min(g/goal*100, 100) : 0;
-    var barCol = pct>=100?'var(--g)' : pct>=60?'var(--y)' : 'var(--r)';
-    return '<div class="bar-row">'
-      + '<div class="bar-lbl"><span style="color:'+t.color+'">'+t.navn+'</span>'
-        + '<span>'+g+' / '+goal+' biler &middot; '+Math.round(pct)+'%</span></div>'
-      + '<div class="bar-bg"><div class="bar-fill" style="width:'+pct.toFixed(1)+'%;background:'+barCol+'"></div></div>'
-    + '</div>';
-  }).join('');
-}
-
-// ─── RENDER: SCORINGER ───────────────────────────────────────────────
 function renderScoring() {
   var all = locFilter === 'all' ? sales : sales.filter(function(s) {
     var sObj = SELGERE.find(function(x) { return x.navn === s.selger; });
