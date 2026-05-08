@@ -259,7 +259,7 @@ function renderArticle(sales, mode) {
   var ws = sales.filter(function(s){ return getWN(new Date(s.ts)) === targetWeek; });
 
   if (ws.length === 0) {
-    document.getElementById('content').innerHTML = '<div class="no-sales">Ingen salg registrert' + (mode==='last'?' forrige uke':' denne uken') + ' ennå. 💪</div>';
+    document.getElementById('article').innerHTML = '<div class="no-sales">Ingen salg registrert' + (mode==='last'?' forrige uke':' denne uken') + ' ennå. 💪</div>';
     copyTextData = 'Ingen salg å rapportere.';
     document.getElementById('dl-btn').disabled = false;
     document.getElementById('dl-btn').textContent = '📄 Last ned PDF';
@@ -436,7 +436,7 @@ function renderArticle(sales, mode) {
 
   // Render
   var modeLabel = mode==='last' ? 'Uke '+targetWeek+' – Mandag morgen' : 'Uke '+targetWeek+' – Pågående';
-  document.getElementById('content').innerHTML =
+  document.getElementById('article').innerHTML =
     '<div id="pdf-content">'
     +'<div class="edition"><div class="edition-week">'+modeLabel+'</div><div class="edition-comp">'+COMP_NAME+'</div></div>'
     +'<div class="hero">'
