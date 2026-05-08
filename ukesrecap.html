@@ -4,67 +4,84 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>La Gazzetta dello VCSO – VCSO Championship 2026</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,700&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#0a111e;--card:#0d1624;--card2:#111e30;--b1:#1c2d42;--gold:#ffd700;--gold2:#ffe566;--txt:#e8f2ff;--muted:#5a7898;--g:#22c55e;--r:#ef4444}
-body{background:var(--bg);font-family:'Barlow Condensed',sans-serif;color:var(--txt);min-height:100vh;padding-bottom:100px}
+body{background:var(--bg);font-family:'Barlow Condensed',sans-serif;color:var(--txt);min-height:100vh;padding-bottom:90px}
 .hdr{background:var(--card);border-bottom:3px solid var(--gold);padding:14px 18px 10px;text-align:center}
-.paper-name{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:var(--gold);letter-spacing:1px}
+.paper-name{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:var(--gold);letter-spacing:1px}
 .paper-sub{font-size:9px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:3px}
 .paper-date{font-size:10px;color:var(--muted);margin-top:6px;padding-top:6px;border-top:1px solid var(--b1)}
-.spinner{width:36px;height:36px;border:3px solid var(--b1);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;margin:60px auto}
+.mode-tabs{display:flex;background:var(--card);border-bottom:1px solid var(--b1)}
+.mode-tab{flex:1;padding:10px 0;font-size:11px;font-weight:700;border:none;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;border-bottom:3px solid transparent;text-transform:uppercase;letter-spacing:.5px}
+.mode-tab.on{color:var(--gold);border-bottom-color:var(--gold)}
+.comp-tabs{display:flex;background:var(--card2);border-bottom:1px solid var(--b1)}
+.comp-tab{flex:1;padding:8px 0;font-size:10px;font-weight:700;border:none;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:.5px}
+.comp-tab.on{color:var(--gold2)}
+.spinner{width:34px;height:34px;border:3px solid var(--b1);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;margin:50px auto}
+.loading-txt{text-align:center;color:var(--muted);font-size:11px;letter-spacing:1px;text-transform:uppercase;margin-top:10px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-txt{text-align:center;color:var(--muted);font-size:12px;letter-spacing:1px;text-transform:uppercase;margin-top:10px}
-/* PDF CONTENT */
-#pdf-content{background:var(--bg);padding:0}
-.edition{background:linear-gradient(135deg,rgba(255,215,0,.12),rgba(255,215,0,.03));border-bottom:2px solid rgba(255,215,0,.3);padding:12px 18px;text-align:center}
-.edition-week{font-family:'Playfair Display',serif;font-size:20px;color:var(--gold)}
-.edition-comp{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:3px}
-.hero{padding:16px 18px;border-bottom:1px solid var(--b1)}
-.kicker{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
-.headline{font-family:'Playfair Display',serif;font-size:26px;line-height:1.1;margin-bottom:10px;color:var(--txt)}
+.edition{background:linear-gradient(135deg,rgba(255,215,0,.12),rgba(255,215,0,.03));border-bottom:2px solid rgba(255,215,0,.25);padding:12px 16px;text-align:center}
+.edition-week{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold)}
+.edition-comp{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+.hero{padding:14px 16px;border-bottom:1px solid var(--b1)}
+.kicker{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:5px}
+.headline{font-family:'Playfair Display',serif;font-size:clamp(19px,5vw,26px);line-height:1.1;margin-bottom:10px;color:var(--txt)}
 .headline em{color:var(--gold);font-style:italic}
-.hero-body{display:flex;gap:14px;align-items:flex-start}
-.hero-photo{width:88px;height:88px;border-radius:50%;overflow:hidden;border:3px solid var(--gold);flex-shrink:0;box-shadow:0 0 20px rgba(255,215,0,.25)}
+.hero-body{display:flex;gap:12px;align-items:flex-start}
+.hero-photo{width:82px;height:82px;border-radius:50%;overflow:hidden;border:3px solid var(--gold);flex-shrink:0;box-shadow:0 0 20px rgba(255,215,0,.25)}
 .hero-photo img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%)}
-.hero-photo-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;background:rgba(255,215,0,.15);color:var(--gold)}
-.body-txt{font-size:13px;line-height:1.65;color:var(--muted)}
+.body-txt{font-size:13px;color:var(--muted);line-height:1.65}
 .body-txt strong{color:var(--txt)}
-.divider{display:flex;align-items:center;gap:8px;padding:10px 18px}
+.divider{display:flex;align-items:center;gap:8px;padding:10px 16px}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--b1)}
 .divider span{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
-.podium{display:flex;gap:10px;justify-content:center;padding:14px 18px}
-.pod{flex:1;max-width:110px;display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center}
-.pod-medal{font-size:18px}
-.pod-photo{border-radius:50%;overflow:hidden;border:2.5px solid;box-shadow:0 0 12px rgba(0,0,0,.4)}
-.pod-photo img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%)}
-.pod-photo-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-weight:900;background:rgba(255,215,0,.1);color:var(--gold)}
+.podium{display:flex;gap:8px;justify-content:center;padding:12px 16px}
+.pod{flex:1;max-width:105px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.pod-medal{font-size:16px}
+.pod-photo{border-radius:50%;overflow:hidden;border:2.5px solid}
 .pod-name{font-size:12px;font-weight:700;color:var(--txt);line-height:1.2}
-.pod-sales{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;line-height:1}
+.pod-sales{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;line-height:1}
 .pod-lbl{font-size:9px;color:var(--muted)}
-.rest-list{padding:0 18px 10px}
+.rest-list{padding:0 16px 8px}
 .rest-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--b1)}
-.rest-rank{width:18px;font-size:11px;color:var(--muted);flex-shrink:0}
-.rest-av{width:30px;height:30px;border-radius:50%;overflow:hidden;border:1.5px solid var(--b1);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:var(--gold);background:rgba(255,215,0,.1)}
-.rest-av img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%)}
+.rest-rank{width:16px;font-size:11px;color:var(--muted);flex-shrink:0}
+.rest-av{width:28px;height:28px;border-radius:50%;overflow:hidden;border:1.5px solid var(--b1);flex-shrink:0}
 .rest-name{flex:1;font-size:13px;font-weight:700}
-.rest-sales{font-size:14px;font-weight:700;color:var(--gold)}
-.hat-card{margin:0 18px 14px;background:linear-gradient(135deg,rgba(255,215,0,.1),rgba(255,215,0,.03));border:1px solid rgba(255,215,0,.3);border-radius:6px;padding:12px;display:flex;align-items:center;gap:12px}
-.hat-photo{width:52px;height:52px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0}
-.hat-photo img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%)}
-.hat-photo-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;background:rgba(255,215,0,.15);color:var(--gold)}
-.hat-title{font-family:'Playfair Display',serif;font-size:15px;color:var(--gold);margin-bottom:3px}
+.rest-sales{font-size:13px;font-weight:700;color:var(--gold)}
+.hat-card{margin:0 16px 12px;background:rgba(255,215,0,.07);border:1px solid rgba(255,215,0,.25);border-radius:5px;padding:12px;display:flex;align-items:center;gap:12px}
+.hat-photo{width:50px;height:50px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0}
+.hat-title{font-family:'Playfair Display',serif;font-size:14px;color:var(--gold);margin-bottom:3px}
 .hat-body{font-size:11px;color:var(--muted);line-height:1.5}
-.footer-strip{background:var(--card);border-top:1px solid var(--b1);padding:12px 18px;text-align:center;font-size:10px;color:var(--muted);letter-spacing:1px}
-/* BOTTOM BAR */
-.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:2px solid var(--gold);padding:12px 16px;display:flex;gap:10px;z-index:100}
-.dl-btn{flex:1;padding:13px;background:var(--gold);color:#000;border:none;border-radius:4px;font-family:inherit;font-size:13px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer}
+.story-section{padding:0 16px 10px}
+.day-item{padding:9px 0;border-bottom:1px solid var(--b1)}
+.day-header{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.day-photo{width:28px;height:28px;border-radius:50%;overflow:hidden;border:1.5px solid var(--b1);flex-shrink:0}
+.day-name{font-size:12px;font-weight:700;color:var(--txt)}
+.day-total{font-size:10px;color:var(--muted)}
+.day-desc{font-size:12px;color:var(--txt);line-height:1.5;padding-left:36px}
+.day-others{font-size:10px;color:var(--muted);padding-left:36px;margin-top:2px}
+.mvp-row{display:flex;gap:10px;padding:10px 16px;justify-content:center}
+.mvp-item{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;max-width:90px;text-align:center}
+.mvp-photo{width:44px;height:44px;border-radius:50%;overflow:hidden;border:2px solid #3b82f6}
+.mvp-name{font-size:11px;font-weight:700;color:var(--txt)}
+.mvp-days{font-size:10px;color:#3b82f6;font-weight:700}
+.ai-section{padding:10px 16px 14px}
+.ai-badge{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;text-align:center;font-style:italic}
+.ai-quote{display:flex;align-items:flex-start;gap:10px;background:var(--card2);border:1px solid var(--b1);border-radius:5px;padding:10px}
+.ai-photo{width:44px;height:44px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0}
+.ai-name{font-size:11px;font-weight:700;color:var(--gold);margin-bottom:4px}
+.ai-comment{font-size:12px;color:var(--muted);line-height:1.55;font-style:italic}
+.footer-strip{background:var(--card);border-top:1px solid var(--b1);padding:10px 16px;text-align:center;font-size:9px;color:var(--muted);letter-spacing:1px}
+.no-sales{text-align:center;padding:50px 20px;color:var(--muted);font-size:13px;font-style:italic}
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:2px solid var(--gold);padding:10px 14px;display:flex;gap:8px;z-index:100}
+.dl-btn{flex:1;padding:12px;background:var(--gold);color:#000;border:none;border-radius:4px;font-family:inherit;font-size:12px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer}
 .dl-btn:disabled{opacity:.5;cursor:default}
 .dl-btn.done{background:var(--g);color:#fff}
-.copy-btn{flex:1;padding:13px;background:transparent;color:var(--gold);border:1px solid var(--gold);border-radius:4px;font-family:inherit;font-size:13px;font-weight:900;letter-spacing:1px;text-transform:uppercase;cursor:pointer}
+.copy-btn{flex:1;padding:12px;background:transparent;color:var(--gold);border:1px solid var(--gold);border-radius:4px;font-family:inherit;font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;cursor:pointer}
 </style>
 </head>
 <body>
@@ -75,6 +92,11 @@ body{background:var(--bg);font-family:'Barlow Condensed',sans-serif;color:var(--
   <div class="paper-date" id="paper-date"></div>
 </div>
 
+<div class="mode-tabs">
+  <button class="mode-tab on" id="tab-week" onclick="setMode('week',this)">📰 Lørdag – Denne uken</button>
+  <button class="mode-tab" id="tab-last" onclick="setMode('last',this)">🏆 Mandag – Uken som gikk</button>
+</div>
+
 <div id="content">
   <div class="spinner"></div>
   <div class="loading-txt">Henter nyheter fra banen...</div>
@@ -82,7 +104,7 @@ body{background:var(--bg);font-family:'Barlow Condensed',sans-serif;color:var(--
 
 <div class="bottom-bar">
   <button class="dl-btn" id="dl-btn" onclick="downloadPDF()" disabled>⏳ Laster...</button>
-  <button class="copy-btn" id="copy-btn" onclick="copyText()">📋 Kopier tekst</button>
+  <button class="copy-btn" id="copy-btn" onclick="copyRecap()">📋 Kopier tekst</button>
 </div>
 
 <script>
@@ -110,91 +132,238 @@ var TABLE = 'sales';
 var COMP_NAME = 'VCSO Championship 2026';
 var LINK = 'https://jorsna.github.io/vcso-serien/';
 var copyTextData = '';
+var curMode = 'week';
+var allSales = [];
 
-var days=['søndag','mandag','tirsdag','onsdag','torsdag','fredag','lørdag'];
-var mons=['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'];
-var now=new Date();
-document.getElementById('paper-date').textContent=days[now.getDay()]+' '+now.getDate()+'. '+mons[now.getMonth()]+' '+now.getFullYear();
+var DAYS_NO = ['søndag','mandag','tirsdag','onsdag','torsdag','fredag','lørdag'];
+var MONTHS_NO = ['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'];
+var now = new Date();
+document.getElementById('paper-date').textContent = DAYS_NO[now.getDay()] + ' ' + now.getDate() + '. ' + MONTHS_NO[now.getMonth()] + ' ' + now.getFullYear();
 
-function getWN(d){var dt=new Date(d);dt.setHours(0,0,0,0);dt.setDate(dt.getDate()+3-(dt.getDay()+6)%7);var w1=new Date(dt.getFullYear(),0,4);return 1+Math.round(((dt.getTime()-w1.getTime())/86400000-3+(w1.getDay()+6)%7)/7);}
+// Override SELGER_PHOTOS if different var name
 
-function nameToId(n){return n.toLowerCase().replace(/\s+/g,'_').replace(/æ/g,'ae').replace(/ø/g,'o').replace(/å/g,'aa').replace(/[^a-z0-9_]/g,'');}
 
-function photoEl(id,size){
-  var photos = typeof SELGER_PHOTOS!=='undefined'?SELGER_PHOTOS:{};
-  if(photos[id]) return '<img src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">';
-  return '<div class="pod-photo-ph" style="font-size:'+(size>60?'18px':'10px')+'">'+id.replace(/_/g,' ').split(' ').map(function(w){return w[0]?w[0].toUpperCase():''}).join('').slice(0,2)+'</div>';
+function setMode(mode, btn) {
+  curMode = mode;
+  document.querySelectorAll('.mode-tab').forEach(function(t){t.classList.remove('on');});
+  btn.classList.add('on');
+  render(allSales, curMode);
 }
 
-function headlines(leader,sales,hatTricks){
-  if(hatTricks.length>0) return hatTricks[0]+' slår til med hat-trick – legenden vokser!';
-  var h=['herjer på toppen – resten må gi alt!','leverer igjen – ingen kan stoppe ham!','er i en klasse for seg denne uken!','setter standarden – '+sales+' biler taler for seg!','er ukens store mester!'];
-  return leader+' '+h[Math.floor(now.getSeconds()%h.length)];
-}
-
-function bodyText(leader,lSales,ranked,per,fin,hats,total,wk){
-  var chaser=ranked[1],diff=chaser?lSales-per[chaser]:0;
-  var finStr=fin[leader]?' Av disse var '+fin[leader]+' finansierte – kvalitet i tillegg til kvantitet.':'';
-  var chaseStr=chaser&&diff<=1?' '+chaser+' er tett i ryggen med kun '+diff+' bils margin – spennende!':chaser?' '+chaser+' følger opp med '+per[chaser]+' salg.':'';
-  var hatStr=hats.length>0?' '+hats.join(' og ')+' leverte hat-trick denne uken!':'';
-  return leader+' tok uke '+wk+' i strupen og leverte imponerende '+lSales+' biler.'+finStr+chaseStr+hatStr+' Totalt '+total+' biler er registrert.';
-}
-
-function load(){
-  fetch(SUPABASE_URL+'/rest/v1/'+TABLE+'?deleted=is.false&select=*',{headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}})
+function load() {
+  fetch(SUPABASE_URL+'/rest/v1/'+TABLE+'?deleted=is.false&select=*',{
+    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}
+  })
   .then(function(r){return r.json();})
   .then(function(data){
-    if(!Array.isArray(data)){document.getElementById('content').innerHTML='<div style="padding:40px;text-align:center;color:#ef4444">Feil: '+JSON.stringify(data)+'</div>';return;}
-    render(data);
+    if(!Array.isArray(data)){
+      document.getElementById('content').innerHTML='<div style="padding:40px;text-align:center;color:#ef4444">Feil: '+JSON.stringify(data)+'</div>';
+      return;
+    }
+    allSales = data;
+    render(allSales, curMode);
   })
-  .catch(function(e){document.getElementById('content').innerHTML='<div style="padding:40px;text-align:center;color:#ef4444">'+e.message+'</div>';});
+  .catch(function(e){
+    document.getElementById('content').innerHTML='<div style="padding:40px;text-align:center;color:#ef4444">'+e.message+'</div>';
+  });
 }
 
-function render(sales){
-  var thisWeek=getWN(new Date());
-  var ws=sales.filter(function(s){return getWN(new Date(s.ts))===thisWeek;});
+// ── HELPERS ──────────────────────────────────────────────────────────
+function getWN(d) {
+  var dt = new Date(d);
+  dt.setHours(0,0,0,0);
+  dt.setDate(dt.getDate() + 3 - (dt.getDay()+6)%7);
+  var w1 = new Date(dt.getFullYear(), 0, 4);
+  return 1 + Math.round(((dt.getTime()-w1.getTime())/86400000 - 3 + (w1.getDay()+6)%7)/7);
+}
+function nameToId(n) {
+  return n.toLowerCase().replace(/\s+/g,'_')
+    .replace(/æ/g,'ae').replace(/ø/g,'o').replace(/å/g,'aa')
+    .replace(/[^a-z0-9_]/g,'');
+}
+function fmtDate(ts) {
+  var d = new Date(ts);
+  var days = ['søn','man','tir','ons','tor','fre','lør'];
+  return days[d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth()+1) + '.';
+}
+var DAYS_NO = ['søndag','mandag','tirsdag','onsdag','torsdag','fredag','lørdag'];
+var MONTHS_NO = ['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'];
 
-  if(ws.length===0){
-    document.getElementById('content').innerHTML='<div style="padding:60px 20px;text-align:center;color:var(--muted);font-style:italic;font-size:14px">Ingen salg denne uken ennå – la oss gi gass! 💪</div>';
-    copyTextData=COMP_NAME+' – Uke '+thisWeek+'\nIngen salg ennå. La oss gi gass! 💪';
-    document.getElementById('dl-btn').disabled=false;
-    document.getElementById('dl-btn').textContent='📄 Last ned PDF';
+function photoEl(id, size) {
+  var photos = typeof SELGER_PHOTOS !== 'undefined' ? SELGER_PHOTOS : {};
+  var initials = id.replace(/_/g,' ').split(' ').map(function(w){return w[0]?w[0].toUpperCase():''}).join('').slice(0,2);
+  if (photos[id]) {
+    return '<img src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">';
+  }
+  return '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:'+(size>60?'18':'10')+'px;font-weight:900;background:rgba(255,215,0,.12);color:#ffd700">'+initials+'</div>';
+}
+
+// ── AI COMMENTS ───────────────────────────────────────────────────────
+function winnerComment(navn, sales, hats, fin) {
+  var firstName = navn.split(' ')[0];
+  var comments = [
+    '"Jeg visste at denne uken ville bli bra. Bilene selger seg selv – jeg bare hjelper til litt." 😄',
+    '"Teamet er fantastisk, men noen ganger må én ta ansvar. Det var meg denne uken."',
+    '"'+sales+' biler er bra, men neste uke tar jeg flere. Konkurrentene vet hva som venter."',
+    '"Hemmelighetene mine? Tidlig morgen, sent kveld, og god kaffe. Og '+navn.split(' ')[1]+'s telefonnummer til alle interessenter." 😂',
+    '"Jeg ga alt denne uken. Sjefen kan være fornøyd – i hvert fallet for én uke." 🏆',
+  ];
+  if (hats > 0) comments.push('"Hat-trick! Tre biler på én dag – det er ikke tilfeldigheter, det er forberedelse og flyt."');
+  if (fin > 0) comments.push('"'+fin+' finansieringer i tillegg. Kunden vil ha totalløsningen – det er vi best på."');
+  return comments[Math.floor(Math.random() * comments.length)];
+}
+
+function rivalComment(winner, chaser, diff) {
+  if (diff === 0) return '"'+chaser.split(' ')[0]+' og jeg er like. Neste uke avgjør hvem som er best."';
+  if (diff === 1) return '"'+diff+' bil. Bare én. Jeg kommer tilbake sterkere neste uke." – '+chaser.split(' ')[0];
+  return '"Gratulerer til '+winner.split(' ')[0]+'. Men denne kampen er ikke over." – '+chaser.split(' ')[0];
+}
+
+// ── DRAMATIC DAILY STORY ─────────────────────────────────────────────
+function buildDailyStory(weekSales, ranked, per, fin, thisWeek) {
+  // Group by day
+  var byDay = {};
+  weekSales.forEach(function(s) {
+    var d = s.ts.slice(0,10);
+    if (!byDay[d]) byDay[d] = [];
+    byDay[d].push(s);
+  });
+  var sortedDays = Object.keys(byDay).sort();
+
+  var html = '';
+  sortedDays.forEach(function(day, i) {
+    var daySales = byDay[day];
+    var dayPer = {};
+    daySales.forEach(function(s){ dayPer[s.selger] = (dayPer[s.selger]||0)+1; });
+    var dayRanked = Object.keys(dayPer).sort(function(a,b){ return dayPer[b]-dayPer[a]; });
+    var dayLeader = dayRanked[0];
+    var dayId = nameToId(dayLeader);
+    var isHatDay = dayPer[dayLeader] >= 3;
+    var d = new Date(day);
+    var dayName = DAYS_NO[d.getDay()].charAt(0).toUpperCase() + DAYS_NO[d.getDay()].slice(1);
+
+    var descriptions = [
+      dayLeader.split(' ')[0] + ' satte tonen for dagen med ' + dayPer[dayLeader] + ' salg.',
+      dayLeader.split(' ')[0] + ' dominerte ' + dayName.toLowerCase() + ' med ' + dayPer[dayLeader] + ' biler levert.',
+      'Ingen stoppet ' + dayLeader.split(' ')[0] + ' – ' + dayPer[dayLeader] + ' salg på én dag.',
+      dayLeader.split(' ')[0] + ' var uslåelig ' + dayName.toLowerCase() + ': ' + dayPer[dayLeader] + ' biler.',
+    ];
+    var desc = isHatDay
+      ? '🔥 HAT-TRICK! ' + dayLeader.split(' ')[0] + ' scoret hele ' + dayPer[dayLeader] + ' biler på én dag!'
+      : descriptions[i % descriptions.length];
+
+    html += '<div class="day-item">'
+      + '<div class="day-header">'
+        + '<div class="day-photo">' + photoEl(dayId, 32) + '</div>'
+        + '<div>'
+          + '<div class="day-name">' + dayName + ' ' + d.getDate() + '.' + (d.getMonth()+1) + '.' + (isHatDay ? ' ⭐' : '') + '</div>'
+          + '<div class="day-total">' + daySales.length + ' salg totalt denne dagen</div>'
+        + '</div>'
+      + '</div>'
+      + '<div class="day-desc">' + desc + '</div>'
+      + (dayRanked.length > 1 ? '<div class="day-others">Andre: ' + dayRanked.slice(1).map(function(n){ return n.split(' ')[0]+' ('+dayPer[n]+')'; }).join(', ') + '</div>' : '')
+    + '</div>';
+  });
+  return html;
+}
+
+// ── MAIN RENDER ───────────────────────────────────────────────────────
+function render(sales, mode) {
+  var now = new Date();
+  var thisWeek = getWN(now);
+  // mode: 'week' = current week, 'last' = last week
+  var targetWeek = mode === 'last' ? thisWeek - 1 : thisWeek;
+  var ws = sales.filter(function(s){ return getWN(new Date(s.ts)) === targetWeek; });
+
+  if (ws.length === 0) {
+    document.getElementById('content').innerHTML = '<div class="no-sales">Ingen salg registrert' + (mode==='last'?' forrige uke':' denne uken') + ' ennå. 💪</div>';
+    copyTextData = 'Ingen salg å rapportere.';
+    document.getElementById('dl-btn').disabled = false;
+    document.getElementById('dl-btn').textContent = '📄 Last ned PDF';
     return;
   }
 
-  var per={},fin={};
-  ws.forEach(function(s){per[s.selger]=(per[s.selger]||0)+1;if(s.finansiert)fin[s.selger]=(fin[s.selger]||0)+1;});
-  var ranked=Object.keys(per).sort(function(a,b){return(per[b]-per[a])||((fin[b]||0)-(fin[a]||0));});
+  // Stats
+  var per = {}, fin = {};
+  ws.forEach(function(s){ per[s.selger]=(per[s.selger]||0)+1; if(s.finansiert)fin[s.selger]=(fin[s.selger]||0)+1; });
 
-  var daily={};
-  ws.forEach(function(s){var k=s.selger+'|'+s.ts.slice(0,10);daily[k]=(daily[k]||0)+1;});
-  var hats=[],hatC={};
-  Object.keys(daily).forEach(function(k){if(daily[k]>=3){var n=k.split('|')[0];if(hats.indexOf(n)===-1)hats.push(n);hatC[n]=(hatC[n]||0)+1;}});
+  // Sort with tiebreaker
+  var ranked = Object.keys(per).sort(function(a,b){
+    return (per[b]-per[a]) || ((fin[b]||0)-(fin[a]||0));
+  });
 
-  var leader=ranked[0],lId=nameToId(leader),lSales=per[leader];
-  var hl=headlines(leader,lSales,hats);
-  var bt=bodyText(leader,lSales,ranked,per,fin,hats,ws.length,thisWeek);
+  // Find truly tied
+  var topScore = per[ranked[0]];
+  var topFin = fin[ranked[0]] || 0;
+  var tied = ranked.filter(function(n){ return per[n]===topScore && (fin[n]||0)===topFin; });
 
-  // Podium
-  var podOrder=ranked.length>=3?[ranked[1],ranked[0],ranked[2]]:ranked.length>=2?[ranked[1],ranked[0]]:[ranked[0]];
-  var podSizes=ranked.length>=3?[72,90,72]:[72,90];
-  var podColors=['#c0c0c0','#ffd700','#cd7f32'];
-  var podColorMap=ranked.length>=3?[podColors[1],podColors[0],podColors[2]]:[podColors[1],podColors[0]];
-  var medals=['🥈','🥇','🥉'];
-  var podHtml=podOrder.map(function(navn,i){
+  // Hat-tricks
+  var daily = {}, hats = [], hatC = {};
+  ws.forEach(function(s){ var k=s.selger+'|'+s.ts.slice(0,10); daily[k]=(daily[k]||0)+1; });
+  Object.keys(daily).forEach(function(k){ if(daily[k]>=3){ var n=k.split('|')[0]; if(hats.indexOf(n)===-1)hats.push(n); hatC[n]=(hatC[n]||0)+1; }});
+
+  // MVP days (who led most days)
+  var mvpDays = {};
+  var byDay = {};
+  ws.forEach(function(s){ var d=s.ts.slice(0,10); if(!byDay[d])byDay[d]={}; byDay[d][s.selger]=(byDay[d][s.selger]||0)+1; });
+  Object.keys(byDay).forEach(function(d){
+    var best=0; var winner='';
+    Object.keys(byDay[d]).forEach(function(n){ if(byDay[d][n]>best){best=byDay[d][n];winner=n;} });
+    if(winner) mvpDays[winner]=(mvpDays[winner]||0)+1;
+  });
+  var mvpSorted = Object.keys(mvpDays).sort(function(a,b){return mvpDays[b]-mvpDays[a];});
+
+  var leader = ranked[0];
+  var lId = nameToId(leader);
+  var lSales = per[leader];
+  var chaser = ranked[1];
+
+  // Headline
+  var hl = hats.length > 0
+    ? hats[0] + ' leverte hat-trick – en uke for historiebøkene!'
+    : tied.length > 1
+    ? tied.map(function(n){return n.split(' ')[0];}).join(' og ') + ' deler tronen – likt på toppen!'
+    : leader + ' – ' + lSales + ' biler og én klar vinner!';
+
+  // Intro text
+  var intro = mode === 'last'
+    ? 'Uke ' + targetWeek + ' er over, og vi kan nå oppsummere en '+(ws.length>15?'fantastisk':'solid')+' uke i ' + COMP_NAME + '. '
+    : 'Vi er inne i uke ' + targetWeek + ', og det er allerede klart at dette blir en spennende uke i ' + COMP_NAME + '. ';
+
+  var tiedStr = tied.length > 1
+    ? tied.map(function(n){return n.split(' ')[0];}).join(' og ') + ' deler førsteplassen med ' + lSales + ' biler og ' + topFin + ' finansieringer hver.'
+    : leader + ' leder an med ' + lSales + ' biler' + (fin[leader]?' og '+fin[leader]+' finansieringer':'') + '.';
+
+  var chaserStr = chaser && tied.indexOf(chaser)===-1
+    ? (per[leader]-per[chaser]===1?' '+chaser.split(' ')[0]+' er kun én bil bak og gir ikke opp!' : ' '+chaser.split(' ')[0]+' følger med '+per[chaser]+' salg.')
+    : '';
+
+  var hatStr = hats.length > 0 ? ' ' + hats.map(function(n){return n.split(' ')[0];}).join(' og ') + ' imponerte med hat-trick!' : '';
+  var bodyTxt = intro + tiedStr + chaserStr + hatStr + ' Totalt ' + ws.length + ' biler er registrert.';
+
+  // Podium HTML
+  var podOrder = ranked.length>=3?[ranked[1],ranked[0],ranked[2]]:ranked.length>=2?[ranked[1],ranked[0]]:[ranked[0]];
+  var podSizes = ranked.length>=3?[72,90,72]:[72,90];
+  var podColors = ['#c0c0c0','#ffd700','#cd7f32'];
+  var podColorMap = ranked.length>=3?[podColors[1],podColors[0],podColors[2]]:[podColors[1],podColors[0]];
+  var medals = ['🥈','🥇','🥉'];
+  var podHtml = podOrder.map(function(navn,i){
     var id=nameToId(navn),sz=podSizes[i],col=podColorMap[i];
-    var stars=hatC[navn]?' '+Array(Math.min(hatC[navn],3)+1).join('⭐'):'';
+    var isTied = tied.indexOf(navn)!==-1 && tied.length>1;
+    var stars = hatC[navn]?' '+Array(Math.min(hatC[navn],3)+1).join('⭐'):'';
+    var tiedBadge = isTied?'<div style="font-size:8px;color:'+col+';letter-spacing:1px;text-transform:uppercase">Delt 1.</div>':'';
     return '<div class="pod">'
       +'<div class="pod-medal">'+medals[i]+'</div>'
       +'<div class="pod-photo" style="width:'+sz+'px;height:'+sz+'px;border-color:'+col+';box-shadow:0 0 '+(navn===ranked[0]?'18':'8')+'px '+col+'55">'+photoEl(id,sz)+'</div>'
+      +tiedBadge
       +'<div class="pod-name">'+navn.split(' ')[0]+stars+'</div>'
       +'<div class="pod-sales" style="color:'+col+'">'+per[navn]+'</div>'
-      +'<div class="pod-lbl">biler</div>'
+      +'<div class="pod-lbl">biler'+(fin[navn]?' · '+fin[navn]+' fin.':'')+'</div>'
     +'</div>';
   }).join('');
 
-  // Rest
-  var restHtml=ranked.slice(3).map(function(navn,i){
+  // Rest rows
+  var restHtml = ranked.slice(3).map(function(navn,i){
     var id=nameToId(navn);
     var stars=hatC[navn]?' ⭐':'';
     var finStr=fin[navn]?' ('+fin[navn]+' fin.)':'';
@@ -207,92 +376,144 @@ function render(sales){
   }).join('');
 
   // Hat cards
-  var hatHtml=hats.map(function(navn){
+  var hatHtml = hats.map(function(navn){
     var id=nameToId(navn);
     var stars=Array(Math.min(hatC[navn],3)+1).join('⭐');
     return '<div class="hat-card">'
       +'<div class="hat-photo">'+photoEl(id,52)+'</div>'
       +'<div><div class="hat-title">Hat-trick! '+stars+'</div>'
-      +'<div class="hat-body"><strong style="color:var(--txt)">'+navn+'</strong> scoret 3+ biler på én dag denne uken. En bragd som huskes!</div></div>'
+      +'<div class="hat-body"><strong style="color:var(--txt)">'+navn+'</strong> scoret 3+ biler på én dag. En bragd!</div></div>'
     +'</div>';
   }).join('');
 
+  // MVP section
+  var mvpHtml = '';
+  if (mvpSorted.length > 0) {
+    mvpHtml = '<div class="divider"><span>Flest MVP-dager</span></div><div class="mvp-row">'
+      + mvpSorted.slice(0,3).map(function(navn){
+          var id=nameToId(navn);
+          return '<div class="mvp-item">'
+            +'<div class="mvp-photo">'+photoEl(id,44)+'</div>'
+            +'<div class="mvp-name">'+navn.split(' ')[0]+'</div>'
+            +'<div class="mvp-days">'+mvpDays[navn]+' dag'+( mvpDays[navn]>1?'er':'')+'</div>'
+          +'</div>';
+        }).join('')
+    +'</div>';
+  }
+
+  // AI comments (Monday mode)
+  var aiHtml = '';
+  if (mode === 'last') {
+    var winComment = winnerComment(leader, lSales, hatC[leader]||0, fin[leader]||0);
+    var rivComment = chaser && tied.indexOf(chaser)===-1 ? rivalComment(leader, chaser, per[leader]-per[chaser]) : '';
+    aiHtml = '<div class="divider"><span>Stemmer fra garderoben</span></div>'
+      +'<div class="ai-section">'
+        +'<div class="ai-badge">🤖 AI-generert ut ifra resultater og form</div>'
+        +'<div class="ai-quote">'
+          +'<div class="ai-photo">'+photoEl(lId,44)+'</div>'
+          +'<div class="ai-txt">'
+            +'<div class="ai-name">'+leader+'</div>'
+            +'<div class="ai-comment">'+winComment+'</div>'
+          +'</div>'
+        +'</div>'
+        +(rivComment?'<div class="ai-quote" style="margin-top:10px">'
+          +'<div class="ai-photo">'+photoEl(nameToId(chaser),44)+'</div>'
+          +'<div class="ai-txt"><div class="ai-name">'+chaser+'</div><div class="ai-comment">'+rivComment+'</div></div>'
+        +'</div>':'')
+      +'</div>';
+  }
+
+  // Daily story
+  var storyHtml = '<div class="divider"><span>Dag for dag</span></div>'
+    + '<div class="story-section">' + buildDailyStory(ws, ranked, per, fin, targetWeek) + '</div>';
+
   // Copy text
-  var lines=[
+  var lines = [
     '📰 LA GAZZETTA DELLO VCSO',
-    COMP_NAME.toUpperCase()+' – UKE '+thisWeek,
+    COMP_NAME.toUpperCase() + ' – UKE ' + targetWeek + (mode==='last'?' (AVSLUTTET)':''),
     '',
-    '🔥 '+hl.toUpperCase(),
+    '🔥 ' + hl.toUpperCase(),
     '',
-    bt,
+    bodyTxt,
     '',
     '📊 STILLINGEN:'
   ];
   ranked.forEach(function(n,i){
     var m=['🥇','🥈','🥉'];
+    var isTied=tied.indexOf(n)!==-1&&tied.length>1;
+    var prefix=isTied?'🥇':(i<3?m[i]:(i+1)+'.');
     var stars=hatC[n]?' '+Array(Math.min(hatC[n],3)+1).join('⭐'):'';
     var fStr=fin[n]?' ('+fin[n]+' finansiert)':'';
-    lines.push((i<3?m[i]:(i+1)+'.')+' '+n+': '+per[n]+' biler'+fStr+stars);
+    lines.push(prefix+' '+n+': '+per[n]+' biler'+fStr+stars);
   });
-  if(hats.length>0){lines.push('');lines.push('⭐ HAT-TRICK: '+hats.join(', ')+'!');}
+  if (hats.length>0){lines.push('');lines.push('⭐ HAT-TRICK: '+hats.join(', ')+'!');}
+  if (mode==='last' && mvpSorted.length>0){lines.push('');lines.push('👑 FLEST MVP-DAGER: '+mvpSorted[0]+' ('+mvpDays[mvpSorted[0]]+' dager)');}
   lines.push('');lines.push('Live: '+LINK);
-  copyTextData=lines.join('\n');
+  copyTextData = lines.join('\n');
 
-  document.getElementById('content').innerHTML=
+  // Render
+  var modeLabel = mode==='last' ? 'Uke '+targetWeek+' – Mandag morgen' : 'Uke '+targetWeek+' – Pågående';
+  document.getElementById('content').innerHTML =
     '<div id="pdf-content">'
-    +'<div class="edition"><div class="edition-week">Uke '+thisWeek+' – Lørdag morgen</div><div class="edition-comp">'+COMP_NAME+'</div></div>'
+    +'<div class="edition"><div class="edition-week">'+modeLabel+'</div><div class="edition-comp">'+COMP_NAME+'</div></div>'
     +'<div class="hero">'
-      +'<div class="kicker">🔥 Ukens store sak</div>'
+      +'<div class="kicker">'+(mode==='last'?'🏆 Ukens dom':'🔥 Ukens store sak')+'</div>'
       +'<div class="headline">'+hl.replace(leader,'<em>'+leader+'</em>')+'</div>'
       +'<div class="hero-body">'
         +'<div class="hero-photo">'+photoEl(lId,88)+'</div>'
-        +'<div class="body-txt">'+bt.replace(leader,'<strong>'+leader+'</strong>')+'</div>'
+        +'<div class="body-txt">'+bodyTxt.replace(leader,'<strong>'+leader+'</strong>')+'</div>'
       +'</div>'
     +'</div>'
     +'<div class="divider"><span>Stillingen</span></div>'
     +'<div class="podium">'+podHtml+'</div>'
     +(restHtml?'<div class="rest-list">'+restHtml+'</div>':'')
+    +storyHtml
     +(hatHtml?'<div class="divider"><span>Hat-trick</span></div>'+hatHtml:'')
-    +'<div class="footer-strip">'+COMP_NAME+' · Uke '+thisWeek+' · '+days[now.getDay()]+' '+now.getDate()+'. '+mons[now.getMonth()]+' '+now.getFullYear()+'</div>'
+    +mvpHtml
+    +aiHtml
+    +'<div class="footer-strip">'+COMP_NAME+' · Uke '+targetWeek+' · La Gazzetta dello VCSO</div>'
     +'</div>';
 
-  document.getElementById('dl-btn').disabled=false;
-  document.getElementById('dl-btn').textContent='📄 Last ned PDF';
+  document.getElementById('dl-btn').disabled = false;
+  document.getElementById('dl-btn').textContent = '📄 Last ned PDF';
 }
 
-function downloadPDF(){
-  var btn=document.getElementById('dl-btn');
-  btn.disabled=true;btn.textContent='⏳ Genererer...';
-  var el=document.getElementById('pdf-content')||document.getElementById('content');
-  html2canvas(el,{scale:2,backgroundColor:'#0a111e',useCORS:true,logging:false}).then(function(canvas){
-    var { jsPDF }=window.jspdf;
-    var pdf=new jsPDF('p','mm','a4');
-    var w=pdf.internal.pageSize.getWidth();
-    var h=(canvas.height*w)/canvas.width;
-    var pages=Math.ceil(h/297);
-    for(var p=0;p<pages;p++){
-      if(p>0)pdf.addPage();
-      var srcY=p*297*(canvas.width/w);
-      var srcH=297*(canvas.width/w);
-      var tmpCanvas=document.createElement('canvas');
-      tmpCanvas.width=canvas.width;tmpCanvas.height=Math.min(srcH,canvas.height-srcY);
-      var ctx=tmpCanvas.getContext('2d');
-      ctx.drawImage(canvas,0,-srcY);
-      pdf.addImage(tmpCanvas.toDataURL('image/jpeg',0.95),'JPEG',0,0,w,Math.min(297,h-p*297));
+function downloadPDF() {
+  var btn = document.getElementById('dl-btn');
+  btn.disabled=true; btn.textContent='⏳ Genererer PDF...';
+  var el = document.getElementById('pdf-content') || document.getElementById('content');
+  html2canvas(el, {scale:2, backgroundColor:'#0a111e', useCORS:true, logging:false}).then(function(canvas){
+    var {jsPDF} = window.jspdf;
+    var pdf = new jsPDF('p','mm','a4');
+    var w = pdf.internal.pageSize.getWidth();
+    var h = (canvas.height * w) / canvas.width;
+    var pageH = 297;
+    var pages = Math.ceil(h / pageH);
+    for (var p=0; p<pages; p++) {
+      if (p>0) pdf.addPage();
+      var tmpCanvas = document.createElement('canvas');
+      var ratio = canvas.width / w;
+      tmpCanvas.width = canvas.width;
+      tmpCanvas.height = Math.min(pageH * ratio, canvas.height - p*pageH*ratio);
+      var ctx = tmpCanvas.getContext('2d');
+      ctx.drawImage(canvas, 0, -p*pageH*ratio);
+      pdf.addImage(tmpCanvas.toDataURL('image/jpeg',0.92),'JPEG',0,0,w,Math.min(pageH,h-p*pageH));
     }
-    pdf.save('gazzetta-vcso-uke.pdf');
-    btn.disabled=false;btn.textContent='✅ Lastet ned!';btn.classList.add('done');
-    setTimeout(function(){btn.textContent='📄 Last ned PDF';btn.classList.remove('done');btn.disabled=false;},3000);
+    var wn = getWN(new Date());
+    pdf.save('gazzetta-uke'+wn+'.pdf');
+    btn.disabled=false; btn.classList.add('done'); btn.textContent='✅ Lastet ned!';
+    setTimeout(function(){ btn.textContent='📄 Last ned PDF'; btn.classList.remove('done'); btn.disabled=false; },3000);
   });
 }
 
-function copyText(){
+function copyRecap() {
   navigator.clipboard.writeText(copyTextData).then(function(){
     var btn=document.getElementById('copy-btn');
     btn.textContent='✅ Kopiert!';
-    setTimeout(function(){btn.textContent='📋 Kopier tekst';},2000);
+    setTimeout(function(){ btn.textContent='📋 Kopier tekst'; },2000);
   });
 }
+
 
 load();
 </script>
