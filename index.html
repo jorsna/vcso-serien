@@ -1732,7 +1732,7 @@ setInterval(countdown, 1000);
       dmap[s.ts.slice(0,10)] = (dmap[s.ts.slice(0,10)]||0)+1;
     });
     // Form: same as selgerDots - last 5 calendar days
-    for (var i = 4; i >= 0; i--) {
+    for (var i = 0; i <= 4; i++) {
       var d = new Date(); d.setDate(d.getDate() - i);
       var ds = d.getFullYear() + '-' + (d.getMonth()+1<10?'0':'') + (d.getMonth()+1) + '-' + (d.getDate()<10?'0':'') + d.getDate();
       form.push(dmap[ds] > 0);
