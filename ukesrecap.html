@@ -3,127 +3,208 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>La Gazzetta dello VCSO – VCSO Championship 2026</title>
+<title>La Gazzetta dello VCSO</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0a111e;--card:#0d1624;--card2:#111e30;--b1:#1c2d42;--gold:#ffd700;--txt:#e8f2ff;--muted:#5a7898;--g:#22c55e;--r:#ef4444;--y:#eab308}
+:root{
+  --bg:#0a111e;--card:#0d1624;--card2:#111e30;--b1:#1c2d42;
+  --gold:#ffd700;--gold2:#ffe566;--txt:#e8f2ff;--muted:#5a7898;
+  --g:#22c55e;--r:#ef4444;--y:#eab308
+}
 body{background:var(--bg);font-family:'Barlow Condensed',sans-serif;color:var(--txt);min-height:100vh;padding-bottom:80px}
-.newspaper-hdr{background:var(--card);border-bottom:3px solid var(--gold);padding:14px 16px 10px;text-align:center}
-.pn{font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:var(--gold);letter-spacing:1px}
+
+/* NEWSPAPER HEADER */
+.hdr{background:var(--card);border-bottom:3px solid var(--gold);padding:14px 16px 10px;text-align:center}
+.pn{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:var(--gold);letter-spacing:1px}
 .ps{font-size:8px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:3px}
 .pd{font-size:10px;color:var(--muted);margin-top:6px;padding-top:6px;border-top:1px solid var(--b1)}
-.mode-tabs{display:flex;background:var(--card);border-bottom:1px solid var(--b1)}
-.mode-tab{flex:1;padding:10px 0;font-size:11px;font-weight:700;border:none;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;border-bottom:3px solid transparent;text-transform:uppercase;letter-spacing:.5px}
-.mode-tab.on{color:var(--gold);border-bottom-color:var(--gold)}
-.spinner{width:34px;height:34px;border:3px solid var(--b1);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;margin:60px auto}
+
+/* MODE TABS */
+.tabs{display:flex;background:var(--card);border-bottom:1px solid var(--b1)}
+.tab{flex:1;padding:10px 0;font-size:11px;font-weight:700;border:none;background:transparent;
+     color:var(--muted);cursor:pointer;font-family:inherit;
+     border-bottom:3px solid transparent;text-transform:uppercase;letter-spacing:.5px}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* SPINNER */
+.spin-wrap{padding:60px 0;text-align:center}
+.spinner{width:34px;height:34px;border:3px solid var(--b1);border-top-color:var(--gold);
+         border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 10px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-txt{text-align:center;color:var(--muted);font-size:11px;letter-spacing:1px;text-transform:uppercase;margin-top:10px}
-.edition{background:linear-gradient(135deg,rgba(255,215,0,.1),transparent);border-bottom:1px solid rgba(255,215,0,.2);padding:8px 14px;text-align:center}
-.ew{font-family:'Playfair Display',serif;font-size:16px;color:var(--gold)}
-.ec{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
-.art-hero{position:relative;height:200px;overflow:hidden}
-.art-hero-img{position:absolute;inset:0;width:100%;height:100%;filter:grayscale(100%) brightness(.4)}
-.art-hero-img img{width:100%;height:100%;object-fit:cover}
-.art-hero-overlay{position:absolute;inset:0;padding:14px;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(0deg,rgba(10,17,30,.95) 0%,rgba(10,17,30,.4) 60%,transparent 100%)}
-.art-kicker{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:5px}
-.art-hl{font-family:'Playfair Display',serif;font-size:clamp(17px,5vw,23px);line-height:1.1;color:#fff;margin-bottom:5px}
-.art-deck{font-size:11px;color:rgba(255,255,255,.6);line-height:1.4;margin-bottom:4px}
-.art-byline{font-size:9px;color:rgba(255,255,255,.3);letter-spacing:1px}
-.art-body{padding:13px 16px}
-.art-intro{font-size:14px;line-height:1.7;color:var(--txt);font-style:italic;border-left:3px solid var(--gold);padding-left:10px;margin-bottom:0}
-.art-subhead{font-family:'Playfair Display',serif;font-size:15px;color:var(--gold);margin:12px 0 6px;padding-top:8px;border-top:1px solid var(--b1)}
-.art-body p{font-size:13px;line-height:1.7;color:var(--muted);margin-bottom:10px}
-.art-body p:last-child{margin-bottom:0}
-.art-closing{font-style:italic;color:var(--txt) !important}
-.art-section-title{font-family:'Playfair Display',serif;font-size:14px;color:var(--gold);padding:10px 16px 4px;border-top:1px solid var(--b1)}
-.podium{display:flex;gap:8px;justify-content:center;padding:10px 14px}
-.pod{flex:1;max-width:105px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
-.pod-medal{font-size:16px}
-.pod-photo{border-radius:50%;overflow:hidden;border:2.5px solid}
-.pod-tied{font-size:8px;color:var(--gold);letter-spacing:1px;text-transform:uppercase}
+.spin-txt{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+
+/* EDITION */
+.edition{background:linear-gradient(135deg,rgba(255,215,0,.1),transparent);
+         border-bottom:1px solid rgba(255,215,0,.2);padding:8px 14px;text-align:center}
+.edition-week{font-family:'Playfair Display',serif;font-size:16px;color:var(--gold)}
+.edition-comp{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+
+/* HERO SECTION */
+.hero-section{position:relative;min-height:180px;overflow:hidden;
+              background:linear-gradient(135deg,rgba(255,215,0,.08),var(--card2))}
+.hero-leader-photo{position:absolute;right:0;top:0;bottom:0;width:45%;
+                   overflow:hidden;opacity:.35}
+.hero-leader-photo img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%)}
+.hero-leader-photo-ph{width:100%;height:100%;display:flex;align-items:center;
+                       justify-content:center;font-size:60px;font-weight:900;
+                       color:rgba(255,215,0,.2)}
+.hero-content{position:relative;z-index:2;padding:14px 16px}
+.hero-kicker{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
+             color:var(--gold);margin-bottom:6px}
+.hero-hl{font-family:'Playfair Display',serif;font-size:clamp(20px,5.5vw,28px);
+         line-height:1.1;color:#fff;margin-bottom:8px}
+.hero-hl em{color:var(--gold2);font-style:italic}
+.hero-deck{font-size:12px;color:rgba(255,255,255,.6);line-height:1.5;margin-bottom:6px}
+.hero-byline{font-size:9px;color:rgba(255,255,255,.3);letter-spacing:1px}
+
+/* ARTICLE BODY */
+.art-body{padding:14px 16px 2px}
+.art-intro{font-size:14px;line-height:1.75;color:var(--txt);font-style:italic;
+           border-left:3px solid var(--gold);padding-left:12px;margin-bottom:14px}
+.art-para{font-size:13px;line-height:1.72;color:var(--muted);margin-bottom:12px}
+.art-para strong{color:var(--txt)}
+.art-para:last-child{margin-bottom:0}
+
+/* SECTION HEADERS */
+.sec-hdr{display:flex;align-items:center;gap:8px;padding:12px 16px 6px;
+         border-top:1px solid var(--b1)}
+.sec-hdr::after{content:'';flex:1;height:1px;background:var(--b1)}
+.sec-title{font-family:'Playfair Display',serif;font-size:15px;color:var(--gold);
+           white-space:nowrap}
+
+/* PODIUM */
+.podium{display:flex;gap:8px;justify-content:center;padding:10px 14px 14px}
+.pod{flex:1;max-width:108px;display:flex;flex-direction:column;align-items:center;
+     gap:4px;text-align:center}
+.pod-medal{font-size:18px}
+.pod-photo{border-radius:50%;overflow:hidden;border:2.5px solid;
+           display:flex;align-items:center;justify-content:center}
+.pod-photo img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%)}
+.pod-photo-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+              font-weight:900;background:rgba(255,215,0,.12);color:var(--gold)}
+.pod-tied{font-size:8px;color:var(--gold);text-transform:uppercase;letter-spacing:1px}
 .pod-name{font-size:12px;font-weight:700;color:var(--txt);line-height:1.2}
-.pod-sales{font-family:'Playfair Display',serif;font-size:21px;font-weight:900;line-height:1}
+.pod-sales{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;line-height:1}
 .pod-lbl{font-size:9px;color:var(--muted)}
-.rest-list{padding:0 16px 8px}
-.rest-row{display:flex;align-items:center;gap:9px;padding:6px 0;border-bottom:1px solid var(--b1)}
-.rest-rank{width:16px;font-size:11px;color:var(--muted);flex-shrink:0}
-.rest-av{width:28px;height:28px;border-radius:50%;overflow:hidden;border:1.5px solid var(--b1);flex-shrink:0}
+
+/* REST TABLE */
+.rest-list{padding:0 16px 10px}
+.rest-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--b1)}
+.rest-rank{width:18px;font-size:11px;color:var(--muted);flex-shrink:0;text-align:center}
+.rest-av{width:30px;height:30px;border-radius:50%;overflow:hidden;border:1.5px solid var(--b1);
+         flex-shrink:0;display:flex;align-items:center;justify-content:center;
+         font-size:9px;font-weight:900;color:var(--gold);background:rgba(255,215,0,.1)}
+.rest-av img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%)}
 .rest-name{flex:1;font-size:13px;font-weight:700}
-.rest-sales{font-size:12px;font-weight:700;color:var(--gold)}
-.team-section{padding:0 16px 10px}
-.team-row{padding:8px 0;border-bottom:1px solid var(--b1)}
-.team-name{font-size:13px;font-weight:900;margin-bottom:2px}
-.team-week{font-size:11px;color:var(--muted);margin-bottom:4px}
-.team-bar-wrap{height:6px;background:var(--b1);border-radius:3px;overflow:hidden;margin-bottom:3px}
-.team-bar{height:100%;border-radius:3px;transition:width 1s}
-.team-pct{font-size:10px;font-weight:700}
-.hat-card{margin:0 16px 10px;background:rgba(255,215,0,.07);border:1px solid rgba(255,215,0,.25);border-radius:5px;padding:11px;display:flex;align-items:center;gap:11px}
-.hat-photo{width:48px;height:48px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0}
+.rest-sales{font-size:13px;font-weight:700;color:var(--gold)}
+
+/* DAY BY DAY */
+.day-list{padding:0 16px 10px}
+.day-item{padding:10px 0;border-bottom:1px solid var(--b1)}
+.day-item:last-child{border:none}
+.day-hdr{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.day-av{width:30px;height:30px;border-radius:50%;overflow:hidden;
+        border:1.5px solid var(--gold);flex-shrink:0;
+        display:flex;align-items:center;justify-content:center;
+        font-size:10px;font-weight:900;color:var(--gold);background:rgba(255,215,0,.1)}
+.day-av img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%)}
+.day-label{font-size:13px;font-weight:700;color:var(--txt)}
+.day-sub{font-size:10px;color:var(--muted)}
+.day-text{font-size:12px;line-height:1.65;color:var(--muted);padding-left:38px}
+.day-text strong{color:var(--txt)}
+
+/* TEAMS */
+.team-list{padding:0 16px 10px}
+.team-item{padding:9px 0;border-bottom:1px solid var(--b1)}
+.team-item:last-child{border:none}
+.team-name-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.team-name{font-size:14px;font-weight:900}
+.team-count{font-size:12px;color:var(--muted)}
+.team-bar-bg{height:6px;background:var(--b1);border-radius:3px;overflow:hidden;margin-bottom:3px}
+.team-bar-fill{height:100%;border-radius:3px}
+.team-pct-txt{font-size:10px;font-weight:700}
+.team-desc{font-size:11px;color:var(--muted);line-height:1.5;margin-top:3px}
+
+/* HAT TRICK */
+.hat-card{margin:0 16px 10px;background:rgba(255,215,0,.07);
+          border:1px solid rgba(255,215,0,.25);border-radius:6px;
+          padding:12px;display:flex;align-items:center;gap:12px}
+.hat-av{width:50px;height:50px;border-radius:50%;overflow:hidden;
+        border:2px solid var(--gold);flex-shrink:0;
+        display:flex;align-items:center;justify-content:center;
+        font-size:16px;font-weight:900;color:var(--gold);background:rgba(255,215,0,.12)}
+.hat-av img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%)}
 .hat-title{font-family:'Playfair Display',serif;font-size:14px;color:var(--gold);margin-bottom:3px}
-.hat-body{font-size:11px;color:var(--muted);line-height:1.5}
-.hat-body strong{color:var(--txt)}
-.ai-wrap{padding:10px 16px 14px}
-.ai-badge{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;text-align:center;margin-bottom:10px;font-style:italic}
-.ai-quote{display:flex;align-items:flex-start;gap:10px;background:var(--card2);border:1px solid var(--b1);border-radius:5px;padding:10px}
-.ai-photo{width:44px;height:44px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0}
-.ai-name{font-size:11px;font-weight:700;color:var(--gold);margin-bottom:4px}
+.hat-text{font-size:11px;color:var(--muted);line-height:1.5}
+.hat-text strong{color:var(--txt)}
+
+/* AI QUOTES */
+.ai-section{padding:4px 16px 14px}
+.ai-badge{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;
+          font-style:italic;text-align:center;margin-bottom:10px}
+.ai-quote{display:flex;gap:10px;align-items:flex-start;
+          background:var(--card2);border:1px solid var(--b1);border-radius:5px;
+          padding:10px;margin-bottom:8px}
+.ai-av{width:44px;height:44px;border-radius:50%;overflow:hidden;
+       border:2px solid var(--gold);flex-shrink:0;
+       display:flex;align-items:center;justify-content:center;
+       font-size:13px;font-weight:900;color:var(--gold);background:rgba(255,215,0,.1)}
+.ai-av img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%)}
+.ai-name{font-size:11px;font-weight:700;color:var(--gold);margin-bottom:3px}
 .ai-comment{font-size:12px;color:var(--muted);line-height:1.6;font-style:italic}
-.art-footer{background:var(--card);border-top:1px solid var(--b1);padding:10px 16px;text-align:center;font-size:9px;color:var(--muted);letter-spacing:1px}
-.story-section{padding:0 16px 10px}
-.day-item{padding:9px 0;border-bottom:1px solid var(--b1)}
-.day-header{display:flex;align-items:center;gap:8px;margin-bottom:4px}
-.day-photo{width:28px;height:28px;border-radius:50%;overflow:hidden;border:1.5px solid var(--b1);flex-shrink:0}
-.day-photo img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%)}
-.day-name{font-size:12px;font-weight:700;color:var(--txt)}
-.day-total{font-size:10px;color:var(--muted)}
-.day-desc{font-size:12px;color:var(--txt);line-height:1.5;padding-left:36px}
-.day-others{font-size:10px;color:var(--muted);padding-left:36px;margin-top:2px}
-.mvp-row{display:flex;gap:10px;padding:10px 16px;justify-content:center}
-.mvp-item{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;max-width:90px;text-align:center}
-.mvp-photo{width:44px;height:44px;border-radius:50%;overflow:hidden;border:2px solid #3b82f6}
-.mvp-photo img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%)}
-.mvp-name{font-size:11px;font-weight:700;color:var(--txt)}
-.mvp-days{font-size:10px;color:#3b82f6;font-weight:700}
 
-.no-sales{text-align:center;padding:50px 20px;color:var(--muted);font-size:13px;font-style:italic}
-.hero-photo{width:82px;height:82px;border-radius:50%;overflow:hidden;border:3px solid var(--gold);flex-shrink:0;box-shadow:0 0 20px rgba(255,215,0,.25)}
-.hero-photo img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%)}
-.hero{padding:14px 16px;border-bottom:1px solid var(--b1)}
-.hero-body{display:flex;gap:12px;align-items:flex-start}
-.kicker{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:5px}
-.headline{font-family:'Playfair Display',serif;font-size:clamp(18px,5vw,24px);line-height:1.1;margin-bottom:10px;color:var(--txt)}
-.headline em{color:var(--gold);font-style:italic}
-.body-txt{font-size:13px;color:var(--muted);line-height:1.65}
-.body-txt strong{color:var(--txt)}
+/* CLOSING */
+.art-closing{padding:14px 16px;border-top:1px solid var(--b1)}
+.closing-text{font-size:13px;line-height:1.7;color:var(--muted);font-style:italic}
+.closing-text strong{color:var(--txt)}
 
-.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:2px solid var(--gold);padding:10px 14px;display:flex;gap:8px;z-index:100}
-.dl-btn{flex:1;padding:12px;background:var(--gold);color:#000;border:none;border-radius:4px;font-family:inherit;font-size:12px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer}
+/* FOOTER */
+.art-footer{background:var(--card);border-top:1px solid var(--b1);
+            padding:10px 16px;text-align:center;font-size:9px;
+            color:var(--muted);letter-spacing:1px}
+
+/* BOTTOM BAR */
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--card);
+            border-top:2px solid var(--gold);padding:10px 14px;display:flex;gap:8px;z-index:100}
+.dl-btn{flex:1;padding:12px;background:var(--gold);color:#000;border:none;border-radius:4px;
+        font-family:inherit;font-size:12px;font-weight:900;letter-spacing:1.5px;
+        text-transform:uppercase;cursor:pointer}
 .dl-btn:disabled{opacity:.5;cursor:default}
 .dl-btn.done{background:var(--g);color:#fff}
-.copy-btn{flex:1;padding:12px;background:transparent;color:var(--gold);border:1px solid var(--gold);border-radius:4px;font-family:inherit;font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;cursor:pointer}
+.copy-btn{flex:1;padding:12px;background:transparent;color:var(--gold);
+          border:1px solid var(--gold);border-radius:4px;font-family:inherit;
+          font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;cursor:pointer}
+.no-sales{text-align:center;padding:50px 20px;color:var(--muted);font-size:13px;font-style:italic}
 </style>
 </head>
 <body>
-<div class="newspaper-hdr">
+
+<div class="hdr">
   <div class="pn">La Gazzetta dello VCSO</div>
   <div class="ps">La voce ufficiale del calcio automobilistico</div>
   <div class="pd" id="paper-date"></div>
 </div>
-<div class="mode-tabs">
-  <button class="mode-tab on" onclick="setMode('week',this)">📰 Lørdag – Denne uken</button>
-  <button class="mode-tab" onclick="setMode('last',this)">🏆 Mandag – Uken som gikk</button>
+
+<div class="tabs">
+  <button class="tab on" onclick="sw('week',this)">📰 Lørdag – Denne uken</button>
+  <button class="tab" onclick="sw('last',this)">🏆 Mandag – Uken som gikk</button>
 </div>
+
 <div id="article">
-  <div class="spinner"></div>
-  <div class="loading-txt">Henter nyheter fra banen...</div>
+  <div class="spin-wrap">
+    <div class="spinner"></div>
+    <div class="spin-txt">Henter nyheter fra banen...</div>
+  </div>
 </div>
+
 <div class="bottom-bar">
-  <button class="dl-btn" id="dl-btn" onclick="downloadPDF()" disabled>⏳ Laster...</button>
-  <button class="copy-btn" id="copy-btn" onclick="copyRecap()">📋 Kopier tekst</button>
+  <button class="dl-btn" id="dl-btn" onclick="dlPDF()" disabled>⏳ Laster...</button>
+  <button class="copy-btn" id="copy-btn" onclick="cpTxt()">📋 Kopier tekst</button>
 </div>
+
 <script>
 const SELGER_PHOTOS={
   "thomas_dokken":"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAcFBQYFBAcGBgYIBwcICxILCwoKCxYPEA0SGhYbGhkWGRgcICgiHB4mHhgZIzAkJiorLS4tGyIyNTEsNSgsLSz/wAALCAB4AHgBAREA/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/9oACAEBAAA/AOgoxSYpDRTWIC5Jqu90oOFG40JLPIMrbSEeymk+1opxIDH67uMVNwRkHNBGaYR1phGKSmmtHFGKSjFUNV1WDSbNp5jnHRR1NYtjq0utuGgQ7c8OwwMV2Oi6JEzqxBmYjqeldta6UsQH7sDjsKg1fwzZapbNHcQ/eGAy8Mv0NeR65Y638PZ1e68zU9B3EG4AzJCCeA49B69/atm0uoL60jubWVZYZBlXU8GpaYy00jFNNaFFFNOFBZmCgcknoK8e1fxHdeJvEFwqS+XYWwKqinrz1PueD+Ndt4aTbbrGoA4Gcdq9Q0CPy4Aep612Fou9R33DIxViS3xwQfyrP1DT47m2eKVEkjdSrKwyCPceleJXOhP4G8Yiwts/2JqhaSBD0hk7qPb+hHpW1SU1hxUZFX6KK5/x1qbaT4Lv7lDhiqxA+m5gpP5E14/oLqtnclDkt8315ya9M8MXiNaqw6k49a9X0CdDAhIrsdPuFBQA1sFldeRxVKfaScDFed+P9PjvdIi3Dc8MqyIfQjP+NcxBL51ukmMF1BI9KfSGmMOau0UVxnxWI/4QGZCfv3EK49fmryPSLryLpAW+VvlIP8q9W8H2pdSBjBYkfSvW9AaGODaw6ck11yrF5StGwPGSc9K0bWaORP8AWDdjpUF1dQhxH5i72OAAa898czt9jSJFyxlC4zj1rkdHm8/SYH5PBGT3wcf0q7RTWHFW6KK4P4s6jZReF/7PlldbyVlngCpuxsPU+g5IrxkTSTIJx80i9QFxnn1ro9M8ZalZaWmyVLcKeG2lyfoMj+dW7b4oeKLcPLDqEkkS9T5AA/Hk+oro9H+P2o2EKw39mt1Hyd8bbTg+x/8ArVnav8TPE+t4eF57S2ZSyIhbLLnqSCAPwrT8NeMNZs4o7mSCVLYsEa6SPzdrYB5y3uK3db17xTqmoJou60vLO4t2upbmGFo5o41OxuCxU/eHTrn2rpbW0t7K0S3tPNa3h/dLI6bA5AGSo645xzzUppKRulWqKK8S+LYuE8eQO74hNohjzyAASD+v865i0SOVCFGAzYxXYaD4FvLuzUWIjnu7WZkkgZ9rL3Rx7FSOenUV2kXgHUYtFuRc6XZWMRT97IQHJH4AD8zWb8DtNtLf4g3twtvHcW0mYIXdAwKZ5YZ4wSPyrv0+H9kviO90a1vl0uaKQ3OnIyho5LdzlowvB/dyFhwchWTtW9deBNQttElW7mtERB87RK2Cv/AjxXOaLFbSXOp6hbhGsbax/s+CYHKykFpJSD3AOxcjjKn0rQv52ls7FWXawhV2+pRaoGm0HpVvApD1pK8l+N1o5fSLtUPl4khZ8cA5BA/nXnGnTsLjb1IOeBXpvhu6m1eaG1m+zgLwJXjBZR7HqK6zxtoOg6P4Pe4mu7y+uWQskc9y7R9OuzOMCuR+F3ijRfD/AItSSW4lNu+CzOchDj+VemeMdV0XxdLNPpcK6rc6Qwmlt3Usjxkc7SOj45BU56g1raDovgXxNoUN3BpuJCucG4kcA/7rMRR4tZLbQZYIPlXYY1CnG0YI6elJq5t1WzigYMY4F3kHPJA4rNptFXKaetJVLV9Hstc09rLUIfNgYhsZwVI6EHsa8M8d6Fa+HPFfkWaulvJCkieY2455B5+orY8Ksz30e0HIXecGote8U/b2a3un8rzV53ggbeyg4/E+9ZWh6DpFzeFn1O2SQglA8oVc9q9o0XVrGzsY7PTleW4kXaUtYHdM98MFwfzrivCOoarofjG4tooZ4bKaRmkhkB/cNk/oa7PxBqr3tvkfMrnbgnAOema0408uJEH8IApaKSrlNPWkorzX4y2ETaZp2o5QTRTGHBOC6sM8euCP1rjvC+sxafeQXJ5KEAg/r+lb9/aeehkW1yS7SKxx3Ocfkelafh/xVJo8YjGmQSSZ27pIA3f6V6rp3iHUrvThdXSeUMFY40TaK4HxcZNJ1h9VJYR3UQjmU88huP61S0G7l8Q62jICLSzIklb1cfdUfz/Cu4pKDSVcpp60hqG4uYrS1muZ22wwI0kh9FUZJ/IV84a54hvPFniCe+u3IBBEMWcrEnZR/X1PNZ8cz28gcsdoIxzivSPDPiO3nhKyiFvJ2na4wDxjBrq9J8Qaf9pnSZwqAbgwPOOuPzrqYtctpJUjLx7EGdzsBjkf0/rXmPjrxTHr+r3EFll4bJGkd1YYIUZJ9z6V2/hD+yP+Ebtm0YhrWQbyx+8X/i3f7Wa2u9NoNJVymswVWJIAUZJPQVxniL4maJooaK2c6ndDjZAfkU/7T9PyzXk/ij4h614m3QtJ9jsjn/R4CQGH+0erfjx7Vy8UhjkDCp2m8z5c98iljeaFg8LlSDkbTjFWxql479WVlw3HXjpUya1qt3m0jlI3Da23qR3ya6/w74fkXwvqTRoZLme2lCjHLEqcf0qD4Ra+9l4gfR5HP2e+BZATwsijOfxAI/Kvagc0GkpDXIav8Q3XdHpNqD286ccfgv8AjXEarqWr60CL++llT/nmDtT/AL5HFYUmmnbjaSB7VzMiGORkbqpINNpeVOOhFWVmBPzLjPftWhY2S3kuCdpHcHGa6bTtHga7xBEShwrsBz9PrXrHhbRwkKYjwp6CvCPFEEvhv4gX62khje1ujJEy8Y53D+dep6ZrlxPYW97bzlFmjD7GOVyeo/Otq38TA4FxARnjch4/I1q2+o2tyQI5lJPY8GrNeWxaepOHJyOKc1iqY2oAe9U7iz35OzBPA5rivEmmtaXS3C8xzcH2YViVraRawas32KRhHcn/AFT5+9/s/X0rf0jws86y2txFiWM7T706x8NXNtqLwsjkKfpXpfhvQ3k09ZTGFwuAAOOtelWWl/ZLQOowI0r5S8c3YvfG2pyqwYCYpkH04rt/BT7/AAlaZ/hZwfpuNbpQDC/Nj+96UhI4YkkDv0rVsdXkhUKWLKP4WOcfjWGoAyQATn8KGUYOcgY6Z71BLFuYKqAMec//AFqzNR0uO+s5LaQgCQdRzg9jXml3aS2V1JbzLtkjOD/jUIJVgQSCOQR2r1P4e/EDTRei08TkIXAVL0rkH08zH/oQ/H1r2aPwzpup3UV3buCGUMGQgq6+oPfiuh0fQreyhMSplQ2RnmvPPix8XbHQNMuPD+hTpdavIDHJNG2UtR357v7Dp39K+aWYsxZiSTySe9eueFbc2/hWxiOV3x7yfTJJ/qK2mDkDcQARwMYqIABlHG0Hmo15IAGO3ev/2Q==",
@@ -143,16 +224,11 @@ const SELGER_PHOTOS={
   "andreas_lydersen":"data:image/jpeg;base64,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"
 };
 
-var SUPABASE_URL='https://jffhdlmwvurnojoapcvs.supabase.co';
-var SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmZmhkbG13dnVybm9qb2FwY3ZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MzIzNjcsImV4cCI6MjA5MzEwODM2N30.Mc_eKMsfR04kLmwfBeH5INn3NTYapv62Fnt0wMpBpMw';
-var TABLE='sales';
-var COMP_NAME='VCSO Championship 2026';
-var LINK='https://jorsna.github.io/vcso-serien/';
-var copyTextData='';
-var curMode='week';
-var allSales=[];
-var TEAM_DEFS=[{id:'ryen',navn:'Ryen',color:'#3b82f6'},{id:'fornebu',navn:'Fornebu',color:'#10b981'},{id:'lillestrom',navn:'Lillestrøm',color:'#f59e0b'}];
-var TEAM_GOALS={mai:{ryen:80,fornebu:80,lillestrom:40},jun:{ryen:112,fornebu:112,lillestrom:96}};
+var URL2  = 'https://jffhdlmwvurnojoapcvs.supabase.co';
+var KEY2  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmZmhkbG13dnVybm9qb2FwY3ZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MzIzNjcsImV4cCI6MjA5MzEwODM2N30.Mc_eKMsfR04kLmwfBeH5INn3NTYapv62Fnt0wMpBpMw';
+var TABLE = 'sales';
+var COMP  = 'VCSO Championship 2026';
+var LINK  = 'https://jorsna.github.io/vcso-serien/';
 var SELGERE_RAW = [
   { navn: 'Thomas Dokken',              loc: 'ryen'       },
   { navn: 'Emma Valen',                 loc: 'ryen'       },
@@ -171,355 +247,418 @@ var SELGERE_RAW = [
   { navn: 'Andreas Lydersen',           loc: 'lillestrom' }
 ];
 var SELGERE_DATA = SELGERE_RAW;
-var DAYS_NO=['søndag','mandag','tirsdag','onsdag','torsdag','fredag','lørdag'];
-var MONTHS_NO=['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'];
-var now=new Date();
-document.getElementById('paper-date').textContent=DAYS_NO[now.getDay()]+' '+now.getDate()+'. '+MONTHS_NO[now.getMonth()]+' '+now.getFullYear();
-function setMode(mode,btn){curMode=mode;document.querySelectorAll('.mode-tab').forEach(function(t){t.classList.remove('on');});btn.classList.add('on');renderArticle(allSales,curMode);}
-function load(){fetch(SUPABASE_URL+'/rest/v1/'+TABLE+'?deleted=is.false&select=*',{headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}}).then(function(r){return r.json();}).then(function(data){if(!Array.isArray(data)){document.getElementById('article').innerHTML='<div style="padding:40px;text-align:center;color:#ef4444">Feil: '+JSON.stringify(data)+'</div>';return;}allSales=data;renderArticle(allSales,curMode);}).catch(function(e){document.getElementById('article').innerHTML='<div style="padding:40px;text-align:center;color:#ef4444">'+e.message+'</div>';});}
-// ── HELPERS ──────────────────────────────────────────────────────────
-function getWN(d) {
-  var dt = new Date(d);
-  dt.setHours(0,0,0,0);
+
+var TEAMS = [
+  {id:'ryen',       navn:'Ryen',       color:'#3b82f6'},
+  {id:'fornebu',    navn:'Fornebu',    color:'#10b981'},
+  {id:'lillestrom', navn:'Lillestrøm', color:'#f59e0b'},
+];
+var GOALS = {
+  mai:{ryen:80, fornebu:80, lillestrom:40},
+  jun:{ryen:112, fornebu:112, lillestrom:96}
+};
+
+var DAYS   = ['søndag','mandag','tirsdag','onsdag','torsdag','fredag','lørdag'];
+var MONTHS = ['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'];
+var now    = new Date();
+var copyData = '';
+var allSales = [];
+var curMode  = 'week';
+
+document.getElementById('paper-date').textContent =
+  DAYS[now.getDay()] + ' ' + now.getDate() + '. ' + MONTHS[now.getMonth()] + ' ' + now.getFullYear();
+
+// ── HELPERS ────────────────────────────────────────────────────────────────
+function wn(d) {
+  var dt = new Date(d); dt.setHours(0,0,0,0);
   dt.setDate(dt.getDate() + 3 - (dt.getDay()+6)%7);
-  var w1 = new Date(dt.getFullYear(), 0, 4);
+  var w1 = new Date(dt.getFullYear(),0,4);
   return 1 + Math.round(((dt.getTime()-w1.getTime())/86400000 - 3 + (w1.getDay()+6)%7)/7);
 }
-function nameToId(n) {
+function nid(n) {
   return n.toLowerCase().replace(/\s+/g,'_')
     .replace(/æ/g,'ae').replace(/ø/g,'o').replace(/å/g,'aa')
     .replace(/[^a-z0-9_]/g,'');
 }
-function fmtDate(ts) {
-  var d = new Date(ts);
-  var days = ['søn','man','tir','ons','tor','fre','lør'];
-  return days[d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth()+1) + '.';
-}
-var DAYS_NO = ['søndag','mandag','tirsdag','onsdag','torsdag','fredag','lørdag'];
-var MONTHS_NO = ['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'];
+function fn(n)  { return n.split(' ')[0]; }
+function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
 
-function photoEl(id, size) {
-  var photos = typeof SELGER_PHOTOS !== 'undefined' ? SELGER_PHOTOS : {};
-  var initials = id.replace(/_/g,' ').split(' ').map(function(w){return w[0]?w[0].toUpperCase():''}).join('').slice(0,2);
-  if (photos[id]) {
-    return '<img src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">';
-  }
-  return '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:'+(size>60?'18':'10')+'px;font-weight:900;background:rgba(255,215,0,.12);color:#ffd700">'+initials+'</div>';
+function photo(id, size) {
+  var ini = id.replace(/_/g,' ').split(' ').map(function(w){return w[0]?w[0].toUpperCase():''}).join('').slice(0,2);
+  var fs  = size > 60 ? '22px' : '10px';
+  if (SELGER_PHOTOS && SELGER_PHOTOS[id])
+    return '<img src="'+SELGER_PHOTOS[id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">';
+  return '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:'+fs+';color:var(--gold);background:rgba(255,215,0,.12)">'+ini+'</div>';
 }
 
-// ── AI COMMENTS ───────────────────────────────────────────────────────
-function winnerComment(navn, sales, hats, fin) {
-  var firstName = navn.split(' ')[0];
-  var comments = [
-    '"Jeg visste at denne uken ville bli bra. Bilene selger seg selv – jeg bare hjelper til litt." 😄',
-    '"Teamet er fantastisk, men noen ganger må én ta ansvar. Det var meg denne uken."',
-    '"'+sales+' biler er bra, men neste uke tar jeg flere. Konkurrentene vet hva som venter."',
-    '"Hemmelighetene mine? Tidlig morgen, sent kveld, og god kaffe. Og '+navn.split(' ')[1]+'s telefonnummer til alle interessenter." 😂',
-    '"Jeg ga alt denne uken. Sjefen kan være fornøyd – i hvert fallet for én uke." 🏆',
-  ];
-  if (hats > 0) comments.push('"Hat-trick! Tre biler på én dag – det er ikke tilfeldigheter, det er forberedelse og flyt."');
-  if (fin > 0) comments.push('"'+fin+' finansieringer i tillegg. Kunden vil ha totalløsningen – det er vi best på."');
-  return comments[Math.floor(Math.random() * comments.length)];
+// ── FETCH ──────────────────────────────────────────────────────────────────
+function sw(mode, btn) {
+  curMode = mode;
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  btn.classList.add('on');
+  render(allSales, curMode);
 }
 
-function rivalComment(winner, chaser, diff) {
-  if (diff === 0) return '"'+chaser.split(' ')[0]+' og jeg er like. Neste uke avgjør hvem som er best."';
-  if (diff === 1) return '"'+diff+' bil. Bare én. Jeg kommer tilbake sterkere neste uke." – '+chaser.split(' ')[0];
-  return '"Gratulerer til '+winner.split(' ')[0]+'. Men denne kampen er ikke over." – '+chaser.split(' ')[0];
+function load() {
+  fetch(URL2+'/rest/v1/'+TABLE+'?deleted=is.false&select=*', {
+    headers:{'apikey':KEY2,'Authorization':'Bearer '+KEY2}
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if (!Array.isArray(data)) { err(JSON.stringify(data)); return; }
+    allSales = data;
+    render(allSales, curMode);
+  })
+  .catch(function(e){ err(e.message); });
 }
 
-// ── DRAMATIC DAILY STORY ─────────────────────────────────────────────
-function buildDailyStory(weekSales, ranked, per, fin, thisWeek) {
-  // Group by day
-  var byDay = {};
-  weekSales.forEach(function(s) {
-    var d = s.ts.slice(0,10);
-    if (!byDay[d]) byDay[d] = [];
-    byDay[d].push(s);
-  });
-  var sortedDays = Object.keys(byDay).sort();
-
-  var html = '';
-  sortedDays.forEach(function(day, i) {
-    var daySales = byDay[day];
-    var dayPer = {};
-    daySales.forEach(function(s){ dayPer[s.selger] = (dayPer[s.selger]||0)+1; });
-    var dayRanked = Object.keys(dayPer).sort(function(a,b){ return dayPer[b]-dayPer[a]; });
-    var dayLeader = dayRanked[0];
-    var dayId = nameToId(dayLeader);
-    var isHatDay = dayPer[dayLeader] >= 3;
-    var d = new Date(day);
-    var dayName = DAYS_NO[d.getDay()].charAt(0).toUpperCase() + DAYS_NO[d.getDay()].slice(1);
-
-    var descriptions = [
-      dayLeader.split(' ')[0] + ' satte tonen for dagen med ' + dayPer[dayLeader] + ' salg.',
-      dayLeader.split(' ')[0] + ' dominerte ' + dayName.toLowerCase() + ' med ' + dayPer[dayLeader] + ' biler levert.',
-      'Ingen stoppet ' + dayLeader.split(' ')[0] + ' – ' + dayPer[dayLeader] + ' salg på én dag.',
-      dayLeader.split(' ')[0] + ' var uslåelig ' + dayName.toLowerCase() + ': ' + dayPer[dayLeader] + ' biler.',
-    ];
-    var desc = isHatDay
-      ? '🔥 HAT-TRICK! ' + dayLeader.split(' ')[0] + ' scoret hele ' + dayPer[dayLeader] + ' biler på én dag!'
-      : descriptions[i % descriptions.length];
-
-    html += '<div class="day-item">'
-      + '<div class="day-header">'
-        + '<div class="day-photo">' + photoEl(dayId, 32) + '</div>'
-        + '<div>'
-          + '<div class="day-name">' + dayName + ' ' + d.getDate() + '.' + (d.getMonth()+1) + '.' + (isHatDay ? ' ⭐' : '') + '</div>'
-          + '<div class="day-total">' + daySales.length + ' salg totalt denne dagen</div>'
-        + '</div>'
-      + '</div>'
-      + '<div class="day-desc">' + desc + '</div>'
-      + (dayRanked.length > 1 ? '<div class="day-others">Andre: ' + dayRanked.slice(1).map(function(n){ return n.split(' ')[0]+' ('+dayPer[n]+')'; }).join(', ') + '</div>' : '')
-    + '</div>';
-  });
-  return html;
+function err(msg) {
+  document.getElementById('article').innerHTML =
+    '<div style="padding:40px;text-align:center;color:var(--r);font-size:13px">⚠️ '+msg+'</div>';
 }
 
-// ── MAIN RENDER ───────────────────────────────────────────────────────
-function renderArticle(sales, mode) {
-  var now = new Date();
-  var thisWeek = getWN(now);
-  // mode: 'week' = current week, 'last' = last week
-  var targetWeek = mode === 'last' ? thisWeek - 1 : thisWeek;
-  var ws = sales.filter(function(s){ return getWN(new Date(s.ts)) === targetWeek; });
+// ── MAIN RENDER ─────────────────────────────────────────────────────────────
+function render(sales, mode) {
+  var thisWk = wn(now);
+  var tgtWk  = mode === 'last' ? thisWk - 1 : thisWk;
+  var ws     = sales.filter(function(s){ return wn(new Date(s.ts)) === tgtWk; });
 
   if (ws.length === 0) {
-    document.getElementById('article').innerHTML = '<div class="no-sales">Ingen salg registrert' + (mode==='last'?' forrige uke':' denne uken') + ' ennå. 💪</div>';
-    copyTextData = 'Ingen salg å rapportere.';
+    document.getElementById('article').innerHTML =
+      '<div class="no-sales">Ingen salg registrert '+(mode==='last'?'forrige':'denne')+' uke ennå. 💪</div>';
     document.getElementById('dl-btn').disabled = false;
     document.getElementById('dl-btn').textContent = '📄 Last ned PDF';
+    copyData = 'Ingen salg å rapportere.';
     return;
   }
 
-  // Stats
+  // ── STATS ──────────────────────────────────────────────────────────────
   var per = {}, fin = {};
-  ws.forEach(function(s){ per[s.selger]=(per[s.selger]||0)+1; if(s.finansiert)fin[s.selger]=(fin[s.selger]||0)+1; });
-
-  // Sort with tiebreaker
+  ws.forEach(function(s){
+    per[s.selger] = (per[s.selger]||0)+1;
+    if (s.finansiert) fin[s.selger] = (fin[s.selger]||0)+1;
+  });
   var ranked = Object.keys(per).sort(function(a,b){
     return (per[b]-per[a]) || ((fin[b]||0)-(fin[a]||0));
   });
-
-  // Find truly tied
-  var topScore = per[ranked[0]];
-  var topFin = fin[ranked[0]] || 0;
-  var tied = ranked.filter(function(n){ return per[n]===topScore && (fin[n]||0)===topFin; });
+  var topPts = per[ranked[0]], topFin = fin[ranked[0]]||0;
+  var tied = ranked.filter(function(n){ return per[n]===topPts && (fin[n]||0)===topFin; });
+  var leader = ranked[0], lid = nid(leader), lSales = per[leader];
+  var chaser = tied.length > 1 ? null : ranked[1];
 
   // Hat-tricks
-  var daily = {}, hats = [], hatC = {};
-  ws.forEach(function(s){ var k=s.selger+'|'+s.ts.slice(0,10); daily[k]=(daily[k]||0)+1; });
-  Object.keys(daily).forEach(function(k){ if(daily[k]>=3){ var n=k.split('|')[0]; if(hats.indexOf(n)===-1)hats.push(n); hatC[n]=(hatC[n]||0)+1; }});
+  var dmap={}, hats=[], hatC={};
+  ws.forEach(function(s){ var k=s.selger+'|'+s.ts.slice(0,10); dmap[k]=(dmap[k]||0)+1; });
+  Object.keys(dmap).forEach(function(k){
+    if (dmap[k]>=3) { var n=k.split('|')[0]; if(hats.indexOf(n)===-1)hats.push(n); hatC[n]=(hatC[n]||0)+1; }
+  });
 
-  // MVP days (who led most days)
-  var mvpDays = {};
-  var byDay = {};
+  // MVP days
+  var mvpD={}, byDay={};
   ws.forEach(function(s){ var d=s.ts.slice(0,10); if(!byDay[d])byDay[d]={}; byDay[d][s.selger]=(byDay[d][s.selger]||0)+1; });
   Object.keys(byDay).forEach(function(d){
-    var best=0; var winner='';
-    Object.keys(byDay[d]).forEach(function(n){ if(byDay[d][n]>best){best=byDay[d][n];winner=n;} });
-    if(winner) mvpDays[winner]=(mvpDays[winner]||0)+1;
+    var best=0,win='';
+    Object.keys(byDay[d]).forEach(function(n){if(byDay[d][n]>best){best=byDay[d][n];win=n;}});
+    if(win) mvpD[win]=(mvpD[win]||0)+1;
   });
-  var mvpSorted = Object.keys(mvpDays).sort(function(a,b){return mvpDays[b]-mvpDays[a];});
+  var mvpSorted=Object.keys(mvpD).sort(function(a,b){return mvpD[b]-mvpD[a];});
 
-  var leader = ranked[0];
-  var lId = nameToId(leader);
-  var lSales = per[leader];
-  var chaser = ranked[1];
-
-  // Headline
+  // ── HEADLINE ───────────────────────────────────────────────────────────
   var hl = hats.length > 0
-    ? hats[0] + ' leverte hat-trick – en uke for historiebøkene!'
+    ? fn(hats[0]) + ' slår til med hat-trick – en uke for historiebøkene!'
     : tied.length > 1
-    ? tied.map(function(n){return n.split(' ')[0];}).join(' og ') + ' deler tronen – likt på toppen!'
-    : leader + ' – ' + lSales + ' biler og én klar vinner!';
+    ? tied.map(fn).join(' og ') + ' deler tronen – jevnt på topp!'
+    : pick([
+        fn(leader) + ' knuser konkurrentene i uke ' + tgtWk + '!',
+        fn(leader) + ' er ustoppelig – ' + lSales + ' biler på én uke!',
+        fn(leader) + ' tar kommandoen i uke ' + tgtWk + '.',
+        fn(leader) + ' setter standarden – ingen kan følge med!',
+      ]);
 
-  // Intro text
-  var intro = mode === 'last'
-    ? 'Uke ' + targetWeek + ' er over, og vi kan nå oppsummere en '+(ws.length>15?'fantastisk':'solid')+' uke i ' + COMP_NAME + '. '
-    : 'Vi er inne i uke ' + targetWeek + ', og det er allerede klart at dette blir en spennende uke i ' + COMP_NAME + '. ';
-
-  var tiedStr = tied.length > 1
-    ? tied.map(function(n){return n.split(' ')[0];}).join(' og ') + ' deler førsteplassen med ' + lSales + ' biler og ' + topFin + ' finansieringer hver.'
-    : leader + ' leder an med ' + lSales + ' biler' + (fin[leader]?' og '+fin[leader]+' finansieringer':'') + '.';
-
-  var chaserStr = chaser && tied.indexOf(chaser)===-1
-    ? (per[leader]-per[chaser]===1?' '+chaser.split(' ')[0]+' er kun én bil bak og gir ikke opp!' : ' '+chaser.split(' ')[0]+' følger med '+per[chaser]+' salg.')
+  // ── INTRO PARAGRAPH ────────────────────────────────────────────────────
+  var gapStr = chaser
+    ? (per[leader]-per[chaser]===1
+        ? ' ' + fn(chaser) + ' er kun én bil bak og gir ikke opp kampen.'
+        : ' ' + fn(chaser) + ' følger etter med ' + per[chaser] + ' biler, men gapet er på ' + (per[leader]-per[chaser]) + '.')
     : '';
+  var finStr = fin[leader] ? ' Av disse var ' + fin[leader] + ' finansierte – kvalitet i tillegg til kvantitet.' : '';
+  var hatStr = hats.length > 0 ? ' Som om ikke det var nok leverte ' + hats.map(fn).join(' og ') + ' hat-trick denne uken.' : '';
+  var tiedStr = tied.length > 1
+    ? tied.map(fn).join(' og ') + ' deler toppen med ' + lSales + ' biler og ' + topFin + ' finansieringer.'
+    : fn(leader) + ' leder an med ' + lSales + ' ' + (lSales===1?'bil':'biler') + '.' + finStr;
 
-  var hatStr = hats.length > 0 ? ' ' + hats.map(function(n){return n.split(' ')[0];}).join(' og ') + ' imponerte med hat-trick!' : '';
-  var bodyTxt = intro + tiedStr + chaserStr + hatStr + ' Totalt ' + ws.length + ' biler er registrert.';
+  var introParts = [
+    mode==='last'
+      ? pick(['Uke '+tgtWk+' er skrevet inn i historiebøkene.', 'Da støvet la seg etter uke '+tgtWk+' stod ett navn igjen på toppen.', 'Uke '+tgtWk+' er over, og regnskapet er gjort opp.'])
+      : pick(['Vi er inne i uke '+tgtWk+', og det begynner å bli klart hvem som mener alvor.', 'Uke '+tgtWk+' er i full gang, og noen har allerede satt sitt preg på den.', 'Halvveis inn i uke '+tgtWk+' tegner det seg et klart bilde.']),
+    tiedStr,
+    gapStr,
+    hatStr,
+    ' Totalt ' + ws.length + ' biler er registrert ' + (mode==='last'?'for uken':'så langt') + '.'
+  ];
+  var introTxt = introParts.join('');
 
-  // Podium HTML
+  // ── DECK ───────────────────────────────────────────────────────────────
+  var deck = mode==='last'
+    ? 'Full kamprapport fra uke '+tgtWk+'. '+ws.length+' biler. Én vinner.'
+    : 'Status uke '+tgtWk+' i '+COMP+'. '+ws.length+' biler registrert hittil.';
+
+  // ── DAY BY DAY ─────────────────────────────────────────────────────────
+  var sortedDays = Object.keys(byDay).sort();
+  var dayItems = sortedDays.map(function(day) {
+    var dp = byDay[day];
+    var dr = Object.keys(dp).sort(function(a,b){return dp[b]-dp[a];});
+    var dLeader = dr[0], dSales = dp[dLeader], dId = nid(dLeader);
+    var d = new Date(day);
+    var dayName = DAYS[d.getDay()].charAt(0).toUpperCase() + DAYS[d.getDay()].slice(1);
+    var isHat = dSales >= 3;
+
+    var verbs = ['gikk av med seieren','tok kommandoen','var uslåelig','leverte varene','styrte showet'];
+    var mainTxt = isHat
+      ? '<strong>' + fn(dLeader) + '</strong> imponerte med hat-trick – ' + dSales + ' biler på én dag. En bragd!'
+      : '<strong>' + fn(dLeader) + '</strong> ' + pick(verbs) + ' med ' + dSales + ' ' + (dSales===1?'bil':'biler') + '.';
+    var otherStr = dr.slice(1).map(function(n){ return fn(n)+' ('+dp[n]+')'; }).join(', ');
+    var fullTxt = mainTxt + (otherStr ? ' I kjølvannet: ' + otherStr + '.' : '');
+    var total = Object.values(dp).reduce(function(a,b){return a+b;},0);
+
+    return '<div class="day-item">'
+      + '<div class="day-hdr">'
+        + '<div class="day-av">' + photo(dId,30) + '</div>'
+        + '<div>'
+          + '<div class="day-label">' + dayName + ' ' + d.getDate() + '.' + (d.getMonth()+1) + '.' + (isHat?' ⭐':'') + '</div>'
+          + '<div class="day-sub">' + total + ' salg denne dagen</div>'
+        + '</div>'
+      + '</div>'
+      + '<div class="day-text">' + fullTxt + '</div>'
+    + '</div>';
+  }).join('');
+
+  // ── TEAM SECTION ───────────────────────────────────────────────────────
+  var curMonth = now.getMonth()===4?'mai':'jun';
+  var teamItems = TEAMS.map(function(t) {
+    var goal = (GOALS[curMonth]&&GOALS[curMonth][t.id]) || 0;
+    var teamWS = ws.filter(function(s){
+      var so = SELGERE_DATA ? SELGERE_DATA.find(function(x){return x.navn===s.selger;}) : null;
+      return so && so.loc === t.id;
+    });
+    var allTeam = sales.filter(function(s){
+      var so = SELGERE_DATA ? SELGERE_DATA.find(function(x){return x.navn===s.selger;}) : null;
+      return so && so.loc === t.id && s.mnd === curMonth;
+    });
+    var wk = teamWS.length, tot = allTeam.length;
+    var pct = goal > 0 ? Math.round(tot/goal*100) : 0;
+    var col = pct>=100?'var(--g)':pct>=60?'var(--y)':'var(--r)';
+    var adjs = pct>=100?['strålende','fantastisk']:pct>=70?['god','solid']:pct>=40?['godkjent','moderat']:['svak','under par'];
+    var desc = t.navn + ' leverte ' + wk + ' ' + (wk===1?'bil':'biler') + ' denne uken'
+      + (goal>0?' og er på ' + tot + ' av ' + goal + ' i måneden (' + pct + '%).':'.') + ' En ' + pick(adjs) + ' innsats.';
+    return '<div class="team-item">'
+      + '<div class="team-name-row"><div class="team-name" style="color:'+t.color+'">'+t.navn+'</div>'
+      + '<div class="team-count">'+wk+' denne uken</div></div>'
+      + (goal>0?'<div class="team-bar-bg"><div class="team-bar-fill" style="width:'+Math.min(pct,100)+'%;background:'+col+'"></div></div>'
+        +'<div class="team-pct-txt" style="color:'+col+'">'+tot+'/'+goal+' ('+pct+'%)</div>':'')
+      + '<div class="team-desc">'+desc+'</div>'
+    + '</div>';
+  }).join('');
+
+  // ── PODIUM ─────────────────────────────────────────────────────────────
   var podOrder = ranked.length>=3?[ranked[1],ranked[0],ranked[2]]:ranked.length>=2?[ranked[1],ranked[0]]:[ranked[0]];
-  var podSizes = ranked.length>=3?[72,90,72]:[72,90];
-  var podColors = ['#c0c0c0','#ffd700','#cd7f32'];
-  var podColorMap = ranked.length>=3?[podColors[1],podColors[0],podColors[2]]:[podColors[1],podColors[0]];
-  var medals = ['🥈','🥇','🥉'];
-  var podHtml = podOrder.map(function(navn,i){
-    var id=nameToId(navn),sz=podSizes[i],col=podColorMap[i];
+  var podSz    = ranked.length>=3?[72,90,72]:[72,90];
+  var podCols  = ['#c0c0c0','#ffd700','#cd7f32'];
+  var podMap   = ranked.length>=3?[podCols[1],podCols[0],podCols[2]]:[podCols[1],podCols[0]];
+  var medals   = ['🥈','🥇','🥉'];
+  var podHtml  = podOrder.map(function(navn,i){
+    var id=nid(navn), sz=podSz[i], col=podMap[i];
     var isTied = tied.indexOf(navn)!==-1 && tied.length>1;
-    var stars = hatC[navn]?' '+Array(Math.min(hatC[navn],3)+1).join('⭐'):'';
-    var tiedBadge = isTied?'<div style="font-size:8px;color:'+col+';letter-spacing:1px;text-transform:uppercase">Delt 1.</div>':'';
+    var stars  = hatC[navn] ? ' '+Array(Math.min(hatC[navn],3)+1).join('⭐') : '';
     return '<div class="pod">'
       +'<div class="pod-medal">'+medals[i]+'</div>'
-      +'<div class="pod-photo" style="width:'+sz+'px;height:'+sz+'px;border-color:'+col+';box-shadow:0 0 '+(navn===ranked[0]?'18':'8')+'px '+col+'55">'+photoEl(id,sz)+'</div>'
-      +tiedBadge
-      +'<div class="pod-name">'+navn.split(' ')[0]+stars+'</div>'
+      +'<div class="pod-photo" style="width:'+sz+'px;height:'+sz+'px;border-color:'+col+';box-shadow:0 0 '+(navn===ranked[0]?'20':'8')+'px '+col+'55">'+photo(id,sz)+'</div>'
+      +(isTied?'<div class="pod-tied">Delt 1.</div>':'')
+      +'<div class="pod-name">'+fn(navn)+stars+'</div>'
       +'<div class="pod-sales" style="color:'+col+'">'+per[navn]+'</div>'
-      +'<div class="pod-lbl">biler'+(fin[navn]?' · '+fin[navn]+' fin.':'')+'</div>'
+      +'<div class="pod-lbl">'+(per[navn]===1?'bil':'biler')+(fin[navn]?' · '+fin[navn]+' fin.':'')+'</div>'
     +'</div>';
   }).join('');
 
-  // Rest rows
+  // Rest of table
   var restHtml = ranked.slice(3).map(function(navn,i){
-    var id=nameToId(navn);
-    var stars=hatC[navn]?' ⭐':'';
-    var finStr=fin[navn]?' ('+fin[navn]+' fin.)':'';
+    var id = nid(navn);
     return '<div class="rest-row">'
       +'<div class="rest-rank">'+(i+4)+'</div>'
-      +'<div class="rest-av">'+photoEl(id,30)+'</div>'
-      +'<div class="rest-name">'+navn+stars+'</div>'
-      +'<div class="rest-sales">'+per[navn]+finStr+'</div>'
+      +'<div class="rest-av">'+photo(id,28)+'</div>'
+      +'<div class="rest-name">'+navn+(hatC[navn]?' ⭐':'')+'</div>'
+      +'<div class="rest-sales">'+per[navn]+(fin[navn]?' ('+fin[navn]+' fin.)':'')+'</div>'
     +'</div>';
   }).join('');
 
-  // Hat cards
+  // ── HAT TRICK ──────────────────────────────────────────────────────────
   var hatHtml = hats.map(function(navn){
-    var id=nameToId(navn);
-    var stars=Array(Math.min(hatC[navn],3)+1).join('⭐');
+    var id = nid(navn);
+    var stars = Array(Math.min(hatC[navn],3)+1).join('⭐');
     return '<div class="hat-card">'
-      +'<div class="hat-photo">'+photoEl(id,52)+'</div>'
-      +'<div><div class="hat-title">Hat-trick! '+stars+'</div>'
-      +'<div class="hat-body"><strong style="color:var(--txt)">'+navn+'</strong> scoret 3+ biler på én dag. En bragd!</div></div>'
+      +'<div class="hat-av">'+photo(id,50)+'</div>'
+      +'<div>'
+        +'<div class="hat-title">Hat-trick! '+stars+'</div>'
+        +'<div class="hat-text"><strong>'+navn+'</strong> – scoret 3 eller flere biler på én dag. '+per[navn]+' biler totalt denne uken. En bragd som vil bli husket.</div>'
+      +'</div>'
     +'</div>';
   }).join('');
 
-  // MVP section
-  var mvpHtml = '';
-  if (mvpSorted.length > 0) {
-    mvpHtml = '<div class="divider"><span>Flest MVP-dager</span></div><div class="mvp-row">'
-      + mvpSorted.slice(0,3).map(function(navn){
-          var id=nameToId(navn);
-          return '<div class="mvp-item">'
-            +'<div class="mvp-photo">'+photoEl(id,44)+'</div>'
-            +'<div class="mvp-name">'+navn.split(' ')[0]+'</div>'
-            +'<div class="mvp-days">'+mvpDays[navn]+' dag'+( mvpDays[navn]>1?'er':'')+'</div>'
-          +'</div>';
-        }).join('')
-    +'</div>';
-  }
-
-  // AI comments (Monday mode)
+  // ── AI QUOTES (Monday only) ─────────────────────────────────────────────
   var aiHtml = '';
   if (mode === 'last') {
-    var winComment = winnerComment(leader, lSales, hatC[leader]||0, fin[leader]||0);
-    var rivComment = chaser && tied.indexOf(chaser)===-1 ? rivalComment(leader, chaser, per[leader]-per[chaser]) : '';
-    aiHtml = '<div class="divider"><span>Stemmer fra garderoben</span></div>'
-      +'<div class="ai-section">'
-        +'<div class="ai-badge">🤖 AI-generert ut ifra resultater og form</div>'
-        +'<div class="ai-quote">'
-          +'<div class="ai-photo">'+photoEl(lId,44)+'</div>'
-          +'<div class="ai-txt">'
-            +'<div class="ai-name">'+leader+'</div>'
-            +'<div class="ai-comment">'+winComment+'</div>'
-          +'</div>'
-        +'</div>'
-        +(rivComment?'<div class="ai-quote" style="margin-top:10px">'
-          +'<div class="ai-photo">'+photoEl(nameToId(chaser),44)+'</div>'
-          +'<div class="ai-txt"><div class="ai-name">'+chaser+'</div><div class="ai-comment">'+rivComment+'</div></div>'
-        +'</div>':'')
+    var winComments = [
+      '"Jeg visste at denne uken ville bli bra. Forberedelsene var på plass, og det bare klikket." 🏆',
+      '"'+lSales+' biler. Det handler om å møte kundene der de er, og levere det de trenger."',
+      '"En god uke. Men neste uke starter på null igjen – det er det fine med denne konkurransen."',
+      '"Teamet rundt meg gjør alt mulig. Men noen ganger må én ta et ekstra steg fremover." 💪',
+      '"Jeg ser ikke på konkurrentene. Jeg gjør jobben min. Resultatene taler for seg selv."',
+    ];
+    if (hatC[leader]) winComments.push('"Hat-trick! Det var en dag i flytsonen – alt bare stemte."');
+    if (fin[leader])  winComments.push('"'+fin[leader]+' finansieringer i tillegg. Kunden vil ha helheten – det er vi best på."');
+
+    aiHtml += '<div class="ai-quote">'
+      +'<div class="ai-av">'+photo(lid,44)+'</div>'
+      +'<div><div class="ai-name">'+leader+'</div>'
+      +'<div class="ai-comment">'+pick(winComments)+'</div></div>'
+    +'</div>';
+
+    if (chaser) {
+      var rivalComments = [
+        '"Gratulerer til vinneren. Men neste uke er en ny sjanse – og den tar jeg." 😤',
+        '"Én bil. Bare én. Neste uke er det min tur." 🔥',
+        '"Jeg trener hardt for å komme tilbake sterkere. Det er det dette handler om."',
+      ];
+      aiHtml += '<div class="ai-quote" style="margin-top:8px">'
+        +'<div class="ai-av">'+photo(nid(chaser),44)+'</div>'
+        +'<div><div class="ai-name">'+chaser+'</div>'
+        +'<div class="ai-comment">'+pick(rivalComments)+'</div></div>'
       +'</div>';
+    }
   }
 
-  // Daily story
-  var storyHtml = '<div class="divider"><span>Dag for dag</span></div>'
-    + '<div class="story-section">' + buildDailyStory(ws, ranked, per, fin, targetWeek) + '</div>';
+  // ── CLOSING ────────────────────────────────────────────────────────────
+  var closings = mode === 'last' ? [
+    'Med uke '+tgtWk+' i boken er én ting klart: '+fn(leader)+' har vist hva han er god for. Kampen er langt fra over – vi sees igjen neste uke.',
+    fn(leader)+' kan smile bredt etter uke '+tgtWk+'. Men i '+COMP+' starter alt på nytt mandag morgen. Spørsmålet er hvem som tar hansken.',
+    'Uke '+tgtWk+' tilhørte '+fn(leader)+'. Men som enhver erfaren selger vet – ingen uke er lik den forrige. Vi venter spent.',
+  ] : [
+    'Uke '+tgtWk+' er ikke over ennå. Mye kan skje. Hold øye med tabellen – og ikke la naboavdelingen stikke av.',
+    'Kampens siste runder gjenstår. '+fn(leader)+' leder, men ingenting er avgjort. Gi gass!',
+    'Det er fortsatt tid igjen av uke '+tgtWk+'. Hvem tar de siste bilene? Stillingen kan endre seg.',
+  ];
+  var closingTxt = pick(closings);
 
-  // Copy text
+  // ── COPY TEXT ──────────────────────────────────────────────────────────
   var lines = [
     '📰 LA GAZZETTA DELLO VCSO',
-    COMP_NAME.toUpperCase() + ' – UKE ' + targetWeek + (mode==='last'?' (AVSLUTTET)':''),
+    COMP.toUpperCase() + ' – UKE ' + tgtWk + (mode==='last'?' · AVSLUTTET':''),
     '',
-    '🔥 ' + hl.toUpperCase(),
+    '⚡ ' + hl.toUpperCase(),
     '',
-    bodyTxt,
+    introTxt,
     '',
-    '📊 STILLINGEN:'
+    '📊 STILLINGEN:',
   ];
   ranked.forEach(function(n,i){
     var m=['🥇','🥈','🥉'];
-    var isTied=tied.indexOf(n)!==-1&&tied.length>1;
-    var prefix=isTied?'🥇':(i<3?m[i]:(i+1)+'.');
-    var stars=hatC[n]?' '+Array(Math.min(hatC[n],3)+1).join('⭐'):'';
-    var fStr=fin[n]?' ('+fin[n]+' finansiert)':'';
-    lines.push(prefix+' '+n+': '+per[n]+' biler'+fStr+stars);
+    var isTied = tied.indexOf(n)!==-1 && tied.length>1;
+    var prefix = isTied ? '🥇' : (i<3 ? m[i] : (i+1)+'.');
+    var stars  = hatC[n] ? ' '+Array(Math.min(hatC[n],3)+1).join('⭐') : '';
+    lines.push(prefix+' '+n+': '+per[n]+' '+(per[n]===1?'bil':'biler')+(fin[n]?' ('+fin[n]+' fin.)':'')+stars);
   });
-  if (hats.length>0){lines.push('');lines.push('⭐ HAT-TRICK: '+hats.join(', ')+'!');}
-  if (mode==='last' && mvpSorted.length>0){lines.push('');lines.push('👑 FLEST MVP-DAGER: '+mvpSorted[0]+' ('+mvpDays[mvpSorted[0]]+' dager)');}
-  lines.push('');lines.push('Live: '+LINK);
-  copyTextData = lines.join('\n');
+  if (hats.length>0) { lines.push(''); lines.push('⭐ HAT-TRICK: '+hats.join(', ')+'!'); }
+  lines.push(''); lines.push(closingTxt);
+  lines.push(''); lines.push('🔴 Live: '+LINK);
+  copyData = lines.join('\n');
 
-  // Render
-  var modeLabel = mode==='last' ? 'Uke '+targetWeek+' – Mandag morgen' : 'Uke '+targetWeek+' – Pågående';
-  document.getElementById('article').innerHTML =
-    '<div id="pdf-content">'
-    +'<div class="edition"><div class="edition-week">'+modeLabel+'</div><div class="edition-comp">'+COMP_NAME+'</div></div>'
-    +'<div class="hero">'
-      +'<div class="kicker">'+(mode==='last'?'🏆 Ukens dom':'🔥 Ukens store sak')+'</div>'
-      +'<div class="headline">'+hl.replace(leader,'<em>'+leader+'</em>')+'</div>'
-      +'<div class="hero-body">'
-        +'<div class="hero-photo">'+photoEl(lId,88)+'</div>'
-        +'<div class="body-txt">'+bodyTxt.replace(leader,'<strong>'+leader+'</strong>')+'</div>'
-      +'</div>'
-    +'</div>'
-    +'<div class="divider"><span>Stillingen</span></div>'
-    +'<div class="podium">'+podHtml+'</div>'
-    +(restHtml?'<div class="rest-list">'+restHtml+'</div>':'')
-    +storyHtml
-    +(hatHtml?'<div class="divider"><span>Hat-trick</span></div>'+hatHtml:'')
-    +mvpHtml
-    +aiHtml
-    +'<div class="footer-strip">'+COMP_NAME+' · Uke '+targetWeek+' · La Gazzetta dello VCSO</div>'
-    +'</div>';
+  // ── BUILD HTML ─────────────────────────────────────────────────────────
+  var modeLabel = mode==='last' ? 'Uke '+tgtWk+' · Avsluttet' : 'Uke '+tgtWk+' · Pågår';
+  var out = '';
 
+  // Edition bar
+  out += '<div class="edition"><div class="edition-week">'+modeLabel+'</div><div class="edition-comp">'+COMP+'</div></div>';
+
+  // Hero section
+  out += '<div class="hero-section">'
+    + '<div class="hero-leader-photo">'+photo(lid,200)+'</div>'
+    + '<div class="hero-content">'
+      + '<div class="hero-kicker">'+(mode==='last'?'🏆 Kamprapport':'🔥 Statusrapport')+'</div>'
+      + '<div class="hero-hl">'+hl.replace(fn(leader),'<em>'+fn(leader)+'</em>')+'</div>'
+      + '<div class="hero-deck">'+deck+'</div>'
+      + '<div class="hero-byline">La Gazzetta dello VCSO &nbsp;·&nbsp; '+DAYS[now.getDay()]+' '+now.getDate()+'. '+MONTHS[now.getMonth()]+'</div>'
+    + '</div>'
+  + '</div>';
+
+  // Intro paragraph
+  out += '<div class="art-body"><p class="art-intro">'+introTxt+'</p></div>';
+
+  // Podium
+  out += '<div class="sec-hdr"><div class="sec-title">🏅 Stillingen</div></div>';
+  out += '<div class="podium">'+podHtml+'</div>';
+  if (restHtml) out += '<div class="rest-list">'+restHtml+'</div>';
+
+  // Day by day
+  if (dayItems) {
+    out += '<div class="sec-hdr"><div class="sec-title">📅 Dag for dag</div></div>';
+    out += '<div class="day-list">'+dayItems+'</div>';
+  }
+
+  // Teams
+  out += '<div class="sec-hdr"><div class="sec-title">🏟️ Avdelingene</div></div>';
+  out += '<div class="team-list">'+teamItems+'</div>';
+
+  // Hat tricks
+  if (hatHtml) {
+    out += '<div class="sec-hdr"><div class="sec-title">⭐ Hat-trick</div></div>';
+    out += hatHtml;
+  }
+
+  // AI (Monday only)
+  if (mode === 'last' && aiHtml) {
+    out += '<div class="sec-hdr"><div class="sec-title">🎙️ Stemmer fra garderoben</div></div>';
+    out += '<div class="ai-section"><div class="ai-badge">🤖 AI-generert ut ifra resultater og form</div>'+aiHtml+'</div>';
+  }
+
+  // Closing
+  out += '<div class="art-closing"><p class="closing-text">'+closingTxt+'</p></div>';
+  out += '<div class="art-footer">La Gazzetta dello VCSO · '+COMP+' · Uke '+tgtWk+'</div>';
+
+  document.getElementById('article').innerHTML = '<div id="pdf-content">'+out+'</div>';
   document.getElementById('dl-btn').disabled = false;
   document.getElementById('dl-btn').textContent = '📄 Last ned PDF';
 }
 
-function downloadPDF() {
+// ── PDF ────────────────────────────────────────────────────────────────────
+function dlPDF() {
   var btn = document.getElementById('dl-btn');
-  btn.disabled=true; btn.textContent='⏳ Genererer PDF...';
-  var el = document.getElementById('pdf-content') || document.getElementById('content');
-  html2canvas(el, {scale:2, backgroundColor:'#0a111e', useCORS:true, logging:false}).then(function(canvas){
-    var {jsPDF} = window.jspdf;
-    var pdf = new jsPDF('p','mm','a4');
-    var w = pdf.internal.pageSize.getWidth();
-    var h = (canvas.height * w) / canvas.width;
-    var pageH = 297;
-    var pages = Math.ceil(h / pageH);
-    for (var p=0; p<pages; p++) {
-      if (p>0) pdf.addPage();
-      var tmpCanvas = document.createElement('canvas');
-      var ratio = canvas.width / w;
-      tmpCanvas.width = canvas.width;
-      tmpCanvas.height = Math.min(pageH * ratio, canvas.height - p*pageH*ratio);
-      var ctx = tmpCanvas.getContext('2d');
-      ctx.drawImage(canvas, 0, -p*pageH*ratio);
-      pdf.addImage(tmpCanvas.toDataURL('image/jpeg',0.92),'JPEG',0,0,w,Math.min(pageH,h-p*pageH));
+  btn.disabled=true; btn.textContent='⏳ Genererer...';
+  html2canvas(document.getElementById('pdf-content'),{
+    scale:2, backgroundColor:'#0a111e', useCORS:true, logging:false
+  }).then(function(canvas){
+    var {jsPDF}=window.jspdf;
+    var pdf=new jsPDF('p','mm','a4');
+    var w=pdf.internal.pageSize.getWidth(), pH=297;
+    var h=(canvas.height*w)/canvas.width;
+    var pages=Math.ceil(h/pH);
+    for(var p=0;p<pages;p++){
+      if(p>0) pdf.addPage();
+      var tmp=document.createElement('canvas');
+      var r=canvas.width/w;
+      tmp.width=canvas.width; tmp.height=Math.min(pH*r,canvas.height-p*pH*r);
+      tmp.getContext('2d').drawImage(canvas,0,-p*pH*r);
+      pdf.addImage(tmp.toDataURL('image/jpeg',.92),'JPEG',0,0,w,Math.min(pH,h-p*pH));
     }
-    var wn = getWN(new Date());
-    pdf.save('gazzetta-uke'+wn+'.pdf');
+    pdf.save('gazzetta-uke'+new Date().getFullYear()+'.pdf');
     btn.disabled=false; btn.classList.add('done'); btn.textContent='✅ Lastet ned!';
     setTimeout(function(){ btn.textContent='📄 Last ned PDF'; btn.classList.remove('done'); btn.disabled=false; },3000);
   });
 }
-
-function copyRecap() {
-  navigator.clipboard.writeText(copyTextData).then(function(){
-    var btn=document.getElementById('copy-btn');
-    btn.textContent='✅ Kopiert!';
-    setTimeout(function(){ btn.textContent='📋 Kopier tekst'; },2000);
+function cpTxt() {
+  navigator.clipboard.writeText(copyData).then(function(){
+    var b=document.getElementById('copy-btn');
+    b.textContent='✅ Kopiert!';
+    setTimeout(function(){b.textContent='📋 Kopier tekst';},2000);
   });
 }
 
