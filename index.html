@@ -1731,10 +1731,11 @@ setInterval(countdown, 1000);
       if (s.finansiert) fin++;
       dmap[s.ts.slice(0,10)] = (dmap[s.ts.slice(0,10)]||0)+1;
     });
-    // Form: last 5 working days
-    var allDays = Object.keys(dmap).sort().reverse();
-    for (var i = 0; i < 5; i++) {
-      form.unshift(allDays[i] ? dmap[allDays[i]] > 0 : false);
+    // Form: same as selgerDots - last 5 calendar days
+    for (var i = 4; i >= 0; i--) {
+      var d = new Date(); d.setDate(d.getDate() - i);
+      var ds = d.getFullYear() + '-' + (d.getMonth()+1<10?'0':'') + (d.getMonth()+1) + '-' + (d.getDate()<10?'0':'') + d.getDate();
+      form.push(dmap[ds] > 0);
     }
     // Hat tricks
     Object.keys(dmap).forEach(function(d){ if(dmap[d]>=3) hatTricks++; });
