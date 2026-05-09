@@ -1418,8 +1418,8 @@ function renderScoring() {
     var dp = (s.ts||'').substring(0,10), tp = (s.ts||'').substring(11,16);
     var dArr = dp.split('-');
     var dateShow = dArr[2] ? dArr[2]+'.'+dArr[1]+'.' : dp;
-    var imgHtml = typeof CAR_IMAGES !== 'undefined' && CAR_IMAGES[s.modell]
-      ? '<img class="score-car-img" src="'+CAR_IMAGES[s.modell]+'" alt="'+s.modell+'">'
+    var carKey = s.modell === 'XC40/EX40' ? 'XC40' : s.modell; var imgHtml = typeof CAR_IMAGES !== 'undefined' && CAR_IMAGES[carKey]
+      ? '<img class="score-car-img" src="'+CAR_IMAGES[carKey]+'" alt="'+s.modell+'">'
       : '<div class="score-car-placeholder">'+s.modell+'</div>';
     return '<div class="score-card" style="animation-delay:'+(i*0.02)+'s">'
       + (userRole==='selger'?'<div class="score-del" onclick="askDel(\''+s.id+'\',\''+s.selger+' \u2013 '+s.modell+'\')">Slett</div>':'')
@@ -1768,6 +1768,10 @@ setInterval(countdown, 1000);
         +'<div class="pc-stat">'
           +'<div class="pc-stat-n" style="color:var(--gold)">'+stats.per+'</div>'
           +'<div class="pc-stat-l">Salg</div>'
+        +'</div>'
+        +'<div class="pc-stat">'
+          +'<div class="pc-stat-n" style="color:var(--gold2)">'+stats.per*3+'</div>'
+          +'<div class="pc-stat-l">Poeng</div>'
         +'</div>'
         +'<div class="pc-stat">'
           +'<div class="pc-stat-n" style="color:#22c55e">'+stats.fin+'</div>'
