@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VCSO Championship – Ukesrecap</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#07090f; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  @keyframes spin  { to{transform:rotate(360deg)} }
+  .spin { width:28px;height:28px;border:2px solid rgba(255,255,255,0.08);border-top-color:rgba(59,130,246,0.7);border-radius:50%;animation:spin 0.8s linear infinite; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+const SB_URL = "https://jffhdlmwvurnojoapcvs.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmZmhkbG13dnVybm9qb2FwY3ZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MzIzNjcsImV4cCI6MjA5MzEwODM2N30.Mc_eKMsfR04kLmwfBeH5INn3NTYapv62Fnt0wMpBpMw";
+
+const A  = "#3b82f6";
+const AD = "rgba(59,130,246,0.15)";
+const BG = "#07090f";
+const CK = "#0d1020";
+const BR = "rgba(59,130,246,0.12)";
+
+const DEPT = {
+  ryen:       { label:"Ryen",       color:"#3b82f6", bg:"rgba(59,130,246,0.13)"  },
+  fornebu:    { label:"Fornebu",    color:"#10b981", bg:"rgba(16,185,129,0.13)"  },
+  lillestrom: { label:"Lillestrøm", color:"#f59e0b", bg:"rgba(245,158,11,0.13)" },
+};
+
+function isoWeek(d) {
+  const u = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const day = u.getUTCDay() || 7;
+  u.setUTCDate(u.getUTCDate() + 4 - day);
+  const y1 = new Date(Date.UTC(u.getUTCFullYear(), 0, 1));
+  return Math.ceil((((u - y1) / 86400000) + 1) / 7);
+}
+
+function weekDates(year, week) {
+  const jan4 = new Date(Date.UTC(year, 0, 4));
+  const w1s  = new Date(jan4);
+  w1s.setUTCDate(jan4.getUTCDate() - ((jan4.getUTCDay() || 7) - 1));
+  const s = new Date(w1s); s.setUTCDate(w1s.getUTCDate() + (week-1)*7);
+  const e = new Date(s);   e.setUTCDate(s.getUTCDate() + 6); e.setUTCHours(23,59,59,999);
+  return { start:s, end:e };
+}
+
+// Always show last completed week (shifts back 7 days from now)
+function getLastWeek() {
+  const d = new Date(); d.setDate(d.getDate() - 7);
+  return { year: d.getFullYear(), week: isoWeek(d) };
+}
+
+function rankSales(sales) {
+  const m = {};
+  sales.forEach(s => {
+    if (!m[s.selger]) m[s.selger] = { salg:0, finansiert:0, loc:s.loc };
+    m[s.selger].salg++;
+    if (s.finansiert) m[s.selger].finansiert++;
+  });
+  return Object.entries(m)
+    .map(([name,d]) => ({ name,...d, poeng:d.salg*3 }))
+    .sort((a,b) => b.poeng-a.poeng || b.finansiert-a.finansiert);
+}
+
+function getMVP(ws) {
+  const bd = {};
+  ws.forEach(s => {
+    const day = s.ts.slice(0,10);
+    if (!bd[day]) bd[day]={};
+    bd[day][s.selger] = (bd[day][s.selger]||0)+1;
+  });
+  const days = Object.keys(bd).sort();
+  const mc = {};
+  days.forEach(day => {
+    const ds = bd[day], max = Math.max(...Object.values(ds));
+    Object.entries(ds).forEach(([n,c]) => { if(c===max) mc[n]=(mc[n]||0)+1; });
+  });
+  if (!Object.keys(mc).length) return null;
+  const [name,count] = Object.entries(mc).sort((a,b)=>b[1]-a[1])[0];
+  const mvpDays = days.map(day => { const ds=bd[day],max=Math.max(...Object.values(ds)); return ds[name]===max&&max>0; });
+  return { name, count, loc:ws.find(s=>s.selger===name)?.loc||"", days, mvpDays };
+}
+
+const dc = loc => DEPT[loc]?.color || A;
+const dl = loc => DEPT[loc]?.label || loc;
+const fmt = d  => d.toLocaleDateString("no-NO",{day:"numeric",month:"long"});
+
+function Avatar({ name, loc, size=48 }) {
+  const init = name.split(" ").map(p=>p[0]).join("").slice(0,2).toUpperCase();
+  return (
+    <div style={{ width:size,height:size,borderRadius:"50%",background:DEPT[loc]?.bg||AD,border:`2px solid ${dc(loc)}`,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Bebas Neue',cursive",fontSize:size*.36,color:dc(loc),flexShrink:0,letterSpacing:"0.05em" }}>
+      {init}
+    </div>
+  );
+}
+
+function Card({ children, top, mb=12 }) {
+  return (
+    <div style={{ background:CK,border:`1px solid ${BR}`,borderRadius:18,padding:"24px 26px",position:"relative",overflow:"hidden",marginBottom:mb }}>
+      {top && <div style={{ position:"absolute",top:0,left:0,right:0,height:2,background:top,borderRadius:"18px 18px 0 0" }} />}
+      {children}
+    </div>
+  );
+}
+
+function Label({ children, mt=20 }) {
+  return <div style={{ fontSize:10,fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"rgba(255,255,255,0.22)",marginTop:mt,marginBottom:10 }}>{children}</div>;
+}
+
+function TrebleBanner({ name }) {
+  return (
+    <div style={{ background:"linear-gradient(135deg,#080d1a,#0a0814)",border:"1px solid rgba(245,200,66,0.3)",borderRadius:20,padding:"44px 32px 40px",textAlign:"center",position:"relative",overflow:"hidden",marginBottom:36 }}>
+      <div style={{ position:"absolute",inset:0,background:"radial-gradient(ellipse 70% 50% at 50% 0%,rgba(59,130,246,0.1),transparent 60%)",pointerEvents:"none" }} />
+      <div style={{ position:"absolute",inset:0,background:"radial-gradient(ellipse 50% 60% at 10% 100%,rgba(245,200,66,0.07),transparent 55%)",pointerEvents:"none" }} />
+      <div style={{ fontSize:52,animation:"float 3s ease-in-out infinite",display:"inline-block",marginBottom:8 }}>👑</div>
+      <div style={{ fontSize:9,fontWeight:700,letterSpacing:"0.22em",textTransform:"uppercase",background:"linear-gradient(90deg,#f5c842,#3b82f6,#10b981)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",marginBottom:12 }}>Historisk prestasjon · The Treble</div>
+      <div style={{ fontFamily:"'Bebas Neue',cursive",fontSize:"clamp(56px,10vw,96px)",letterSpacing:"0.04em",lineHeight:1,background:"linear-gradient(135deg,#f5c842 0%,#3b82f6 50%,#10b981 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",marginBottom:12 }}>{name}</div>
+      <div style={{ fontSize:13,color:"rgba(255,255,255,0.35)",fontStyle:"italic",marginBottom:28 }}>Ukens vinner · Flest MVP-dager · Totalledelse — i samme uke</div>
+      <div style={{ display:"flex",justifyContent:"center",gap:40 }}>
+        {[["🥇","Ukens vinner"],["⭐","MVP-leder"],["📈","Totalledelse"]].map(([ic,lb]) => (
+          <div key={lb} style={{ textAlign:"center" }}>
+            <div style={{ fontSize:22,marginBottom:5 }}>{ic}</div>
+            <div style={{ fontSize:9,fontWeight:700,letterSpacing:"0.14em",textTransform:"uppercase",color:"rgba(255,255,255,0.3)" }}>{lb}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function WinnerCard({ w, label, top, goldVal }) {
+  return (
+    <Card top={top}>
+      <div style={{ fontSize:9,fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"rgba(255,255,255,0.28)",marginBottom:16 }}>{label}</div>
+      <div style={{ display:"flex",alignItems:"center",gap:14,marginBottom:18 }}>
+        <Avatar name={w.name} loc={w.loc} size={54} />
+        <div>
+          <div style={{ fontFamily:"'Bebas Neue',cursive",fontSize:"clamp(30px,5vw,46px)",letterSpacing:"0.03em",lineHeight:1,marginBottom:4 }}>{w.name}</div>
+          <div style={{ fontSize:11,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",color:dc(w.loc) }}>{dl(w.loc)}</div>
+        </div>
+      </div>
+      <div style={{ display:"flex",gap:24 }}>
+        {[{v:w.poeng,l:"poeng",c:goldVal?"#f5c842":A},{v:w.salg,l:"salg"},{v:w.finansiert,l:"finansiert"}].map(({v,l,c})=>(
+          <div key={l}>
+            <div style={{ fontFamily:"'Bebas Neue',cursive",fontSize:32,lineHeight:1,color:c||"rgba(255,255,255,0.8)" }}>{v}</div>
+            <div style={{ fontSize:9,fontWeight:700,letterSpacing:"0.12em",textTransform:"uppercase",color:"rgba(255,255,255,0.25)",marginTop:2 }}>{l}</div>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+function Top5({ ranked }) {
+  const medals = ["🥇","🥈","🥉"];
+  return (
+    <Card top={`linear-gradient(90deg,${A},rgba(59,130,246,0.4))`} mb={12}>
+      {ranked.slice(0,5).map((s,i) => (
+        <div key={s.name} style={{ display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 0",borderBottom:i<Math.min(ranked.length,5)-1?"1px solid rgba(59,130,246,0.08)":"none" }}>
+          <div style={{ display:"flex",alignItems:"center",gap:12 }}>
+            <div style={{ width:22,textAlign:"center",fontSize:i<3?16:12,color:"rgba(255,255,255,0.3)",fontFamily:"'Bebas Neue',cursive" }}>{medals[i]||`${i+1}`}</div>
+            <Avatar name={s.name} loc={s.loc} size={34} />
+            <div>
+              <div style={{ fontSize:14,fontWeight:600 }}>{s.name}</div>
+              <div style={{ fontSize:10,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",color:dc(s.loc),marginTop:1 }}>{dl(s.loc)}</div>
+            </div>
+          </div>
+          <div style={{ textAlign:"right" }}>
+            <div style={{ fontFamily:"'Bebas Neue',cursive",fontSize:22,lineHeight:1,color:i===0?"#f5c842":"#fff" }}>{s.poeng}</div>
+            <div style={{ fontSize:9,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",color:"rgba(255,255,255,0.22)",marginTop:2 }}>{s.salg} salg · {s.finansiert} fin.</div>
+          </div>
+        </div>
+      ))}
+    </Card>
+  );
+}
+
+function MVPCard({ mvp }) {
+  return (
+    <Card top="linear-gradient(90deg,#f5c842,#e8a820)" mb={12}>
+      <div style={{ fontSize:9,fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"rgba(255,255,255,0.28)",marginBottom:14 }}>⭐ Flest MVP-dager denne uken</div>
+      <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",gap:16,flexWrap:"wrap" }}>
+        <div style={{ display:"flex",alignItems:"center",gap:14 }}>
+          <Avatar name={mvp.name} loc={mvp.loc} size={50} />
+          <div>
+            <div style={{ fontFamily:"'Bebas Neue',cursive",fontSize:"clamp(24px,4vw,38px)",letterSpacing:"0.03em",lineHeight:1,marginBottom:4 }}>{mvp.name}</div>
+            <div style={{ fontSize:11,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",color:dc(mvp.loc) }}>{dl(mvp.loc)}</div>
+            <div style={{ display:"flex",gap:5,marginTop:10,flexWrap:"wrap" }}>
+              {mvp.days.map((day,i) => (
+                <div key={day} style={{ width:9,height:9,borderRadius:"50%",background:mvp.mvpDays[i]?"#f5c842":"rgba(255,255,255,0.1)",boxShadow:mvp.mvpDays[i]?"0 0 7px rgba(245,200,66,0.6)":"none" }} />
+              ))}
+            </div>
+          </div>
+        </div>
+        <div style={{ textAlign:"right" }}>
+          <div style={{ fontFamily:"'Bebas Neue',cursive",fontSize:48,lineHeight:1,color:"#f5c842" }}>{mvp.count}</div>
+          <div style={{ fontSize:9,fontWeight:700,letterSpacing:"0.12em",textTransform:"uppercase",color:"rgba(255,255,255,0.28)" }}>dager som MVP</div>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function App() {
+  const [sales,   setSales]   = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error,   setError]   = useState(null);
+
+  const { year, week }  = getLastWeek();
+  const { start, end }  = weekDates(year, week);
+  const compStartWeek   = isoWeek(new Date("2026-05-04"));
+  const compStartYear   = new Date("2026-05-04").getFullYear();
+  const showTotal       = !(year === compStartYear && week === compStartWeek);
+
+  useEffect(() => {
+    fetch(`${SB_URL}/rest/v1/sales?deleted=eq.false&select=*`, {
+      headers:{ apikey:SB_KEY, Authorization:`Bearer ${SB_KEY}` }
+    })
+    .then(r=>r.json())
+    .then(d=>{ setSales(d); setLoading(false); })
+    .catch(e=>{ setError(e.message); setLoading(false); });
+  }, []);
+
+  const weekSales   = sales.filter(s=>s.ts&&new Date(s.ts)>=start&&new Date(s.ts)<=end);
+  const ranked      = rankSales(weekSales);
+  const winner      = ranked[0];
+  const mvp         = getMVP(weekSales);
+  const totalLeader = showTotal ? rankSales(sales)[0] : null;
+  const isTreble    = showTotal && mvp && winner && winner.name===mvp.name && winner.name===totalLeader?.name;
+
+  return (
+    <div style={{ minHeight:"100vh",background:`radial-gradient(ellipse 100% 40% at 50% 0%,rgba(59,130,246,0.08),transparent 50%),${BG}`,color:"#fff",fontFamily:"'DM Sans',sans-serif",display:"flex",flexDirection:"column",alignItems:"center",padding:"40px 16px 80px" }}>
+
+      {/* Header */}
+      <div style={{ textAlign:"center",marginBottom:36 }}>
+        <div style={{ display:"inline-flex",alignItems:"center",gap:6,background:AD,border:"1px solid rgba(59,130,246,0.25)",borderRadius:100,fontSize:10,fontWeight:700,letterSpacing:"0.14em",textTransform:"uppercase",color:A,padding:"5px 16px",marginBottom:18 }}>
+          🏆 VCSO Championship 2026
+        </div>
+
+        <div style={{ display:"flex",alignItems:"baseline",justifyContent:"center",gap:14,marginBottom:6 }}>
+          <div style={{ fontFamily:"'Bebas Neue',cursive",fontSize:"clamp(44px,7vw,72px)",letterSpacing:"0.04em",lineHeight:1 }}>Ukesrecap</div>
+          <div style={{ fontFamily:"'Bebas Neue',cursive",fontSize:"clamp(44px,7vw,72px)",letterSpacing:"0.04em",lineHeight:1,color:A }}>#{week}</div>
+        </div>
+
+        <div style={{ fontSize:12,color:"rgba(255,255,255,0.3)",letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:10 }}>
+          {fmt(start)} – {fmt(end)}
+        </div>
+
+        <div style={{ display:"inline-flex",alignItems:"center",gap:7,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:100,padding:"4px 14px" }}>
+          <div style={{ width:6,height:6,borderRadius:"50%",background:"#22c55e",boxShadow:"0 0 6px rgba(34,197,94,0.7)" }} />
+          <span style={{ fontSize:10,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",color:"rgba(255,255,255,0.3)" }}>Oppdateres neste mandag</span>
+        </div>
+      </div>
+
+      <div style={{ width:"100%",maxWidth:700 }}>
+        {loading && <div style={{ display:"flex",flexDirection:"column",alignItems:"center",gap:16,padding:"80px 20px",color:"rgba(255,255,255,0.3)",fontSize:12,letterSpacing:"0.1em",textTransform:"uppercase" }}><div className="spin"/>Henter data...</div>}
+        {error   && <div style={{ textAlign:"center",padding:60,color:"#f87171",fontSize:13 }}>Feil: {error}</div>}
+
+        {!loading && !error && weekSales.length===0 && (
+          <div style={{ textAlign:"center",padding:60,color:"rgba(255,255,255,0.3)",fontStyle:"italic",fontSize:14 }}>Ingen salg registrert i uke {week}.</div>
+        )}
+
+        {!loading && !error && weekSales.length>0 && <>
+          {isTreble && <TrebleBanner name={winner.name} />}
+
+          <Label mt={0}>🥇 Ukens vinner</Label>
+          <WinnerCard w={winner} label="Flest poeng denne uken" top="linear-gradient(90deg,#f5c842,#e8a820)" goldVal />
+
+          <Label>📊 Topp 5 denne uken</Label>
+          <Top5 ranked={ranked} />
+
+          {mvp && <><Label>⭐ Flest MVP-dager</Label><MVPCard mvp={mvp} /></>}
+
+          {showTotal && totalLeader && <>
+            <div style={{ height:1,background:"rgba(59,130,246,0.1)",margin:"24px 0 18px" }} />
+            <Label mt={0}>📈 Totalledelse hittil</Label>
+            <WinnerCard w={totalLeader} label="Leder sammenlagt" top={`linear-gradient(90deg,${A},rgba(59,130,246,0.4))`} goldVal={false} />
+          </>}
+        </>}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
