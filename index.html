@@ -1132,7 +1132,7 @@ function renderInd() {
         + '<div class="name-sub">'+(LL[r.loc]||r.loc)+'</div>'
       + '</div>'
       + '<div class="sc">'+r.g+'</div>'
-      + '<div class="sc pts">'+r.pts+'</div>'+(r.wk>0?'<div class="sc" style="opacity:.45;font-size:10px">('+r.wk+')</div>':'')
+      + '<div class="sc pts" style="line-height:1">'+r.pts+(r.wk>0?'<br><span style="font-size:8px;opacity:.4;font-weight:400">('+r.wk+')</span>':'')+'</div>'
       + '<div><div class="form-dots">'+selgerDots(r.navn)+'</div></div>'
       + (function(){
           var already=hasHeia(r.navn);
