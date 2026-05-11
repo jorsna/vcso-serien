@@ -393,10 +393,6 @@ html, body {
   </div>
 </div>
 
-
-
-
-
 <!-- KONFETTI -->
 <div class="konfetti-wrap hide" id="konfetti"></div>
 <!-- STATUS -->
@@ -445,7 +441,6 @@ html, body {
   <button class="tab" onclick="setTab('team',this)">Avdelinger</button>
   <button class="tab" onclick="setTab('stats',this)">Statistikk</button>
   <button class="tab" onclick="setTab('scoring',this)">Scoringer</button>
-  <button class="tab" onclick="setTab('hof', this)">🏆 Hall of Fame</button>
 </div>
 
 <!-- MATCHDAY BAR -->
@@ -492,7 +487,9 @@ html, body {
   </div>
   <div id="tbl-team"></div>
   <div style="padding:10px 14px 4px;background:var(--card);border-top:1px solid var(--b1)">
-    
+    <div class="stat-title" style="font-size:16px;letter-spacing:1px">&#127942; Hall of Fame</div>
+  </div>
+  <div id="hof-container" style="padding:8px 14px 14px;background:var(--card)"></div>
   <div class="form-legend">
     <div class="fl"><div class="fl-dot" style="background:var(--g)"></div>I rute (100%+)</div>
     <div class="fl"><div class="fl-dot" style="background:var(--y)"></div>Solgt, men under tempo</div>
@@ -559,68 +556,111 @@ html, body {
 </div><!-- end .page -->
 
 <!-- HJELP MODAL -->
-
-
-<!-- HOF VIEW -->
-<div class="view" id="view-hof">
-  <div class="stat-title" style="font-size:16px;letter-spacing:1px">&#127942; Hall of Fame</div>
-  </div>
-  <div id="hof-container" style="padding:8px 14px 14px;background:var(--card)"></div>
-</div>
-
-<div id="help-modal" onclick="if(event.target===this)this.classList.remove('show')">
+<div class="modal-overlay" id="help-modal" onclick="if(event.target===this)this.classList.remove('show')">
   <div class="modal" style="text-align:left;max-width:520px;max-height:85vh;overflow-y:auto">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;position:sticky;top:0;background:var(--card);padding-bottom:10px;border-bottom:1px solid var(--b1)">
       <div style="font-family:'Anton',sans-serif;font-size:20px;color:var(--gold)">&#9432; Slik bruker du VCSO Championship</div>
-      <button onclick="document.getElementById('help-modal').classList.remove('show')" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;flex-shrink:0">&times;</button>
+      <button onclick="document.getElementById('help-modal').classList.remove('show')"
+        style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;flex-shrink:0">&times;</button>
     </div>
     <div style="display:flex;flex-direction:column;gap:0;font-size:13px;color:var(--muted);line-height:1.6">
 
+      <!-- REGISTRERING -->
       <div style="padding:12px 0;border-bottom:1px solid var(--b1)">
         <div style="font-family:'Anton',sans-serif;font-size:14px;color:var(--gold);letter-spacing:1px;margin-bottom:8px">REGISTRER ET SALG</div>
-        <div style="display:flex;flex-direction:column;gap:6px"><div style="display:flex;gap:10px;align-items:flex-start">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;gap:10px;align-items:flex-start">
             <div style="background:var(--gold);color:#000;font-family:'Anton',sans-serif;font-size:11px;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">1</div>
-            <div><strong style="color:var(--txt)">Velg selger</strong> – finn ditt navn i nedtrekksmenyen.</div>
-          </div><div style="display:flex;gap:10px;align-items:flex-start">
+            <div><strong style="color:var(--txt)">Velg selger</strong> – finn ditt navn i nedtrekksmenyen. Avdeling hentes automatisk.</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
             <div style="background:var(--gold);color:#000;font-family:'Anton',sans-serif;font-size:11px;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">2</div>
-            <div><strong style="color:var(--txt)">Velg modell</strong> – EX30, XC40/EX40, EX90, EC40, ES90, XC60 eller XC90.</div>
-          </div><div style="display:flex;gap:10px;align-items:flex-start">
+            <div><strong style="color:var(--txt)">Velg modell</strong> – EX30, EX40, EX60, EX90, EC40, ES90, XC40, XC60 eller XC90.</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
             <div style="background:var(--gold);color:#000;font-family:'Anton',sans-serif;font-size:11px;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">3</div>
-            <div><strong style="color:var(--txt)">Finansiert?</strong> – huk av om kunden valgte finansiering. Gir gyllent &#9670; FINANSIERT-stempel og tiebreaker ved likt antall salg.</div>
-          </div><div style="display:flex;gap:10px;align-items:flex-start">
+            <div><strong style="color:var(--txt)">Finansiert?</strong> – huk av boksen nederst i skjemaet om kunden valgte finansiering. Bilen f&#229;r et gyllent <span style="color:var(--gold);font-weight:700">&#9670; FINANSIERT</span>-stempel i Scoringer-fanen.</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
             <div style="background:var(--gold);color:#000;font-family:'Anton',sans-serif;font-size:11px;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">4</div>
-            <div><strong style="color:var(--txt)">Trykk den gule knappen</strong> – salget lagres og vises for alle umiddelbart. Konfetti!</div>
-          </div></div>
+            <div><strong style="color:var(--txt)">Trykk den gule knappen</strong> – salget lagres umiddelbart og vises for alle. Konfetti!</div>
+          </div>
+        </div>
+        <div style="margin-top:8px;padding:7px 10px;background:rgba(239,68,68,.1);border-left:3px solid var(--r);border-radius:3px;font-size:11px;color:var(--r);font-weight:600">
+          Bilen m&#229; leveres innen 30. juni 2026 for &#229; telle i konkurransen.
+        </div>
       </div>
 
+      <!-- FANENE -->
       <div style="padding:12px 0;border-bottom:1px solid var(--b1)">
         <div style="font-family:'Anton',sans-serif;font-size:14px;color:var(--gold);letter-spacing:1px;margin-bottom:8px">FANENE</div>
-        <div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;gap:10px">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;gap:10px">
             <div style="background:var(--b1);color:var(--gold);font-family:'Anton',sans-serif;font-size:10px;padding:2px 8px;border-radius:3px;flex-shrink:0;white-space:nowrap;height:fit-content;margin-top:2px">SELGERE</div>
-            <div>Individuell rangering for alle 15 selgere sortert etter poeng. Viser m&#229;l, poeng og form siste 5 dager. Hold musepekeren over en selger for &#229; se spillerkort.</div>
-          </div><div style="display:flex;gap:10px">
+            <div>Individuell poengrangering for alle 15 selgere. Sortert etter poeng. Viser salg, poeng og form-prikker for de siste 5 dagene. Selgere med salg tre dager p&#229; rad f&#229;r flamme-ikon &#128293;.</div>
+          </div>
+          <div style="display:flex;gap:10px">
             <div style="background:var(--b1);color:var(--gold);font-family:'Anton',sans-serif;font-size:10px;padding:2px 8px;border-radius:3px;flex-shrink:0;white-space:nowrap;height:fit-content;margin-top:2px">AVDELINGER</div>
-            <div>Ryen, Fornebu og Lillestr&#248;m med fremgangsbar mot m&#229;let. Gr&#248;nn = i rute, gul = bak, r&#248;d = langt bak.</div>
-          </div><div style="display:flex;gap:10px">
+            <div>Ryen, Fornebu og Lillestr&#248;m med fremgangsbar mot m&#229;let. Gr&#248;nn = i rute, gul = bak, r&#248;d = langt bak. Form-prikker viser om avdelingen selger nok daglig.</div>
+          </div>
+          <div style="display:flex;gap:10px">
             <div style="background:var(--b1);color:var(--gold);font-family:'Anton',sans-serif;font-size:10px;padding:2px 8px;border-radius:3px;flex-shrink:0;white-space:nowrap;height:fit-content;margin-top:2px">STATISTIKK</div>
-            <div>Toppscorerliste, aktivitet siste 5 dager og avdelingens fremgang mot m&#229;let.</div>
-          </div><div style="display:flex;gap:10px">
+            <div>Toppscorerliste med profilbilde og mini-bar, aktivitet siste 5 dager per selger, og avdelingens totale fremgang mot m&#229;let.</div>
+          </div>
+          <div style="display:flex;gap:10px">
             <div style="background:var(--b1);color:var(--gold);font-family:'Anton',sans-serif;font-size:10px;padding:2px 8px;border-radius:3px;flex-shrink:0;white-space:nowrap;height:fit-content;margin-top:2px">SCORINGER</div>
-            <div>Alle solgte biler med modellbilde, selger og tidspunkt. Nyeste &#248;verst. Feilregistreringer slettes herfra.</div>
-          </div><div style="display:flex;gap:10px">
-            <div style="background:var(--b1);color:var(--gold);font-family:'Anton',sans-serif;font-size:10px;padding:2px 8px;border-radius:3px;flex-shrink:0;white-space:nowrap;height:fit-content;margin-top:2px">HALL OF FAME</div>
-            <div>Ukens vinnere k&#229;res s&#248;ndag kl. 23:59. Vinneren og hat-trick-helter vises med bilde. Hat-trick i inneværende uke vises umiddelbart.</div>
-          </div></div>
+            <div>Alle solgte biler med modellbilde, selgernavn, avdeling og tidspunkt. Nyeste bil &#248;verst. Filtrer per avdeling med knappene &#248;verst. Feilregistreringer kan slettes herfra.</div>
+          </div>
+        </div>
       </div>
 
+      <!-- FORM-PRIKKER -->
+      <div style="padding:12px 0;border-bottom:1px solid var(--b1)">
+        <div style="font-family:'Anton',sans-serif;font-size:14px;color:var(--gold);letter-spacing:1px;margin-bottom:8px">FORM-PRIKKER – SISTE 5 DAGER</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="display:flex;gap:10px;align-items:center">
+            <div style="width:13px;height:13px;border-radius:50%;background:var(--g);flex-shrink:0"></div>
+            <div><strong style="color:var(--txt)">Gr&#248;nn selger</strong> – solgt minst &#233;n bil denne dagen.</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <div style="width:13px;height:13px;border-radius:50%;background:var(--r);flex-shrink:0"></div>
+            <div><strong style="color:var(--txt)">R&#248;d selger</strong> – ingen salg registrert denne dagen.</div>
+          </div>
+          <div style="height:1px;background:var(--b1);margin:4px 0"></div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <div style="width:13px;height:13px;border-radius:50%;background:var(--g);flex-shrink:0"></div>
+            <div><strong style="color:var(--txt)">Gr&#248;nn avdeling</strong> – selger nok til &#229; holde daglig tempo mot m&#229;let.</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <div style="width:13px;height:13px;border-radius:50%;background:var(--y);flex-shrink:0"></div>
+            <div><strong style="color:var(--txt)">Gul avdeling</strong> – solgt biler, men ikke nok til &#229; holde tempo.</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <div style="width:13px;height:13px;border-radius:50%;background:var(--r);flex-shrink:0"></div>
+            <div><strong style="color:var(--txt)">R&#248;d avdeling</strong> – ingen salg registrert denne dagen.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SPESIALFUNKSJONER -->
       <div style="padding:12px 0;border-bottom:1px solid var(--b1)">
         <div style="font-family:'Anton',sans-serif;font-size:14px;color:var(--gold);letter-spacing:1px;margin-bottom:8px">SPESIALFUNKSJONER</div>
-        <div style="display:flex;flex-direction:column;gap:7px"><div><strong style="color:var(--txt)">&#128081; Dagens MVP</strong> – selgeren med flest salg i dag. Ved likt teller finansierte salg. Er det fortsatt likt vises begge som Delt MVP.</div><div><strong style="color:var(--txt)">&#128293; Streak</strong> – tre dager p&#229; rad med salg gir flamme-ikon. Bevares over helger.</div><div><strong style="color:var(--txt)">&#11088; Hat-trick</strong> – 3 eller flere biler p&#229; én dag. Gir gullstjerne bak navnet og vises umiddelbart i Hall of Fame.</div><div><strong style="color:var(--txt)">&#128276; Push-varsler</strong> – f&#229; varsel p&#229; telefonen n&#229;r noen scorer.</div><div><strong style="color:var(--txt)">&#128101; Tilskuer</strong> – se tabellen uten &#229; logge inn med selgerpassord.</div><div><strong style="color:var(--txt)">&#128260; Live-oppdatering</strong> – henter nye data hvert 2. minutt automatisk.</div></div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div><strong style="color:var(--txt)">&#128081; Dagens MVP</strong> – selgeren med flest salg i dag vises &#248;verst med krone og profilbilde. Ved likt antall teller finansierte salg. Er det fortsatt likt, vises begge som Delt MVP.</div>
+          <div><strong style="color:var(--txt)">&#128293; Streak</strong> – Selgere med salg tre dager p&#229; rad f&#229;r flamme-ikon ved siden av navnet. Streaken bevares over helger.</div>
+          <div><strong style="color:var(--txt)">&#11088; Hat-trick</strong> &#8211; Scorer du 3 eller flere biler p&#229; &#233;n dag f&#229;r du en hat-trick! For hvert hat-trick f&#229;r du en gullstjerne &#11088; bak navnet ditt i tabellen. Du kan samle flere stjerner gjennom hele konkurransen.</div>
+          <div><strong style="color:var(--txt)">&#128276; Push-varsler</strong> – godtar du varsler f&#229;r du en notifikasjon p&#229; telefonen n&#229;r noen scorer. Sp&#248;r nettleseren ved f&#248;rste bes&#248;k.</div>
+          <div><strong style="color:var(--txt)">Live-oppdatering</strong> – siden henter nye data hvert 2. minutt. Du trenger ikke refreshe manuelt.</div>
+        </div>
       </div>
 
+      <!-- SLETT OG BACKUP -->
       <div style="padding:12px 0">
-        <div style="font-family:'Anton',sans-serif;font-size:14px;color:var(--gold);letter-spacing:1px;margin-bottom:8px">SLETT FEILREGISTRERING</div>
-        <div>G&#229; til Scoringer-fanen, hold musen over bilkortet og trykk &laquo;Slett&raquo;. Bekreft i dialogboksen. Kun selgere med passord kan slette.</div>
+        <div style="font-family:'Anton',sans-serif;font-size:14px;color:var(--gold);letter-spacing:1px;margin-bottom:8px">SLETT OG BACKUP</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div><strong style="color:var(--txt)">Slette en feilregistrering</strong> – g&#229; til Scoringer-fanen, hold musen over bilkortet og trykk &laquo;Slett&raquo;. Bekreft i dialogboksen. Kun selgere med passord kan slette.</div>
+
+        </div>
       </div>
 
     </div>
@@ -1398,7 +1438,7 @@ function renderScoring() {
 
 function renderAll() {
   if      (curTab==='ind')     renderInd();
-  else if (curTab==='team' || curTab==='hof')    renderTeam();
+  else if (curTab==='team')    renderTeam();
   else if (curTab==='stats')   renderStats();
   else if (curTab==='scoring') renderScoring();
   updateMVP();
