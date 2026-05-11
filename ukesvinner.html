@@ -102,6 +102,43 @@ function getWeekWinners(ranked) {
   return ranked.filter(r => r.poeng === top.poeng && r.finansiert === top.finansiert);
 }
 
+
+function getBestDept(ws) {
+  const deptSales = {};
+  ws.forEach(s => {
+    // Find loc from name
+    const loc = s.loc || '';
+    if (!loc) return;
+    deptSales[loc] = (deptSales[loc]||0) + 1;
+  });
+  if (Object.keys(deptSales).length === 0) return null;
+  const max = Math.max(...Object.values(deptSales));
+  const best = Object.keys(deptSales).filter(k => deptSales[k] === max);
+  return { locs: best, count: max };
+}
+
+function DeptCard({ result }) {
+  if (!result) return null;
+  return (
+    <Card top="linear-gradient(90deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02))">
+      <div style={{ fontSize:9,fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"rgba(255,255,255,0.28)",marginBottom:16 }}>
+        🏟️ Beste forhandler denne uken
+      </div>
+      {result.locs.map((loc, i) => (
+        <div key={loc} style={{ display:"flex",alignItems:"center",gap:14,marginBottom: i < result.locs.length-1 ? 12 : 0 }}>
+          <div style={{ width:48,height:48,borderRadius:"50%",background:DEPT[loc]?.bg||AD,border:`2px solid ${dc(loc)}`,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Bebas Neue',cursive",fontSize:16,color:dc(loc),flexShrink:0 }}>
+            {(DEPT[loc]?.label||loc).slice(0,2).toUpperCase()}
+          </div>
+          <div>
+            <div style={{ fontFamily:"'Bebas Neue',cursive",fontSize:32,letterSpacing:"0.03em",lineHeight:1,color:dc(loc) }}>{DEPT[loc]?.label||loc}</div>
+            <div style={{ fontSize:11,color:"rgba(255,255,255,0.3)",marginTop:2 }}>{result.count} salg denne uken</div>
+          </div>
+        </div>
+      ))}
+    </Card>
+  );
+}
+
 function getMVPs(ws) {
   const bd = {};
   ws.forEach(s => {
@@ -305,6 +342,7 @@ function App() {
   const ranked      = rankSales(weekSales);
   const winners     = getWeekWinners(ranked);
   const mvps        = getMVPs(weekSales);
+  const bestDept    = getBestDept(weekSales);
   const totalRanked = showTotal ? rankSales(sales) : [];
   const totalLeaders = showTotal ? getWeekWinners(totalRanked) : [];
   // Treble: single winner who also has the most MVP days AND leads total — no ties
@@ -353,6 +391,8 @@ function App() {
           <Top5 ranked={ranked} />
 
           {mvps.length>0 && <><Label>⭐ Flest MVP-dager</Label><MVPCard mvps={mvps} /></>}
+
+          {bestDept && <><Label>🏟️ Beste forhandler</Label><DeptCard result={bestDept} /></>}
 
           {showTotal && totalLeaders.length>0 && <>
             <div style={{ height:1,background:"rgba(59,130,246,0.1)",margin:"24px 0 18px" }} />
