@@ -1124,15 +1124,15 @@ function renderInd() {
     var avHtml = hasPhoto
       ? '<img src="'+SELGER_PHOTOS[r.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">'
       : r.initials;
-    return '<div class="trow zm" style="animation-delay:'+(i*0.03)+'s">'
+    return '<div class="trow zm" data-navn="'+r.navn+'" style="animation-delay:'+(i*0.03)+'s">'
       + '<div class="pos-n" style="color:'+pc+';font-size:'+(isTied?'11px':'13px')+'">'+(rankLabel)+'</div>'
       + '<div><div class="av" style="background:'+r.bg+';color:'+r.color+';overflow:hidden;padding:0">'+avHtml+'</div></div>'
       + '<div class="name-c">'
         + '<div class="name-main">'+r.navn+(r.wk>0?' <span style="opacity:.4;font-size:10px;font-weight:400">('+r.wk+')</span>':'')+(ht>0?' '+Array(Math.min(ht,5)+1).join('&#11088;'):'')+(sk>=3?' &#128293;':'')+'</div>'
         + '<div class="name-sub">'+(LL[r.loc]||r.loc)+'</div>'
       + '</div>'
-      + '<div class="sc">'+r.g+'</div>'
-      + '<div class="sc pts" style="line-height:1">'+r.pts+(r.wk>0?'<br><span style="font-size:8px;opacity:.4;font-weight:400">('+r.wk+')</span>':'')+'</div>'
+      + '<div class="sc" style="line-height:1">'+r.g+(r.wk>0?'<br><span style="font-size:8px;opacity:.4;font-weight:400">('+r.wk+')</span>':'')+'</div>'
+      + '<div class="sc pts">'+r.pts+'</div>'
       + '<div><div class="form-dots">'+selgerDots(r.navn)+'</div></div>'
       + (function(){
           var already=hasHeia(r.navn);
