@@ -1228,9 +1228,13 @@ function renderTeam() {
       var d = new Date(s.ts);
       var wn = getWeekNum(d);
       var key = wn + '_' + d.getFullYear();
-      if (!allWeeks[key]) allWeeks[key] = { week: wn, sales: {}, fin: {} };
+      if (!allWeeks[key]) allWeeks[key] = { week: wn, sales: {}, fin: {}, firstTs: {} };
       allWeeks[key].sales[s.selger] = (allWeeks[key].sales[s.selger]||0) + 1;
       if (s.finansiert) allWeeks[key].fin[s.selger] = (allWeeks[key].fin[s.selger]||0) + 1;
+      // Track earliest timestamp per selger per week
+      if (!allWeeks[key].firstTs[s.selger] || s.ts < allWeeks[key].firstTs[s.selger]) {
+        allWeeks[key].firstTs[s.selger] = s.ts;
+      }
     });
     var thisWeek = getWeekNum(new Date());
     var weekKeys = Object.keys(allWeeks).sort(function(a,b){
@@ -1282,7 +1286,13 @@ function renderTeam() {
         var tied = SELGERE.filter(function(s){ return (wd.sales[s.navn]||0)===bestN; });
         var bestFin = 0;
         tied.forEach(function(s){ if((wd.fin[s.navn]||0)>bestFin) bestFin=(wd.fin[s.navn]||0); });
-        var winners = tied.filter(function(s){ return (wd.fin[s.navn]||0)===bestFin; });
+        var finTied = tied.filter(function(s){ return (wd.fin[s.navn]||0)===bestFin; });
+        // Final tiebreak: earliest first timestamp (first to reach the score)
+        finTied.sort(function(a,b){
+          var ta = wd.firstTs[a.navn]||''; var tb = wd.firstTs[b.navn]||'';
+          return ta < tb ? -1 : ta > tb ? 1 : 0;
+        });
+        var winners = [finTied[0]].filter(Boolean);
         var hatDays = {};
         sales.forEach(function(x) {
           var d = new Date(x.ts);
