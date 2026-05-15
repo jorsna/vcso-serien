@@ -893,6 +893,7 @@ function updateMVP() {
   sales.forEach(function(s) { if (tsDate(s.ts) === today) counts[s.selger] = (counts[s.selger]||0) + 1; });
   var banner = document.getElementById('mvp-banner');
   if (!banner) return;
+  if (curTab === 'hof' || curTab === 'scoring') { banner.style.display = 'none'; return; }
   var bestN = 0;
   Object.keys(counts).forEach(function(n) { if (counts[n] > bestN) bestN = counts[n]; });
   if (bestN === 0) { banner.style.display = 'none'; return; }
