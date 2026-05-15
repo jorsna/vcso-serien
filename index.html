@@ -1238,9 +1238,39 @@ function renderTeam() {
     var weekKeys = Object.keys(allWeeks).sort(function(a,b){
       return parseInt(b.split('_')[0]) - parseInt(a.split('_')[0]);
     });
+    // Hat-trick inneværende uke (live)
+    var thisHatDays = {};
+    sales.forEach(function(x) {
+      if (getWeekNum(new Date(x.ts)) !== thisWeek) return;
+      var ds = tsDate(x.ts);
+      if (!thisHatDays[x.selger]) thisHatDays[x.selger] = {};
+      thisHatDays[x.selger][ds] = (thisHatDays[x.selger][ds]||0) + 1;
+    });
+    var thisHatWinners = [];
+    Object.keys(thisHatDays).forEach(function(navn) {
+      var hasHat = Object.keys(thisHatDays[navn]).some(function(d){ return thisHatDays[navn][d] >= 3; });
+      if (hasHat) { var sObj = SELGERE.find(function(x){ return x.navn===navn; }); if (sObj) thisHatWinners.push(sObj); }
+    });
+    var personCard0 = function(s) {
+      var hasPhoto = typeof SELGER_PHOTOS!=='undefined' && SELGER_PHOTOS[s.id];
+      var avInner = hasPhoto
+        ? '<img src="'+SELGER_PHOTOS[s.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">'
+        : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:'+s.color+'">'+s.initials+'</div>';
+      return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">'
+        + '<div style="width:40px;height:40px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0">'+avInner+'</div>'
+        + '<div><div style="font-size:12px;font-weight:700;color:var(--txt)">'+s.navn+'</div>'
+        + '<div style="font-size:9px;color:var(--muted)">'+(LL[s.loc]||s.loc)+'</div></div>'
+      + '</div>';
+    };
     var currentBox = '<div style="margin-bottom:14px;padding:10px 12px;background:var(--card2);border-radius:5px;border:1px solid var(--b1)">'
       + '<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:8px">Vinner uke '+thisWeek+'</div>'
-      + '<div style="font-size:11px;color:var(--muted);font-style:italic">Kåres søndag kl. 23:59</div>'
+      + '<div style="font-size:11px;color:var(--muted);font-style:italic'+(thisHatWinners.length?';margin-bottom:12px':'')+'">K\u00e5res s\u00f8ndag kl. 23:59</div>'
+      + (thisHatWinners.length
+        ? '<div style="border-top:1px solid var(--b1);padding-top:10px">'
+          + '<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px">&#9917; Hat-trick denne uken</div>'
+          + thisHatWinners.map(personCard0).join('')
+          + '</div>'
+        : '')
       + '</div>';
     var pastKeys = weekKeys.filter(function(k){ return parseInt(k.split('_')[0]) !== thisWeek; });
     if (!pastKeys.length) {
@@ -1573,6 +1603,10 @@ function setTab(tab, btn) {
   btn.classList.add('on');
   document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('on'); });
   document.getElementById('view-'+tab).classList.add('on');
+  var ro = document.getElementById('reg-outer');
+  if (ro && userRole === 'selger') {
+    ro.style.display = (tab === 'hof' || tab === 'tips') ? 'none' : 'block';
+  }
   renderAll();
 }
 function setMonth(m, btn) {
