@@ -114,16 +114,8 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .tabs{display:flex;background:var(--card);border-bottom:1px solid var(--b1)}
 .tab{flex:1;padding:10px 0;font-size:11px;font-weight:700;border:none;background:transparent;
   color:var(--muted);cursor:pointer;font-family:'Barlow',sans-serif;
-  border-bottom:3px solid transparent;transition:all .2s;text-transform:uppercase;letter-spacing:.5px;
-  display:flex;flex-direction:column;align-items:center;gap:3px}
+  border-bottom:3px solid transparent;transition:all .2s;text-transform:uppercase;letter-spacing:.5px}
 .tab.on{color:var(--gold);border-bottom-color:var(--gold)}
-.tab-icon{font-size:16px;line-height:1}
-.tab-label{font-size:10px}
-@media(max-width:520px){
-  .tab-label{display:none}
-  .tab{padding:10px 0}
-  .tab-icon{font-size:18px}
-}
 
 /* MATCHDAY BAR */
 .mbar{background:var(--card);border-bottom:1px solid var(--b1);padding:9px 16px;
@@ -288,28 +280,6 @@ select:focus,input[type=text]:focus{border-color:var(--gold)}
 .modal-confirm{flex:1;padding:9px;font-size:12px;font-weight:700;background:var(--r);
   color:#fff;border:none;border-radius:4px;cursor:pointer;font-family:'Barlow',sans-serif}
 
-/* HJELP MODAL */
-#help-modal{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;
-  display:flex;align-items:center;justify-content:center;
-  opacity:0;pointer-events:none;transition:opacity .2s}
-#help-modal.show{opacity:1;pointer-events:all}
-
-/* TIPS */
-.tips-btn{background:var(--card);border:1px solid var(--b1);border-radius:5px;padding:10px;cursor:pointer;text-align:left;width:100%;transition:border-color .15s,background .15s}
-.tips-btn:hover{background:var(--card2);border-color:var(--gold)}
-.tips-btn.on{border:2px solid var(--gold);background:var(--card2)}
-.tips-btn-icon{font-size:16px;margin-bottom:4px}
-.tips-btn-label{font-size:12px;font-weight:700;color:var(--txt);line-height:1.3}
-.tips-btn-sub{font-size:10px;color:var(--muted);margin-top:2px}
-.tips-arg{background:var(--card);border:1px solid var(--b1);border-radius:5px;padding:10px 12px;margin-bottom:8px}
-.tips-arg-top{display:flex;align-items:flex-start;gap:8px;margin-bottom:4px}
-.tips-arg-num{min-width:20px;height:20px;border-radius:50%;background:var(--card2);border:1px solid var(--b1);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--muted);flex-shrink:0;margin-top:1px}
-.tips-arg-title{font-size:12px;font-weight:700;color:var(--txt);line-height:1.35}
-.tips-arg-body{font-size:11px;color:var(--muted);line-height:1.6;padding-left:28px}
-.tips-closer{margin-top:12px;padding:10px 12px;background:var(--card2);border-left:2px solid var(--g);margin-bottom:16px}
-.tips-closer-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--g);margin-bottom:3px}
-.tips-closer-text{font-size:11px;color:var(--txt);line-height:1.55;font-style:italic}
-
 /* MOBIL-FIKS */
 html, body {
   overflow-x: hidden;
@@ -471,12 +441,12 @@ html, body {
 
 <!-- TABS -->
 <div class="tabs">
-  <button class="tab on" onclick="setTab('ind',this)"><span class="tab-icon">⚽</span><span class="tab-label">Selgere</span></button>
-  <button class="tab" onclick="setTab('team',this)"><span class="tab-icon">🏟️</span><span class="tab-label">Avdelinger</span></button>
-  <button class="tab" onclick="setTab('stats',this)"><span class="tab-icon">📊</span><span class="tab-label">Statistikk</span></button>
-  <button class="tab" onclick="setTab('scoring',this)"><span class="tab-icon">🚗</span><span class="tab-label">Scoringer</span></button>
-  <button class="tab" onclick="setTab('hof',this)"><span class="tab-icon">🏆</span><span class="tab-label">Hall of Fame</span></button>
-  <button class="tab" onclick="setTab('tips',this)"><span class="tab-icon">💡</span><span class="tab-label">Salgsverktøy</span></button>
+  <button class="tab on" onclick="setTab('ind',this)">Selgere</button>
+  <button class="tab" onclick="setTab('team',this)">Avdelinger</button>
+  <button class="tab" onclick="setTab('stats',this)">Statistikk</button>
+  <button class="tab" onclick="setTab('scoring',this)">Scoringer</button>
+  <button class="tab" onclick="setTab('hof', this)">🏆 Hall of Fame</button>
+  <button class="tab" onclick="setTab('tips', this)">💡 Salgsverktøy</button>
 </div>
 
 <!-- MATCHDAY BAR -->
@@ -523,12 +493,12 @@ html, body {
   </div>
   <div id="tbl-team"></div>
   <div style="padding:10px 14px 4px;background:var(--card);border-top:1px solid var(--b1)">
-    <div class="form-legend">
-      <div class="fl"><div class="fl-dot" style="background:var(--g)"></div>I rute (100%+)</div>
-      <div class="fl"><div class="fl-dot" style="background:var(--y)"></div>Solgt, men under tempo</div>
-      <div class="fl"><div class="fl-dot" style="background:var(--b1)"></div>Ingen salg denne uken</div>
-      <div class="fl" style="margin-left:auto;font-size:9px;color:var(--muted)">Innrammet = innev&#230;rende uke</div>
-    </div>
+    
+  <div class="form-legend">
+    <div class="fl"><div class="fl-dot" style="background:var(--g)"></div>I rute (100%+)</div>
+    <div class="fl"><div class="fl-dot" style="background:var(--y)"></div>Solgt, men under tempo</div>
+    <div class="fl"><div class="fl-dot" style="background:var(--b1)"></div>Ingen salg denne uken</div>
+    <div class="fl" style="margin-left:auto;font-size:9px;color:var(--muted)">Innrammet = innev&#230;rende uke</div>
   </div>
 </div>
 
@@ -556,22 +526,6 @@ html, body {
     </div>
   </div>
   <div class="scoring-grid" id="scoring-grid"></div>
-</div>
-
-<!-- HOF VIEW -->
-<div class="view" id="view-hof">
-  <div class="stat-title" style="font-size:16px;letter-spacing:1px">&#127942; Hall of Fame</div>
-  <div id="hof-container" style="padding:8px 14px 14px;background:var(--card)"></div>
-</div>
-
-<!-- TIPS VIEW -->
-<div class="view" id="view-tips">
-  <div style="padding:14px 14px 0">
-    <div class="stat-title" style="font-size:13px;letter-spacing:.5px;margin-bottom:4px">&#128161; Innvendingsh&#229;ndterer</div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Trykk p&#229; en innvending for &#229; se argumenter og closing-sp&#248;rsm&#229;l</div>
-    <div id="tips-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px"></div>
-    <div id="tips-panel"></div>
-  </div>
 </div>
 
 <!-- REGISTER (hidden for guests) -->
@@ -606,6 +560,19 @@ html, body {
 </div><!-- end .page -->
 
 <!-- HJELP MODAL -->
+
+
+<!-- HOF VIEW -->
+<div class="view" id="view-hof">
+  <div class="stat-title" style="font-size:16px;letter-spacing:1px">&#127942; Hall of Fame</div>
+  </div>
+  <div id="hof-container" style="padding:8px 14px 14px;background:var(--card)"></div>
+</div>
+
+<!-- SALGSVERKTØY VIEW -->
+<div class="view" id="view-tips">
+  <div id="tips-container" style="padding:14px"></div>
+</div>
 
 <div id="help-modal" onclick="if(event.target===this)this.classList.remove('show')">
   <div class="modal" style="text-align:left;max-width:520px;max-height:85vh;overflow-y:auto">
@@ -651,7 +618,7 @@ html, body {
             <div>Ukens vinnere k&#229;res s&#248;ndag kl. 23:59. Vinneren og hat-trick-helter vises med bilde. Hat-trick i inneværende uke vises umiddelbart.</div>
           </div><div style="display:flex;gap:10px">
             <div style="background:var(--b1);color:var(--gold);font-family:'Anton',sans-serif;font-size:10px;padding:2px 8px;border-radius:3px;flex-shrink:0;white-space:nowrap;height:fit-content;margin-top:2px">SALGSVERKT&#216;Y</div>
-            <div>Innvendingsh&#229;ndterer med konkrete argumenter og closing-sp&#248;rsm&#229;l for 8 vanlige kundeinnvendinger.</div>
+            <div>Innvendingsh&#229;ndterer med konkrete argumenter og closing-sp&#248;rsm&#229;l for de vanligste kundeinnvendingene.</div>
           </div></div>
       </div>
 
@@ -724,6 +691,11 @@ const SELGER_PHOTOS = {
 
 
 // ─── KONFIGURASJON ───────────────────────────────────────────────────
+
+// ─── KONFIGURASJON ───────────────────────────────────────────────────
+
+
+
 var SUPABASE_URL = 'https://jffhdlmwvurnojoapcvs.supabase.co';
 var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmZmhkbG13dnVybm9qb2FwY3ZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MzIzNjcsImV4cCI6MjA5MzEwODM2N30.Mc_eKMsfR04kLmwfBeH5INn3NTYapv62Fnt0wMpBpMw';
 var API = SUPABASE_URL + '/rest/v1/sales';
@@ -926,7 +898,6 @@ function updateMVP() {
   sales.forEach(function(s) { if (tsDate(s.ts) === today) counts[s.selger] = (counts[s.selger]||0) + 1; });
   var banner = document.getElementById('mvp-banner');
   if (!banner) return;
-  if (curTab === 'hof' || curTab === 'scoring') { banner.style.display = 'none'; return; }
   var bestN = 0;
   Object.keys(counts).forEach(function(n) { if (counts[n] > bestN) bestN = counts[n]; });
   if (bestN === 0) { banner.style.display = 'none'; return; }
@@ -1261,52 +1232,17 @@ function renderTeam() {
       var d = new Date(s.ts);
       var wn = getWeekNum(d);
       var key = wn + '_' + d.getFullYear();
-      if (!allWeeks[key]) allWeeks[key] = { week: wn, sales: {}, fin: {}, firstTs: {} };
+      if (!allWeeks[key]) allWeeks[key] = { week: wn, sales: {}, fin: {} };
       allWeeks[key].sales[s.selger] = (allWeeks[key].sales[s.selger]||0) + 1;
       if (s.finansiert) allWeeks[key].fin[s.selger] = (allWeeks[key].fin[s.selger]||0) + 1;
-      // Track earliest timestamp per selger per week
-      if (!allWeeks[key].firstTs[s.selger] || s.ts < allWeeks[key].firstTs[s.selger]) {
-        allWeeks[key].firstTs[s.selger] = s.ts;
-      }
     });
     var thisWeek = getWeekNum(new Date());
     var weekKeys = Object.keys(allWeeks).sort(function(a,b){
       return parseInt(b.split('_')[0]) - parseInt(a.split('_')[0]);
     });
-    // Hat-trick inneværende uke
-    var curHatDays = {};
-    sales.forEach(function(x) {
-      var d = new Date(x.ts);
-      if (getWeekNum(d) !== thisWeek) return;
-      var ds = tsDate(x.ts);
-      if (!curHatDays[x.selger]) curHatDays[x.selger] = {};
-      curHatDays[x.selger][ds] = (curHatDays[x.selger][ds]||0) + 1;
-    });
-    var curHatWinners = [];
-    Object.keys(curHatDays).forEach(function(navn) {
-      var hasHat = Object.keys(curHatDays[navn]).some(function(d){ return curHatDays[navn][d] >= 3; });
-      if (hasHat) { var sObj = SELGERE.find(function(x){ return x.navn===navn; }); if (sObj) curHatWinners.push(sObj); }
-    });
-    var curHatCard = function(s) {
-      var hasPhoto = typeof SELGER_PHOTOS!=='undefined' && SELGER_PHOTOS[s.id];
-      var avInner = hasPhoto
-        ? '<img src="'+SELGER_PHOTOS[s.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">'
-        : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:'+s.color+'">'+s.initials+'</div>';
-      return '<div style="display:flex;align-items:center;gap:10px;margin-top:6px">'
-        + '<div style="width:40px;height:40px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0">'+avInner+'</div>'
-        + '<div><div style="font-size:12px;font-weight:700;color:var(--txt)">'+s.navn+' &#11088;</div>'
-        + '<div style="font-size:9px;color:var(--muted)">'+(LL[s.loc]||s.loc)+'</div></div>'
-      + '</div>';
-    };
     var currentBox = '<div style="margin-bottom:14px;padding:10px 12px;background:var(--card2);border-radius:5px;border:1px solid var(--b1)">'
       + '<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:8px">Vinner uke '+thisWeek+'</div>'
-      + '<div style="font-size:11px;color:var(--muted);font-style:italic">K&#229;res s&#248;ndag kl. 23:59</div>'
-      + (curHatWinners.length
-        ? '<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--b1)">'
-          + '<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--gold);margin-bottom:2px">&#9917; Hat-trick denne uken</div>'
-          + curHatWinners.map(curHatCard).join('')
-        + '</div>'
-        : '')
+      + '<div style="font-size:11px;color:var(--muted);font-style:italic">Kåres søndag kl. 23:59</div>'
       + '</div>';
     var pastKeys = weekKeys.filter(function(k){ return parseInt(k.split('_')[0]) !== thisWeek; });
     if (!pastKeys.length) {
@@ -1314,25 +1250,12 @@ function renderTeam() {
     } else {
       hof.innerHTML = currentBox + pastKeys.map(function(key) {
         var wd = allWeeks[key];
-        // Uke 19 2026: tre likestilte vinnere beholdes (gamle regler)
-        var WEEK19_WINNERS = ['Norman Elton', 'Linn Askmann-Olsen', 'Simen Olsen'];
-        var isWeek19 = (wd.week === 19 && key.indexOf('2026') !== -1);
-        var winners;
-        if (isWeek19) {
-          winners = WEEK19_WINNERS.map(function(n){ return SELGERE.find(function(s){ return s.navn === n; }); }).filter(Boolean);
-        } else {
-          var bestN = 0;
-          Object.keys(wd.sales).forEach(function(n){ if(wd.sales[n]>bestN) bestN=wd.sales[n]; });
-          var tied = SELGERE.filter(function(s){ return (wd.sales[s.navn]||0)===bestN; });
-          var bestFin = 0;
-          tied.forEach(function(s){ if((wd.fin[s.navn]||0)>bestFin) bestFin=(wd.fin[s.navn]||0); });
-          var finTied = tied.filter(function(s){ return (wd.fin[s.navn]||0)===bestFin; });
-          finTied.sort(function(a,b){
-            var ta = wd.firstTs[a.navn]||''; var tb = wd.firstTs[b.navn]||'';
-            return ta < tb ? -1 : ta > tb ? 1 : 0;
-          });
-          winners = [finTied[0]].filter(Boolean);
-        }
+        var bestN = 0;
+        Object.keys(wd.sales).forEach(function(n){ if(wd.sales[n]>bestN) bestN=wd.sales[n]; });
+        var tied = SELGERE.filter(function(s){ return (wd.sales[s.navn]||0)===bestN; });
+        var bestFin = 0;
+        tied.forEach(function(s){ if((wd.fin[s.navn]||0)>bestFin) bestFin=(wd.fin[s.navn]||0); });
+        var winners = tied.filter(function(s){ return (wd.fin[s.navn]||0)===bestFin; });
         var hatDays = {};
         sales.forEach(function(x) {
           var d = new Date(x.ts);
@@ -1364,8 +1287,8 @@ function renderTeam() {
           + '<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gold);margin-bottom:10px">Vinner uke '+wd.week+'</div>'
           + '<div style="display:grid;grid-template-columns:1fr'+(hatWinners.length?' 1fr':'')+';gap:0">'
             + '<div>'
-              + '<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px">&#128081; '+(winners.length>1?'Ukens vinnere':'Ukesvinner')+'</div>'
-              + winners.map(function(s){ return personCard(s, wd.sales[s.navn]); }).join('<div style="margin-top:8px"></div>')
+              + '<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px">&#128081; Ukesvinner</div>'
+              + winners.map(function(s){ return personCard(s, wd.sales[s.navn]); }).join('')
             + '</div>'
             + (hatWinners.length
               ? '<div style="border-left:1px solid var(--b1);padding-left:12px">'
@@ -1381,6 +1304,16 @@ function renderTeam() {
 }
 
 // ─── RENDER: STATISTIKK ──────────────────────────────────────────────
+
+// ─── UKE-HJELPER ─────────────────────────────────────────────────────
+function getWeekNum(d) {
+  var date = new Date(d);
+  date.setHours(0,0,0,0);
+  date.setDate(date.getDate() + 3 - (date.getDay()+6)%7);
+  var week1 = new Date(date.getFullYear(), 0, 4);
+  return 1 + Math.round(((date.getTime()-week1.getTime())/86400000 - 3 + (week1.getDay()+6)%7)/7);
+}
+
 function renderStats() {
   var m = curMonth;
   var scorers = SELGERE.map(function(s) {
@@ -1483,113 +1416,156 @@ function renderAll() {
   updateMVP();
 }
 
-// ─── SALGSVERKTØY ─────────────────────────────────────────────────────
+// ─── SALGSVERKTØY ────────────────────────────────────────────────────
 var TIPS_DATA = [
-  { id:'pris', icon:'💰', label:'For dyr', sub:'Prisen er for høy',
-    args:[
-      { t:'Totalkostnad, ikke månedspris', b:'En Volvo koster gjerne 3 000–5 000 kr mer i månedspris enn et rimeligere alternativ – men service, drivstoff og forsikring er ofte lavere. Regn totalsum over 5 år, ikke bare listepris.' },
-      { t:'Restverdien slår tilbake i din favør', b:'Volvo holder verdien svært godt. EX40 og XC60 er blant bilene med best restverdi i Norge. Det betyr at kunden «leier» en bil som er mer verdt når de leverer tilbake.' },
-      { t:'Finansiering gjør det håndterbart nå', b:'Med Volvo Financial Services og fleksibel restverdi kan en EX40 koste under 5 000 kr/mnd. Spør hva kunden betaler i dag – svaret overrasker dem ofte.' },
-      { t:'Sammenlign med hva de betaler nå', b:'«Hva betaler du i drivstoff per måned?» En bensin-SUV bruker gjerne 2 500–3 500 kr/mnd bare i drivstoff. Med elbil forsvinner det – det dekker mye av prisforskjellen.' }
+  {
+    id: 'pris',
+    icon: '💰',
+    label: 'For dyr',
+    sub: 'Prisen er for høy',
+    args: [
+      { t: 'Totalkostnad, ikke månedspris', b: 'En Volvo koster gjerne mer i listepris – men service, drivstoff og forsikring er ofte lavere. Regn totalsum over 5 år, ikke bare listepris. Kunden betaler for en helhet.' },
+      { t: 'Restverdien slår tilbake i din favør', b: 'Volvo holder verdien svært godt. EX40 og XC60 er blant bilene med best restverdi i Norge. Det betyr at kunden «leier» en bil som er mer verdt når de leverer tilbake – eller selger videre.' },
+      { t: 'Finansiering gjør det håndterbart nå', b: 'Med Volvo Financial Services og fleksibel restverdi kan månedsprisen overraske positivt. Spør hva kunden betaler i dag – svaret overrasker dem ofte.' },
+      { t: 'Hva er den faktiske kostnaden per dag?', b: 'Del månedsprisen på 30. For mange er det en kaffe ekstra om dagen. Sett opp mot trygghet, komfort og teknologi – er det egentlig dyrt?' }
     ],
-    closer:'«Hvis vi legger inn finansiering og regner faktisk månedskostnad inkludert strøm vs. bensin – skal vi se på det sammen?»'
+    closer: '«Hvis vi regner faktisk månedskostnad med finansiering – skal vi se på det tallene sammen?»'
   },
-  { id:'rekkevidde', icon:'🔋', label:'For kort rekkevidde', sub:'Rekker ikke langt nok',
-    args:[
-      { t:'Hvor langt kjører kunden faktisk?', b:'Gjennomsnittlig daglig kjøring i Norge er 37 km. EX40 har over 500 km rekkevidde. De fleste trenger aldri tenke på lading til hverdag – kun på helgeturer.' },
-      { t:'Lynlading er ikke det det var', b:'EX90 og EX40 støtter opp til 200 kW lynlading. På en raskpause lader de 10–80% på under 30 minutter. Strekningene mellom ladestasjoner i Norge er kortere enn de tror.' },
-      { t:'Hjemmelading løser 90% av behovet', b:'Med hjemmelader starter de hver dag med fullt batteri – som en bensinstasjon i garasjen. Rekkeviddestress gjelder kun de siste 10% av turene.' },
-      { t:'Norges infrastruktur er best i verden', b:'Norge har over 25 000 offentlige ladepunkter. IONITY, Recharge og Tesla Supercharger dekker alle store veier. Vis konkrete ruter for turer de er bekymret for.' }
+  {
+    id: 'innbytte',
+    icon: '🔄',
+    label: 'Innbyttebil',
+    sub: 'Får mer ved å selge selv',
+    args: [
+      { t: 'Enkelt og ansvarsfritt', b: 'Å selge selv tar tid – annonser, visninger, pruting, prøvekjøringer med fremmede, og ikke minst: du er ansvarlig i reklamasjonsperioden. Her bytter du inn og er ferdig.' },
+      { t: 'Ingen overraskelser i etterkant', b: 'Når kunden selger privat kan det dukke opp krav måneder etterpå. Med innbytte her er alt avklart på en gang – pris, betingelser, ansvar. Null hodepine.' },
+      { t: 'Vi er best i pris på Volvo', b: 'For en Volvo-innbytte er vi det naturlige stedet – vi kjenner bilene, vi vil ha dem, og vi kan gi en skikkelig pris. Mot en annen merke-forhandler stiller vi svakere, men på Volvo er vi konkurransedyktige.' },
+      { t: 'Tid er penger', b: 'Differansen mellom privatsalg og innbytte er gjerne noen tusenlapper. Men hva er det verdt å slippe prosessen? Annonsering, visninger, bank-id-sjekk, overlevering – alt dette forsvinner med innbytte her.' }
     ],
-    closer:'«Kan du fortelle meg den strekningen du er mest bekymret for? Jeg kan vise deg ladestopp på ruten med en gang.»'
+    closer: '«Vil du at vi tar en kikk på hva vi kan gi for den i dag? Det er uforpliktende, og du ser hva du sitter igjen med.»'
   },
-  { id:'elbil', icon:'⚡', label:'Vil ikke ha elbil', sub:'Foretrekker bensin/diesel',
-    args:[
-      { t:'Driftskostnadene er dramatisk lavere', b:'Strøm koster ca. 2–4 kr/kWh hjemme. Å kjøre 1 000 km i EX40 koster rundt 200 kr. Samme distanse med bensin: 900–1 200 kr. Det er 700–1 000 kr spart per 1 000 km.' },
-      { t:'Service er nesten ikke-eksisterende', b:'Ingen oljebytte, ingen tenning, ingen eksosanlegg. Volvo-garantien på batteri er 8 år / 160 000 km. Service koster en brøkdel sammenlignet med bensin over tid.' },
-      { t:'Kjøreopplevelsen er faktisk bedre', b:'Momentan akselerasjon, stille kabine og lavt tyngdepunkt gir en kjøreopplevelse bensinbiler ikke kan matche. Kunder som prøvekjører EX40 for første gang er nesten alltid positivt overrasket.' },
-      { t:'Avgiftsmessig er det fortsatt veldig gunstig', b:'Elbiler er fritatt for engangsavgift og har lavere forsikringspremie. Gratis parkering og bompassering kan spare 2 000–4 000 kr/mnd i urbane strøk.' }
+  {
+    id: 'rekkevidde',
+    icon: '🔋',
+    label: 'For kort rekkevidde',
+    sub: 'Rekker ikke langt nok',
+    args: [
+      { t: 'Hvor langt kjører kunden faktisk?', b: 'Gjennomsnittlig daglig kjøring i Norge er 37 km. EX40 har over 500 km rekkevidde. De fleste trenger aldri tenke på lading til hverdag – kun på helgeturer.' },
+      { t: 'Lynlading er ikke det det var', b: 'EX90 og EX40 støtter opp til 200 kW lynlading. På en raskpause lader de 10–80% på under 30 minutter. Strekningene mellom ladestasjonene i Norge er kortere enn de tror.' },
+      { t: 'Hjemmelading løser 90% av behovet', b: 'Med hjemmelader starter de hver dag med fullt batteri – som en bensinstasjon i garasjen. Rekkeviddestress gjelder kun de siste 10% av turene.' },
+      { t: 'Norges infrastruktur er best i verden', b: 'Norge har over 25 000 offentlige ladepunkter. IONITY, Recharge og Tesla Supercharger dekker alle store veier. Vi kan vise konkrete ladestopp for de turene de er bekymret for.' }
     ],
-    closer:'«Hva er det viktigste for deg i en bil til daglig? La oss finne ut om vi kan dekke det bedre enn du forventer.»'
+    closer: '«Kan du fortelle meg den strekningen du er mest bekymret for? Jeg kan vise deg ladestopp på ruten med en gang.»'
   },
-  { id:'finansiering', icon:'💳', label:'Vil ikke finansiere', sub:'Betaler kontant eller ingenting',
-    args:[
-      { t:'«Jeg tar det i huslånet i stedet»', b:'Huslånet er billig ja – men du bruker da opp boliglånsrammen din på en bil som synker i verdi. Neste gang du trenger å trekke på rammen til oppussing eller noe som faktisk øker boligverdien, er den brukt opp på en depresierbar eiendel.' },
-      { t:'Kontant er ikke alltid finansielt smartest', b:'Med finansiering beholder kunden kapitalen sin investert. Volvo Financial Services tilbyr renter som ofte er lavere enn alternativkostnaden på bundet kapital. Finansiering er en finansiell beslutning, ikke et tegn på dårlig økonomi.' },
-      { t:'Restverdien beskytter dem mot verdifall', b:'Med restverdiavtale betaler de kun for den delen av bilen de faktisk bruker. Etter 3 år kan de levere tilbake til forhåndsavtalt pris – uten risiko for uventet verdifall.' },
-      { t:'Fleksibilitet til å bytte med teknologien', b:'Elbilteknologien utvikler seg raskt. Med finansiering kan de bytte om 3 år uten å binde kapitalen. Kontantkjøp binder dem til en bil i 7–10 år mens teknologien løper forbi dem.' }
+  {
+    id: 'finansiering',
+    icon: '🏦',
+    label: 'Vil ikke finansiere',
+    sub: 'Betaler kontant / tar i huslånet',
+    args: [
+      { t: 'Frigjør kapital til annet', b: 'Å binde opp 400 000–600 000 kr i en bil som synker i verdi er dyrt kapitalbruk. Med finansiering beholder de pengene i fond, eiendom eller buffer – som i snitt gir bedre avkastning enn renten koster.' },
+      { t: 'Huslånet er ikke løsningen', b: 'Å ta bilen inn i boliglånet bruker opp rammen på en eiendel som synker i verdi. Neste gang de trenger å trekke på rammen til oppussing eller tilbygg – er den brukt opp på en bil.' },
+      { t: 'Restverdi-finansiering er annerledes', b: 'Dette er ikke et vanlig lån. De betaler ned en lavere sum og har opsjon på å levere tilbake eller refinansiere ved slutten. Fleksibilitet, ikke binding.' },
+      { t: 'Renten er skattefradragsberettiget', b: 'Renteutgifter på billån gir skattefradrag. Den faktiske kostnaden etter fradrag er lavere enn nominell rente tilsier.' }
     ],
-    closer:'«Skal vi bare se hva månedsprisen blir? Uten at du forplikter deg – bare for sammenligningens skyld.»'
+    closer: '«Skal vi bare kjøre tallene så du ser hva finansiering faktisk koster per måned – sammenlignet med å binde kapitalen?»'
   },
-  { id:'tid', icon:'⏳', label:'Vil tenke på det', sub:'Trenger mer tid',
-    args:[
-      { t:'Finn ut hva de egentlig tenker på', b:'«Tenke på det» er sjelden om selve bilen – det er om økonomi, timing eller at ektefellen ikke er involvert. Spør: «Er det noe konkret du er usikker på som vi kan avklare nå?»' },
-      { t:'Skap et konkret neste steg', b:'Utsatte beslutninger dør. Foreslå noe spesifikt: «Kan vi reservere denne konfigurasjonen i 48 timer mens du snakker med dem hjemme?» Et lavterskel commitment holder dialogen i live.' },
-      { t:'Isoler hindringen og løs den', b:'Hva er det som gjør at de ikke bestemmer seg i dag? Er det finansieringsbeløpet, fargen, leveringstiden? Isoler hindringen og løs den én om gangen.' },
-      { t:'Bruk tidsbegrensning med ærlighet', b:'Hvis det er reelt: «Denne prisen/konfigurasjonen gjelder ut måneden.» Ikke fabriker knapphet – men hvis det faktisk er en kampanje eller begrenset lager, er det viktig å si det.' }
+  {
+    id: 'levetid',
+    icon: '🔧',
+    label: 'Usikker på kvalitet/holdbarhet',
+    sub: 'Hva hvis noe går galt?',
+    args: [
+      { t: 'Volvo topper alle kvalitetsmålinger', b: 'I J.D. Power og Dekra sine undersøkelser scorer Volvo konsekvent i toppen på pålitelighet. Merket er bygget på trygghet – det er ikke tilfeldig.' },
+      { t: '5 års garanti som standard', b: 'Fabrikksgaranti i 5 år eller 100 000 km. Batteriet er garantert i 8 år / 160 000 km. Det er en av de beste garantiene i bransjen.' },
+      { t: 'Service koster nesten ingenting', b: 'Elbiler har ingen olje, ingen tenning, ingen eksosanlegg. Servicekostnadene over 5 år er en brøkdel av hva en bensinbil koster å holde i gang.' },
+      { t: 'Hele Volvo-nettverket bak deg', b: 'Med VCSO får kunden service hos alle Volvo-forhandlere i Norge. Digital servicebokregistrering, original deler, fabrikkopplærte teknikere.' }
     ],
-    closer:'«Hva er det ene du trenger å avklare før du kan bestemme deg? La oss ta det nå.»'
+    closer: '«Hvilken del er du mest usikker på? La meg ta den direkte.»'
   },
-  { id:'merke', icon:'🚘', label:'Lojal til annet merke', sub:'Har alltid kjørt BMW/Toyota/etc.',
-    args:[
-      { t:'Anerkjenn lojaliteten – ikke angrip den', b:'«Det er forståelig, et godt merke.» Aldri snakk negativt om konkurrenten. Spør heller: «Hva er det du liker best med dem?» Nå vet du nøyaktig hva du skal matche.' },
-      { t:'Volvo er ikke hva det var for 10 år siden', b:'Mange har et bilde av Volvo som solid men kjedelig. EX90 og EX40 er av designmagasiner kåret blant verdens vakreste biler. Vis bilder – visuell overbevisning slår verbal.' },
-      { t:'Sikkerhet som ekte differensiering', b:'Volvo er det eneste merket med selvpålagt fartsgrense på 180 km/t og Care Key. Uavhengige Euro NCAP-tester gir Volvo konsekvent toppkarakter. Ingen andre kan si det samme.' },
-      { t:'Prøvekjøring er det sterkeste argumentet', b:'Merkeskepsis forsvinner oftest bak rattet. Foreslå en prøvekjøring uten press: «Kjør den en halvtime, og så kan du sammenligne med det du kjenner.» Bilen selger seg selv.' }
+  {
+    id: 'timing',
+    icon: '⏳',
+    label: 'Vil vente litt',
+    sub: 'Ikke klar til å bestemme seg nå',
+    args: [
+      { t: 'Hva venter de egentlig på?', b: 'Spør direkte: «Er det noe konkret du mangler informasjon om, eller er det noe annet som stopper deg?» Venting er som regel en skjult innvending – finn den.' },
+      { t: 'Priser og kampanjer endrer seg', b: 'Nåværende kampanje, innbyttepris og leveringssituasjon gjelder ikke nødvendigvis om 2–3 måneder. Det kan koste dem dyrt å vente.' },
+      { t: 'Bilen de kjører koster penger nå', b: 'Hver måned de venter fortsetter kostnaden med dagens bil. Drivstoff, service, verditap. Å «vente» er aldri gratis.' },
+      { t: 'Testdrive fjerner usikkerhet', b: 'Mye av «venting» handler om at de ikke er helt sikre. En testdrive løser det raskere enn en uke med research. Tilby det konkret og nå.' }
     ],
-    closer:'«Gi meg 30 minutter og en prøvekjøring – ikke for å overbevise deg, men for at du skal ha et ordentlig sammenligningsgrunnlag.»'
+    closer: '«Hva skal til for at du kan ta en beslutning i dag? La oss finne ut av det akkurat nå.»'
   },
-  { id:'partner', icon:'👫', label:'Må snakke med partner', sub:'Bestemmer ikke alene',
-    args:[
-      { t:'Involver partneren aktivt', b:'«Kan vi invitere dem på en felles prøvekjøring?» En partner som ikke har sett bilen vil nesten alltid si nei – det er ukjent risiko. Gjør dem kjent med bilen.' },
-      { t:'Gi dem noe konkret å ta med hjem', b:'Send en personlig konfigurasjonslenke med den spesifikke bilen, prisen og finansieringsalternativet. Da er samtalen hjemme konkret, ikke abstrakt.' },
-      { t:'Finn ut hva partneren bryr seg om', b:'Spør: «Hva tror du er viktigst for dem – økonomi, sikkerhet, praktisk plass?» Nå kan du gi dem de tre argumentene som treffer akkurat det.' },
-      { t:'Bruk en myk reservasjon', b:'«Skal vi sette av denne bilen i 48 timer? Ingen forpliktelse.» Det gir dem noe å forsvare hjemme – og en grunn til å komme tilbake.' }
+  {
+    id: 'konkurrent',
+    icon: '⚔️',
+    label: 'Vurderer konkurrent',
+    sub: 'BMW, Mercedes, Audi, Tesla...',
+    args: [
+      { t: 'Volvo vs. tyske premiumbiler', b: 'Vi er ærlige: BMW, Mercedes og Audi har sterke produkter. Men på sikkerhet, bærekraft, nordisk design og total eierkostnad over 5 år – der konkurrerer Volvo med de beste. Vi er best på Volvo, men de bør kjøpe Volvo av oss fordi vi er Volvo-eksperter.' },
+      { t: 'Tesla-sammenligning', b: 'Tesla leverer god rekkevidde og teknologi. Volvo leverer trygghet, kvalitetsmaterialer og et komplett serviceapparat i Norge. Mange bytter fra Tesla til Volvo nettopp for dette.' },
+      { t: 'Total eierkostnad, ikke bare listepris', b: 'Be dem sammenligne forsikring, service, drivstoff og restverdi over 5 år – ikke bare listepris. Volvos totaløkonomi er sterkere enn de fleste tror.' },
+      { t: 'Vi er Volvo-spesialistene', b: 'Hos oss får de dedikert Volvo-kompetanse, Volvo Financial Services, garanti og service av folk som kan Volvo innover og utover. En generalist-forhandler kan ikke matche det.' }
     ],
-    closer:'«Hva tror du er det viktigste for dem? Gi meg to minutter, så lager jeg et sammendrag dere kan se på sammen.»'
+    closer: '«Hva er det konkret hos dem som trekker? Er det pris, modell eller noe annet – så tar vi det punkt for punkt.»'
   },
-  { id:'levering', icon:'🚚', label:'For lang leveringstid', sub:'Vil ha bilen fortere',
-    args:[
-      { t:'Sjekk lager av demo-biler', b:'Vi har ofte demonstrasjonsbiler med lav kilometerstand som kan leveres innen få dager. Kunden får nesten ny bil til lavere pris – og slipper ventetiden.' },
-      { t:'Bruk ventetiden aktivt', b:'«Hva kjører du nå? Vil du ha lånebil i mellomtiden?» Mange lar seg overbevise av at vi løser overgangsperioden – den faktiske leveringstiden føles kortere.' },
-      { t:'Alternativ konfigurasjon kan komme raskere', b:'En bestemt farge eller utstyrspakke kan gi 3 måneder ekstra ventetid. Spør om de er fleksible på fargen – det kan halvere leveringstiden uten at de ofrer noe vesentlig.' },
-      { t:'Knytt ventetiden til et positivt mål', b:'«Bilen leveres i august – perfekt timing til sommerferien.» Ramm inn leveringen som et naturlig tidspunkt, ikke et problem.' }
+  {
+    id: 'partner',
+    icon: '👥',
+    label: 'Må snakke med partner',
+    sub: 'Ikke alene om beslutningen',
+    args: [
+      { t: 'Ta med partneren hit', b: 'Inviter begge til en felles testdrive. Beslutninger tatt sammen holder – og da slipper du å selge bilen to ganger.' },
+      { t: 'Gi dem noe konkret å ta med hjem', b: 'Send en tilpasset oppsummering: månedspris, innbyttepris, modell og utstyrsnivå – noe partneren kan se på. Gjør det enkelt for dem å presentere det.' },
+      { t: 'Finn ut hvem som bestemmer', b: 'Spør: «Er det praktiske hensyn partneren er opptatt av, eller handler det om økonomi?» Da vet du hva du skal sørge for at de tar med hjem.' },
+      { t: 'Sett en konkret dato', b: 'Ikke la det være åpent. «Når tenker dere å ta beslutningen – er neste helg mulig for en felles test?» Åpne avtaler faller alltid ut.' }
     ],
-    closer:'«La meg sjekke om vi har noe på lager nå – og hvilke konfigurasjoner som er klart innen [dato kunden ønsker].»'
+    closer: '«Kan vi booke en testdrive for dere begge denne uken? Da får partneren kjenne på bilen selv.»'
   }
 ];
 
-var tipsActive = null;
+var openTip = null;
+
 function renderTips() {
-  var grid = document.getElementById('tips-grid');
-  var panel = document.getElementById('tips-panel');
-  if (!grid) return;
-  if (grid.childElementCount > 0) return; // already rendered
-  grid.innerHTML = TIPS_DATA.map(function(d) {
-    return '<button class="tips-btn" id="tipsbtn-'+d.id+'" onclick="toggleTip(\''+d.id+'\')">'
-      + '<div class="tips-btn-icon">'+d.icon+'</div>'
-      + '<div class="tips-btn-label">'+d.label+'</div>'
-      + '<div class="tips-btn-sub">'+d.sub+'</div>'
-    + '</button>';
-  }).join('');
+  var el = document.getElementById('tips-container');
+  if (!el) return;
+
+  var html = '<div style="font-family:\'Anton\',sans-serif;font-size:22px;color:var(--gold);letter-spacing:1px;margin-bottom:4px">💡 Innvendingshåndterer</div>';
+  html += '<div style="font-size:12px;color:var(--muted);margin-bottom:16px">Trykk på en innvending for argumenter og closing-spørsmål</div>';
+
+  TIPS_DATA.forEach(function(tip) {
+    var isOpen = openTip === tip.id;
+    html += '<div onclick="toggleTip(\'' + tip.id + '\')" style="background:var(--card);border:1px solid ' + (isOpen ? 'var(--gold)' : 'var(--b1)') + ';border-radius:10px;margin-bottom:10px;overflow:hidden;cursor:pointer">';
+    html += '<div style="display:flex;align-items:center;gap:12px;padding:14px 16px">';
+    html += '<div style="font-size:22px;flex-shrink:0">' + tip.icon + '</div>';
+    html += '<div style="flex:1"><div style="font-family:\'Anton\',sans-serif;font-size:15px;color:var(--txt);letter-spacing:.5px">' + tip.label + '</div>';
+    html += '<div style="font-size:11px;color:var(--muted)">' + tip.sub + '</div></div>';
+    html += '<div style="font-size:18px;color:var(--gold);transition:transform .2s;transform:rotate(' + (isOpen ? '90' : '0') + 'deg)">›</div>';
+    html += '</div>';
+
+    if (isOpen) {
+      html += '<div style="padding:0 16px 16px;border-top:1px solid var(--b1)">';
+      tip.args.forEach(function(arg, i) {
+        html += '<div style="margin-top:12px">';
+        html += '<div style="display:flex;align-items:flex-start;gap:8px">';
+        html += '<div style="background:var(--gold);color:#000;font-family:\'Anton\',sans-serif;font-size:10px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">' + (i+1) + '</div>';
+        html += '<div><div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:3px">' + arg.t + '</div>';
+        html += '<div style="font-size:12px;color:var(--muted);line-height:1.55">' + arg.b + '</div></div></div></div>';
+      });
+      html += '<div style="margin-top:16px;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.25);border-radius:8px;padding:12px">';
+      html += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gold);margin-bottom:5px">🎯 Closing-spørsmål</div>';
+      html += '<div style="font-size:13px;color:var(--txt);font-style:italic">' + tip.closer + '</div></div>';
+      html += '</div>';
+    }
+    html += '</div>';
+  });
+
+  el.innerHTML = html;
 }
 
 function toggleTip(id) {
-  var panel = document.getElementById('tips-panel');
-  document.querySelectorAll('.tips-btn').forEach(function(b) { b.classList.remove('on'); });
-  if (tipsActive === id) { tipsActive = null; panel.innerHTML = ''; return; }
-  tipsActive = id;
-  document.getElementById('tipsbtn-'+id).classList.add('on');
-  var d = TIPS_DATA.find(function(x){ return x.id===id; });
-  if (!d) return;
-  panel.innerHTML = '<div style="font-size:11px;color:var(--muted);margin-bottom:10px">Slik svarer du på «'+d.label.toLowerCase()+'»</div>'
-    + d.args.map(function(a,i){
-      return '<div class="tips-arg">'
-        + '<div class="tips-arg-top"><div class="tips-arg-num">'+(i+1)+'</div><div class="tips-arg-title">'+a.t+'</div></div>'
-        + '<div class="tips-arg-body">'+a.b+'</div>'
-      + '</div>';
-    }).join('')
-    + '<div class="tips-closer"><div class="tips-closer-label">Foreslått closing-spørsmål</div><div class="tips-closer-text">'+d.closer+'</div></div>';
+  openTip = openTip === id ? null : id;
+  renderTips();
 }
 
 // ─── NAVIGASJON ──────────────────────────────────────────────────────
