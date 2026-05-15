@@ -280,6 +280,12 @@ select:focus,input[type=text]:focus{border-color:var(--gold)}
 .modal-confirm{flex:1;padding:9px;font-size:12px;font-weight:700;background:var(--r);
   color:#fff;border:none;border-radius:4px;cursor:pointer;font-family:'Barlow',sans-serif}
 
+/* HJELP MODAL */
+#help-modal{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .2s}
+#help-modal.show{opacity:1;pointer-events:all}
+
 /* MOBIL-FIKS */
 html, body {
   overflow-x: hidden;
@@ -474,34 +480,6 @@ html, body {
 
 <!-- SELGERE VIEW -->
 <div class="view on" id="view-ind">
-  <!-- REGISTER (hidden for guests, only shown on Selgere tab) -->
-  <div class="reg-outer" id="reg-outer" style="display:none">
-    <div class="reg-card">
-      <input type="hidden" id="sel-loc" value="">
-      <div class="fg2">
-        <select id="sel-selger"><option value="">Selger...</option></select>
-        <select id="sel-modell">
-          <option value="">Modell...</option>
-          <option>EX30</option><option>EX40</option><option>EX60</option>
-          <option>EX90</option><option>EC40</option><option>ES90</option>
-          <option>XC40</option><option>XC60</option><option>XC90</option>
-        </select>
-      </div>
-      <div class="fin-label" id="fin-label" onclick="toggleFin()">
-        <div class="fin-box" id="chk-box">
-          <span class="fin-check" id="chk-cross">&#10003;</span>
-        </div>
-        <input type="checkbox" id="chk-fin" style="display:none">
-        <div>
-          <div style="font-size:13px;font-weight:700;color:var(--txt)">Finansiert</div>
-          <div style="font-size:10px;color:var(--muted)">Kunden har valgt finansiering</div>
-        </div>
-        <div class="fin-badge" id="fin-badge">&#9670; FINANSIERT</div>
-      </div>
-      <button class="reg-btn" id="reg-btn" onclick="reg()">Registrer scoring &#8212; +3 poeng!</button>
-      <div class="toast" id="toast"></div>
-    </div>
-  </div>
   <div class="tbl-head">
     <div>#</div><div></div><div>Spiller</div>
     <div>M&#229;l</div><div>Poeng</div><div>Siste 5 dager</div><div>&#128588;</div>
@@ -555,6 +533,34 @@ html, body {
   <div class="scoring-grid" id="scoring-grid"></div>
 </div>
 
+<!-- REGISTER (hidden for guests) -->
+<div class="reg-outer" id="reg-outer" style="display:none">
+  <div class="reg-card">
+    <input type="hidden" id="sel-loc" value="">
+    <div class="fg2">
+      <select id="sel-selger"><option value="">Selger...</option></select>
+      <select id="sel-modell">
+        <option value="">Modell...</option>
+        <option>EX30</option><option>EX40</option><option>EX60</option>
+        <option>EX90</option><option>EC40</option><option>ES90</option>
+        <option>XC40</option><option>XC60</option><option>XC90</option>
+      </select>
+    </div>
+    <div class="fin-label" id="fin-label" onclick="toggleFin()">
+      <div class="fin-box" id="chk-box">
+        <span class="fin-check" id="chk-cross">&#10003;</span>
+      </div>
+      <input type="checkbox" id="chk-fin" style="display:none">
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--txt)">Finansiert</div>
+        <div style="font-size:10px;color:var(--muted)">Kunden har valgt finansiering</div>
+      </div>
+      <div class="fin-badge" id="fin-badge">&#9670; FINANSIERT</div>
+    </div>
+    <button class="reg-btn" id="reg-btn" onclick="reg()">Registrer scoring &#8212; +3 poeng!</button>
+    <div class="toast" id="toast"></div>
+  </div>
+</div>
 
 </div><!-- end .page -->
 
