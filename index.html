@@ -1281,18 +1281,25 @@ function renderTeam() {
     } else {
       hof.innerHTML = currentBox + pastKeys.map(function(key) {
         var wd = allWeeks[key];
-        var bestN = 0;
-        Object.keys(wd.sales).forEach(function(n){ if(wd.sales[n]>bestN) bestN=wd.sales[n]; });
-        var tied = SELGERE.filter(function(s){ return (wd.sales[s.navn]||0)===bestN; });
-        var bestFin = 0;
-        tied.forEach(function(s){ if((wd.fin[s.navn]||0)>bestFin) bestFin=(wd.fin[s.navn]||0); });
-        var finTied = tied.filter(function(s){ return (wd.fin[s.navn]||0)===bestFin; });
-        // Final tiebreak: earliest first timestamp (first to reach the score)
-        finTied.sort(function(a,b){
-          var ta = wd.firstTs[a.navn]||''; var tb = wd.firstTs[b.navn]||'';
-          return ta < tb ? -1 : ta > tb ? 1 : 0;
-        });
-        var winners = [finTied[0]].filter(Boolean);
+        // Uke 19 2026: tre likestilte vinnere beholdes (gamle regler)
+        var WEEK19_WINNERS = ['Norman Elton', 'Linn Askmann Olsen', 'Simen Olsen'];
+        var isWeek19 = (wd.week === 19 && key.indexOf('2026') !== -1);
+        var winners;
+        if (isWeek19) {
+          winners = WEEK19_WINNERS.map(function(n){ return SELGERE.find(function(s){ return s.navn === n; }); }).filter(Boolean);
+        } else {
+          var bestN = 0;
+          Object.keys(wd.sales).forEach(function(n){ if(wd.sales[n]>bestN) bestN=wd.sales[n]; });
+          var tied = SELGERE.filter(function(s){ return (wd.sales[s.navn]||0)===bestN; });
+          var bestFin = 0;
+          tied.forEach(function(s){ if((wd.fin[s.navn]||0)>bestFin) bestFin=(wd.fin[s.navn]||0); });
+          var finTied = tied.filter(function(s){ return (wd.fin[s.navn]||0)===bestFin; });
+          finTied.sort(function(a,b){
+            var ta = wd.firstTs[a.navn]||''; var tb = wd.firstTs[b.navn]||'';
+            return ta < tb ? -1 : ta > tb ? 1 : 0;
+          });
+          winners = [finTied[0]].filter(Boolean);
+        }
         var hatDays = {};
         sales.forEach(function(x) {
           var d = new Date(x.ts);
@@ -1324,8 +1331,8 @@ function renderTeam() {
           + '<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gold);margin-bottom:10px">Vinner uke '+wd.week+'</div>'
           + '<div style="display:grid;grid-template-columns:1fr'+(hatWinners.length?' 1fr':'')+';gap:0">'
             + '<div>'
-              + '<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px">&#128081; Ukesvinner</div>'
-              + winners.map(function(s){ return personCard(s, wd.sales[s.navn]); }).join('')
+              + '<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px">&#128081; '+(winners.length>1?'Ukens vinnere':'Ukesvinner')+'</div>'
+              + winners.map(function(s){ return personCard(s, wd.sales[s.navn]); }).join('<div style="margin-top:8px"></div>')
             + '</div>'
             + (hatWinners.length
               ? '<div style="border-left:1px solid var(--b1);padding-left:12px">'
