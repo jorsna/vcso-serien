@@ -266,10 +266,10 @@ select:focus,input[type=text]:focus{border-color:var(--gold)}
 .toast.show{opacity:1}
 
 /* MODALS */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;
+.modal-overlay, #help-modal{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;
   display:flex;align-items:center;justify-content:center;
   opacity:0;pointer-events:none;transition:opacity .2s}
-.modal-overlay.show{opacity:1;pointer-events:all}
+.modal-overlay.show, #help-modal.show{opacity:1;pointer-events:all}
 .modal{background:var(--card);border:1px solid var(--b2);border-radius:8px;
   padding:24px 28px;max-width:480px;width:90%}
 .modal-title{font-family:'Anton',sans-serif;font-size:18px;letter-spacing:1px;
