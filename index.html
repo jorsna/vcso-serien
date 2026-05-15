@@ -439,35 +439,6 @@ html, body {
   </div>
 </div>
 
-<!-- REGISTER (hidden for guests) -->
-<div class="reg-outer" id="reg-outer" style="display:none">
-  <div class="reg-card">
-    <input type="hidden" id="sel-loc" value="">
-    <div class="fg2">
-      <select id="sel-selger"><option value="">Selger...</option></select>
-      <select id="sel-modell">
-        <option value="">Modell...</option>
-        <option>EX30</option><option>EX40</option><option>EX60</option>
-        <option>EX90</option><option>EC40</option><option>ES90</option>
-        <option>XC40</option><option>XC60</option><option>XC90</option>
-      </select>
-    </div>
-    <div class="fin-label" id="fin-label" onclick="toggleFin()">
-      <div class="fin-box" id="chk-box">
-        <span class="fin-check" id="chk-cross">&#10003;</span>
-      </div>
-      <input type="checkbox" id="chk-fin" style="display:none">
-      <div>
-        <div style="font-size:13px;font-weight:700;color:var(--txt)">Finansiert</div>
-        <div style="font-size:10px;color:var(--muted)">Kunden har valgt finansiering</div>
-      </div>
-      <div class="fin-badge" id="fin-badge">&#9670; FINANSIERT</div>
-    </div>
-    <button class="reg-btn" id="reg-btn" onclick="reg()">Registrer scoring &#8212; +3 poeng!</button>
-    <div class="toast" id="toast"></div>
-  </div>
-</div>
-
 <!-- TABS -->
 <div class="tabs">
   <button class="tab on" onclick="setTab('ind',this)">Selgere</button>
@@ -503,6 +474,34 @@ html, body {
 
 <!-- SELGERE VIEW -->
 <div class="view on" id="view-ind">
+  <!-- REGISTER (hidden for guests, only shown on Selgere tab) -->
+  <div class="reg-outer" id="reg-outer" style="display:none">
+    <div class="reg-card">
+      <input type="hidden" id="sel-loc" value="">
+      <div class="fg2">
+        <select id="sel-selger"><option value="">Selger...</option></select>
+        <select id="sel-modell">
+          <option value="">Modell...</option>
+          <option>EX30</option><option>EX40</option><option>EX60</option>
+          <option>EX90</option><option>EC40</option><option>ES90</option>
+          <option>XC40</option><option>XC60</option><option>XC90</option>
+        </select>
+      </div>
+      <div class="fin-label" id="fin-label" onclick="toggleFin()">
+        <div class="fin-box" id="chk-box">
+          <span class="fin-check" id="chk-cross">&#10003;</span>
+        </div>
+        <input type="checkbox" id="chk-fin" style="display:none">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--txt)">Finansiert</div>
+          <div style="font-size:10px;color:var(--muted)">Kunden har valgt finansiering</div>
+        </div>
+        <div class="fin-badge" id="fin-badge">&#9670; FINANSIERT</div>
+      </div>
+      <button class="reg-btn" id="reg-btn" onclick="reg()">Registrer scoring &#8212; +3 poeng!</button>
+      <div class="toast" id="toast"></div>
+    </div>
+  </div>
   <div class="tbl-head">
     <div>#</div><div></div><div>Spiller</div>
     <div>M&#229;l</div><div>Poeng</div><div>Siste 5 dager</div><div>&#128588;</div>
@@ -521,12 +520,12 @@ html, body {
   </div>
   <div id="tbl-team"></div>
   <div style="padding:10px 14px 4px;background:var(--card);border-top:1px solid var(--b1)">
-  <div class="form-legend">
-    <div class="fl"><div class="fl-dot" style="background:var(--g)"></div>I rute (100%+)</div>
-    <div class="fl"><div class="fl-dot" style="background:var(--y)"></div>Solgt, men under tempo</div>
-    <div class="fl"><div class="fl-dot" style="background:var(--b1)"></div>Ingen salg denne uken</div>
-    <div class="fl" style="margin-left:auto;font-size:9px;color:var(--muted)">Innrammet = innev&#230;rende uke</div>
-  </div>
+    <div class="form-legend">
+      <div class="fl"><div class="fl-dot" style="background:var(--g)"></div>I rute (100%+)</div>
+      <div class="fl"><div class="fl-dot" style="background:var(--y)"></div>Solgt, men under tempo</div>
+      <div class="fl"><div class="fl-dot" style="background:var(--b1)"></div>Ingen salg denne uken</div>
+      <div class="fl" style="margin-left:auto;font-size:9px;color:var(--muted)">Innrammet = innev&#230;rende uke</div>
+    </div>
   </div>
 </div>
 
@@ -1246,26 +1245,24 @@ function renderTeam() {
       var hasHat = Object.keys(curHatDays[navn]).some(function(d){ return curHatDays[navn][d] >= 3; });
       if (hasHat) { var sObj = SELGERE.find(function(x){ return x.navn===navn; }); if (sObj) curHatWinners.push(sObj); }
     });
-    var curPersonCard = function(s) {
+    var curHatCard = function(s) {
       var hasPhoto = typeof SELGER_PHOTOS!=='undefined' && SELGER_PHOTOS[s.id];
       var avInner = hasPhoto
         ? '<img src="'+SELGER_PHOTOS[s.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">'
         : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:'+s.color+'">'+s.initials+'</div>';
       return '<div style="display:flex;align-items:center;gap:10px;margin-top:6px">'
         + '<div style="width:40px;height:40px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0">'+avInner+'</div>'
-        + '<div>'
-          + '<div style="font-size:12px;font-weight:700;color:var(--txt)">'+s.navn+' ⭐</div>'
-          + '<div style="font-size:9px;color:var(--muted)">'+(LL[s.loc]||s.loc)+'</div>'
-        + '</div>'
+        + '<div><div style="font-size:12px;font-weight:700;color:var(--txt)">'+s.navn+' &#11088;</div>'
+        + '<div style="font-size:9px;color:var(--muted)">'+(LL[s.loc]||s.loc)+'</div></div>'
       + '</div>';
     };
     var currentBox = '<div style="margin-bottom:14px;padding:10px 12px;background:var(--card2);border-radius:5px;border:1px solid var(--b1)">'
       + '<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:8px">Vinner uke '+thisWeek+'</div>'
-      + '<div style="font-size:11px;color:var(--muted);font-style:italic">Kåres søndag kl. 23:59</div>'
+      + '<div style="font-size:11px;color:var(--muted);font-style:italic">K&#229;res s&#248;ndag kl. 23:59</div>'
       + (curHatWinners.length
         ? '<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--b1)">'
-          + '<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--gold);margin-bottom:4px">⚽ Hat-trick denne uken</div>'
-          + curHatWinners.map(curPersonCard).join('')
+          + '<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--gold);margin-bottom:2px">&#9917; Hat-trick denne uken</div>'
+          + curHatWinners.map(curHatCard).join('')
         + '</div>'
         : '')
       + '</div>';
