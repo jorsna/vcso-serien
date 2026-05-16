@@ -7,17 +7,403 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Bebas+Neue&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing:border-box; margin:0; padding:0; }
-  body { background:#07090f; }
-  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-  @keyframes spin  { to{transform:rotate(360deg)} }
-  .spin { width:28px;height:28px;border:2px solid rgba(255,255,255,0.08);border-top-color:rgba(59,130,246,0.7);border-radius:50%;animation:spin 0.8s linear infinite; }
+* { box-sizing:border-box; margin:0; padding:0; }
+
+:root {
+  --gold: #c9a84c;
+  --gold2: #e8c96a;
+  --gold3: #f7e098;
+  --gold-dim: rgba(201,168,76,0.18);
+  --gold-glow: rgba(201,168,76,0.35);
+  --ink: #060810;
+  --ink2: #0b0e1a;
+  --ink3: #111525;
+  --ink4: #181d30;
+  --border: rgba(201,168,76,0.14);
+  --border2: rgba(201,168,76,0.28);
+  --text: #f0e8d8;
+  --text-dim: rgba(240,232,216,0.45);
+  --text-faint: rgba(240,232,216,0.22);
+  --ryen: #4a8fff;
+  --fornebu: #27c98a;
+  --lillestrom: #e8a020;
+}
+
+html, body { background: var(--ink); min-height:100vh; }
+
+/* ── Particles canvas ── */
+#particles-canvas {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.55;
+}
+
+/* ── Noise grain overlay ── */
+body::before {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:1;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+  opacity: 0.5; mix-blend-mode: overlay;
+}
+
+/* ── Diagonal gold rule ── */
+.page-wrap {
+  position:relative; z-index:2; max-width: 520px; margin:0 auto; padding: 0 0 60px;
+}
+
+/* ── Keyframes ── */
+@keyframes float    { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-12px) rotate(2deg)} }
+@keyframes pulse-gold { 0%,100%{opacity:.7} 50%{opacity:1} }
+@keyframes shimmer  {
+  0%  { background-position: -200% center; }
+  100%{ background-position:  200% center; }
+}
+@keyframes spin     { to{transform:rotate(360deg)} }
+@keyframes reveal-up {
+  from { opacity:0; transform:translateY(28px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes reveal-fade {
+  from { opacity:0; } to { opacity:1; }
+}
+@keyframes crown-drop {
+  0%   { opacity:0; transform:translateY(-40px) scale(0.7) rotate(-10deg); }
+  60%  { transform:translateY(6px) scale(1.08) rotate(2deg); }
+  80%  { transform:translateY(-4px) scale(0.97) rotate(-1deg); }
+  100% { opacity:1; transform:translateY(0) scale(1) rotate(0deg); }
+}
+@keyframes line-grow {
+  from { transform:scaleX(0); } to { transform:scaleX(1); }
+}
+@keyframes bar-fill {
+  from { width:0%; } to { width:var(--bar-w); }
+}
+@keyframes orbit {
+  from { transform:rotate(0deg) translateX(var(--r)) rotate(0deg); }
+  to   { transform:rotate(360deg) translateX(var(--r)) rotate(-360deg); }
+}
+@keyframes glow-pulse {
+  0%,100% { box-shadow: 0 0 20px var(--gold-glow), 0 0 60px rgba(201,168,76,0.1); }
+  50%     { box-shadow: 0 0 40px var(--gold-glow), 0 0 100px rgba(201,168,76,0.25); }
+}
+@keyframes number-pop {
+  0%  { transform:scale(0.5); opacity:0; }
+  70% { transform:scale(1.15); }
+  100%{ transform:scale(1); opacity:1; }
+}
+@keyframes scan-line {
+  0%  { transform:translateY(-100%); }
+  100%{ transform:translateY(400%); }
+}
+@keyframes dash {
+  to { stroke-dashoffset: 0; }
+}
+
+/* ── Utility ── */
+.reveal { animation: reveal-up 0.7s cubic-bezier(.16,1,.3,1) both; }
+.reveal-fade { animation: reveal-fade 0.8s ease both; }
+
+.gold-text {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold3) 45%, var(--gold2) 70%, var(--gold) 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 4s linear infinite;
+}
+
+.spin { width:28px;height:28px;border:2px solid rgba(255,255,255,0.06);border-top-color:var(--gold);border-radius:50%;animation:spin 0.9s linear infinite; }
+
+/* ── Header ── */
+.site-header {
+  text-align:center; padding: 52px 24px 44px;
+  background: linear-gradient(180deg, rgba(201,168,76,0.06) 0%, transparent 100%);
+  border-bottom: 1px solid var(--border);
+  position: relative; overflow: hidden;
+}
+.site-header::before {
+  content:''; position:absolute; top:0; left:50%; transform:translateX(-50%);
+  width:1px; height:100%; background:linear-gradient(180deg,var(--gold),transparent);
+  opacity:0.3;
+}
+.header-eyebrow {
+  font-family:'Montserrat',sans-serif;
+  font-size:9px; font-weight:600; letter-spacing:0.32em;
+  text-transform:uppercase; color:var(--gold);
+  margin-bottom:18px; opacity:0.75;
+  animation: reveal-fade 1s ease both;
+}
+.header-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size: clamp(46px, 12vw, 80px);
+  font-weight:300; letter-spacing:0.06em; line-height:0.95;
+  color: var(--text); margin-bottom:6px;
+  animation: reveal-up 0.9s cubic-bezier(.16,1,.3,1) 0.1s both;
+}
+.header-week {
+  font-family:'Bebas Neue',cursive;
+  font-size: clamp(16px,4vw,22px);
+  letter-spacing:0.28em;
+  animation: reveal-fade 1s ease 0.3s both;
+}
+.header-date {
+  font-family:'Montserrat',sans-serif;
+  font-size:11px; color:var(--text-faint); margin-top:12px; letter-spacing:0.1em;
+  animation: reveal-fade 1s ease 0.45s both;
+}
+
+/* corner ornaments */
+.ornament {
+  position:absolute; width:28px; height:28px;
+  border-color: rgba(201,168,76,0.35); border-style:solid; border-width:0;
+}
+.ornament-tl { top:20px;left:20px; border-top-width:1px; border-left-width:1px; }
+.ornament-tr { top:20px;right:20px; border-top-width:1px; border-right-width:1px; }
+.ornament-bl { bottom:20px;left:20px; border-bottom-width:1px; border-left-width:1px; }
+.ornament-br { bottom:20px;right:20px; border-bottom-width:1px; border-right-width:1px; }
+
+/* ── Divider ── */
+.section-divider {
+  display:flex; align-items:center; gap:12px; padding: 8px 24px;
+  font-family:'Montserrat',sans-serif; font-size:8px; font-weight:600;
+  letter-spacing:0.26em; text-transform:uppercase; color:var(--gold);
+  opacity:0.55; margin: 6px 0;
+}
+.section-divider::before, .section-divider::after {
+  content:''; flex:1; height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent); opacity:0.4;
+}
+
+/* ── Cards ── */
+.lux-card {
+  position:relative; overflow:hidden;
+  background: var(--ink2);
+  border: 1px solid var(--border);
+  border-radius:4px;
+  margin:12px 16px;
+  padding:32px 28px;
+}
+.lux-card::before {
+  content:''; position:absolute; inset:0;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,168,76,0.04), transparent 65%);
+  pointer-events:none;
+}
+/* top accent line */
+.lux-card-accent {
+  position:absolute; top:0; left:0; right:0; height:1px;
+  transform-origin: left; animation: line-grow 0.8s cubic-bezier(.16,1,.3,1) 0.2s both;
+}
+/* scan-line shimmer on winner card */
+.winner-card::after {
+  content:''; position:absolute; left:0; right:0; height:40%;
+  background:linear-gradient(180deg,transparent,rgba(201,168,76,0.03),transparent);
+  animation: scan-line 6s ease-in-out infinite;
+  pointer-events:none;
+}
+
+/* ── Card label ── */
+.card-label {
+  font-family:'Montserrat',sans-serif;
+  font-size:8px; font-weight:700; letter-spacing:0.26em;
+  text-transform:uppercase; color:var(--gold); opacity:0.7;
+  margin-bottom:24px;
+  display:flex; align-items:center; gap:8px;
+}
+.card-label::after {
+  content:''; flex:1; height:1px;
+  background:linear-gradient(90deg,var(--gold-dim),transparent); opacity:0.6;
+}
+
+/* ── Avatar ── */
+.lux-avatar {
+  position:relative; flex-shrink:0;
+  border-radius:50%; overflow:hidden;
+  border:1px solid var(--border2);
+}
+.lux-avatar img { width:100%; height:100%; object-fit:cover; filter:grayscale(80%) contrast(1.1); }
+.lux-avatar-ring {
+  position:absolute; inset:-4px; border-radius:50%;
+  border:1px solid var(--gold); opacity:0.45;
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+.lux-avatar-ring2 {
+  position:absolute; inset:-8px; border-radius:50%;
+  border:1px dashed rgba(201,168,76,0.18);
+  animation: glow-pulse 3s ease-in-out 1s infinite;
+}
+
+/* ── Winner stats ── */
+.stat-trio {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:24px;
+}
+.stat-box {
+  background:rgba(255,255,255,0.025); border:1px solid var(--border);
+  border-radius:3px; padding:16px 10px; text-align:center;
+  position:relative; overflow:hidden;
+}
+.stat-box::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent); opacity:0.4;
+}
+.stat-num {
+  font-family:'Cormorant Garamond',serif;
+  font-size:40px; font-weight:600; line-height:1;
+  animation: number-pop 0.6s cubic-bezier(.34,1.56,.64,1) both;
+}
+.stat-label {
+  font-family:'Montserrat',sans-serif;
+  font-size:7px; font-weight:600; letter-spacing:0.22em;
+  text-transform:uppercase; color:var(--text-faint); margin-top:5px;
+}
+
+/* ── Ranking list ── */
+.rank-row {
+  display:flex; align-items:center; gap:14px;
+  padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.04);
+  animation: reveal-up 0.5s ease both;
+}
+.rank-pos {
+  font-family:'Cormorant Garamond',serif;
+  font-size:18px; font-weight:300; color:var(--text-faint);
+  width:22px; text-align:center; flex-shrink:0;
+}
+.rank-name {
+  font-family:'Montserrat',sans-serif;
+  font-size:13px; font-weight:500; color:var(--text); flex:1;
+}
+.rank-pts {
+  font-family:'Cormorant Garamond',serif;
+  font-size:20px; font-weight:600;
+}
+
+/* ── MVP day dots ── */
+.day-pip {
+  flex:1; border-radius:2px; padding:8px 4px;
+  text-align:center; border-width:1px; border-style:solid;
+  transition:all .3s ease;
+}
+.day-pip-label {
+  font-family:'Montserrat',sans-serif;
+  font-size:7px; font-weight:700; letter-spacing:0.12em;
+}
+
+/* ── Dept badge ── */
+.dept-badge {
+  font-family:'Bebas Neue',cursive;
+  font-size:42px; letter-spacing:0.04em; line-height:1;
+}
+
+/* ── Hat-trick day badge ── */
+.ht-day {
+  display:flex; align-items:center; gap:10px;
+  padding:8px 14px; border-radius:3px;
+  margin-bottom:6px;
+  background:rgba(39,201,138,0.06);
+  border:1px solid rgba(39,201,138,0.18);
+  font-family:'Montserrat',sans-serif; font-size:12px;
+}
+
+/* ── Sales list ── */
+.sale-row {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 14px;
+  border-bottom:1px solid rgba(255,255,255,0.03);
+  transition:background .15s;
+}
+.sale-row:hover { background:rgba(201,168,76,0.03); }
+
+/* ── Treble banner ── */
+.treble-banner {
+  margin:16px 16px 0;
+  padding:52px 32px 48px;
+  text-align:center;
+  position:relative; overflow:hidden;
+  background: var(--ink2);
+  border:1px solid rgba(201,168,76,0.5);
+  border-radius:4px;
+  animation: glow-pulse 4s ease-in-out infinite;
+}
+.treble-banner::before {
+  content:''; position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%,  rgba(59,130,246,0.09), transparent 60%),
+    radial-gradient(ellipse 50% 60% at 10% 100%, rgba(201,168,76,0.08), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 90% 80%,  rgba(39,201,138,0.07), transparent 50%);
+  pointer-events:none;
+}
+.treble-crown {
+  font-size:56px; display:inline-block;
+  animation: crown-drop 1s cubic-bezier(.34,1.56,.64,1) both, float 4s ease-in-out 1.2s infinite;
+  margin-bottom:12px;
+}
+.treble-sub {
+  font-family:'Montserrat',sans-serif;
+  font-size:9px; font-weight:600; letter-spacing:0.28em;
+  text-transform:uppercase; margin-bottom:16px; opacity:0.8;
+}
+.treble-name {
+  font-family:'Cormorant Garamond',serif;
+  font-size: clamp(52px, 12vw, 88px);
+  font-weight:300; letter-spacing:0.05em; line-height:0.95;
+  margin-bottom:14px;
+}
+.treble-caption {
+  font-family:'Montserrat',sans-serif;
+  font-size:11px; color:var(--text-dim); line-height:1.8; letter-spacing:0.06em;
+}
+/* sparkle orbits */
+.spark-orbit {
+  position:absolute; top:50%; left:50%;
+  width:6px; height:6px; border-radius:50%;
+  background:var(--gold); opacity:0.6;
+  --r: 120px;
+  animation: orbit 5s linear infinite;
+  margin:-3px;
+}
+
+/* ── Error ── */
+.error-state {
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  color:#ef4444; font-family:'Montserrat',sans-serif; padding:24px;
+}
 </style>
 </head>
 <body>
+<canvas id="particles-canvas"></canvas>
 <div id="root"></div>
+
+<script>
+/* Gold particle field */
+(function(){
+  const c = document.getElementById('particles-canvas');
+  const ctx = c.getContext('2d');
+  let W,H,pts=[];
+  function resize(){ W=c.width=window.innerWidth; H=c.height=window.innerHeight; }
+  resize(); window.addEventListener('resize',resize);
+  for(let i=0;i<55;i++){
+    pts.push({
+      x:Math.random()*9999, y:Math.random()*9999,
+      vx:(Math.random()-.5)*0.18, vy:(Math.random()-.5)*0.18,
+      r:Math.random()*1.4+0.3, a:Math.random()
+    });
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0)p.x=W; if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+      const pulse = 0.4+0.6*Math.abs(Math.sin(Date.now()*0.0007+p.a*6.28));
+      ctx.beginPath();
+      ctx.arc(p.x%W,p.y%H,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(201,168,76,${pulse*0.45})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+
 <script type="text/babel">
 const SELGER_PHOTOS = {
   "thomas_dokken":         "photos/thomas_dokken.jpg",
@@ -44,22 +430,16 @@ function nameToId(n) {
     .replace(/[^a-z0-9_]/g,'');
 }
 
-
 const SB_URL = "https://jffhdlmwvurnojoapcvs.supabase.co";
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmZmhkbG13dnVybm9qb2FwY3ZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MzIzNjcsImV4cCI6MjA5MzEwODM2N30.Mc_eKMsfR04kLmwfBeH5INn3NTYapv62Fnt0wMpBpMw";
 
-const A  = "#3b82f6";
-const AD = "rgba(59,130,246,0.15)";
-const BG = "#07090f";
-const CK = "#0d1020";
-const BR = "rgba(59,130,246,0.12)";
-
 const DEPT = {
-  ryen:       { label:"Ryen",       color:"#3b82f6", bg:"rgba(59,130,246,0.13)"  },
-  fornebu:    { label:"Fornebu",    color:"#10b981", bg:"rgba(16,185,129,0.13)"  },
-  lillestrom: { label:"Lillestrøm", color:"#f59e0b", bg:"rgba(245,158,11,0.13)" },
+  ryen:       { label:"Ryen",       color:"#4a8fff", bg:"rgba(74,143,255,0.10)"  },
+  fornebu:    { label:"Fornebu",    color:"#27c98a", bg:"rgba(39,201,138,0.10)"  },
+  lillestrom: { label:"Lillestrøm", color:"#e8a020", bg:"rgba(232,160,32,0.10)" },
 };
 
+/* ── All logic below identical to original ── */
 function isoWeek(d) {
   const u = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
   const day = u.getUTCDay() || 7;
@@ -67,7 +447,6 @@ function isoWeek(d) {
   const y1 = new Date(Date.UTC(u.getUTCFullYear(), 0, 1));
   return Math.ceil((((u - y1) / 86400000) + 1) / 7);
 }
-
 function weekDates(year, week) {
   const jan4 = new Date(Date.UTC(year, 0, 4));
   const w1s  = new Date(jan4);
@@ -76,13 +455,10 @@ function weekDates(year, week) {
   const e = new Date(s);   e.setUTCDate(s.getUTCDate() + 6); e.setUTCHours(23,59,59,999);
   return { start:s, end:e };
 }
-
-// Always show last completed week (shifts back 7 days from now)
 function getLastWeek() {
   const d = new Date(); d.setDate(d.getDate() - 7);
   return { year: d.getFullYear(), week: isoWeek(d) };
 }
-
 function rankSales(sales) {
   const m = {};
   sales.forEach(s => {
@@ -93,148 +469,126 @@ function rankSales(sales) {
   });
   return Object.entries(m)
     .map(([name,d]) => ({ name,...d, poeng:d.salg*3 }))
-    // 1. Flest poeng, 2. Flest finansiert, 3. Eldste tidsstempel (første til å nå tallet)
     .sort((a,b) => b.poeng-a.poeng || b.finansiert-a.finansiert || a.firstTs.localeCompare(b.firstTs));
 }
-
-// Always returns exactly one winner
 function getWeekWinners(ranked) {
   if (!ranked.length) return [];
   return [ranked[0]];
 }
-
-
 function getBestDept(ws) {
   const deptSales = {};
-  ws.forEach(s => {
-    const loc = s.loc || '';
-    if (!loc) return;
-    deptSales[loc] = (deptSales[loc]||0) + 1;
-  });
-  if (Object.keys(deptSales).length === 0) return null;
+  ws.forEach(s => { const loc=s.loc||''; if(!loc)return; deptSales[loc]=(deptSales[loc]||0)+1; });
+  if (!Object.keys(deptSales).length) return null;
   const max = Math.max(...Object.values(deptSales));
-  const best = Object.keys(deptSales).filter(k => deptSales[k] === max);
+  const best = Object.keys(deptSales).filter(k=>deptSales[k]===max);
   return { locs: best, count: max };
 }
-
-function DeptCard({ result }) {
-  if (!result) return null;
-  return (
-    <Card top="linear-gradient(90deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02))">
-      <div style={{ fontSize:9,fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"rgba(255,255,255,0.28)",marginBottom:16 }}>
-        🏟️ Beste forhandler denne uken
-      </div>
-      {result.locs.map((loc, i) => (
-        <div key={loc} style={{ display:"flex",alignItems:"center",gap:14,marginBottom: i < result.locs.length-1 ? 12 : 0 }}>
-          <div style={{ width:48,height:48,borderRadius:"50%",background:DEPT[loc]?.bg||AD,border:`2px solid ${dc(loc)}`,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Bebas Neue',cursive",fontSize:16,color:dc(loc),flexShrink:0 }}>
-            {(DEPT[loc]?.label||loc).slice(0,2).toUpperCase()}
-          </div>
-          <div>
-            <div style={{ fontFamily:"'Bebas Neue',cursive",fontSize:32,letterSpacing:"0.03em",lineHeight:1,color:dc(loc) }}>{DEPT[loc]?.label||loc}</div>
-            <div style={{ fontSize:11,color:"rgba(255,255,255,0.3)",marginTop:2 }}>{result.count} salg denne uken</div>
-          </div>
-        </div>
-      ))}
-    </Card>
-  );
-}
-
 function getMVPs(ws) {
   const bd = {};
   ws.forEach(s => {
-    const day = s.ts.slice(0,10);
-    if (!bd[day]) bd[day]={};
-    bd[day][s.selger] = (bd[day][s.selger]||0)+1;
+    const day=s.ts.slice(0,10);
+    if(!bd[day])bd[day]={};
+    bd[day][s.selger]=(bd[day][s.selger]||0)+1;
   });
   const days = Object.keys(bd).sort();
   const mc = {};
-  days.forEach(day => {
-    const ds = bd[day], max = Math.max(...Object.values(ds));
-    Object.entries(ds).forEach(([n,c]) => { if(c===max) mc[n]=(mc[n]||0)+1; });
+  days.forEach(day=>{
+    const ds=bd[day], max=Math.max(...Object.values(ds));
+    Object.entries(ds).forEach(([n,c])=>{ if(c===max)mc[n]=(mc[n]||0)+1; });
   });
-  if (!Object.keys(mc).length) return [];
-  const sorted = Object.entries(mc).sort((a,b)=>b[1]-a[1]);
-  const topCount = sorted[0][1];
+  if(!Object.keys(mc).length) return [];
+  const sorted=Object.entries(mc).sort((a,b)=>b[1]-a[1]);
+  const topCount=sorted[0][1];
   return sorted
-    .filter(([,count]) => count === topCount)
-    .map(([name, count]) => {
-      const mvpDays = days.map(day => { const ds=bd[day],max=Math.max(...Object.values(ds)); return ds[name]===max&&max>0; });
-      return { name, count, loc:ws.find(s=>s.selger===name)?.loc||"", days, mvpDays };
+    .filter(([,count])=>count===topCount)
+    .map(([name,count])=>{
+      const mvpDays=days.map(day=>{const ds=bd[day],max=Math.max(...Object.values(ds));return ds[name]===max&&max>0;});
+      return {name,count,loc:ws.find(s=>s.selger===name)?.loc||"",days,mvpDays};
     });
 }
 
-const dc = loc => DEPT[loc]?.color || A;
+const dc = loc => DEPT[loc]?.color || '#c9a84c';
 const dl = loc => DEPT[loc]?.label || loc;
 const fmt = d  => d.toLocaleDateString("no-NO",{day:"numeric",month:"long"});
 
-function Avatar({ name, loc, size=48 }) {
+/* ── Visual components (new) ── */
+function Avatar({ name, loc, size=64 }) {
   const init = name.split(" ").map(p=>p[0]).join("").slice(0,2).toUpperCase();
   const id = nameToId(name);
   const photo = SELGER_PHOTOS[id];
+  const ringSize = size + 16;
   return (
-    <div style={{ width:size,height:size,borderRadius:"50%",overflow:"hidden",border:`2px solid ${dc(loc)}`,flexShrink:0,background:DEPT[loc]?.bg||AD,display:"flex",alignItems:"center",justifyContent:"center" }}>
-      {photo
-        ? <img src={photo} style={{ width:"100%",height:"100%",objectFit:"cover",filter:"grayscale(100%)" }} />
-        : <div style={{ fontFamily:"'Bebas Neue',cursive",fontSize:size*.36,color:dc(loc),letterSpacing:"0.05em" }}>{init}</div>
-      }
+    <div style={{ position:"relative", width:ringSize, height:ringSize, flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
+      <div className="lux-avatar-ring2" style={{ width:ringSize, height:ringSize, position:"absolute", top:0, left:0 }} />
+      <div className="lux-avatar-ring"  style={{ width:size+8, height:size+8, position:"absolute", top:(ringSize-size-8)/2, left:(ringSize-size-8)/2 }} />
+      <div className="lux-avatar" style={{ width:size, height:size }}>
+        {photo
+          ? <img src={photo} alt={name} />
+          : <div style={{ width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",background:DEPT[loc]?.bg||"rgba(201,168,76,0.12)",fontFamily:"'Cormorant Garamond',serif",fontSize:size*.35,fontWeight:600,color:dc(loc) }}>{init}</div>
+        }
+      </div>
     </div>
   );
 }
 
-function Card({ children, top, mb=12 }) {
+function LuxCard({ children, accentColor, className="", style={} }) {
+  const accent = accentColor || "#c9a84c";
   return (
-    <div style={{ background:CK,border:`1px solid ${BR}`,borderRadius:18,padding:"24px 26px",position:"relative",overflow:"hidden",marginBottom:mb }}>
-      {top && <div style={{ position:"absolute",top:0,left:0,right:0,height:2,background:top,borderRadius:"18px 18px 0 0" }} />}
+    <div className={`lux-card reveal ${className}`} style={style}>
+      <div className="lux-card-accent" style={{ background:`linear-gradient(90deg,transparent,${accent},transparent)` }} />
       {children}
     </div>
   );
 }
 
-function Label({ children, mt=20 }) {
-  return <div style={{ fontSize:10,fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"rgba(255,255,255,0.22)",marginTop:mt,marginBottom:10 }}>{children}</div>;
+function CardLabel({ children }) {
+  return <div className="card-label">{children}</div>;
 }
 
 function TrebleBanner({ name }) {
   return (
-    <div style={{ background:"linear-gradient(135deg,#080d1a,#0a0814)",border:"1px solid rgba(245,200,66,0.3)",borderRadius:20,padding:"44px 32px 40px",textAlign:"center",position:"relative",overflow:"hidden",marginBottom:36 }}>
-      <div style={{ position:"absolute",inset:0,background:"radial-gradient(ellipse 70% 50% at 50% 0%,rgba(59,130,246,0.1),transparent 60%)",pointerEvents:"none" }} />
-      <div style={{ position:"absolute",inset:0,background:"radial-gradient(ellipse 50% 60% at 10% 100%,rgba(245,200,66,0.07),transparent 55%)",pointerEvents:"none" }} />
-      <div style={{ fontSize:52,animation:"float 3s ease-in-out infinite",display:"inline-block",marginBottom:8 }}>👑</div>
-      <div style={{ fontSize:9,fontWeight:700,letterSpacing:"0.22em",textTransform:"uppercase",background:"linear-gradient(90deg,#f5c842,#3b82f6,#10b981)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",marginBottom:12 }}>Historisk prestasjon · The Treble</div>
-      <div style={{ fontFamily:"'Bebas Neue',cursive",fontSize:"clamp(56px,10vw,96px)",letterSpacing:"0.04em",lineHeight:1,background:"linear-gradient(135deg,#f5c842 0%,#3b82f6 50%,#10b981 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",marginBottom:12 }}>{name}</div>
-      <div style={{ fontSize:13,color:"rgba(255,255,255,0.4)",lineHeight:1.6 }}>
-        Ukens vinner · Flest MVP-dager · Beste avdeling
-      </div>
+    <div className="treble-banner reveal">
+      <div className="spark-orbit" style={{ animationDelay:"0s",   background:"#c9a84c" }} />
+      <div className="spark-orbit" style={{ animationDelay:"1.7s", background:"#4a8fff", "--r":"140px" }} />
+      <div className="spark-orbit" style={{ animationDelay:"3.3s", background:"#27c98a", "--r":"100px" }} />
+      <div className="treble-crown">👑</div>
+      <div className="treble-sub gold-text">Historisk prestasjon · The Treble</div>
+      <div className="treble-name gold-text">{name}</div>
+      <div className="treble-caption">Ukens vinner &nbsp;·&nbsp; Flest MVP-dager &nbsp;·&nbsp; Beste avdeling</div>
     </div>
   );
 }
 
 function WinnerCard({ winners, ranked, weekSales }) {
   const isTied = winners.length > 1;
+  const w0 = winners[0];
+  const color = dc(w0.loc);
   return (
-    <Card top={`linear-gradient(90deg,${dc(winners[0].loc)},${dc(winners[0].loc)}44)`} mb={16}>
-      <div style={{ fontSize:9,fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"rgba(255,255,255,0.28)",marginBottom:16 }}>
-        {isTied ? "🤝 Delt ukens vinner" : "🏆 Ukens vinner"}
-      </div>
+    <LuxCard accentColor={color} className="winner-card" style={{ marginTop:20 }}>
+      <CardLabel>{isTied ? "⚖ Delt ukens vinner" : "✦ Ukens vinner"}</CardLabel>
       {winners.map((w, i) => (
         <div key={w.name}>
-          {i > 0 && <div style={{ borderTop:`1px solid ${BR}`,margin:"16px 0" }} />}
-          <div style={{ display:"flex",alignItems:"center",gap:16,marginBottom:16 }}>
-            <Avatar name={w.name} loc={w.loc} size={64} />
+          {i > 0 && <div style={{ borderTop:"1px solid rgba(201,168,76,0.1)", margin:"28px 0" }} />}
+          <div style={{ display:"flex", alignItems:"center", gap:20, marginBottom:8 }}>
+            <Avatar name={w.name} loc={w.loc} size={72} />
             <div style={{ flex:1 }}>
-              <div style={{ fontFamily:"'Bebas Neue',cursive",fontSize:"clamp(28px,6vw,44px)",letterSpacing:"0.03em",lineHeight:1,color:"#fff" }}>{w.name}</div>
-              <div style={{ fontSize:11,color:dc(w.loc),fontWeight:600,marginTop:4,letterSpacing:"0.06em" }}>{dl(w.loc).toUpperCase()}</div>
+              <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"clamp(28px,7vw,52px)", fontWeight:300, letterSpacing:"0.04em", lineHeight:1, color:"var(--text)", marginBottom:6 }}>
+                {w.name}
+              </div>
+              <div style={{ fontFamily:"'Montserrat',sans-serif", fontSize:9, fontWeight:700, letterSpacing:"0.26em", textTransform:"uppercase", color:dc(w.loc) }}>
+                {dl(w.loc)}
+              </div>
             </div>
           </div>
-          <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10 }}>
+          <div className="stat-trio">
             {[
-              { v: w.salg,      l: "Salg" },
-              { v: w.poeng,     l: "Poeng" },
-              { v: w.finansiert,l: "Finansiert" },
-            ].map(({v,l}) => (
-              <div key={l} style={{ background:"rgba(255,255,255,0.04)",borderRadius:10,padding:"12px 10px",textAlign:"center" }}>
-                <div style={{ fontFamily:"'Bebas Neue',cursive",fontSize:28,color:dc(w.loc),lineHeight:1 }}>{v}</div>
-                <div style={{ fontSize:9,color:"rgba(255,255,255,0.3)",marginTop:4,letterSpacing:"0.1em",textTransform:"uppercase" }}>{l}</div>
+              { v: w.salg,       l: "Salg",       delay:"0.1s" },
+              { v: w.poeng,      l: "Poeng",       delay:"0.2s" },
+              { v: w.finansiert, l: "Finansiert",  delay:"0.3s" },
+            ].map(({v,l,delay}) => (
+              <div className="stat-box" key={l}>
+                <div className="stat-num gold-text" style={{ animationDelay:delay }}>{v}</div>
+                <div className="stat-label">{l}</div>
               </div>
             ))}
           </div>
@@ -242,19 +596,26 @@ function WinnerCard({ winners, ranked, weekSales }) {
       ))}
 
       {ranked.length > winners.length && (
-        <>
-          <Label>Øvrig topp {Math.min(ranked.length, 5)}</Label>
-          {ranked.slice(winners.length, 5).map((r,i) => (
-            <div key={r.name} style={{ display:"flex",alignItems:"center",gap:12,padding:"8px 0",borderBottom:`1px solid rgba(255,255,255,0.04)` }}>
-              <div style={{ fontFamily:"'Bebas Neue',cursive",fontSize:18,color:"rgba(255,255,255,0.2)",width:24,textAlign:"center" }}>{i+winners.length+1}</div>
-              <Avatar name={r.name} loc={r.loc} size={32} />
-              <div style={{ flex:1,fontSize:13,color:"rgba(255,255,255,0.7)",fontWeight:500 }}>{r.name}</div>
-              <div style={{ fontFamily:"'Bebas Neue',cursive",fontSize:18,color:dc(r.loc) }}>{r.poeng}p</div>
+        <div style={{ marginTop:28 }}>
+          <div style={{ fontFamily:"'Montserrat',sans-serif", fontSize:8, fontWeight:600, letterSpacing:"0.22em", textTransform:"uppercase", color:"var(--text-faint)", marginBottom:14 }}>
+            Øvrig topp {Math.min(ranked.length, 5)}
+          </div>
+          {ranked.slice(winners.length, 5).map((r, i) => (
+            <div className="rank-row" key={r.name} style={{ animationDelay:`${(i+1)*0.08}s` }}>
+              <div className="rank-pos">{i + winners.length + 1}</div>
+              <div style={{ width:36, height:36, flexShrink:0, borderRadius:"50%", overflow:"hidden", border:`1px solid ${dc(r.loc)}44`, background:DEPT[r.loc]?.bg||"rgba(201,168,76,0.08)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                {SELGER_PHOTOS[nameToId(r.name)]
+                  ? <img src={SELGER_PHOTOS[nameToId(r.name)]} style={{ width:"100%", height:"100%", objectFit:"cover", filter:"grayscale(80%)" }} />
+                  : <span style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:13, fontWeight:600, color:dc(r.loc) }}>{r.name.split(" ").map(p=>p[0]).join("").slice(0,2)}</span>
+                }
+              </div>
+              <div className="rank-name">{r.name}</div>
+              <div className="rank-pts" style={{ color:dc(r.loc) }}>{r.poeng}<span style={{ fontSize:11, color:"var(--text-faint)", fontWeight:300 }}>p</span></div>
             </div>
           ))}
-        </>
+        </div>
       )}
-    </Card>
+    </LuxCard>
   );
 }
 
@@ -262,43 +623,46 @@ function MVPCard({ mvps }) {
   if (!mvps.length) return null;
   const isTied = mvps.length > 1;
   return (
-    <Card top="linear-gradient(90deg,rgba(245,200,66,0.6),rgba(245,200,66,0.1))">
-      <div style={{ fontSize:9,fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"rgba(255,255,255,0.28)",marginBottom:16 }}>
-        {isTied ? "👑 Delt flest MVP-dager" : "👑 Flest MVP-dager"}
-      </div>
+    <LuxCard accentColor="#c9a84c">
+      <CardLabel>{isTied ? "◈ Delt flest MVP-dager" : "◈ Flest MVP-dager"}</CardLabel>
       {mvps.map((mvp, idx) => (
         <div key={mvp.name}>
-          {idx > 0 && <div style={{ borderTop:`1px solid ${BR}`,margin:"14px 0" }} />}
-          <div style={{ display:"flex",alignItems:"center",gap:14,marginBottom:14 }}>
-            <Avatar name={mvp.name} loc={mvp.loc} size={52} />
+          {idx > 0 && <div style={{ borderTop:"1px solid rgba(201,168,76,0.1)", margin:"24px 0" }} />}
+          <div style={{ display:"flex", alignItems:"center", gap:18, marginBottom:18 }}>
+            <Avatar name={mvp.name} loc={mvp.loc} size={56} />
             <div>
-              <div style={{ fontFamily:"'Bebas Neue',cursive",fontSize:28,letterSpacing:"0.03em",lineHeight:1,color:"#fff" }}>{mvp.name}</div>
-              <div style={{ fontSize:11,color:"#f5c842",fontWeight:600,marginTop:3 }}>MVP {mvp.count} av {mvp.days.length} dag{mvp.days.length>1?"er":""}</div>
+              <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"clamp(22px,5vw,36px)", fontWeight:300, letterSpacing:"0.04em", lineHeight:1, color:"var(--text)" }}>
+                {mvp.name}
+              </div>
+              <div style={{ fontFamily:"'Montserrat',sans-serif", fontSize:10, fontWeight:600, color:"var(--gold)", marginTop:6, letterSpacing:"0.06em" }}>
+                MVP {mvp.count} av {mvp.days.length} dag{mvp.days.length>1?"er":""}
+              </div>
             </div>
           </div>
-          <div style={{ display:"flex",gap:6 }}>
-            {mvp.days.map((day,i) => (
-              <div key={day} style={{ flex:1,background:mvp.mvpDays[i]?"rgba(245,200,66,0.18)":"rgba(255,255,255,0.04)",border:`1px solid ${mvp.mvpDays[i]?"rgba(245,200,66,0.4)":"rgba(255,255,255,0.06)"}`,borderRadius:8,padding:"6px 4px",textAlign:"center" }}>
-                <div style={{ fontSize:8,color:mvp.mvpDays[i]?"#f5c842":"rgba(255,255,255,0.2)",fontWeight:700,letterSpacing:"0.1em" }}>
-                  {new Date(day).toLocaleDateString("no-NO",{weekday:"short"}).toUpperCase().slice(0,3)}
+          <div style={{ display:"flex", gap:5 }}>
+            {mvp.days.map((day, i) => (
+              <div key={day} className="day-pip" style={{
+                background: mvp.mvpDays[i] ? "rgba(201,168,76,0.12)" : "rgba(255,255,255,0.03)",
+                borderColor: mvp.mvpDays[i] ? "rgba(201,168,76,0.45)" : "rgba(255,255,255,0.06)",
+              }}>
+                <div className="day-pip-label" style={{ color: mvp.mvpDays[i] ? "var(--gold)" : "rgba(255,255,255,0.18)" }}>
+                  {new Date(day).toLocaleDateString("no-NO",{weekday:"short"}).toUpperCase().slice(0,2)}
                 </div>
-                {mvp.mvpDays[i] && <div style={{ fontSize:14,marginTop:2 }}>👑</div>}
+                {mvp.mvpDays[i] && <div style={{ fontSize:13, marginTop:4 }}>◆</div>}
               </div>
             ))}
           </div>
         </div>
       ))}
-    </Card>
+    </LuxCard>
   );
 }
 
 function HatTrickCard({ hatters, weekSales }) {
   if (!hatters.length) return null;
   return (
-    <Card top="linear-gradient(90deg,rgba(16,185,129,0.5),rgba(16,185,129,0.1))">
-      <div style={{ fontSize:9,fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"rgba(255,255,255,0.28)",marginBottom:16 }}>
-        ⚽ Hat-trick denne uken
-      </div>
+    <LuxCard accentColor="#27c98a">
+      <CardLabel>⬡ Hat-trick denne uken</CardLabel>
       {hatters.map((h, idx) => {
         const days = {};
         weekSales.filter(s=>s.selger===h.name).forEach(s=>{
@@ -307,32 +671,62 @@ function HatTrickCard({ hatters, weekSales }) {
         const htDays = Object.entries(days).filter(([,c])=>c>=3).map(([d,c])=>({d,c}));
         return (
           <div key={h.name}>
-            {idx > 0 && <div style={{ borderTop:`1px solid ${BR}`,margin:"14px 0" }} />}
-            <div style={{ display:"flex",alignItems:"center",gap:14,marginBottom:12 }}>
-              <Avatar name={h.name} loc={h.loc} size={48} />
+            {idx > 0 && <div style={{ borderTop:"1px solid rgba(39,201,138,0.1)", margin:"24px 0" }} />}
+            <div style={{ display:"flex", alignItems:"center", gap:18, marginBottom:16 }}>
+              <Avatar name={h.name} loc={h.loc} size={52} />
               <div>
-                <div style={{ fontFamily:"'Bebas Neue',cursive",fontSize:26,letterSpacing:"0.03em",lineHeight:1,color:"#fff" }}>{h.name} ⭐</div>
-                <div style={{ fontSize:11,color:"#10b981",fontWeight:600,marginTop:3 }}>{htDays.length} hat-trick-dag{htDays.length>1?"er":""}</div>
+                <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"clamp(20px,5vw,34px)", fontWeight:300, letterSpacing:"0.04em", lineHeight:1, color:"var(--text)" }}>
+                  {h.name}
+                </div>
+                <div style={{ fontFamily:"'Montserrat',sans-serif", fontSize:9, fontWeight:600, color:"#27c98a", marginTop:6, letterSpacing:"0.08em", textTransform:"uppercase" }}>
+                  {htDays.length} hat-trick-dag{htDays.length>1?"er":""}
+                </div>
               </div>
             </div>
             {htDays.map(({d,c}) => (
-              <div key={d} style={{ display:"flex",alignItems:"center",gap:8,padding:"6px 10px",background:"rgba(16,185,129,0.08)",borderRadius:8,marginBottom:6,fontSize:12,color:"rgba(255,255,255,0.6)" }}>
-                <span style={{ color:"#10b981",fontWeight:700 }}>{c} salg</span>
-                <span>–</span>
-                <span>{new Date(d).toLocaleDateString("no-NO",{weekday:"long",day:"numeric",month:"long"})}</span>
+              <div key={d} className="ht-day">
+                <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:20, fontWeight:600, color:"#27c98a", flexShrink:0 }}>{c}</div>
+                <div style={{ fontFamily:"'Montserrat',sans-serif", fontSize:9, color:"var(--text-faint)", fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase" }}>salg</div>
+                <div style={{ width:1, height:14, background:"rgba(39,201,138,0.25)", flexShrink:0 }} />
+                <div style={{ fontFamily:"'Montserrat',sans-serif", fontSize:11, color:"rgba(255,255,255,0.55)" }}>
+                  {new Date(d).toLocaleDateString("no-NO",{weekday:"long",day:"numeric",month:"long"})}
+                </div>
               </div>
             ))}
           </div>
         );
       })}
-    </Card>
+    </LuxCard>
+  );
+}
+
+function DeptCard({ result }) {
+  if (!result) return null;
+  return (
+    <LuxCard accentColor="rgba(255,255,255,0.2)">
+      <CardLabel>◉ Beste forhandler denne uken</CardLabel>
+      {result.locs.map((loc, i) => (
+        <div key={loc} style={{ display:"flex", alignItems:"center", gap:18, marginBottom: i < result.locs.length-1 ? 16 : 0 }}>
+          <div style={{ width:60, height:60, borderRadius:3, background:DEPT[loc]?.bg||"rgba(201,168,76,0.1)", border:`1px solid ${dc(loc)}44`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+            <span style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:13, fontWeight:600, letterSpacing:"0.1em", color:dc(loc) }}>
+              {(DEPT[loc]?.label||loc).slice(0,3).toUpperCase()}
+            </span>
+          </div>
+          <div>
+            <div className="dept-badge" style={{ color:dc(loc) }}>{DEPT[loc]?.label||loc}</div>
+            <div style={{ fontFamily:"'Montserrat',sans-serif", fontSize:10, color:"var(--text-faint)", marginTop:3, letterSpacing:"0.06em" }}>
+              {result.count} salg denne uken
+            </div>
+          </div>
+        </div>
+      ))}
+    </LuxCard>
   );
 }
 
 function App() {
-  const [sales, setSales]     = useState(null);
-  const [error, setError]     = useState(null);
-
+  const [sales, setSales] = useState(null);
+  const [error, setError] = useState(null);
   const lw = getLastWeek();
 
   useEffect(() => {
@@ -348,11 +742,8 @@ function App() {
   }, []);
 
   if (error) return (
-    <div style={{ minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",color:"#ef4444",fontFamily:"DM Sans",padding:24 }}>
-      Feil: {error}
-    </div>
+    <div className="error-state">Feil: {error}</div>
   );
-
   if (!sales) return (
     <div style={{ minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center" }}>
       <div className="spin" />
@@ -364,7 +755,6 @@ function App() {
   const mvps     = getMVPs(sales);
   const bestDept = getBestDept(sales);
 
-  // Hat-trick
   const htMap = {};
   sales.forEach(s => {
     const d = s.ts.slice(0,10);
@@ -375,56 +765,82 @@ function App() {
     .filter(([,days]) => Object.values(days).some(c=>c>=3))
     .map(([name]) => ({ name, loc: sales.find(s=>s.selger===name)?.loc||"" }));
 
-  // The Treble: vinner + flest MVP + beste avdeling = samme person
-  const winnerNames    = new Set(winners.map(w=>w.name));
-  const mvpNames       = new Set(mvps.map(m=>m.name));
-  const trebleWinners  = winners.filter(w => mvpNames.has(w.name) && bestDept?.locs.includes(w.loc));
-  const hasTreble      = trebleWinners.length > 0;
+  const mvpNames      = new Set(mvps.map(m=>m.name));
+  const trebleWinners = winners.filter(w => mvpNames.has(w.name) && bestDept?.locs.includes(w.loc));
+  const hasTreble     = trebleWinners.length > 0;
 
   const { start, end } = weekDates(lw.year, lw.week);
 
   return (
-    <div style={{ fontFamily:"'DM Sans',sans-serif",color:"#fff",background:BG,minHeight:"100vh",padding:"0 0 40px" }}>
+    <div style={{ fontFamily:"'Montserrat',sans-serif", color:"var(--text)", background:"var(--ink)", minHeight:"100vh" }}>
+
       {/* Header */}
-      <div style={{ background:"linear-gradient(180deg,#0a0d1a 0%,#07090f 100%)",borderBottom:"1px solid rgba(59,130,246,0.12)",padding:"28px 24px 24px",textAlign:"center",position:"relative" }}>
-        <div style={{ fontSize:9,fontWeight:700,letterSpacing:"0.22em",textTransform:"uppercase",color:"rgba(255,255,255,0.25)",marginBottom:8 }}>
-          VCSO CHAMPIONSHIP 2026
-        </div>
-        <div style={{ fontFamily:"'Bebas Neue',cursive",fontSize:"clamp(32px,8vw,56px)",letterSpacing:"0.04em",lineHeight:1,marginBottom:6 }}>
-          Uke {lw.week} – Recap
-        </div>
-        <div style={{ fontSize:12,color:"rgba(255,255,255,0.3)" }}>
-          {fmt(start)} – {fmt(end)}
-        </div>
+      <header className="site-header">
+        <div className="ornament ornament-tl" />
+        <div className="ornament ornament-tr" />
+        <div className="ornament ornament-bl" />
+        <div className="ornament ornament-br" />
+        <div className="header-eyebrow">VCSO Championship 2026</div>
+        <div className="header-title">Ukens<br/>Vinner</div>
+        <div className="header-week gold-text">Uke {lw.week}</div>
+        <div className="header-date">{fmt(start)} — {fmt(end)}</div>
         {!sales.length && (
-          <div style={{ marginTop:16,fontSize:13,color:"rgba(255,255,255,0.35)",fontStyle:"italic" }}>
+          <div style={{ marginTop:24, fontFamily:"'Cormorant Garamond',serif", fontSize:16, color:"var(--text-faint)", fontStyle:"italic" }}>
             Ingen salg registrert denne uken.
           </div>
         )}
-      </div>
+      </header>
 
       {sales.length > 0 && (
-        <div style={{ maxWidth:480,margin:"0 auto",padding:"24px 16px 0" }}>
+        <div className="page-wrap">
           {hasTreble && <TrebleBanner name={trebleWinners[0].name} />}
+
           {winners.length > 0 && <WinnerCard winners={winners} ranked={ranked} weekSales={sales} />}
-          {mvps.length > 0    && <MVPCard mvps={mvps} />}
-          {hatters.length > 0 && <HatTrickCard hatters={hatters} weekSales={sales} />}
-          {bestDept           && <DeptCard result={bestDept} />}
+
+          {mvps.length > 0 && (
+            <>
+              <div className="section-divider">Daglig MVP</div>
+              <MVPCard mvps={mvps} />
+            </>
+          )}
+
+          {hatters.length > 0 && (
+            <>
+              <div className="section-divider">Hat-trick</div>
+              <HatTrickCard hatters={hatters} weekSales={sales} />
+            </>
+          )}
+
+          {bestDept && (
+            <>
+              <div className="section-divider">Avdelingstoppen</div>
+              <DeptCard result={bestDept} />
+            </>
+          )}
 
           {/* Alle salg */}
-          <div style={{ marginTop:8,padding:"16px 0 0" }}>
-            <div style={{ fontSize:9,fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"rgba(255,255,255,0.22)",marginBottom:12 }}>
-              📋 Alle {sales.length} salg denne uken
-            </div>
+          <div className="section-divider">Alle {sales.length} salg</div>
+          <div style={{ margin:"0 16px" }}>
             {sales.slice().sort((a,b)=>b.ts.localeCompare(a.ts)).map((s,i) => (
-              <div key={i} style={{ display:"flex",alignItems:"center",gap:10,padding:"9px 14px",background:i%2===0?"rgba(255,255,255,0.025)":"transparent",borderRadius:8,marginBottom:2 }}>
-                <div style={{ width:6,height:6,borderRadius:"50%",background:dc(s.loc),flexShrink:0 }} />
-                <div style={{ flex:1,fontSize:13,color:"rgba(255,255,255,0.75)",fontWeight:500 }}>{s.selger}</div>
-                <div style={{ fontSize:12,color:"rgba(255,255,255,0.4)" }}>{s.modell}</div>
-                {s.finansiert && <div style={{ fontSize:9,fontWeight:700,color:"#f5c842",letterSpacing:"0.1em" }}>◆ FIN</div>}
-                <div style={{ fontSize:11,color:"rgba(255,255,255,0.25)" }}>{s.ts.slice(5,10).replace("-",".")}</div>
+              <div key={i} className="sale-row">
+                <div style={{ width:5,height:5,borderRadius:"50%",background:dc(s.loc),flexShrink:0,boxShadow:`0 0 6px ${dc(s.loc)}88` }} />
+                <div style={{ flex:1, fontFamily:"'Montserrat',sans-serif", fontSize:13, color:"rgba(240,232,216,0.72)", fontWeight:500 }}>{s.selger}</div>
+                <div style={{ fontSize:11, color:"var(--text-faint)", letterSpacing:"0.04em" }}>{s.modell}</div>
+                {s.finansiert && (
+                  <div style={{ fontFamily:"'Montserrat',sans-serif", fontSize:7, fontWeight:700, color:"var(--gold)", letterSpacing:"0.16em", padding:"2px 6px", border:"1px solid rgba(201,168,76,0.3)", borderRadius:2 }}>FIN</div>
+                )}
+                <div style={{ fontSize:10, color:"var(--text-faint)", letterSpacing:"0.06em", flexShrink:0 }}>
+                  {s.ts.slice(5,10).replace("-",".")}
+                </div>
               </div>
             ))}
+          </div>
+
+          {/* Footer ornament */}
+          <div style={{ textAlign:"center", padding:"48px 24px 0", opacity:0.25 }}>
+            <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:11, letterSpacing:"0.4em", color:"var(--gold)", textTransform:"uppercase" }}>
+              — VCSO —
+            </div>
           </div>
         </div>
       )}
