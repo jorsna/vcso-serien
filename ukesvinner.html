@@ -456,8 +456,16 @@ function weekDates(year, week) {
   return { start:s, end:e };
 }
 function getLastWeek() {
-  const d = new Date(); d.setDate(d.getDate() - 7);
-  return { year: d.getFullYear(), week: isoWeek(d) };
+  const now  = new Date();
+  const thisWeek = isoWeek(now);
+  const thisYear = now.getFullYear();
+  if (thisWeek > 1) {
+    return { year: thisYear, week: thisWeek - 1 };
+  } else {
+    // Uke 1 → forrige uke er siste uke i fjoråret
+    const dec28 = new Date(Date.UTC(thisYear - 1, 11, 28));
+    return { year: thisYear - 1, week: isoWeek(dec28) };
+  }
 }
 function rankSales(sales) {
   const m = {};
