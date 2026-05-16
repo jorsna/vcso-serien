@@ -741,7 +741,7 @@ function App() {
     const { start, end } = weekDates(lw.year, lw.week);
     const from = start.toISOString();
     const to   = end.toISOString();
-    fetch(`${SB_URL}/rest/v1/sales?select=*&ts=gte.${from}&ts=lte.${to}&deleted=is.null&order=ts.asc`, {
+    fetch(`${SB_URL}/rest/v1/sales?select=*&ts=gte.${from}&ts=lte.${to}&deleted=is.false&order=ts.asc`, {
       headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }
     })
       .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
