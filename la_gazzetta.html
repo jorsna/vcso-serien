@@ -366,7 +366,7 @@ function tryAdminLogin() {
     isAdmin = (pw === ADMIN_PW);
     document.getElementById('login-overlay').style.display = 'none';
     if (isAdmin) document.getElementById('admin-bar').style.display = 'flex';
-    localStorage.setItem('gaz-role', isAdmin ? 'admin' : 'selger');
+    localStorage.setItem('gaz-champ-role', isAdmin ? 'admin' : 'selger');
     loadGazzetta();
   } else {
     var e = document.getElementById('pw-err');
@@ -378,7 +378,7 @@ function tryAdminLogin() {
 
 function enterAsReader() {
   document.getElementById('login-overlay').style.display = 'none';
-  localStorage.setItem('gaz-role', 'tilskuer');
+  localStorage.setItem('gaz-champ-role', 'tilskuer');
   loadGazzetta();
 }
 
@@ -627,7 +627,7 @@ function genererTekst(salg, dato) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + SB_KEY
+      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlc3Jqdnp0c3FkeHpxZ2lmZmVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzg0MTMsImV4cCI6MjA5Mzc1NDQxM30.ouYcq-2hIUkqkn395Q5us5jYqa9JDVbOjJzORDBM72Y'
     },
     body: JSON.stringify({ prompt: prompt })
   })
@@ -655,7 +655,7 @@ function genererTekst(salg, dato) {
 
 // ── INIT ─────────────────────────────────────────────────────────────
 (function() {
-  var saved = localStorage.getItem('gaz-role');
+  var saved = localStorage.getItem('gaz-champ-role');
   if (saved === 'admin') {
     isAdmin = true;
     document.getElementById('login-overlay').style.display = 'none';
