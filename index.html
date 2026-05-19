@@ -336,7 +336,7 @@ html, body {
   border:1px solid rgba(255,215,0,.35);
   border-radius:10px;overflow:hidden;
   box-shadow:0 8px 40px rgba(0,0,0,.7),0 0 30px rgba(255,215,0,.1);
-  pointer-events:none;
+  pointer-events:all;
   opacity:0;transition:opacity .15s ease;
 }
 .player-card.show{opacity:1}
@@ -371,6 +371,32 @@ html, body {
 .hof-avatar-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;border:1.5px solid #0a0a14}
 .hof-hat-ring{width:44px;height:44px;border-radius:50%;padding:2px;background:linear-gradient(135deg,#fff,#ffd700,#fff);background-size:300% 300%;animation:goldSpin 4s ease infinite;flex-shrink:0;opacity:.9}
 .hof-hat-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;border:1.5px solid #0a0a14}
+.pc-skjerf-btn{display:block;width:calc(100% - 24px);margin:0 12px 12px;padding:8px;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.45);border-radius:5px;color:var(--gold);font-family:'Barlow',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;text-align:center;transition:background .15s}
+.pc-skjerf-btn:hover{background:rgba(201,168,76,0.25)}
+#skjerf-modal{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+#skjerf-modal.show{opacity:1;pointer-events:all}
+.skjerf-inner{background:#0a1a0f;border:1px solid rgba(201,168,76,0.3);border-radius:12px;width:100%;max-width:500px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.skjerf-close{align-self:flex-end;background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;line-height:1;padding:0;margin-bottom:-4px}
+#skjerf-canvas{width:100%;border-radius:8px;display:block}
+.skjerf-copy-btn{width:100%;padding:12px;background:var(--gold);border:none;color:#000;font-family:'Barlow',sans-serif;font-size:12px;font-weight:900;letter-spacing:2px;text-transform:uppercase;border-radius:6px;cursor:pointer}
+#skjerf-copy-status{font-size:11px;color:rgba(201,168,76,0.5);text-align:center;min-height:14px;letter-spacing:1px}
+.press-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;padding:0 14px 14px}
+.press-card{background:var(--card2);border-radius:8px;padding:12px;border-left:4px solid transparent}
+.press-avd-lbl{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px}
+.press-bar-bg{height:7px;background:var(--faint);border-radius:3px;overflow:hidden;margin:5px 0}
+.press-bar-fill{height:100%;border-radius:3px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.press-status-row{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700}
+.press-pct-lbl{font-size:9px;color:var(--muted);margin-top:2px}
+.press-legend{display:flex;flex-wrap:wrap;gap:10px;padding:8px 14px 10px;font-size:9px;color:var(--muted);border-top:1px solid var(--b1)}
+.modell-trophy{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:7px;margin-bottom:12px}
+.modell-trophy-name{font-family:'Anton',sans-serif;font-size:18px;color:var(--gold);letter-spacing:1px}
+.modell-trophy-sub{font-size:9px;color:var(--muted);margin-top:1px}
+.modell-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.modell-bar-name{font-size:11px;color:var(--txt);width:72px;flex-shrink:0;text-align:right}
+.modell-bar-bg{flex:1;background:var(--faint);border-radius:3px;height:18px;overflow:hidden}
+.modell-bar-fill{height:100%;border-radius:3px;display:flex;align-items:center;justify-content:flex-end;padding-right:7px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.modell-bar-count{font-size:10px;font-weight:700;color:#000}
+.modell-bar-pct{font-size:9px;color:var(--muted);width:30px;text-align:right;flex-shrink:0}
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6NJ95NHF98"></script>
@@ -456,6 +482,7 @@ html, body {
   <button class="tab" onclick="setTab('scoring',this)">Scoringer</button>
   <button class="tab wide" onclick="setTab('hof', this)">🏆 Hall of Fame</button>
   <button class="tab wide" onclick="setTab('tips', this)">💡 Salgsverktøy</button>
+  <button class="tab wide" onclick="window.open('la_gazzetta.html','_blank')">📰 La Gazzetta</button>
 </div>
 
 <!-- MATCHDAY BAR -->
@@ -517,7 +544,28 @@ html, body {
   <div class="stats-grid">
     <div class="stat-card"><div class="stat-title">Toppscorere</div><div id="top-scorers"></div></div>
     <div class="stat-card"><div class="stat-title">Siste 5 dager</div><div id="top-form"></div></div>
-    <div class="stat-card full"><div class="stat-title">Avdeling mot m&#229;l</div><div id="team-bars"></div></div>
+    <div class="stat-card full"><div class="stat-title">Avdeling mot mål</div><div id="team-bars"></div></div>
+    <div class="stat-card full"><div class="stat-title">📊 Modell-statistikk</div><div id="modell-stats"></div></div>
+  </div>
+  <div style="padding:10px 14px 6px;background:var(--card);border-top:1px solid var(--b1)">
+    <div class="stat-title" style="margin-bottom:8px">🌡️ Press-indikator</div>
+  </div>
+  <div class="press-grid" id="press-grid"></div>
+  <div class="press-legend">
+    <span>☀️ I rute (&gt;75%)</span>
+    <span>🌥️ Beholder (50–75%)</span>
+    <span>🌧️ Bak (35–50%)</span>
+    <span>⛈️ Under press (&lt;35%)</span>
+  </div>
+</div>
+
+<!-- SKJERF MODAL -->
+<div id="skjerf-modal" onclick="if(event.target===this)lukkSkjerf()">
+  <div class="skjerf-inner">
+    <button class="skjerf-close" onclick="lukkSkjerf()">&times;</button>
+    <canvas id="skjerf-canvas"></canvas>
+    <button class="skjerf-copy-btn" onclick="kopierSkjerf()">&#128203; Del skjerf – kopier til utklippstavle</button>
+    <div id="skjerf-copy-status"></div>
   </div>
 </div>
 
@@ -1419,6 +1467,32 @@ function renderStats() {
       + '<div class="bar-bg"><div class="bar-fill" style="width:'+pct.toFixed(1)+'%;background:'+barCol+'"></div></div>'
     + '</div>';
   }).join('');
+
+  var el4 = document.getElementById('modell-stats');
+  if (el4) {
+    var mc={};
+    sales.forEach(function(s){if(m!=='all'&&s.mnd!==m)return;mc[s.modell]=(mc[s.modell]||0)+1;});
+    var ma=Object.keys(mc).map(function(k){return{navn:k,antall:mc[k]};}).sort(function(a,b){return b.antall-a.antall;});
+    var tot=ma.reduce(function(a,x){return a+x.antall;},0);
+    var mx=ma.length?ma[0].antall:1;
+    var MC=['#c9a84c','#3b82f6','#22c55e','#8b5cf6','#e8001a','#f59e0b','#06b6d4','#f43f5e','#84cc16'];
+    el4.innerHTML=ma.length?(ma.length?'<div class="modell-trophy"><span style="font-size:22px">🏆</span><div><div class="modell-trophy-name">'+ma[0].navn+'</div><div class="modell-trophy-sub">Bestselger · '+ma[0].antall+' solgt</div></div><div style="margin-left:auto;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.4);border-radius:20px;padding:3px 10px;font-size:10px;color:var(--gold);font-weight:700">GULLBIL 🏅</div></div>':'')+ma.map(function(mv,i){var p=Math.round(mv.antall/Math.max(mx,1)*100);var sp=tot>0?Math.round(mv.antall/tot*100):0;return'<div class="modell-bar-row"><div class="modell-bar-name">'+mv.navn+'</div><div class="modell-bar-bg"><div class="modell-bar-fill" style="width:'+p+'%;background:'+MC[i%MC.length]+'"><span class="modell-bar-count">'+mv.antall+'</span></div></div><div class="modell-bar-pct">'+sp+'%</div></div>';}).join(''):'<div style="font-size:12px;color:var(--muted);padding:8px 0">Ingen salg ennå.</div>';
+  }
+
+  var pg=document.getElementById('press-grid');
+  if(pg){
+    var n2=new Date(),mo2=n2.getMonth()===4?'mai':'jun',el=n2.getDate()/(mo2==='mai'?31:30);
+    pg.innerHTML=TEAMS.map(function(t){
+      var gl=teamGoal(t.id,mo2)||1,ac=teamGoalsFor(t.id,mo2),pc=Math.min(ac/gl*100,100),op=Math.round(gl*el)>0?ac/Math.round(gl*el):1;
+      var w,wc,bc;
+      if(op>=0.75){w='☀️';wc='var(--g)';bc='var(--g)';}
+      else if(op>=0.50){w='🌥️';wc='var(--y)';bc='var(--y)';}
+      else if(op>=0.35){w='🌧️';wc='#f97316';bc='#f97316';}
+      else{w='⛈️';wc='var(--r)';bc='var(--r)';}
+      var st=op>=0.75?'I RUTE':op>=0.50?'BEHOLDER':op>=0.35?'BAKT':'UNDER PRESS';
+      return'<div class="press-card" style="border-left-color:'+t.color+'"><div class="press-avd-lbl" style="color:'+t.color+'">'+t.navn+'</div><div class="press-bar-bg"><div class="press-bar-fill" style="width:'+pc.toFixed(1)+'%;background:'+bc+'"></div></div><div class="press-status-row"><span style="font-size:14px">'+w+'</span><span style="color:'+wc+'">'+st+'</span></div><div class="press-pct-lbl">'+ac+' av '+gl+' · '+Math.round(pc)+'% av månedsmål</div></div>';
+    }).join('');
+  }
 }
 function renderScoring() {
   var all = locFilter === 'all' ? sales : sales.filter(function(s) {
@@ -1902,121 +1976,134 @@ setInterval(countdown, 1000);
   card.id = 'player-hover-card';
   document.body.appendChild(card);
 
+  var hideTimer = null, frozen = false;
+
   function getSelgerStats(navn) {
-    var per = 0, fin = 0, form = [], hatTricks = 0;
-    var dmap = {};
-    sales.forEach(function(s) {
-      if (s.selger !== navn) return;
-      per++;
-      if (s.finansiert) fin++;
-      dmap[s.ts.slice(0,10)] = (dmap[s.ts.slice(0,10)]||0)+1;
+    var per=0,fin=0,form=[],hatTricks=0,dmap={};
+    sales.forEach(function(s){
+      if(s.selger!==navn)return;
+      per++;if(s.finansiert)fin++;
+      dmap[s.ts.slice(0,10)]=(dmap[s.ts.slice(0,10)]||0)+1;
     });
-    // Form: same as selgerDots - last 5 calendar days
-    for (var i = 0; i <= 4; i++) {
-      var d = new Date(); d.setDate(d.getDate() - i);
-      var ds = d.getFullYear() + '-' + (d.getMonth()+1<10?'0':'') + (d.getMonth()+1) + '-' + (d.getDate()<10?'0':'') + d.getDate();
-      form.push(dmap[ds] > 0);
+    for(var i=0;i<=4;i++){
+      var d=new Date();d.setDate(d.getDate()-i);
+      var ds=d.getFullYear()+'-'+(d.getMonth()+1<10?'0':'')+(d.getMonth()+1)+'-'+(d.getDate()<10?'0':'')+d.getDate();
+      form.push(dmap[ds]>0);
     }
-    // Hat tricks
-    Object.keys(dmap).forEach(function(d){ if(dmap[d]>=3) hatTricks++; });
-    return { per:per, fin:fin, form:form, hatTricks:hatTricks };
+    Object.keys(dmap).forEach(function(d){if(dmap[d]>=3)hatTricks++;});
+    return{per:per,fin:fin,form:form,hatTricks:hatTricks};
   }
 
-  function showCard(navn, color, id, loc, e) {
-    var stats = getSelgerStats(navn);
-    var photos = typeof SELGER_PHOTOS !== 'undefined' ? SELGER_PHOTOS : {};
-    var ini = id.replace(/_/g,' ').split(' ').map(function(w){return w[0]?w[0].toUpperCase():''}).join('').slice(0,2);
-    var photoHtml = photos[id]
-      ? '<img src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">'
-      : '<div class="pc-photo-ph">'+ini+'</div>';
+  function positionCard(e){
+    var x=e.clientX+14,y=e.clientY-60;
+    if(x+228>window.innerWidth)x=e.clientX-242;
+    if(y+340>window.innerHeight)y=window.innerHeight-350;
+    if(y<10)y=10;
+    card.style.left=x+'px';card.style.top=y+'px';
+  }
 
-    var locMap = {ryen:'Ryen',fornebu:'Fornebu',lillestrom:'Lillestrøm',okern:'Økern'};
-    var locStr = locMap[loc] || loc;
-
-    var formDots = stats.form.map(function(f){
-      return '<div class="pc-dot" style="background:'+(f?'#22c55e':'#ef4444')+'"></div>';
-    }).join('');
-
-    card.innerHTML =
-      '<div class="pc-top">'
-        +'<div class="pc-comp">VCSO Championship</div>'
-        +'<div class="pc-week">2026</div>'
-      +'</div>'
+  function showCard(navn,color,id,loc,e){
+    if(hideTimer){clearTimeout(hideTimer);hideTimer=null;}
+    frozen=false;
+    var stats=getSelgerStats(navn);
+    var photos=typeof SELGER_PHOTOS!=='undefined'?SELGER_PHOTOS:{};
+    var ini=id.replace(/_/g,' ').split(' ').map(function(w){return w[0]?w[0].toUpperCase():'';}).join('').slice(0,2);
+    var photoHtml=photos[id]
+      ?'<img src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">'
+      :'<div class="pc-photo-ph">'+ini+'</div>';
+    var locMap={ryen:'Ryen',fornebu:'Fornebu',lillestrom:'Lillestrøm'};
+    var locStr=locMap[loc]||loc;
+    var formDots=stats.form.map(function(f){return'<div class="pc-dot" style="background:'+(f?'#22c55e':'#ef4444')+'"></div>';}).join('');
+    card.innerHTML=
+      '<div class="pc-top"><div class="pc-comp">VCSO Championship</div><div class="pc-week">2026</div></div>'
       +'<div class="pc-photo-wrap"><div class="pc-photo">'+photoHtml+'</div></div>'
       +'<div class="pc-name">'+navn+'</div>'
       +'<div class="pc-avd" style="color:'+color+'">'+locStr+'</div>'
       +'<div class="pc-stats">'
-        +'<div class="pc-stat">'
-          +'<div class="pc-stat-n" style="color:var(--gold)">'+stats.per+'</div>'
-          +'<div class="pc-stat-l">Salg</div>'
-        +'</div>'
-        +'<div class="pc-stat">'
-          +'<div class="pc-stat-n" style="color:var(--gold2)">'+stats.per*3+'</div>'
-          +'<div class="pc-stat-l">Poeng</div>'
-        +'</div>'
-        +'<div class="pc-stat">'
-          +'<div class="pc-stat-n" style="color:#22c55e">'+stats.fin+'</div>'
-          +'<div class="pc-stat-l">Finansiert</div>'
-        +'</div>'
-        +(stats.hatTricks>0?'<div class="pc-stat">'
-          +'<div class="pc-stat-n" style="color:var(--gold)">'+stats.hatTricks+'</div>'
-          +'<div class="pc-stat-l">Hat-trick</div>'
-        +'</div>':'')
+        +'<div class="pc-stat"><div class="pc-stat-n" style="color:var(--gold)">'+stats.per+'</div><div class="pc-stat-l">Salg</div></div>'
+        +'<div class="pc-stat"><div class="pc-stat-n" style="color:var(--gold2)">'+stats.per*3+'</div><div class="pc-stat-l">Poeng</div></div>'
+        +'<div class="pc-stat"><div class="pc-stat-n" style="color:#22c55e">'+stats.fin+'</div><div class="pc-stat-l">Finansiert</div></div>'
+        +(stats.hatTricks>0?'<div class="pc-stat"><div class="pc-stat-n" style="color:var(--gold)">'+stats.hatTricks+'</div><div class="pc-stat-l">Hat-trick</div></div>':'')
       +'</div>'
-      +'<div class="pc-form">'+formDots+'</div>';
-
-    // Position
-    var x = e.clientX + 14, y = e.clientY - 60;
-    if (x + 220 > window.innerWidth) x = e.clientX - 234;
-    if (y + 320 > window.innerHeight) y = window.innerHeight - 330;
-    card.style.left = x + 'px';
-    card.style.top  = y + 'px';
-    card.classList.add('show');
+      +'<div class="pc-form">'+formDots+'</div>'
+      +'<button class="pc-skjerf-btn" onclick="visSkjerf(\''+navn+'\',\''+id+'\',\''+loc+'\','+stats.per+','+stats.per*3+','+stats.fin+','+stats.hatTricks+')">&#x1F9E3; Del skjerf</button>';
+    positionCard(e);card.classList.add('show');
+    card.onmouseenter=function(){frozen=true;if(hideTimer){clearTimeout(hideTimer);hideTimer=null;}};
+    card.onmouseleave=function(){frozen=false;hideTimer=setTimeout(function(){card.classList.remove('show');},80);};
   }
 
-  function hideCard() {
-    card.classList.remove('show');
-  }
+  function scheduleHide(){hideTimer=setTimeout(function(){if(!frozen)card.classList.remove('show');},120);}
+  function moveCard(e){if(!frozen)positionCard(e);}
 
-  function moveCard(e) {
-    var x = e.clientX + 14, y = e.clientY - 60;
-    if (x + 220 > window.innerWidth) x = e.clientX - 234;
-    if (y + 320 > window.innerHeight) y = window.innerHeight - 330;
-    card.style.left = x + 'px';
-    card.style.top  = y + 'px';
-  }
-
-  // Attach to trows after render
-  var origRenderInd = typeof renderInd === 'function' ? renderInd : null;
-
-  function attachHovers() {
-    var tbl = document.getElementById('tbl-ind');
-    if (!tbl) return;
-    var rows = tbl.querySelectorAll('.trow');
-    rows.forEach(function(row) {
-      var navn = row.getAttribute('data-navn');
-      if (!navn) return;
-      var sObj = SELGERE.find(function(s){ return s.navn === navn; });
-      if (!sObj) return;
-      row.addEventListener('mouseenter', function(e){ showCard(sObj.navn, sObj.color, sObj.id, sObj.loc, e); });
-      row.addEventListener('mousemove', moveCard);
-      row.addEventListener('mouseleave', hideCard);
+  function attachHovers(){
+    var tbl=document.getElementById('tbl-ind');
+    if(!tbl)return;
+    tbl.querySelectorAll('.trow').forEach(function(row){
+      if(row._hoverAttached)return;
+      row._hoverAttached=true;
+      var navn=row.getAttribute('data-navn');
+      if(!navn)return;
+      var sObj=SELGERE.find(function(s){return s.navn===navn;});
+      if(!sObj)return;
+      row.addEventListener('mouseenter',function(e){showCard(sObj.navn,sObj.color,sObj.id,sObj.loc,e);});
+      row.addEventListener('mousemove',moveCard);
+      row.addEventListener('mouseleave',scheduleHide);
     });
   }
 
-  // Hook into renderAll
-  var origRenderAll = typeof renderAll === 'function' ? renderAll : null;
-  if (origRenderAll) {
-    window.renderAll = function() {
-      origRenderAll();
-      setTimeout(attachHovers, 100);
-    };
-  }
-
-  // Also try on load
-  setTimeout(attachHovers, 2000);
-  document.addEventListener('click', function(){ setTimeout(attachHovers, 200); });
+  var origRenderAll=typeof renderAll==='function'?renderAll:null;
+  if(origRenderAll){window.renderAll=function(){origRenderAll();setTimeout(attachHovers,100);};}
+  setTimeout(attachHovers,2000);
+  document.addEventListener('click',function(){setTimeout(attachHovers,200);});
 })();
+
+// ── SKJERF ──────────────────────────────────────────────────────────────────
+var AVD_SKJERF={ryen:{color:'#3b82f6',dark:'#1e3a8a'},fornebu:{color:'#10b981',dark:'#065f46'},lillestrom:{color:'#f59e0b',dark:'#92400e'}};
+var BADGE_SKJERF={'HAT-TRICK':{bg:'rgba(201,168,76,0.25)',stroke:'#c9a84c',text:'#f0c96e'},'STREAK':{bg:'rgba(239,68,68,0.2)',stroke:'#ef4444',text:'#f87171'},'FINANSIERING':{bg:'rgba(34,197,94,0.2)',stroke:'#22c55e',text:'#4ade80'}};
+
+function visSkjerf(navn,id,loc,salg,pts,fin,hatTricks){
+  var modal=document.getElementById('skjerf-modal'),canvas=document.getElementById('skjerf-canvas');
+  if(!modal||!canvas)return;
+  var W=580,H=220;canvas.width=W*2;canvas.height=H*2;canvas.style.width='100%';
+  var ctx=canvas.getContext('2d');ctx.scale(2,2);
+  var avd=AVD_SKJERF[loc]||{color:'#c9a84c',dark:'#7a6030'};
+  var sk=streakCount(navn),badges=[];
+  if(hatTricks>0)badges.push('HAT-TRICK');if(sk>=3)badges.push('STREAK');if(fin>0)badges.push('FINANSIERING');
+  ctx.fillStyle='#111';srr(ctx,0,0,W,H,10);ctx.fill();
+  sst(ctx,0,0,72,H,avd.color,avd.dark,'left');ctx.fillStyle='#111';ctx.fillRect(62,0,12,H);
+  sst(ctx,W-72,0,72,H,avd.color,avd.dark,'right');ctx.fillStyle='#111';ctx.fillRect(W-74,0,12,H);
+  var pat=scp(ctx);if(pat){ctx.fillStyle=pat;ctx.fillRect(74,0,W-148,H);}
+  ctx.fillStyle='rgba(10,26,15,0.75)';ctx.fillRect(74,0,W-148,H);
+  ctx.fillStyle='rgba(201,168,76,0.55)';ctx.fillRect(66,0,3,H);ctx.fillRect(W-69,0,3,H);
+  ctx.fillStyle='rgba(201,168,76,0.2)';ctx.fillRect(74,14,W-148,1);ctx.fillRect(74,H-15,W-148,1);
+  ctx.textAlign='center';ctx.font='700 10px sans-serif';ctx.fillStyle='rgba(201,168,76,0.65)';
+  ctx.fillText((LL[loc]||loc).toUpperCase()+' · VCSO CHAMPIONSHIP 2026',W/2,37);
+  var nu=navn.toUpperCase(),fs=58;ctx.font='900 '+fs+'px sans-serif';
+  while(ctx.measureText(nu).width>W-170&&fs>22){fs-=2;ctx.font='900 '+fs+'px sans-serif';}
+  ctx.fillStyle='#fff';ctx.fillText(nu,W/2,106);
+  ctx.fillStyle='rgba(201,168,76,0.3)';ctx.fillRect(74,116,W-148,1);
+  ctx.font='900 28px sans-serif';ctx.fillStyle='#c9a84c';ctx.fillText(String(salg),108,148);
+  ctx.font='700 9px sans-serif';ctx.fillStyle='rgba(255,255,255,0.35)';ctx.fillText('SALG',108,162);
+  ctx.font='900 28px sans-serif';ctx.fillStyle='#c9a84c';ctx.fillText(String(pts),210,148);
+  ctx.font='700 9px sans-serif';ctx.fillStyle='rgba(255,255,255,0.35)';ctx.fillText('POENG',210,162);
+  ctx.strokeStyle='rgba(201,168,76,0.2)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(248,122);ctx.lineTo(248,170);ctx.stroke();
+  var bx=258;
+  badges.forEach(function(b){var bc=BADGE_SKJERF[b]||BADGE_SKJERF['HAT-TRICK'];ctx.font='700 9px sans-serif';var bw=ctx.measureText(b).width+22;if(bx+bw>W-74)return;ctx.fillStyle=bc.bg;srr(ctx,bx,122,bw,20,3);ctx.fill();ctx.strokeStyle=bc.stroke;ctx.lineWidth=0.8;srr(ctx,bx,122,bw,20,3);ctx.stroke();ctx.fillStyle=bc.text;ctx.textAlign='center';ctx.fillText(b,bx+bw/2,135);bx+=bw+7;});
+  ctx.font='700 9px sans-serif';ctx.fillStyle='rgba(201,168,76,0.28)';ctx.textAlign='center';ctx.fillText('VCSO · CHAMPIONSHIP · 2026',W/2,200);
+  var st=document.getElementById('skjerf-copy-status');if(st)st.textContent='';
+  modal.classList.add('show');
+}
+function lukkSkjerf(){var m=document.getElementById('skjerf-modal');if(m)m.classList.remove('show');}
+function kopierSkjerf(){
+  var c=document.getElementById('skjerf-canvas'),s=document.getElementById('skjerf-copy-status');
+  if(!c)return;
+  c.toBlob(function(blob){
+    navigator.clipboard.write([new ClipboardItem({'image/png':blob})]).then(function(){s.textContent='✓ Kopiert!';s.style.color='#22c55e';setTimeout(function(){s.textContent='';},4000);}).catch(function(){var a=document.createElement('a');a.href=c.toDataURL('image/png');a.download='skjerf.png';a.click();s.textContent='↓ Lastet ned';s.style.color='#f59e0b';setTimeout(function(){s.textContent='';},5000);});
+  },'image/png');
+}
+function srr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();}
+function sst(ctx,x,y,w,h,c1,c2,side){var o=document.createElement('canvas');o.width=w;o.height=h;var oc=o.getContext('2d'),sw=18;for(var i=0;i*sw<w+h;i++){oc.fillStyle=i%2===0?c1:c2;oc.beginPath();oc.moveTo(i*sw-h,0);oc.lineTo(i*sw,0);oc.lineTo(i*sw-h+sw,h);oc.lineTo(i*sw-h,h);oc.closePath();oc.fill();}ctx.save();ctx.beginPath();if(side==='left'){ctx.moveTo(x+10,y);ctx.lineTo(x+w,y);ctx.lineTo(x+w,y+h);ctx.lineTo(x+10,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-10);ctx.lineTo(x,y+10);ctx.quadraticCurveTo(x,y,x+10,y);}else{ctx.moveTo(x,y);ctx.lineTo(x+w-10,y);ctx.quadraticCurveTo(x+w,y,x+w,y+10);ctx.lineTo(x+w,y+h-10);ctx.quadraticCurveTo(x+w,y+h,x+w-10,y+h);ctx.lineTo(x,y+h);}ctx.closePath();ctx.clip();ctx.drawImage(o,x,y);ctx.restore();}
+function scp(ctx){var p=document.createElement('canvas');p.width=24;p.height=24;var pc=p.getContext('2d');pc.strokeStyle='rgba(201,168,76,0.1)';pc.lineWidth=1.2;pc.beginPath();pc.moveTo(0,12);pc.lineTo(12,0);pc.lineTo(24,12);pc.lineTo(12,24);pc.lineTo(0,12);pc.stroke();return ctx.createPattern(p,'repeat');}
 
 </script>
 </body>
