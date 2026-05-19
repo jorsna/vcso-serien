@@ -619,7 +619,7 @@ function genererTekst(salg, dato) {
 
   var prompt = 'Du er La Gazzetta dello VCSO Championship – en dramatisk italiensk-inspirert sportsavis for VCSO Championship 2026.\n\nKAMPRAPPORT – ' + norskDato(dato) + '\n\nSALG PER SELGER DENNE DAGEN:\n' + selgerListe + '\n\nSAMMENDRAG:\n- Totalt denne dagen: ' + totalt + ' biler\n- MVP: ' + (mvp||'ingen') + ' fra ' + mvpAvd + ' med ' + (selgerTelling[mvp]||0) + ' biler\n- Avdeling-totaler: Ryen ' + avdTelling.ryen + ', Fornebu ' + avdTelling.fornebu + ', Lillestrøm ' + avdTelling.lillestrom + ', Økern ' + avdTelling.okern + '\n- Bestselger-modell: ' + (topModell||'ukjent') + ' (' + (modellTelling[topModell]||0) + ' stk)\n- Finansierte salg: ' + finTelling + '\n' + (hatTrickNavn.length ? '- HAT-TRICK: ' + hatTrickTekst + ' scoret 3+ biler på én dag\n' : '') + '\nVIKTIG: Bruk eksakt riktig avdeling for hver selger slik det står i listen. Ikke finn på avdelinger.\n\nSkriv en dramatisk avisartikkel på NORSK:\n1. Dramatisk overskrift (maks 10 ord)\n2. Kort ingress (1 setning)\n3. Artikkeltekst 4-5 avsnitt ca 250 ord. Avsnitt skilles av \\n\\n. Inkluder et sitat i anførselstegn.\n\nSvar KUN med gyldig JSON:\n{"overskrift":"...","ingress":"...","tekst":"avsnitt1\\n\\navsnitt2\\n\\n\\"Sitat\\"\\n\\navsnitt3"}';
 
-  return fetch('https://jffhdlmwvurnojoapcvs.supabase.co/functions/v1/swift-api', {
+  return fetch('https://resrjvztsqdxzqgiffeg.supabase.co/functions/v1/swift-api', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
