@@ -150,7 +150,7 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .trow:hover{background:var(--faint)}
 .trow.zt{border-left:3px solid var(--g)}.trow.zb{border-left:3px solid var(--r)}.trow.zm{border-left:3px solid transparent}
 .pos-n{font-family:'Anton',sans-serif;font-size:13px;line-height:1}
-.av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;
+.av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;
   justify-content:center;font-size:9px;font-weight:700}
 .name-c{display:flex;flex-direction:column;gap:1px;padding:0 6px;align-items:flex-start}
 .name-main{font-size:13px;font-weight:700}
@@ -474,7 +474,7 @@ html, body {
 <!-- MVP BANNER -->
 <div id="mvp-banner" style="display:none;padding:10px 16px;background:linear-gradient(135deg,rgba(255,215,0,.1),rgba(255,215,0,.04));border-bottom:1px solid rgba(255,215,0,.2);align-items:center;gap:12px">
   <div style="font-size:22px">&#128081;</div>
-  <div id="mvp-av" style="width:34px;height:34px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700"></div>
+  <div id="mvp-av" style="width:36px;height:36px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700"></div>
   <div>
     <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gold)">Dagens MVP</div>
     <div id="mvp-name" style="font-size:15px;font-weight:700;color:var(--txt)">&#8211;</div>
@@ -937,7 +937,7 @@ function updateMVP() {
     }
     banner.innerHTML +=
       '<div style="display:flex;align-items:center;gap:8px;margin-right:14px;flex-shrink:0">'+
-        '<div style="width:34px;height:34px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0">'+avHtml+'</div>'+
+        '<div style="width:36px;height:36px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0">'+avHtml+'</div>'+
         '<div>'+
           '<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gold)">'+(delt?'Delt MVP':'Dagens MVP')+'</div>'+
           '<div style="font-size:14px;font-weight:700;color:var(--txt)">'+navn+'</div>'+
