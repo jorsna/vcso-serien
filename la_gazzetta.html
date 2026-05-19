@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Gazzetta dello VCSO Championship</title>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #f5f0e8;
+  font-family: 'Barlow', sans-serif;
+  min-height: 100vh;
+}
+
+/* ── HEADER / MASTHEAD ── */
+.masthead {
+  background: #fff;
+  border-bottom: 3px solid #1a1a1a;
+  padding: 0;
+}
+.masthead-top {
+  background: #1a1a1a;
+  color: #f5f0e8;
+  text-align: center;
+  padding: 6px 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.masthead-title {
+  font-family: 'UnifrakturMaguntia', cursive;
+  font-size: clamp(36px, 8vw, 72px);
+  color: #1a1a1a;
+  text-align: center;
+  padding: 16px 20px 8px;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+.masthead-rule { height: 1px; background: #1a1a1a; margin: 0 20px; }
+.masthead-rule-thick { height: 3px; background: #1a1a1a; margin: 4px 20px 0; }
+.masthead-sub {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 20px 10px;
+  font-size: 11px;
+  color: #555;
+  font-style: italic;
+}
+.masthead-motto {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: #333;
+  text-align: center;
+}
+
+/* ── PAGE ── */
+.page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 16px 60px;
+}
+
+/* ── LOADING / EMPTY ── */
+.state-box {
+  text-align: center;
+  padding: 80px 20px;
+  font-family: 'Playfair Display', serif;
+}
+.state-box .big { font-size: 48px; margin-bottom: 12px; }
+.state-box p { font-size: 16px; color: #666; font-style: italic; }
+
+/* ── ARTICLE ── */
+.article-wrap {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-top: none;
+  padding: 32px 32px 40px;
+}
+
+.edition-date {
+  text-align: center;
+  padding: 12px 0 16px;
+  font-size: 12px;
+  color: #888;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 28px;
+}
+
+.article-headline {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(26px, 5vw, 42px);
+  font-weight: 900;
+  line-height: 1.15;
+  color: #1a1a1a;
+  text-align: center;
+  margin-bottom: 10px;
+}
+.article-deck {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  font-style: italic;
+  color: #555;
+  text-align: center;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+.article-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 28px;
+}
+.article-divider::before,
+.article-divider::after { content: ''; flex: 1; height: 1px; background: #1a1a1a; }
+.article-divider-diamond { font-size: 10px; color: #1a1a1a; }
+
+.article-body {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  line-height: 1.85;
+  color: #1a1a1a;
+  columns: 2;
+  column-gap: 32px;
+}
+@media (max-width: 600px) {
+  .article-body { columns: 1; }
+  .article-wrap { padding: 20px 16px 28px; }
+}
+
+.article-body p { margin-bottom: 14px; }
+.article-body p:first-child::first-letter {
+  font-size: 52px;
+  font-weight: 900;
+  float: left;
+  line-height: 0.85;
+  margin: 4px 6px 0 0;
+  font-family: 'Playfair Display', serif;
+}
+
+.article-pull {
+  column-span: all;
+  border-top: 2px solid #1a1a1a;
+  border-bottom: 2px solid #1a1a1a;
+  padding: 14px 0 10px;
+  margin: 20px 0;
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-style: italic;
+  font-weight: 700;
+  color: #1a1a1a;
+  text-align: center;
+}
+.article-pull-disclaimer {
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 400;
+  color: #999;
+  margin-top: 6px;
+  letter-spacing: 0.3px;
+}
+
+.stats-box {
+  column-span: all;
+  background: #f5f0e8;
+  border: 1px solid #ddd;
+  border-left: 4px solid #1a1a1a;
+  padding: 16px 20px;
+  margin: 20px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.stat-item { text-align: center; flex: 1; min-width: 80px; }
+.stat-n {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: #1a1a1a;
+  line-height: 1;
+}
+.stat-l { font-size: 10px; color: #888; letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; }
+
+/* ── ADMIN PANEL ── */
+.admin-bar {
+  background: #1a1a1a;
+  color: #f5f0e8;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.admin-badge {
+  background: #c9a84c;
+  color: #000;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  padding: 3px 10px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+.admin-bar-label { font-size: 12px; color: #aaa; flex: 1; }
+.admin-gen-btn {
+  background: #c9a84c;
+  color: #000;
+  border: none;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 8px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.admin-gen-btn:disabled { opacity: 0.5; cursor: default; }
+.admin-gen-btn:hover:not(:disabled) { background: #f0c96e; }
+
+/* ── LOGIN ── */
+.login-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+.login-box {
+  background: #1a1a1a;
+  border: 1px solid #c9a84c;
+  border-radius: 8px;
+  padding: 28px 32px;
+  width: 100%; max-width: 340px;
+  text-align: center;
+}
+.login-box h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  color: #c9a84c;
+  margin-bottom: 6px;
+}
+.login-box p { font-size: 12px; color: #888; margin-bottom: 18px; }
+.login-box input {
+  width: 100%; padding: 10px 14px;
+  background: #0a0a0a; border: 1px solid #333;
+  color: #fff; border-radius: 4px; font-size: 14px;
+  margin-bottom: 10px; outline: none;
+}
+.login-box input:focus { border-color: #c9a84c; }
+.login-box button {
+  width: 100%; padding: 10px;
+  background: #c9a84c; color: #000;
+  border: none; border-radius: 4px;
+  font-size: 13px; font-weight: 900;
+  letter-spacing: 1px; text-transform: uppercase;
+  cursor: pointer; margin-bottom: 8px;
+}
+.login-box .login-tilskuer {
+  background: transparent; color: #888;
+  border: 1px solid #333; margin-bottom: 0;
+}
+.login-box .login-tilskuer:hover { color: #aaa; border-color: #555; }
+.login-err { font-size: 11px; color: #ef4444; min-height: 16px; margin-top: 4px; }
+
+/* ── SPINNER ── */
+.spinner {
+  display: inline-block;
+  width: 16px; height: 16px;
+  border: 2px solid rgba(201,168,76,0.3);
+  border-top-color: #c9a84c;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.back-link {
+  display: inline-block;
+  margin: 16px 0 0;
+  font-size: 11px;
+  color: #888;
+  text-decoration: none;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.back-link:hover { color: #555; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN OVERLAY -->
+<div id="login-overlay" class="login-overlay">
+  <div class="login-box">
+    <h2>La Gazzetta dello VCSO Championship</h2>
+    <p>Logg inn for å administrere, eller les som tilskuer</p>
+    <input type="password" id="pw-input" placeholder="Adminpassord" onkeydown="if(event.key==='Enter')tryAdminLogin()">
+    <div class="login-err" id="pw-err"></div>
+    <button onclick="tryAdminLogin()">&#9997; Logg inn som admin</button>
+    <button class="login-tilskuer" onclick="enterAsReader()">&#128065; Les som tilskuer</button>
+  </div>
+</div>
+
+<!-- MASTHEAD -->
+<div class="masthead">
+  <div class="masthead-top">
+    <span id="top-left">VCSO Championship 2026</span>
+    <span>La Gazzetta dello VCSO Championship</span>
+    <span id="top-right">Mai &ndash; Juni 2026</span>
+  </div>
+  <div class="masthead-title">La Gazzetta dello VCSO Championship</div>
+  <div class="masthead-rule"></div>
+  <div class="masthead-sub">
+    <span id="edition-label">Laster...</span>
+    <span class="masthead-motto">«Nybiler, drama og lagerbiler»</span>
+    <span id="edition-num">Daglig utgave</span>
+  </div>
+  <div class="masthead-rule-thick"></div>
+</div>
+
+<!-- ADMIN BAR (vises kun for admin) -->
+<div id="admin-bar" class="admin-bar" style="display:none">
+  <span class="admin-badge">Admin</span>
+  <span class="admin-bar-label" id="admin-status">Ingen utgave generert i dag</span>
+  <button class="admin-gen-btn" id="gen-btn" onclick="genererGazzetta()">&#9997; Generer dagens utgave</button>
+</div>
+
+<div class="page">
+  <a href="index.html" class="back-link">&larr; Tilbake til appen</a>
+  <div id="content"></div>
+</div>
+
+<script>
+var SB_URL = 'https://jffhdlmwvurnojoapcvs.supabase.co';
+var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmZmhkbG13dnVybm9qb2FwY3ZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MzIzNjcsImV4cCI6MjA5MzEwODM2N30.Mc_eKMsfR04kLmwfBeH5INn3NTYapv62Fnt0wMpBpMw';
+var ADMIN_PW = 'vcso-admin';
+var SELGER_PW = 'selekt2026';
+
+
+var isAdmin = false;
+
+function sbH() {
+  return {
+    'apikey': SB_KEY,
+    'Authorization': 'Bearer ' + SB_KEY,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=representation'
+  };
+}
+
+// ── INNLOGGING ───────────────────────────────────────────────────────
+function tryAdminLogin() {
+  var pw = document.getElementById('pw-input').value;
+  if (pw === ADMIN_PW || pw === SELGER_PW) {
+    isAdmin = (pw === ADMIN_PW);
+    document.getElementById('login-overlay').style.display = 'none';
+    if (isAdmin) document.getElementById('admin-bar').style.display = 'flex';
+    localStorage.setItem('gaz-role', isAdmin ? 'admin' : 'selger');
+    loadGazzetta();
+  } else {
+    var e = document.getElementById('pw-err');
+    e.textContent = 'Feil passord';
+    setTimeout(function(){ e.textContent = ''; }, 2500);
+    document.getElementById('pw-input').value = '';
+  }
+}
+
+function enterAsReader() {
+  document.getElementById('login-overlay').style.display = 'none';
+  localStorage.setItem('gaz-role', 'tilskuer');
+  loadGazzetta();
+}
+
+// ── DATO-HJELP ───────────────────────────────────────────────────────
+function idag() {
+  var d = new Date();
+  return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+}
+function igar() {
+  var d = new Date(); d.setDate(d.getDate()-1);
+  return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+}
+function pad(n) { return n < 10 ? '0'+n : String(n); }
+
+function norskDato(dateStr) {
+  var dager = ['søndag','mandag','tirsdag','onsdag','torsdag','fredag','lørdag'];
+  var mnd = ['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'];
+  var d = new Date(dateStr);
+  return dager[d.getDay()] + ' ' + d.getDate() + '. ' + mnd[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+// ── LAST GAZZETTA ────────────────────────────────────────────────────
+function loadGazzetta() {
+  var dato = idag();
+  document.getElementById('edition-label').textContent = norskDato(dato);
+
+  // Hent nyeste artikkel (ikke nødvendigvis dagens dato)
+  fetch(SB_URL + '/rest/v1/championship_gazzetta?order=dato.desc&limit=1', { headers: sbH() })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (Array.isArray(data) && data.length > 0) {
+        visTekst(data[0]);
+        if (isAdmin) {
+          document.getElementById('admin-status').textContent = 'Siste utgave: ' + norskDato(data[0].dato) + '. Generer ny for i dag?';
+          document.getElementById('gen-btn').textContent = '✎ Generer dagens utgave';
+        }
+      } else {
+        visIngen();
+        if (isAdmin) {
+          document.getElementById('admin-status').textContent = 'Ingen utgave generert ennå. Generer nå:';
+        }
+      }
+    })
+    .catch(function(err) {
+      visIngen();
+      console.error(err);
+    });
+}
+
+function visIngen() {
+  var content = document.getElementById('content');
+  content.innerHTML = '<div class="state-box">'
+    + '<div class="big">📰</div>'
+    + '<p>Ingen utgave er publisert ennå for i dag.</p>'
+    + (isAdmin ? '<p style="margin-top:8px;font-size:13px;color:#999">Trykk «Generer dagens utgave» i den svarte linjen øverst.</p>' : '<p style="margin-top:8px;font-size:13px;color:#999">Kom tilbake senere – redaksjonen er i arbeid.</p>')
+    + '</div>';
+}
+
+function visTekst(row) {
+  var content = document.getElementById('content');
+  // Splitt artikkelinnhold på avsnitt
+  var tekst = row.tekst || '';
+  var avsnitt = tekst.split('\n\n').filter(function(a){ return a.trim(); });
+
+  var stats = row.stats ? (typeof row.stats === 'string' ? JSON.parse(row.stats) : row.stats) : null;
+
+  var statsHtml = '';
+  if (stats) {
+    statsHtml = '<div class="stats-box">'
+      + (stats.totalt ? '<div class="stat-item"><div class="stat-n">'+stats.totalt+'</div><div class="stat-l">Salg totalt i VCSO i går</div></div>' : '')
+      + (stats.mvp ? '<div class="stat-item"><div class="stat-n" style="font-size:18px">'+stats.mvp+'</div><div class="stat-l">MVP</div></div>' : '')
+      + (stats.topAvd ? '<div class="stat-item"><div class="stat-n" style="font-size:18px">'+stats.topAvd+'</div><div class="stat-l">Ledende avd.</div></div>' : '')
+      + (stats.hatTrick ? '<div class="stat-item"><div class="stat-n">⭐</div><div class="stat-l">Hat-trick</div></div>' : '')
+      + '</div>';
+  }
+
+  var avsnittsHtml = avsnitt.map(function(a, i) {
+    if (a.startsWith('«') || a.startsWith('"')) {
+      return '<div class="article-pull">'+a+'<div class="article-pull-disclaimer">(Sitat generert etter beste evne basert på resultater av AI)</div></div>';
+    }
+    return '<p>'+a+'</p>';
+  }).join('');
+
+  // Sett inn stats etter andre avsnitt
+  if (avsnitt.length > 2) {
+    var deler = avsnitt.map(function(a, i) {
+      if (a.startsWith('«') || a.startsWith('"')) return '<div class="article-pull">'+a+'<div class="article-pull-disclaimer">(Sitat generert etter beste evne basert på resultater av AI)</div></div>';
+      return '<p>'+a+'</p>';
+    });
+    deler.splice(2, 0, statsHtml);
+    avsnittsHtml = deler.join('');
+  }
+
+  content.innerHTML = '<div class="article-wrap">'
+    + '<div class="edition-date">Omhandler ' + norskDato(row.dato) + ' &nbsp;·&nbsp; Publisert av redaksjonen</div>'
+    + '<h1 class="article-headline">'+escHtml(row.overskrift || 'Dagens utgave')+'</h1>'
+    + (row.ingress ? '<p class="article-deck">'+escHtml(row.ingress)+'</p>' : '')
+    + '<div class="article-divider"><span class="article-divider-diamond">◆</span></div>'
+    + '<div class="article-body">'+avsnittsHtml+'</div>'
+    + '</div>';
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── GENERER (ADMIN) ──────────────────────────────────────────────────
+function genererGazzetta() {
+  var btn = document.getElementById('gen-btn');
+  var statusEl = document.getElementById('admin-status');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Henter data...';
+
+  // Hent gårsdagens salg fra Supabase
+  var igaar = igar();
+
+  fetch(SB_URL + '/rest/v1/sales?select=*&deleted=eq.false&order=ts.asc', { headers: Object.assign({}, sbH(), {'Range-Unit': 'items'}) })
+    .then(function(r) { return r.json(); })
+    .then(function(allSalg) {
+      if (!Array.isArray(allSalg)) allSalg = [];
+      // Filtrer på dato i norsk tid klientsiden – sikrest
+      var salg = allSalg.filter(function(s) {
+        if (!s.ts) return false;
+        var d = new Date(s.ts);
+        var norskDatoStr = d.toLocaleDateString('sv-SE', {timeZone: 'Europe/Oslo'});
+        return norskDatoStr === igaar;
+      });
+      console.log('Salg hentet for ' + igaar + ':', salg.length, salg.map(function(s){ return s.selger + ' ' + s.modell; }));
+      btn.innerHTML = '<span class="spinner"></span>Skriver artikkel...';
+      statusEl.textContent = 'Henter salgsdata og sender til AI...';
+      return genererTekst(salg, igaar);
+    })
+    .then(function(resultat) {
+      // Lagre i Supabase
+      var row = {
+        dato: igaar,
+        overskrift: resultat.overskrift,
+        ingress: resultat.ingress,
+        tekst: resultat.tekst,
+        stats: resultat.stats
+      };
+      console.log('Sender til Supabase:', JSON.stringify(row));
+      return fetch(SB_URL + '/rest/v1/championship_gazzetta', {
+        method: 'POST',
+        headers: sbH(),
+        body: JSON.stringify(row)
+      }).then(function(r) {
+        if (!r.ok) return r.text().then(function(txt) {
+          throw new Error('Lagring feilet ' + r.status + ': ' + txt);
+        });
+        return row;
+      });
+    })
+    .then(function(row) {
+      btn.disabled = false;
+      btn.innerHTML = '&#9997; Generer på nytt';
+      statusEl.textContent = 'Publisert! Utgave for ' + norskDato(igaar) + ' er live.';
+      visTekst(row);
+    })
+    .catch(function(err) {
+      btn.disabled = false;
+      btn.innerHTML = '&#9997; Generer dagens utgave';
+      statusEl.textContent = 'Feil: ' + err.message;
+      console.error(err);
+      // Vis feilmelding i content
+      document.getElementById('content').innerHTML = '<div class="state-box">'
+        + '<div class="big">⚠️</div>'
+        + '<p>'+err.message+'</p>'
+        + '<p style="margin-top:8px;font-size:12px;color:#999">Sjekk at championship_gazzetta-tabellen finnes i Supabase, og at API-nøkkelen er konfigurert.</p>'
+        + '</div>';
+    });
+}
+
+// ── AI-GENERERING ────────────────────────────────────────────────────
+function genererTekst(salg, dato) {
+  // Bygg datasammendrag til AI
+  var totalt = salg.length;
+  var selgerTelling = {};
+  var avdTelling = { ryen:0, fornebu:0, lillestrom:0, okern:0 };
+  var modellTelling = {};
+  var finTelling = 0;
+  var hatTrickNavn = [];
+  var dagMap = {};
+
+  salg.forEach(function(s) {
+    selgerTelling[s.selger] = (selgerTelling[s.selger]||0) + 1;
+    if (avdTelling[s.loc] !== undefined) avdTelling[s.loc]++;
+    modellTelling[s.modell] = (modellTelling[s.modell]||0) + 1;
+    if (s.finansiert) finTelling++;
+    dagMap[s.selger] = (dagMap[s.selger]||0) + 1;
+  });
+
+  Object.keys(dagMap).forEach(function(n) {
+    if (dagMap[n] >= 3) hatTrickNavn.push(n);
+  });
+
+  var mvp = Object.keys(selgerTelling).sort(function(a,b){ return selgerTelling[b]-selgerTelling[a]; })[0] || null;
+  var topAvd = Object.keys(avdTelling).sort(function(a,b){ return avdTelling[b]-avdTelling[a]; })[0] || null;
+  var topModell = Object.keys(modellTelling).sort(function(a,b){ return modellTelling[b]-modellTelling[a]; })[0] || null;
+  var avdNavn = {ryen:'Ryen',fornebu:'Fornebu',lillestrom:'Lillestrøm',okern:'Økern'};
+
+  var stats = {
+    totalt: totalt,
+    mvp: mvp ? mvp.split(' ')[0] : null,
+    topAvd: topAvd ? avdNavn[topAvd] : null,
+    hatTrick: hatTrickNavn.length > 0
+  };
+
+  if (totalt === 0) {
+    return Promise.resolve({
+      overskrift: 'En stille dag i ' + norskDato(dato).split(' ').slice(0,2).join(' '),
+      ingress: 'Ingen biler byttet hender ' + norskDato(dato) + '. Hvilerdag – eller stormens øye?',
+      tekst: 'Det er dager i bruktbilenes verden der stillheten taler høyere enn noe salg noensinne kunne gjort. ' + norskDato(dato) + ' var en slik dag.\n\nIngen scoringer ble registrert. Selgerne ladet batteriene, studerte markedet og forberedte seg på dagene som kommer. La Gazzetta noterer med respekt fraværet av tall – og ser frem til morgendagens kamp med forventning.\n\n«Stormen som ikke kom, varsler alltid en større storm.»\n\nRedaksjonen holder øye med gresset og venter.',
+      stats: stats
+    });
+  }
+
+  var SELGER_AVD = {
+    'Thomas Dokken':'Ryen','Emma Valen':'Ryen','William Østby':'Ryen',
+    'Norman Elton':'Ryen','Alexander Karlsen':'Ryen',
+    'Fabian Bredal-Jørgensen':'Fornebu','Henrik Østby':'Fornebu',
+    'Johan Kalenius':'Fornebu','Odd Bjarne Bjørvik':'Fornebu',
+    'Ask Herlofsen':'Fornebu','Emanuel Bereket':'Fornebu',
+    'Daniel K. Johansen':'Lillestrøm','Linn Askmann-Olsen':'Lillestrøm',
+    'Simen Olsen':'Lillestrøm','Andreas Lydersen':'Lillestrøm'
+  };
+
+  var selgerListe = Object.keys(selgerTelling).sort(function(a,b){ return selgerTelling[b]-selgerTelling[a]; }).map(function(n) {
+    var avd = SELGER_AVD[n] || 'ukjent avdeling';
+    return '- ' + n + ' (' + avd + '): ' + selgerTelling[n] + ' bil' + (selgerTelling[n]>1?'er':'');
+  }).join('\n');
+
+  var hatTrickTekst = hatTrickNavn.map(function(n) {
+    return n + ' (' + (SELGER_AVD[n]||'ukjent avdeling') + ')';
+  }).join(', ');
+
+  var mvpAvd = mvp ? (SELGER_AVD[mvp] || 'ukjent') : '';
+
+  var prompt = 'Du er La Gazzetta dello VCSO Championship – en dramatisk italiensk-inspirert sportsavis for VCSO Championship 2026.\n\nKAMPRAPPORT – ' + norskDato(dato) + '\n\nSALG PER SELGER DENNE DAGEN:\n' + selgerListe + '\n\nSAMMENDRAG:\n- Totalt denne dagen: ' + totalt + ' biler\n- MVP: ' + (mvp||'ingen') + ' fra ' + mvpAvd + ' med ' + (selgerTelling[mvp]||0) + ' biler\n- Avdeling-totaler: Ryen ' + avdTelling.ryen + ', Fornebu ' + avdTelling.fornebu + ', Lillestrøm ' + avdTelling.lillestrom + ', Økern ' + avdTelling.okern + '\n- Bestselger-modell: ' + (topModell||'ukjent') + ' (' + (modellTelling[topModell]||0) + ' stk)\n- Finansierte salg: ' + finTelling + '\n' + (hatTrickNavn.length ? '- HAT-TRICK: ' + hatTrickTekst + ' scoret 3+ biler på én dag\n' : '') + '\nVIKTIG: Bruk eksakt riktig avdeling for hver selger slik det står i listen. Ikke finn på avdelinger.\n\nSkriv en dramatisk avisartikkel på NORSK:\n1. Dramatisk overskrift (maks 10 ord)\n2. Kort ingress (1 setning)\n3. Artikkeltekst 4-5 avsnitt ca 250 ord. Avsnitt skilles av \\n\\n. Inkluder et sitat i anførselstegn.\n\nSvar KUN med gyldig JSON:\n{"overskrift":"...","ingress":"...","tekst":"avsnitt1\\n\\navsnitt2\\n\\n\\"Sitat\\"\\n\\navsnitt3"}';
+
+  return fetch('https://jffhdlmwvurnojoapcvs.supabase.co/functions/v1/swift-api', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + SB_KEY
+    },
+    body: JSON.stringify({ prompt: prompt })
+  })
+  .then(function(r) {
+    if (!r.ok) throw new Error('AI-feil: ' + r.status + '. Sjekk Edge Function og secret i Supabase.');
+    return r.json();
+  })
+  .then(function(data) {
+    console.log('Edge Function svar:', JSON.stringify(data));
+    var content = data.content || (data.data && data.data.content);
+    var raw = content && content[0] ? content[0].text : null;
+    if (!raw) throw new Error('Tomt svar fra AI. Full respons: ' + JSON.stringify(data));
+    console.log('AI tekst:', raw);
+    // Finn JSON-blokk i svaret
+    var clean = raw;
+    var jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if (jsonMatch) clean = jsonMatch[0];
+    else clean = raw.replace(/```json|```/g,'').trim();
+    var parsed = JSON.parse(clean);
+    if (!parsed.overskrift) throw new Error('Mangler overskrift. Svar: ' + clean);
+    parsed.stats = stats;
+    return parsed;
+  });
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────
+(function() {
+  var saved = localStorage.getItem('gaz-role');
+  if (saved === 'admin') {
+    isAdmin = true;
+    document.getElementById('login-overlay').style.display = 'none';
+    document.getElementById('admin-bar').style.display = 'flex';
+    loadGazzetta();
+  } else if (saved === 'tilskuer' || saved === 'selger') {
+    document.getElementById('login-overlay').style.display = 'none';
+    loadGazzetta();
+  }
+  // Ellers: vis login-overlay
+
+  // Sett riktig dato i headeren
+  var now = new Date();
+  var dager = ['Søn','Man','Tir','Ons','Tor','Fre','Lør'];
+  var mnd = ['jan','feb','mar','apr','mai','jun','jul','aug','sep','okt','nov','des'];
+  document.getElementById('top-right').textContent = dager[now.getDay()] + ' ' + now.getDate() + '. ' + mnd[now.getMonth()] + ' ' + now.getFullYear();
+})();
+</script>
+</body>
+</html>
