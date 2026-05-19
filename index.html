@@ -136,12 +136,12 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
   border-bottom:1px solid rgba(255,215,0,.2);align-items:center;gap:12px}
 
 /* TABLE */
-.tbl-head{display:grid;grid-template-columns:26px 28px 1fr 36px 40px 90px 40px;
+.tbl-head{display:grid;grid-template-columns:26px 40px 1fr 36px 40px 90px 40px;
   padding:7px 12px;font-size:8.5px;font-weight:700;color:var(--muted);
   text-transform:uppercase;letter-spacing:.6px;background:var(--card2);border-bottom:1px solid var(--b1)}
 .tbl-head>*{text-align:center}
 .tbl-head>*:nth-child(3){text-align:left}
-.trow{display:grid;grid-template-columns:26px 28px 1fr 36px 40px 90px 40px;
+.trow{display:grid;grid-template-columns:26px 40px 1fr 36px 40px 90px 40px;
   padding:8px 12px;align-items:center;border-bottom:1px solid var(--b1);
   transition:background .15s;animation:fadeIn .35s ease both}
 .trow>*{text-align:center}
@@ -297,11 +297,11 @@ html, body {
 }
 /* Prevent table overflow on mobile */
 .tbl-head, .trow {
-  grid-template-columns: 22px 26px 1fr 32px 36px 80px 36px;
+  grid-template-columns: 22px 40px 1fr 32px 36px 80px 36px;
 }
 @media (max-width: 400px) {
   .tbl-head, .trow {
-    grid-template-columns: 20px 24px 1fr 28px 32px 70px 32px;
+    grid-template-columns: 20px 40px 1fr 28px 32px 70px 32px;
   }
   .name-main { font-size: 12px; }
   .cd-n { font-size: 14px; }
@@ -474,7 +474,7 @@ html, body {
 <!-- MVP BANNER -->
 <div id="mvp-banner" style="display:none;padding:10px 16px;background:linear-gradient(135deg,rgba(255,215,0,.1),rgba(255,215,0,.04));border-bottom:1px solid rgba(255,215,0,.2);align-items:center;gap:12px">
   <div style="font-size:22px">&#128081;</div>
-  <div id="mvp-av" style="width:36px;height:36px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700"></div>
+  <div id="mvp-av" style="width:48px;height:48px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700"></div>
   <div>
     <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gold)">Dagens MVP</div>
     <div id="mvp-name" style="font-size:15px;font-weight:700;color:var(--txt)">&#8211;</div>
@@ -937,7 +937,7 @@ function updateMVP() {
     }
     banner.innerHTML +=
       '<div style="display:flex;align-items:center;gap:8px;margin-right:14px;flex-shrink:0">'+
-        '<div style="width:36px;height:36px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0">'+avHtml+'</div>'+
+        '<div style="width:48px;height:48px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0">'+avHtml+'</div>'+
         '<div>'+
           '<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gold)">'+(delt?'Delt MVP':'Dagens MVP')+'</div>'+
           '<div style="font-size:14px;font-weight:700;color:var(--txt)">'+navn+'</div>'+
