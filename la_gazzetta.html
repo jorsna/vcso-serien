@@ -423,8 +423,12 @@ function loadGazzetta() {
       }
     })
     .catch(function(err) {
-      visIngen();
       console.error(err);
+      document.getElementById('content').innerHTML = '<div class="state-box">'
+        + '<div class="big">📰</div>'
+        + '<p>Ingen utgave publisert ennå.</p>'
+        + (isAdmin ? '<p style="margin-top:8px;font-size:13px;color:#999">Trykk «Generer dagens utgave» ovenfor.</p>' : '<p style="margin-top:8px;font-size:13px;color:#999">Kom tilbake senere.</p>')
+        + '</div>';
     });
 }
 
