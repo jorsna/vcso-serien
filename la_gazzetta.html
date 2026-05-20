@@ -513,7 +513,7 @@ function genererGazzetta() {
       console.log('Salg hentet for ' + igaar + ':', salg.length, salg.map(function(s){ return s.selger + ' ' + s.modell; }));
       btn.innerHTML = '<span class="spinner"></span>Skriver artikkel...';
       statusEl.textContent = 'Henter salgsdata og sender til AI...';
-      return genererTekst(salg, igaar);
+      return genererTekst(salg, igaar, allSalg);
     })
     .then(function(resultat) {
       // Lagre i Supabase
@@ -557,36 +557,37 @@ function genererGazzetta() {
 }
 
 // ── AI-GENERERING ────────────────────────────────────────────────────
-function genererTekst(salg, dato) {
-  // Bygg datasammendrag til AI
+function genererTekst(salg, dato, alleSalg) {
   var totalt = salg.length;
-  var selgerTelling = {};
-  var avdTelling = { ryen:0, fornebu:0, lillestrom:0, okern:0 };
-  var modellTelling = {};
-  var finTelling = 0;
-  var hatTrickNavn = [];
-  var dagMap = {};
+  var selgerTelling = {}, avdTelling = {ryen:0,fornebu:0,lillestrom:0}, modellTelling = {}, finTelling = 0, hatTrickNavn = [];
 
   salg.forEach(function(s) {
     selgerTelling[s.selger] = (selgerTelling[s.selger]||0) + 1;
     if (avdTelling[s.loc] !== undefined) avdTelling[s.loc]++;
     modellTelling[s.modell] = (modellTelling[s.modell]||0) + 1;
     if (s.finansiert) finTelling++;
-    dagMap[s.selger] = (dagMap[s.selger]||0) + 1;
   });
 
-  Object.keys(dagMap).forEach(function(n) {
-    if (dagMap[n] >= 3) hatTrickNavn.push(n);
-  });
+  Object.keys(selgerTelling).forEach(function(n){ if(selgerTelling[n]>=3) hatTrickNavn.push(n); });
 
-  var mvp = Object.keys(selgerTelling).sort(function(a,b){ return selgerTelling[b]-selgerTelling[a]; })[0] || null;
+  var maxSalg = Math.max.apply(null, Object.values(selgerTelling).concat([0]));
+  var mvpListe = Object.keys(selgerTelling).filter(function(n){ return selgerTelling[n]===maxSalg; });
   var topAvd = Object.keys(avdTelling).sort(function(a,b){ return avdTelling[b]-avdTelling[a]; })[0] || null;
   var topModell = Object.keys(modellTelling).sort(function(a,b){ return modellTelling[b]-modellTelling[a]; })[0] || null;
-  var avdNavn = {ryen:'Ryen',fornebu:'Fornebu',lillestrom:'Lillestrøm',okern:'Økern'};
+  var avdNavn = {ryen:'Ryen',fornebu:'Fornebu',lillestrom:'Lillestrøm'};
+
+  var totalSesongen = (alleSalg||[]).length;
+  var totalAvd = {ryen:0,fornebu:0,lillestrom:0};
+  var totalSelger = {};
+  (alleSalg||[]).forEach(function(s){
+    if(totalAvd[s.loc]!==undefined) totalAvd[s.loc]++;
+    totalSelger[s.selger] = (totalSelger[s.selger]||0)+1;
+  });
+  var totalLeder = Object.keys(totalSelger).sort(function(a,b){return totalSelger[b]-totalSelger[a];})[0]||null;
 
   var stats = {
     totalt: totalt,
-    mvp: mvp ? mvp.split(' ')[0] : null,
+    mvp: mvpListe.map(function(n){return n.split(' ')[0];}).join('/'),
     topAvd: topAvd ? avdNavn[topAvd] : null,
     hatTrick: hatTrickNavn.length > 0
   };
@@ -594,8 +595,8 @@ function genererTekst(salg, dato) {
   if (totalt === 0) {
     return Promise.resolve({
       overskrift: 'En stille dag i ' + norskDato(dato).split(' ').slice(0,2).join(' '),
-      ingress: 'Ingen biler byttet hender ' + norskDato(dato) + '. Hvilerdag – eller stormens øye?',
-      tekst: 'Det er dager i bruktbilenes verden der stillheten taler høyere enn noe salg noensinne kunne gjort. ' + norskDato(dato) + ' var en slik dag.\n\nIngen scoringer ble registrert. Selgerne ladet batteriene, studerte markedet og forberedte seg på dagene som kommer. La Gazzetta noterer med respekt fraværet av tall – og ser frem til morgendagens kamp med forventning.\n\n«Stormen som ikke kom, varsler alltid en større storm.»\n\nRedaksjonen holder øye med gresset og venter.',
+      ingress: 'Ingen nybiler ble levert ' + norskDato(dato) + '. Hvilerdag – eller stormens øye?',
+      tekst: 'Det er dager i nybilsalgets verden der stillheten taler høyere enn noe salg noensinne kunne gjort. ' + norskDato(dato) + ' var en slik dag.\n\nIngen scoringer ble registrert. Selgerne ladet batteriene og forberedte seg på dagene som kommer.\n\n«Stormen som ikke kom, varsler alltid en større storm.»\n\nRedaksjonen holder øye med lageret og venter.',
       stats: stats
     });
   }
@@ -610,18 +611,22 @@ function genererTekst(salg, dato) {
     'Simen Olsen':'Lillestrøm','Andreas Lydersen':'Lillestrøm'
   };
 
-  var selgerListe = Object.keys(selgerTelling).sort(function(a,b){ return selgerTelling[b]-selgerTelling[a]; }).map(function(n) {
-    var avd = SELGER_AVD[n] || 'ukjent avdeling';
-    return '- ' + n + ' (' + avd + '): ' + selgerTelling[n] + ' bil' + (selgerTelling[n]>1?'er':'');
+  var selgerListe = Object.keys(selgerTelling).sort(function(a,b){return selgerTelling[b]-selgerTelling[a];}).map(function(n){
+    var avd = SELGER_AVD[n]||'ukjent';
+    var fin = salg.filter(function(s){return s.selger===n&&s.finansiert;}).length;
+    return '- '+n+' ('+avd+'): '+selgerTelling[n]+' bil'+(selgerTelling[n]>1?'er':'')+(fin>0?' inkl. '+fin+' finansiert':'');
   }).join('\n');
 
-  var hatTrickTekst = hatTrickNavn.map(function(n) {
-    return n + ' (' + (SELGER_AVD[n]||'ukjent avdeling') + ')';
-  }).join(', ');
+  var mvpTekst = mvpListe.length > 1
+    ? 'DELT MVP: ' + mvpListe.map(function(n){return n+' ('+(SELGER_AVD[n]||'ukjent')+')';}).join(' og ') + ' – begge med ' + maxSalg + ' bil' + (maxSalg>1?'er':'')
+    : 'MVP: ' + mvpListe[0] + ' (' + (SELGER_AVD[mvpListe[0]]||'ukjent') + ') med ' + maxSalg + ' bil' + (maxSalg>1?'er':'');
 
-  var mvpAvd = mvp ? (SELGER_AVD[mvp] || 'ukjent') : '';
+  var hatTrickTekst = hatTrickNavn.map(function(n){return n+' ('+(SELGER_AVD[n]||'ukjent')+')';}).join(', ');
 
-  var prompt = 'Du er La Gazzetta dello VCSO Championship – en dramatisk italiensk-inspirert sportsavis for VCSO Championship 2026.\n\nKAMPRAPPORT – ' + norskDato(dato) + '\n\nSALG PER SELGER DENNE DAGEN:\n' + selgerListe + '\n\nSAMMENDRAG:\n- Totalt denne dagen: ' + totalt + ' biler\n- MVP: ' + (mvp||'ingen') + ' fra ' + mvpAvd + ' med ' + (selgerTelling[mvp]||0) + ' biler\n- Avdeling-totaler: Ryen ' + avdTelling.ryen + ', Fornebu ' + avdTelling.fornebu + ', Lillestrøm ' + avdTelling.lillestrom + ', Økern ' + avdTelling.okern + '\n- Bestselger-modell: ' + (topModell||'ukjent') + ' (' + (modellTelling[topModell]||0) + ' stk)\n- Finansierte salg: ' + finTelling + '\n' + (hatTrickNavn.length ? '- HAT-TRICK: ' + hatTrickTekst + ' scoret 3+ biler på én dag\n' : '') + '\nVIKTIG: Bruk eksakt riktig avdeling for hver selger slik det står i listen. Ikke finn på avdelinger.\n\nSkriv en dramatisk avisartikkel på NORSK:\n1. Dramatisk overskrift (maks 10 ord)\n2. Kort ingress (1 setning)\n3. Artikkeltekst 4-5 avsnitt ca 250 ord. Avsnitt skilles av \\n\\n. Inkluder et sitat i anførselstegn.\n\nSvar KUN med gyldig JSON:\n{"overskrift":"...","ingress":"...","tekst":"avsnitt1\\n\\navsnitt2\\n\\n\\"Sitat\\"\\n\\navsnitt3"}';
+  var totalOppsummering = alleSalg && alleSalg.length > 0
+    ? '\nSESONGTOTAL (til og med i går):\n- Totalt levert hele sesongen: '+totalSesongen+' biler\n- Avdelinger totalt: Ryen '+totalAvd.ryen+', Fornebu '+totalAvd.fornebu+', Lillestrøm '+totalAvd.lillestrom+'\n- Ledende selger totalt: '+(totalLeder||'ingen')+' ('+(totalSelger[totalLeder]||0)+' biler)' : '';
+
+  var prompt = 'Du er La Gazzetta dello VCSO Championship – en dramatisk italiensk-inspirert sportsavis for VCSO Championship 2026, en nybilsalgskonkurranse (lagerbiler) hos Volvo Car Service Oslo.\n\nKAMPRAPPORT – ' + norskDato(dato) + '\n\nSALG PER SELGER DENNE DAGEN:\n' + selgerListe + '\n\nSAMMENDRAG DENNE DAGEN:\n- Totalt: ' + totalt + ' biler\n- ' + mvpTekst + '\n- Avdelinger: Ryen ' + avdTelling.ryen + ', Fornebu ' + avdTelling.fornebu + ', Lillestrøm ' + avdTelling.lillestrom + '\n- Bestselger-modell: ' + (topModell||'ukjent') + ' (' + (modellTelling[topModell]||0) + ' stk)\n- Finansierte salg: ' + finTelling + '\n' + (hatTrickNavn.length?'- HAT-TRICK: '+hatTrickTekst+'\n':'') + totalOppsummering + '\n\nVIKTIG: Bruk eksakt riktig avdeling per selger. Skriv om DENNE DAGEN, men avslutt med kort sesongtotal-oppsummering.\n\nSkriv en dramatisk avisartikkel på NORSK:\n1. Dramatisk overskrift (maks 10 ord)\n2. Kort ingress (1 setning)\n3. 4-5 avsnitt ca 270 ord. Avsnitt skilles av \\n\\n. Siste avsnitt = sesongtotal. Inkluder et sitat i anførselstegn.\n\nSvar KUN med gyldig JSON:\n{"overskrift":"...","ingress":"...","tekst":"avsnitt1\\n\\navsnitt2\\n\\n\\"Sitat\\"\\n\\navsnitt3\\n\\nSesongtotal-avsnitt"}';
 
   return fetch('https://resrjvztsqdxzqgiffeg.supabase.co/functions/v1/swift-api', {
     method: 'POST',
