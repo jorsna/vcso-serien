@@ -618,7 +618,21 @@ html, body {
 <!-- HOF VIEW -->
 <div class="view" id="view-hof">
   <div class="stat-title" style="font-size:16px;letter-spacing:1px">&#127942; Hall of Fame</div>
+  <!-- Sub-tabs -->
+  <div style="display:flex;gap:1px;background:var(--b1);border-bottom:2px solid var(--b1)">
+    <button id="hof-sub-uker" onclick="switchHofTab('uker')"
+      style="flex:1;padding:9px;font-family:Anton,sans-serif;font-size:11px;letter-spacing:1.5px;
+             background:var(--card);color:var(--gold);border:none;cursor:pointer;border-bottom:2px solid var(--gold);transition:all .2s">
+      DENNE SESONGEN
+    </button>
+    <button id="hof-sub-legender" onclick="switchHofTab('legender')"
+      style="flex:1;padding:9px;font-family:Anton,sans-serif;font-size:11px;letter-spacing:1.5px;
+             background:var(--card2);color:var(--muted);border:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s">
+      &#127775; LEGENDER
+    </button>
+  </div>
   <div id="hof-container" style="padding:8px 14px 14px;background:var(--card)"></div>
+  <div id="legender-container" style="display:none;background:var(--card)"></div>
 </div>
 
 <!-- SALGSVERKTØY VIEW -->
@@ -2140,6 +2154,216 @@ function srr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quad
 function sst(ctx,x,y,w,h,c1,c2,side){var o=document.createElement('canvas');o.width=w;o.height=h;var oc=o.getContext('2d'),sw=18;for(var i=0;i*sw<w+h;i++){oc.fillStyle=i%2===0?c1:c2;oc.beginPath();oc.moveTo(i*sw-h,0);oc.lineTo(i*sw,0);oc.lineTo(i*sw-h+sw,h);oc.lineTo(i*sw-h,h);oc.closePath();oc.fill();}ctx.save();ctx.beginPath();if(side==='left'){ctx.moveTo(x+10,y);ctx.lineTo(x+w,y);ctx.lineTo(x+w,y+h);ctx.lineTo(x+10,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-10);ctx.lineTo(x,y+10);ctx.quadraticCurveTo(x,y,x+10,y);}else{ctx.moveTo(x,y);ctx.lineTo(x+w-10,y);ctx.quadraticCurveTo(x+w,y,x+w,y+10);ctx.lineTo(x+w,y+h-10);ctx.quadraticCurveTo(x+w,y+h,x+w-10,y+h);ctx.lineTo(x,y+h);}ctx.closePath();ctx.clip();ctx.drawImage(o,x,y);ctx.restore();}
 function scp(ctx){var p=document.createElement('canvas');p.width=24;p.height=24;var pc=p.getContext('2d');pc.strokeStyle='rgba(201,168,76,0.1)';pc.lineWidth=1.2;pc.beginPath();pc.moveTo(0,12);pc.lineTo(12,0);pc.lineTo(24,12);pc.lineTo(12,24);pc.lineTo(0,12);pc.stroke();return ctx.createPattern(p,'repeat');}
 
+
+// ─── LEGENDER ──────────────────────────────────────────────────────────────
+function renderLegender() {
+  var el = document.getElementById('legender-container');
+  if (!el) return;
+  el.innerHTML = '<div style="font-size:11px;color:var(--muted);font-style:italic;padding:16px 14px">Laster legender...</div>';
+
+  fetch(SUPABASE_URL + '/rest/v1/weekly_winners?order=week_year.asc,week_nr.asc&limit=200', {
+    mode:'cors', headers: sbH()
+  }).then(function(r){
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }).then(function(data){
+    if (!data || !data.length) {
+      el.innerHTML = '<div style="font-size:11px;color:var(--muted);font-style:italic;padding:16px 14px">Ingen data ennå — kom tilbake etter første uke.</div>';
+      return;
+    }
+
+    // Grupper per sesong (week_year)
+    var seasons = {};
+    data.forEach(function(w){
+      var yr = w.week_year || 2026;
+      if (!seasons[yr]) seasons[yr] = { year: yr, rows: [] };
+      seasons[yr].rows.push(w);
+    });
+
+    var seasonList = Object.values(seasons).sort(function(a,b){ return b.year - a.year; });
+
+    // Aktiv sesong-tab
+    var activeSeason = seasonList[0].year;
+
+    function buildSeason(season) {
+      var rows = season.rows;
+
+      // Ukevinner-tellinger
+      var winnerCount = {};
+      var hatCount = {};
+      var weekNrs = {};
+
+      // Finn vinner per uke (høyest pts, deretter tiebreaker)
+      var byWeek = {};
+      rows.forEach(function(w){
+        var k = w.week_nr;
+        if (!byWeek[k]) byWeek[k] = [];
+        byWeek[k].push(w);
+      });
+
+      Object.keys(byWeek).forEach(function(wk){
+        var weekRows = byWeek[wk].sort(function(a,b){
+          return b.pts-a.pts || (b.finansiert||b.tens||0)-(a.finansiert||a.tens||0);
+        });
+        var bestPts = weekRows[0].pts;
+        var bestTb  = weekRows[0].finansiert || weekRows[0].tens || 0;
+        var winners = weekRows.filter(function(r){
+          return r.pts===bestPts && (r.finansiert||r.tens||0)===bestTb;
+        });
+        winners.forEach(function(w){
+          var navn = w.selger || w.pst || '';
+          winnerCount[navn] = (winnerCount[navn]||0) + 1;
+          if (!weekNrs[navn]) weekNrs[navn] = [];
+          weekNrs[navn].push(parseInt(wk));
+        });
+        // Hat tricks
+        var hatArr = weekRows[0].hat_tricks || [];
+        hatArr.forEach(function(navn){
+          hatCount[navn] = (hatCount[navn]||0) + 1;
+        });
+      });
+
+      // Sorter ukevinnere
+      var winnerList = Object.keys(winnerCount).map(function(navn){
+        var sObj = SELGERE.find(function(s){ return s.navn===navn; }) || {};
+        return { navn:navn, sObj:sObj, wins:winnerCount[navn], hats:hatCount[navn]||0, weeks:weekNrs[navn]||[] };
+      }).sort(function(a,b){ return b.wins-a.wins || b.hats-a.hats; });
+
+      // Sorter hat trick-heltene
+      var hatList = Object.keys(hatCount).map(function(navn){
+        var sObj = SELGERE.find(function(s){ return s.navn===navn; }) || {};
+        return { navn:navn, sObj:sObj, hats:hatCount[navn], wins:winnerCount[navn]||0 };
+      }).sort(function(a,b){ return b.hats-a.hats || b.wins-a.wins; });
+
+      function avHtml(sObj, size) {
+        var sz = size || 40;
+        var hasPhoto = typeof SELGER_PHOTOS!=='undefined' && sObj.id && SELGER_PHOTOS[sObj.id];
+        var inner = hasPhoto
+          ? '<img src="'+SELGER_PHOTOS[sObj.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">'
+          : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:'+(sz*0.32)+'px;font-weight:900;color:'+(sObj.color||'var(--gold)')+'">'+( sObj.initials||'?')+'</div>';
+        return '<div style="width:'+sz+'px;height:'+sz+'px;border-radius:50%;padding:2px;'
+          +'background:linear-gradient(135deg,#f5e642,#ffd700,#c8960c,#ffd700,#f5e642);'
+          +'background-size:300% 300%;animation:goldSpin 3s ease infinite,hofGlow 2.5s ease-in-out infinite;flex-shrink:0">'
+          +'<div style="width:100%;height:100%;border-radius:50%;overflow:hidden;border:1.5px solid #0a0a14">'
+          +inner
+          +'</div></div>';
+      }
+
+      var medalColors = ['#ffd700','#c0c0c0','#cd7f32'];
+      var medalEmoji  = ['👑','🥈','🥉'];
+
+      // ── Ukevinnere-seksjonen ──
+      var winnersHtml = '<div style="padding:14px 14px 6px">'
+        +'<div style="font-family:Anton,sans-serif;font-size:10px;letter-spacing:3px;color:var(--gold);opacity:.7;margin-bottom:12px">👑 UKEVINNERE</div>';
+
+      winnerList.forEach(function(p, i){
+        var medal = i < 3 ? medalEmoji[i] : (i+1)+'.';
+        var col   = i < 3 ? medalColors[i] : 'var(--muted)';
+        var weekStr = p.weeks.length ? 'Uke '+p.weeks.join(', ')+'  ·  ' : '';
+        winnersHtml += '<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--b1)">'
+          +'<div style="font-size:'+(i===0?'22':'16')+'px;width:28px;text-align:center;flex-shrink:0">'+medal+'</div>'
+          +avHtml(p.sObj, i===0?48:36)
+          +'<div style="flex:1">'
+            +'<div style="font-family:Anton,sans-serif;font-size:'+(i===0?'16':'13')+'px;color:var(--txt);letter-spacing:.5px">'+p.navn+'</div>'
+            +'<div style="font-size:9px;color:var(--muted);margin-top:2px">'+weekStr+(LL[p.sObj.loc]||p.sObj.loc||'')+'</div>'
+          +'</div>'
+          +'<div style="text-align:right;flex-shrink:0">'
+            +'<div style="font-family:Anton,sans-serif;font-size:'+(i===0?'22':'16')+'px;color:'+col+'">'+p.wins+'</div>'
+            +'<div style="font-size:8px;color:var(--muted)">UKE'+(p.wins===1?'':'R')+'</div>'
+            +(p.hats>0?'<div style="font-size:9px;color:var(--gold);margin-top:2px">&#11088; '+p.hats+'</div>':'')
+          +'</div>'
+        +'</div>';
+      });
+      winnersHtml += '</div>';
+
+      // ── Hat trick-heltene ──
+      var hatHtml = '';
+      if (hatList.length) {
+        hatHtml = '<div style="padding:14px 14px 6px;border-top:1px solid var(--b1)">'
+          +'<div style="font-family:Anton,sans-serif;font-size:10px;letter-spacing:3px;color:var(--gold);opacity:.7;margin-bottom:12px">⚽ HAT TRICK-HELTER</div>';
+        hatList.forEach(function(p, i){
+          hatHtml += '<div style="display:flex;align-items:center;gap:12px;padding:7px 0;border-bottom:1px solid var(--b1)">'
+            +'<div style="font-size:'+(i===0?'22':'16')+'px;width:28px;text-align:center;flex-shrink:0">'+(i===0?'⚽':(i+1)+'.')+'</div>'
+            +avHtml(p.sObj, i===0?44:34)
+            +'<div style="flex:1">'
+              +'<div style="font-family:Anton,sans-serif;font-size:'+(i===0?'15':'12')+'px;color:var(--txt)">'+p.navn+'</div>'
+              +'<div style="font-size:9px;color:var(--muted);">'+(LL[p.sObj.loc]||p.sObj.loc||'')+'</div>'
+            +'</div>'
+            +'<div style="text-align:right;flex-shrink:0">'
+              +'<div style="font-family:Anton,sans-serif;font-size:'+(i===0?'20':'15')+'px;color:var(--gold)">'+p.hats+' &#11088;</div>'
+              +(p.wins>0?'<div style="font-size:8px;color:var(--muted)">'+p.wins+' ukevinn'+(p.wins===1?'er':'ere')+'</div>':'')
+            +'</div>'
+          +'</div>';
+        });
+        hatHtml += '</div>';
+      }
+
+      return winnersHtml + hatHtml;
+    }
+
+    // ── Render sesong-tabs hvis mer enn én sesong ──
+    var tabsHtml = '';
+    if (seasonList.length > 1) {
+      tabsHtml = '<div style="display:flex;gap:1px;background:var(--b1);border-bottom:1px solid var(--b1)">'
+        + seasonList.map(function(s){
+            return '<button id="leg-tab-'+s.year+'" onclick="switchLegenderSesong('+s.year+')" '
+              +'style="flex:1;padding:8px;font-family:Anton,sans-serif;font-size:11px;letter-spacing:1px;'
+              +'background:'+(s.year===activeSeason?'var(--card)':'var(--card2)')+';'
+              +'color:'+(s.year===activeSeason?'var(--gold)':'var(--muted)')+';'
+              +'border:none;cursor:pointer;transition:all .2s">Sesong '+s.year+'</button>';
+          }).join('')
+        +'</div>';
+    }
+
+    el.innerHTML = tabsHtml
+      + '<div id="legender-content">'
+      + buildSeason(seasonList[0])
+      + '</div>';
+
+    // Gjør buildSeason tilgjengelig for tab-switching
+    el._seasons = seasons;
+    el._buildSeason = buildSeason;
+
+  }).catch(function(){
+    el.innerHTML = '<div style="font-size:11px;color:var(--muted);font-style:italic;padding:16px 14px">Kunne ikke laste legender.</div>';
+  });
+}
+
+function switchLegenderSesong(year) {
+  var el = document.getElementById('legender-container');
+  if (!el || !el._seasons) return;
+  var season = el._seasons[year];
+  if (!season) return;
+  // Oppdater tab-styling
+  document.querySelectorAll('[id^="leg-tab-"]').forEach(function(btn){
+    var isActive = btn.id === 'leg-tab-'+year;
+    btn.style.background = isActive ? 'var(--card)' : 'var(--card2)';
+    btn.style.color = isActive ? 'var(--gold)' : 'var(--muted)';
+  });
+  document.getElementById('legender-content').innerHTML = el._buildSeason(season);
+}
+
+function switchHofTab(tab) {
+  var uker     = document.getElementById('hof-container');
+  var legender = document.getElementById('legender-container');
+  var btnUker  = document.getElementById('hof-sub-uker');
+  var btnLeg   = document.getElementById('hof-sub-legender');
+  if (tab === 'uker') {
+    uker.style.display     = 'block';
+    legender.style.display = 'none';
+    btnUker.style.background  = 'var(--card)';  btnUker.style.color  = 'var(--gold)';  btnUker.style.borderBottom  = '2px solid var(--gold)';
+    btnLeg.style.background   = 'var(--card2)'; btnLeg.style.color   = 'var(--muted)'; btnLeg.style.borderBottom   = '2px solid transparent';
+  } else {
+    uker.style.display     = 'none';
+    legender.style.display = 'block';
+    btnUker.style.background  = 'var(--card2)'; btnUker.style.color  = 'var(--muted)'; btnUker.style.borderBottom  = '2px solid transparent';
+    btnLeg.style.background   = 'var(--card)';  btnLeg.style.color   = 'var(--gold)';  btnLeg.style.borderBottom   = '2px solid var(--gold)';
+    // Lazy-load legender første gang
+    var el = document.getElementById('legender-container');
+    if (el && el.innerHTML.indexOf('Laster') === -1 && el.innerHTML.trim() === '') return;
+    if (el && (el.innerHTML.trim() === '' || el.innerHTML.indexOf('Laster') !== -1)) renderLegender();
+  }
+}
 </script>
 </body>
 </html>
