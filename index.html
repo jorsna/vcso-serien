@@ -1407,7 +1407,7 @@ function renderTeam() {
             + '<div>'
               + '<div style="font-size:13px;font-weight:700;color:var(--txt);letter-spacing:.3px">'+w.selger+'</div>'
               + '<div style="font-family:Anton,sans-serif;font-size:18px;color:var(--gold);letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,.4)">'+w.salg+' bil'+(w.salg===1?'':'er')+'</div>'
-              + '<div style="font-size:9px;color:var(--muted)">'+(LL[sObj.loc]||w.loc||'')+'</div>'
+              + '<div style="font-size:9px;color:var(--muted);margin-top:2px">'+(w.finansiert>0?'&#128176; '+w.finansiert+' finansiert &nbsp;·&nbsp; ':'')+(LL[sObj.loc]||w.loc||'')+'</div>'
             + '</div>'
           + '</div>';
         }).join('');
