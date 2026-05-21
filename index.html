@@ -1359,17 +1359,24 @@ function renderTeam() {
         return b.weekYear - a.weekYear || b.weekNr - a.weekNr;
       });
       el.innerHTML = weeks.map(function(wk){
-        // Vinner = raden med høyest pts (allerede sortert fra DB)
-        var w = wk.rows[0];
-        var sObj = SELGERE.find(function(s){ return s.navn===w.selger; }) || {};
-        var hasPhoto = typeof SELGER_PHOTOS!=='undefined' && sObj.id && SELGER_PHOTOS[sObj.id];
-        var avInner = hasPhoto
-          ? '<img src="'+SELGER_PHOTOS[sObj.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">'
-          : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:'+(sObj.color||'var(--gold)')+'">'+( sObj.initials||'?')+'</div>';
+        // Sorter rader: høyest pts først, deretter finansiert
+        wk.rows.sort(function(a,b){ return b.pts-a.pts || b.finansiert-a.finansiert; });
+
+        // Finn beste poengsum og alle vinnere med den poengsummen
+        var bestPts = wk.rows[0].pts;
+        var bestFin = 0;
+        wk.rows.filter(function(r){ return r.pts===bestPts; })
+          .forEach(function(r){ if(r.finansiert>bestFin) bestFin=r.finansiert; });
+        var winners = wk.rows.filter(function(r){
+          return r.pts===bestPts && r.finansiert===bestFin;
+        });
+
+        // Hat tricks hentes fra første rad (alle rader for uken har samme array)
+        var hatTricks = wk.rows[0].hat_tricks || [];
 
         var hatHtml = '';
-        if (w.hat_tricks && w.hat_tricks.length) {
-          var hatObjs = w.hat_tricks.map(function(navn){
+        if (hatTricks.length) {
+          var hatObjs = hatTricks.map(function(navn){
             return SELGERE.find(function(s){ return s.navn===navn; }) || { navn:navn, initials:navn.slice(0,2).toUpperCase(), color:'var(--gold)', loc:'' };
           });
           hatHtml = '<div style="border-left:1px solid rgba(255,215,0,.15);padding-left:14px">'
@@ -1389,6 +1396,22 @@ function renderTeam() {
           + '</div>';
         }
 
+        var winnersHtml = winners.map(function(w){
+          var sObj = SELGERE.find(function(s){ return s.navn===w.selger; }) || {};
+          var hasPhoto = typeof SELGER_PHOTOS!=='undefined' && sObj.id && SELGER_PHOTOS[sObj.id];
+          var avInner = hasPhoto
+            ? '<img src="'+SELGER_PHOTOS[sObj.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">'
+            : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:'+(sObj.color||'var(--gold)')+'">'+( sObj.initials||'?')+'</div>';
+          return '<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">'
+            + '<div class="hof-avatar-ring"><div class="hof-avatar-inner">'+avInner+'</div></div>'
+            + '<div>'
+              + '<div style="font-size:13px;font-weight:700;color:var(--txt);letter-spacing:.3px">'+w.selger+'</div>'
+              + '<div style="font-family:Anton,sans-serif;font-size:18px;color:var(--gold);letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,.4)">'+w.salg+' bil'+(w.salg===1?'':'er')+'</div>'
+              + '<div style="font-size:9px;color:var(--muted)">'+(LL[sObj.loc]||w.loc||'')+'</div>'
+            + '</div>'
+          + '</div>';
+        }).join('');
+
         return '<div style="margin-bottom:16px;padding:16px;background:linear-gradient(160deg,#12121e 0%,#1a1a2e 60%,rgba(255,215,0,.05) 100%);border-radius:10px;border:1px solid rgba(255,215,0,.35);box-shadow:0 2px 24px rgba(255,215,0,.08),inset 0 1px 0 rgba(255,215,0,.12)">'
           + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">'
             + '<div style="font-size:14px">&#127942;</div>'
@@ -1396,17 +1419,10 @@ function renderTeam() {
             + '<div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(255,215,0,.3),transparent)"></div>'
             + '<div style="font-size:9px;color:var(--muted)">'+(wk.weekEnd||'').slice(0,10)+'</div>'
           + '</div>'
-          + '<div style="display:grid;grid-template-columns:1fr'+(w.hat_tricks&&w.hat_tricks.length?' 1fr':'')+';gap:0">'
+          + '<div style="display:grid;grid-template-columns:1fr'+(hatTricks.length?' 1fr':'')+';gap:0">'
             + '<div>'
-              + '<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,215,0,.5);margin-bottom:10px">&#128081; Ukesvinner</div>'
-              + '<div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">'
-                + '<div class="hof-avatar-ring"><div class="hof-avatar-inner">'+avInner+'</div></div>'
-                + '<div>'
-                  + '<div style="font-size:13px;font-weight:700;color:var(--txt);letter-spacing:.3px">'+w.selger+'</div>'
-                  + '<div style="font-family:Anton,sans-serif;font-size:18px;color:var(--gold);letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,.4)">'+w.salg+' bil'+(w.salg===1?'':'er')+'</div>'
-                  + '<div style="font-size:9px;color:var(--muted)">'+(LL[sObj.loc]||w.loc||'')+'</div>'
-                + '</div>'
-              + '</div>'
+              + '<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,215,0,.5);margin-bottom:10px">&#128081; Ukesvinner'+(winners.length>1?'e':'')+'</div>'
+              + winnersHtml
             + '</div>'
             + hatHtml
           + '</div>'
