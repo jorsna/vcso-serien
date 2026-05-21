@@ -406,7 +406,7 @@ function loadGazzetta() {
   document.getElementById('edition-label').textContent = norskDato(dato);
 
   // Hent nyeste artikkel (ikke nødvendigvis dagens dato)
-  fetch(SB_URL + '/rest/v1/championship_gazzetta?order=dato.desc&limit=1', { headers: sbH() })
+  fetch(SB_URL + '/rest/v1/championship_gazzetta?order=created_at.desc&limit=1', { headers: sbH() })
     .then(function(r) { return r.json(); })
     .then(function(data) {
       if (Array.isArray(data) && data.length > 0) {
