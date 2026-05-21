@@ -1279,22 +1279,13 @@ function renderTeam() {
   }).join('');
 
   // ─── HALL OF FAME ────────────────────────────────────────────────
+  // Inneværende uke vises live fra sales-arrayet.
+  // Avsluttede uker hentes fra weekly_winners-tabellen (permanent).
   var hof = document.getElementById('hof-container');
   if (hof) {
-    var allWeeks = {};
-    sales.forEach(function(s) {
-      var d = new Date(s.ts);
-      var wn = getWeekNum(d);
-      var key = wn + '_' + d.getFullYear();
-      if (!allWeeks[key]) allWeeks[key] = { week: wn, sales: {}, fin: {} };
-      allWeeks[key].sales[s.selger] = (allWeeks[key].sales[s.selger]||0) + 1;
-      if (s.finansiert) allWeeks[key].fin[s.selger] = (allWeeks[key].fin[s.selger]||0) + 1;
-    });
     var thisWeek = getWeekNum(new Date());
-    var weekKeys = Object.keys(allWeeks).sort(function(a,b){
-      return parseInt(b.split('_')[0]) - parseInt(a.split('_')[0]);
-    });
-    // Hat-trick inneværende uke (live)
+
+    // ── Live: hat-trick inneværende uke ──
     var thisHatDays = {};
     sales.forEach(function(x) {
       if (getWeekNum(new Date(x.ts)) !== thisWeek) return;
@@ -1307,7 +1298,9 @@ function renderTeam() {
       var hasHat = Object.keys(thisHatDays[navn]).some(function(d){ return thisHatDays[navn][d] >= 3; });
       if (hasHat) { var sObj = SELGERE.find(function(x){ return x.navn===navn; }); if (sObj) thisHatWinners.push(sObj); }
     });
-    var personCard0 = function(s) {
+
+    // ── Inneværende uke-boks ──
+    var personCardHat = function(s) {
       var hasPhoto = typeof SELGER_PHOTOS!=='undefined' && SELGER_PHOTOS[s.id];
       var avInner = hasPhoto
         ? '<img src="'+SELGER_PHOTOS[s.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(30%)">'
@@ -1329,74 +1322,100 @@ function renderTeam() {
       + (thisHatWinners.length
         ? '<div style="border-top:1px solid rgba(255,215,0,.15);padding-top:12px">'
           + '<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,215,0,.5);margin-bottom:10px">&#9917; Hat-trick denne uken</div>'
-          + thisHatWinners.map(personCard0).join('')
+          + thisHatWinners.map(personCardHat).join('')
           + '</div>'
         : '')
       + '</div>';
-    var pastKeys = weekKeys.filter(function(k){ return parseInt(k.split('_')[0]) !== thisWeek; });
-    if (!pastKeys.length) {
-      hof.innerHTML = currentBox;
-    } else {
-      hof.innerHTML = currentBox + pastKeys.map(function(key) {
-        var wd = allWeeks[key];
-        var bestN = 0;
-        Object.keys(wd.sales).forEach(function(n){ if(wd.sales[n]>bestN) bestN=wd.sales[n]; });
-        var tied = SELGERE.filter(function(s){ return (wd.sales[s.navn]||0)===bestN; });
-        var bestFin = 0;
-        tied.forEach(function(s){ if((wd.fin[s.navn]||0)>bestFin) bestFin=(wd.fin[s.navn]||0); });
-        var winners = tied.filter(function(s){ return (wd.fin[s.navn]||0)===bestFin; });
-        var hatDays = {};
-        sales.forEach(function(x) {
-          var d = new Date(x.ts);
-          if (getWeekNum(d) !== wd.week) return;
-          var ds = tsDate(x.ts);
-          if (!hatDays[x.selger]) hatDays[x.selger] = {};
-          hatDays[x.selger][ds] = (hatDays[x.selger][ds]||0) + 1;
-        });
-        var hatWinners = [];
-        Object.keys(hatDays).forEach(function(navn) {
-          var hasHat = Object.keys(hatDays[navn]).some(function(d){ return hatDays[navn][d] >= 3; });
-          if (hasHat) { var sObj = SELGERE.find(function(x){ return x.navn===navn; }); if (sObj) hatWinners.push(sObj); }
-        });
-        var personCard = function(s, sold, isHat) {
-          var hasPhoto = typeof SELGER_PHOTOS!=='undefined' && SELGER_PHOTOS[s.id];
-          var avInner = hasPhoto
-            ? '<img src="'+SELGER_PHOTOS[s.id]+'" style="width:100%;height:100%;object-fit:cover;filter:'+(isHat?'grayscale(30%)':'grayscale(100%)')+'">'
-            : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:'+s.color+'">'+s.initials+'</div>';
-          var ringCls = isHat ? 'hof-hat-ring' : 'hof-avatar-ring';
-          var innerCls = isHat ? 'hof-hat-inner' : 'hof-avatar-inner';
-          return '<div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">'
-            + '<div class="'+ringCls+'"><div class="'+innerCls+'">'+avInner+'</div></div>'
-            + '<div>'
-              + '<div style="font-size:13px;font-weight:700;color:var(--txt);letter-spacing:.3px">'+s.navn+'</div>'
-              + (sold!==null?'<div style="font-family:Anton,sans-serif;font-size:18px;color:var(--gold);letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,.4)">'+sold+' bil'+(sold>1?'er':'')+'</div>':'')
-              + (isHat?'<div style="font-size:10px;color:var(--gold);letter-spacing:.5px">&#9917; HAT-TRICK</div>':'')
-              + '<div style="font-size:9px;color:var(--muted)">'+(LL[s.loc]||s.loc)+'</div>'
-            + '</div>'
+
+    // ── Vis skeleton mens vi henter fra DB ──
+    hof.innerHTML = currentBox
+      + '<div id="hof-past-weeks" style="display:flex;flex-direction:column;gap:12px">'
+      + '<div style="font-size:11px;color:var(--muted);font-style:italic;padding:4px 0">Laster avsluttede uker...</div>'
+      + '</div>';
+
+    // ── Hent avsluttede uker fra weekly_winners ──
+    fetch(SUPABASE_URL + '/rest/v1/weekly_winners?order=week_year.desc,week_nr.desc&limit=30', {
+      mode:'cors', headers: sbH()
+    }).then(function(r){
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    }).then(function(data){
+      var el = document.getElementById('hof-past-weeks');
+      if (!el) return;
+      // Filtrer ut inneværende uke (den vises live ovenfor)
+      var past = (data||[]).filter(function(w){ return w.week_nr !== thisWeek; });
+      if (!past.length) {
+        el.innerHTML = '<div style="font-size:11px;color:var(--muted);font-style:italic;padding:4px 0">Avsluttede uker vises her fra og med neste mandag.</div>';
+        return;
+      }
+      // Grupper per uke (én rad per uke, hat_tricks er array)
+      var byWeek = {};
+      past.forEach(function(w){
+        var k = w.week_year + '-' + w.week_nr;
+        if (!byWeek[k]) byWeek[k] = { weekNr:w.week_nr, weekYear:w.week_year, weekEnd:w.week_end, rows:[] };
+        byWeek[k].rows.push(w);
+      });
+      var weeks = Object.values(byWeek).sort(function(a,b){
+        return b.weekYear - a.weekYear || b.weekNr - a.weekNr;
+      });
+      el.innerHTML = weeks.map(function(wk){
+        // Vinner = raden med høyest pts (allerede sortert fra DB)
+        var w = wk.rows[0];
+        var sObj = SELGERE.find(function(s){ return s.navn===w.selger; }) || {};
+        var hasPhoto = typeof SELGER_PHOTOS!=='undefined' && sObj.id && SELGER_PHOTOS[sObj.id];
+        var avInner = hasPhoto
+          ? '<img src="'+SELGER_PHOTOS[sObj.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">'
+          : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:'+(sObj.color||'var(--gold)')+'">'+( sObj.initials||'?')+'</div>';
+
+        var hatHtml = '';
+        if (w.hat_tricks && w.hat_tricks.length) {
+          var hatObjs = w.hat_tricks.map(function(navn){
+            return SELGERE.find(function(s){ return s.navn===navn; }) || { navn:navn, initials:navn.slice(0,2).toUpperCase(), color:'var(--gold)', loc:'' };
+          });
+          hatHtml = '<div style="border-left:1px solid rgba(255,215,0,.15);padding-left:14px">'
+            + '<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,215,0,.5);margin-bottom:10px">&#9917; Hat-trick</div>'
+            + hatObjs.map(function(s){
+                var hp = typeof SELGER_PHOTOS!=='undefined' && s.id && SELGER_PHOTOS[s.id];
+                var hi = hp
+                  ? '<img src="'+SELGER_PHOTOS[s.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(30%)">'
+                  : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:'+s.color+'">'+s.initials+'</div>';
+                return '<div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">'
+                  + '<div class="hof-hat-ring"><div class="hof-hat-inner">'+hi+'</div></div>'
+                  + '<div><div style="font-size:13px;font-weight:700;color:var(--txt)">'+s.navn+'</div>'
+                  + '<div style="font-size:10px;color:var(--gold);letter-spacing:.5px">&#9917; HAT-TRICK</div>'
+                  + '<div style="font-size:9px;color:var(--muted)">'+(LL[s.loc]||s.loc||'')+'</div></div>'
+                + '</div>';
+              }).join('')
           + '</div>';
-        };
-        var divider = '<div style="height:1px;background:linear-gradient(90deg,transparent,rgba(255,215,0,.4),transparent);margin:10px 0"></div>';
+        }
+
         return '<div style="margin-bottom:16px;padding:16px;background:linear-gradient(160deg,#12121e 0%,#1a1a2e 60%,rgba(255,215,0,.05) 100%);border-radius:10px;border:1px solid rgba(255,215,0,.35);box-shadow:0 2px 24px rgba(255,215,0,.08),inset 0 1px 0 rgba(255,215,0,.12)">'
           + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">'
             + '<div style="font-size:14px">&#127942;</div>'
-            + '<div style="font-family:Anton,sans-serif;font-size:13px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;opacity:.85">Uke '+wd.week+'</div>'
+            + '<div style="font-family:Anton,sans-serif;font-size:13px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;opacity:.85">Uke '+wk.weekNr+'</div>'
             + '<div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(255,215,0,.3),transparent)"></div>'
+            + '<div style="font-size:9px;color:var(--muted)">'+(wk.weekEnd||'').slice(0,10)+'</div>'
           + '</div>'
-          + '<div style="display:grid;grid-template-columns:1fr'+(hatWinners.length?' 1fr':'')+';gap:0">'
+          + '<div style="display:grid;grid-template-columns:1fr'+(w.hat_tricks&&w.hat_tricks.length?' 1fr':'')+';gap:0">'
             + '<div>'
               + '<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,215,0,.5);margin-bottom:10px">&#128081; Ukesvinner</div>'
-              + winners.map(function(s){ return personCard(s, wd.sales[s.navn]); }).join('')
-            + '</div>'
-            + (hatWinners.length
-              ? '<div style="border-left:1px solid rgba(255,215,0,.15);padding-left:14px">'
-                + '<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,215,0,.5);margin-bottom:10px">&#9917; Hat-trick</div>'
-                + hatWinners.map(function(s){ return personCard(s, null, true); }).join('')
+              + '<div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">'
+                + '<div class="hof-avatar-ring"><div class="hof-avatar-inner">'+avInner+'</div></div>'
+                + '<div>'
+                  + '<div style="font-size:13px;font-weight:700;color:var(--txt);letter-spacing:.3px">'+w.selger+'</div>'
+                  + '<div style="font-family:Anton,sans-serif;font-size:18px;color:var(--gold);letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,.4)">'+w.salg+' bil'+(w.salg===1?'':'er')+'</div>'
+                  + '<div style="font-size:9px;color:var(--muted)">'+(LL[sObj.loc]||w.loc||'')+'</div>'
+                + '</div>'
               + '</div>'
-              : '')
+            + '</div>'
+            + hatHtml
           + '</div>'
         + '</div>';
       }).join('');
-    }
+    }).catch(function(){
+      var el = document.getElementById('hof-past-weeks');
+      if (el) el.innerHTML = '<div style="font-size:11px;color:var(--muted);font-style:italic;padding:4px 0">Avsluttede uker vises her fra og med neste mandag.</div>';
+    });
   }
 }
 
