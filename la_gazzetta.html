@@ -570,8 +570,25 @@ function genererTekst(salg, dato, alleSalg) {
 
   Object.keys(selgerTelling).forEach(function(n){ if(selgerTelling[n]>=3) hatTrickNavn.push(n); });
 
+  // Finn MVP med finansiering som tiebreaker
   var maxSalg = Math.max.apply(null, Object.values(selgerTelling).concat([0]));
-  var mvpListe = Object.keys(selgerTelling).filter(function(n){ return selgerTelling[n]===maxSalg; });
+  var toppSelgere = Object.keys(selgerTelling).filter(function(n){ return selgerTelling[n]===maxSalg; });
+
+  var finPerSelger = {};
+  salg.forEach(function(s){ if(s.finansiert) finPerSelger[s.selger] = (finPerSelger[s.selger]||0)+1; });
+
+  var mvpListe;
+  if (toppSelgere.length > 1) {
+    var maxFin = Math.max.apply(null, toppSelgere.map(function(n){ return finPerSelger[n]||0; }));
+    var etterTiebreak = toppSelgere.filter(function(n){ return (finPerSelger[n]||0) === maxFin; });
+    if (etterTiebreak.length < toppSelgere.length) {
+      mvpListe = etterTiebreak;
+    } else {
+      mvpListe = toppSelgere;
+    }
+  } else {
+    mvpListe = toppSelgere;
+  }
   var topAvd = Object.keys(avdTelling).sort(function(a,b){ return avdTelling[b]-avdTelling[a]; })[0] || null;
   var topModell = Object.keys(modellTelling).sort(function(a,b){ return modellTelling[b]-modellTelling[a]; })[0] || null;
   var avdNavn = {ryen:'Ryen',fornebu:'Fornebu',lillestrom:'Lillestrøm'};
@@ -618,8 +635,8 @@ function genererTekst(salg, dato, alleSalg) {
   }).join('\n');
 
   var mvpTekst = mvpListe.length > 1
-    ? 'DELT MVP: ' + mvpListe.map(function(n){return n+' ('+(SELGER_AVD[n]||'ukjent')+')';}).join(' og ') + ' – begge med ' + maxSalg + ' bil' + (maxSalg>1?'er':'')
-    : 'MVP: ' + mvpListe[0] + ' (' + (SELGER_AVD[mvpListe[0]]||'ukjent') + ') med ' + maxSalg + ' bil' + (maxSalg>1?'er':'');
+    ? 'DELT MVP: ' + mvpListe.map(function(n){return n+' ('+(SELGER_AVD[n]||'ukjent')+', '+selgerTelling[n]+' salg, '+(finPerSelger[n]||0)+' finansiert)';}).join(' og ')
+    : 'MVP: ' + mvpListe[0] + ' (' + (SELGER_AVD[mvpListe[0]]||'ukjent') + ') med ' + maxSalg + ' salg og ' + (finPerSelger[mvpListe[0]]||0) + ' finansiert – vant på finansiering som tiebreaker';
 
   var hatTrickTekst = hatTrickNavn.map(function(n){return n+' ('+(SELGER_AVD[n]||'ukjent')+')';}).join(', ');
 
