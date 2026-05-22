@@ -589,10 +589,10 @@ function genererTekst(salg, dato, alleSalg) {
   } else {
     mvpListe = toppSelgere;
   }
-  var topAvd = Object.keys(avdTelling).sort(function(a,b){ return avdTelling[b]-avdTelling[a]; })[0] || null;
   var topModell = Object.keys(modellTelling).sort(function(a,b){ return modellTelling[b]-modellTelling[a]; })[0] || null;
   var avdNavn = {ryen:'Ryen',fornebu:'Fornebu',lillestrom:'Lillestrøm'};
 
+  // Sesongtotaler beregnes før topAvd slik at ledende avd. er basert på hele sesongen
   var totalSesongen = (alleSalg||[]).length;
   var totalAvd = {ryen:0,fornebu:0,lillestrom:0};
   var totalSelger = {};
@@ -601,6 +601,9 @@ function genererTekst(salg, dato, alleSalg) {
     totalSelger[s.selger] = (totalSelger[s.selger]||0)+1;
   });
   var totalLeder = Object.keys(totalSelger).sort(function(a,b){return totalSelger[b]-totalSelger[a];})[0]||null;
+
+  // topAvd bruker sesongtotal, ikke bare dagens salg
+  var topAvd = Object.keys(totalAvd).sort(function(a,b){ return totalAvd[b]-totalAvd[a]; })[0] || null;
 
   var stats = {
     totalt: totalt,
