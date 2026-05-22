@@ -83,9 +83,10 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .hdr-cd{display:flex;align-items:center;gap:10px}
 .hdr-cd-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap}
 .brand{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
-.crest{width:38px;height:38px;border-radius:50%;background:#1a3060;border:2px solid var(--gold);
-  display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.t1{font-family:'VolvoBroad','Anton',sans-serif;font-size:17px;letter-spacing:2px;line-height:1;white-space:nowrap}
+@keyframes logoShine{to{background-position:300% center}}
+.crest{width:54px;height:54px;border-radius:50%;background:#1a3060;border:2px solid var(--gold);
+  display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.t1{font-family:'VolvoBroad','Anton',sans-serif;font-size:22px;letter-spacing:3px;line-height:1;white-space:nowrap}
 .t2{font-size:10px;color:var(--gold);letter-spacing:.6px;text-transform:uppercase;margin-top:2px}
 .hdr-right{display:flex;gap:6px;align-items:center;flex-shrink:0}
 .cd-row{display:flex;gap:3px;align-items:center}
@@ -397,6 +398,81 @@ html, body {
 .modell-bar-fill{height:100%;border-radius:3px;display:flex;align-items:center;justify-content:flex-end;padding-right:7px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
 .modell-bar-count{font-size:10px;font-weight:700;color:#000}
 .modell-bar-pct{font-size:9px;color:var(--muted);width:30px;text-align:right;flex-shrink:0}
+
+/* ── GAZZETTA TICKER ── */
+#gazzetta-ticker {
+  position: relative;
+  width: 100%;
+  height: 32px;
+  background: linear-gradient(90deg, #0a0a0a 0%, #111 50%, #0a0a0a 100%);
+  border-top: 1px solid rgba(255,215,0,.3);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  z-index: 9999;
+  box-shadow: 0 -2px 12px rgba(0,0,0,.5);
+}
+#gazzetta-ticker .ticker-label {
+  flex-shrink: 0;
+  padding: 0 10px;
+  font-family: Anton, sans-serif;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #0a0a0a;
+  background: linear-gradient(135deg, #ffd700, #c8960c);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  border-right: 1px solid rgba(255,215,0,.4);
+}
+#gazzetta-ticker .ticker-track-wrap {
+  flex: 1;
+  overflow: hidden;
+  height: 100%;
+  position: relative;
+}
+#gazzetta-ticker .ticker-track {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  white-space: nowrap;
+  animation: tickerScroll 40s linear infinite;
+  will-change: transform;
+}
+#gazzetta-ticker .ticker-track:hover { animation-play-state: paused; }
+#gazzetta-ticker .ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 28px;
+  border-right: 1px solid rgba(255,215,0,.15);
+  cursor: pointer;
+}
+#gazzetta-ticker .ticker-date {
+  font-size: 8px;
+  color: rgba(255,215,0,.6);
+  font-family: Anton, sans-serif;
+  letter-spacing: 1px;
+  flex-shrink: 0;
+}
+#gazzetta-ticker .ticker-headline {
+  font-size: 11px;
+  font-weight: 700;
+  color: #f0f0f0;
+  letter-spacing: .3px;
+}
+#gazzetta-ticker .ticker-ingress {
+  font-size: 10px;
+  color: rgba(255,255,255,.45);
+  font-style: italic;
+}
+@keyframes tickerScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6NJ95NHF98"></script>
@@ -447,7 +523,7 @@ html, body {
       <div class="brand">
         <div class="crest">&#9917;</div>
         <div>
-          <div class="t1">VCSO CHAMPIONSHIP</div>
+          <div class="t1" style="background:linear-gradient(135deg,#fff 0%,var(--gold) 40%,#fff 70%,var(--gold) 100%);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:logoShine 3s linear infinite;filter:drop-shadow(0 0 8px rgba(255,215,0,.3))">VCSO CHAMPIONSHIP</div>
           <div class="t2">Mai &amp; Juni 2026 &middot; Levering innen 30. juni
             <span class="login-badge" id="role-badge"></span>
           </div>
@@ -483,6 +559,16 @@ html, body {
   <button class="tab wide" onclick="setTab('hof', this)">🏆 Hall of Fame</button>
   <button class="tab wide" onclick="setTab('tips', this)">💡 Salgsverktøy</button>
   <button class="tab wide" onclick="window.open('la_gazzetta.html','_blank')">📰 La Gazzetta</button>
+</div>
+
+<!-- GAZZETTA TICKER -->
+<div id="gazzetta-ticker">
+  <div class="ticker-label">&#128240; LA GAZZETTA</div>
+  <div class="ticker-track-wrap">
+    <div class="ticker-track" id="ticker-track">
+      <span style="font-size:10px;color:rgba(255,255,255,.3);padding:0 20px">Laster nyheter...</span>
+    </div>
+  </div>
 </div>
 
 <!-- MATCHDAY BAR -->
@@ -2364,6 +2450,46 @@ function switchHofTab(tab) {
     if (el && (el.innerHTML.trim() === '' || el.innerHTML.indexOf('Laster') !== -1)) renderLegender();
   }
 }
+
+// ── GAZZETTA TICKER ──────────────────────────────────────────────
+(function initTicker() {
+  setTimeout(function() {
+    var url = SUPABASE_URL + '/rest/v1/championship_gazzetta?order=created_at.desc&limit=12&select=dato,overskrift,ingress';
+    fetch(url, { mode:'cors', headers: sbH() })
+      .then(function(r){ return r.ok ? r.json() : []; })
+      .then(function(data) { buildTicker(data); })
+      .catch(function() { buildTicker([]); });
+  }, 1500);
+})();
+
+
+function buildTicker(data) {
+  var track = document.getElementById('ticker-track');
+  if (!track) return;
+  if (!data || !data.length) {
+    track.innerHTML = '<span style="font-size:10px;color:rgba(255,255,255,.3);padding:0 20px">La Gazzetta — ingen utgaver ennå</span>';
+    return;
+  }
+  var ukedager = ['søn','man','tir','ons','tor','fre','lør'];
+  var mnd = ['jan','feb','mar','apr','mai','jun','jul','aug','sep','okt','nov','des'];
+  function fmtDato(d) {
+    if (!d) return '';
+    var dt = new Date(d);
+    return ukedager[dt.getDay()] + ' ' + dt.getDate() + '. ' + mnd[dt.getMonth()];
+  }
+  var items = data.map(function(row) {
+    return '<div class="ticker-item" onclick="window.open('la_gazzetta.html','_blank')">'
+      + '<span class="ticker-date">' + fmtDato(row.dato) + '</span>'
+      + '<span class="ticker-headline">' + (row.overskrift||'') + '</span>'
+      + (row.ingress ? '<span class="ticker-ingress">— ' + row.ingress + '</span>' : '')
+      + '</div>';
+  }).join('');
+  track.innerHTML = items + items;
+  var totalW = track.scrollWidth / 2;
+  var speed = Math.max(30, Math.min(80, totalW / 8));
+  track.style.animationDuration = speed + 's';
+}
 </script>
+
 </body>
 </html>
