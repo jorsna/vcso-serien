@@ -439,16 +439,19 @@ html, body {
   white-space: nowrap;
   animation: tickerScroll 22s linear infinite;
   will-change: transform;
+  flex-wrap: nowrap;
 }
 #gazzetta-ticker .ticker-track:hover { animation-play-state: paused; }
 #gazzetta-ticker .ticker-item {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 40px;
-  border-right: 2px solid rgba(255,215,0,.2);
+  gap: 10px;
+  padding: 0 48px;
+  border-right: 2px solid rgba(255,215,0,.25);
   cursor: pointer;
   white-space: nowrap;
+  flex-shrink: 0;
+  overflow: hidden;
 }
 #gazzetta-ticker .ticker-date {
   font-size: 8px;
@@ -462,11 +465,18 @@ html, body {
   font-weight: 700;
   color: #f0f0f0;
   letter-spacing: .3px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 #gazzetta-ticker .ticker-ingress {
   font-size: 10px;
   color: rgba(255,255,255,.45);
   font-style: italic;
+  white-space: nowrap;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
 }
 @keyframes tickerScroll {
   0%   { transform: translateX(0); }
@@ -2456,39 +2466,79 @@ function switchHofTab(tab) {
 // ── GAZZETTA TICKER ──────────────────────────────────────────────
 (function initTicker() {
   setTimeout(function() {
-    var url = SUPABASE_URL + '/rest/v1/championship_gazzetta?order=created_at.desc&limit=12&select=dato,overskrift,ingress';
-    fetch(url, { mode:'cors', headers: sbH() })
-      .then(function(r){ return r.ok ? r.json() : []; })
-      .then(function(data) { buildTicker(data); })
-      .catch(function() { buildTicker([]); });
+    var now = new Date();
+    var tz  = 'T00:00:00.000+02:00'; // norsk tid (CEST)
+    var todayStr = now.toISOString().slice(0,10);
+
+    // Beregn i går i norsk tid
+    var igaar = new Date(now.getTime() - 24*60*60*1000);
+    var igaarStr = igaar.toISOString().slice(0,10);
+
+    var items = [];
+
+    // Hent siste salg
+    var saleUrl = SUPABASE_URL + '/rest/v1/sales?order=ts.desc&limit=1&deleted=is.false&select=selger,loc,modell,ts';
+    // Hent gårsdagens Gazzetta
+    var gazzUrl = SUPABASE_URL + '/rest/v1/championship_gazzetta?order=created_at.desc&limit=1&select=dato,overskrift,ingress';
+
+    Promise.all([
+      fetch(saleUrl,  { mode:'cors', headers: sbH() }).then(function(r){ return r.ok ? r.json() : []; }),
+      fetch(gazzUrl,  { mode:'cors', headers: sbH() }).then(function(r){ return r.ok ? r.json() : []; }),
+    ]).then(function(results) {
+      var sales = results[0] || [];
+      var gazz  = results[1] || [];
+
+      // Siste salg
+      if (sales.length) {
+        var s   = sales[0];
+        var ts  = s.ts ? new Date(s.ts) : null;
+        var tid = ts ? ts.toLocaleTimeString('nb-NO', {hour:'2-digit',minute:'2-digit'}) : '';
+        var label = (s["selger"]||"?")+' · '+(s["modell"]||"")+' · '+(LL[s.loc]||s.loc||"");
+        items.push({
+          date:  tid,
+          headline: '&#9660; Siste registrering',
+          ingress:  label,
+        });
+      }
+
+      // Gårsdagens Gazzetta
+      if (gazz.length) {
+        var g = gazz[0];
+        var ukedager = ['søn','man','tir','ons','tor','fre','lør'];
+        var mnd = ['jan','feb','mar','apr','mai','jun','jul','aug','sep','okt','nov','des'];
+        var gd  = g.dato ? new Date(g.dato) : null;
+        var gLabel = gd ? ukedager[gd.getDay()] + ' ' + gd.getDate() + '. ' + mnd[gd.getMonth()] : '';
+        items.push({
+          date:     gLabel,
+          headline: g.overskrift || '',
+          ingress:  g.ingress    || '',
+        });
+      }
+
+      buildTicker(items);
+    }).catch(function() { buildTicker([]); });
   }, 1500);
 })();
 
 
-function buildTicker(data) {
+function buildTicker(items) {
   var track = document.getElementById('ticker-track');
   if (!track) return;
-  if (!data || !data.length) {
-    track.innerHTML = '<span style="font-size:10px;color:rgba(255,255,255,.3);padding:0 20px">La Gazzetta — ingen utgaver ennå</span>';
+  if (!items || !items.length) {
+    track.innerHTML = '<span style="font-size:10px;color:rgba(255,255,255,.3);padding:0 20px">Ingen data ennå</span>';
     return;
   }
-  var ukedager = ['søn','man','tir','ons','tor','fre','lør'];
-  var mnd = ['jan','feb','mar','apr','mai','jun','jul','aug','sep','okt','nov','des'];
-  function fmtDato(d) {
-    if (!d) return '';
-    var dt = new Date(d);
-    return ukedager[dt.getDay()] + ' ' + dt.getDate() + '. ' + mnd[dt.getMonth()];
-  }
-  var items = data.map(function(row) {
+  var html = items.map(function(item) {
     return '<div class="ticker-item" onclick="window.open(\'la_gazzetta.html\',\'_blank\')">'
-      + '<span class="ticker-date">' + fmtDato(row.dato) + '</span>'
-      + '<span class="ticker-headline">' + (row.overskrift||'') + '</span>'
-      + (row.ingress ? '<span class="ticker-ingress">— ' + row.ingress + '</span>' : '')
+      + (item.date ? '<span class="ticker-date">' + item.date + '</span>' : '')
+      + '<span class="ticker-headline">' + (item.headline||'') + '</span>'
+      + (item.ingress ? '<span class="ticker-ingress">— ' + item.ingress + '</span>' : '')
       + '</div>';
   }).join('');
-  track.innerHTML = items + items;
+  // Dupliser for sømløs loop
+  track.innerHTML = html + html;
   var totalW = track.scrollWidth / 2;
-  var speed = Math.max(15, Math.min(40, totalW / 14));
+  var speed = Math.max(10, Math.min(25, totalW / 16));
   track.style.animationDuration = speed + 's';
 }
 </script>
