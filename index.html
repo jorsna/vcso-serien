@@ -437,17 +437,18 @@ html, body {
   align-items: center;
   height: 100%;
   white-space: nowrap;
-  animation: tickerScroll 40s linear infinite;
+  animation: tickerScroll 22s linear infinite;
   will-change: transform;
 }
 #gazzetta-ticker .ticker-track:hover { animation-play-state: paused; }
 #gazzetta-ticker .ticker-item {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 28px;
-  border-right: 1px solid rgba(255,215,0,.15);
+  gap: 12px;
+  padding: 0 40px;
+  border-right: 2px solid rgba(255,215,0,.2);
   cursor: pointer;
+  white-space: nowrap;
 }
 #gazzetta-ticker .ticker-date {
   font-size: 8px;
@@ -2487,7 +2488,7 @@ function buildTicker(data) {
   }).join('');
   track.innerHTML = items + items;
   var totalW = track.scrollWidth / 2;
-  var speed = Math.max(30, Math.min(80, totalW / 8));
+  var speed = Math.max(15, Math.min(40, totalW / 14));
   track.style.animationDuration = speed + 's';
 }
 </script>
