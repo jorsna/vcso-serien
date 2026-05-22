@@ -562,7 +562,7 @@ html, body {
 </div>
 
 <!-- GAZZETTA TICKER -->
-<div id="gazzetta-ticker">
+<div id="gazzetta-ticker" style="display:none">
   <div class="ticker-label">&#128240; LA GAZZETTA</div>
   <div class="ticker-track-wrap">
     <div class="ticker-track" id="ticker-track">
@@ -2022,6 +2022,7 @@ function closeIntro() {
   ov.style.opacity = '0';
   ov.style.pointerEvents = 'none';
   setTimeout(function() { ov.style.display = 'none'; }, 400);
+  var _t = document.getElementById('gazzetta-ticker'); if (_t) _t.style.display = 'flex';
 }
 
 function updateRoleBadge() {
@@ -2478,7 +2479,7 @@ function buildTicker(data) {
     return ukedager[dt.getDay()] + ' ' + dt.getDate() + '. ' + mnd[dt.getMonth()];
   }
   var items = data.map(function(row) {
-    return '<div class="ticker-item" onclick="window.open('la_gazzetta.html','_blank')">'
+    return '<div class="ticker-item" onclick="window.open(\'la_gazzetta.html\',\'_blank\')">'
       + '<span class="ticker-date">' + fmtDato(row.dato) + '</span>'
       + '<span class="ticker-headline">' + (row.overskrift||'') + '</span>'
       + (row.ingress ? '<span class="ticker-ingress">— ' + row.ingress + '</span>' : '')
