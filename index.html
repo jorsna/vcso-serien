@@ -953,8 +953,92 @@ function fetchSales() {
       hideStatus();
       renderAll();
       updateMVP();
+      autoSaveWeeklyWinner();
     })
     .catch(function(e) { showStatus('Feil: ' + e.message, true); });
+}
+
+// ─── AUTO-LAGRE UKESVINNER ────────────────────────────────────────────
+function getIsoWeek(d) {
+  var date = new Date(d);
+  date.setHours(0,0,0,0);
+  date.setDate(date.getDate() + 3 - (date.getDay()+6)%7);
+  var week1 = new Date(date.getFullYear(),0,4);
+  return 1 + Math.round(((date-week1)/86400000 - 3 + (week1.getDay()+6)%7)/7);
+}
+function getIsoYear(d) {
+  var date = new Date(d);
+  date.setDate(date.getDate() + 3 - (date.getDay()+6)%7);
+  return date.getFullYear();
+}
+function getPrevWeekBounds() {
+  var now = new Date();
+  var day = now.getDay();
+  var diffToMon = (day===0) ? -6 : 1 - day;
+  var mon = new Date(now); mon.setDate(now.getDate() + diffToMon - 7); mon.setHours(0,0,0,0);
+  var sun = new Date(mon); sun.setDate(mon.getDate()+6); sun.setHours(23,59,59,999);
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function fmt(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+  return { start:fmt(mon), end:fmt(sun), weekNr:getIsoWeek(mon), weekYear:getIsoYear(mon) };
+}
+
+function autoSaveWeeklyWinner() {
+  var wb = getPrevWeekBounds();
+  fetch(SUPABASE_URL+'/rest/v1/weekly_winners?week_nr=eq.'+wb.weekNr+'&week_year=eq.'+wb.weekYear+'&limit=1', {
+    headers: sbH()
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(existing){
+    if(existing && existing.length > 0) return;
+    fetch(API+'?order=ts.asc&deleted=is.false&ts=gte.'+wb.start+'T00:00:00&ts=lte.'+wb.end+'T23:59:59&limit=1000', {
+      headers: sbH()
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(weekSales){
+      if(!Array.isArray(weekSales) || !weekSales.length) return;
+      var stats = {};
+      weekSales.forEach(function(s){
+        if(!stats[s.selger]) stats[s.selger] = { selger:s.selger, loc:s.loc, g:0, fin:0, pts:0, days:{} };
+        var p = stats[s.selger];
+        p.g++; p.pts+=3;
+        if(s.finansiert) p.fin++;
+        var d = (s.ts||'').substring(0,10);
+        p.days[d] = (p.days[d]||0)+1;
+      });
+      var rows = Object.values(stats);
+      if(!rows.length) return;
+      rows.sort(function(a,b){ return b.pts-a.pts || b.fin-a.fin; });
+      var bestPts = rows[0].pts;
+      var bestFin = rows[0].fin;
+      var winners = rows.filter(function(r){ return r.pts===bestPts && r.fin===bestFin; });
+      var hatTricks = [];
+      rows.forEach(function(p){
+        if(Object.keys(p.days).some(function(d){ return p.days[d]>=3; })) hatTricks.push(p.selger);
+      });
+      var inserts = winners.map(function(w){
+        return {
+          week_nr:    wb.weekNr,
+          week_year:  wb.weekYear,
+          week_start: wb.start,
+          week_end:   wb.end,
+          selger:     w.selger,
+          loc:        w.loc,
+          pts:        w.pts,
+          salg:       w.g,
+          finansiert: w.fin,
+          tens:       0,
+          fup:        w.fin,
+          hat_tricks: hatTricks
+        };
+      });
+      fetch(SUPABASE_URL+'/rest/v1/weekly_winners', {
+        method:'POST',
+        headers: Object.assign({}, sbH(), {'Prefer':'resolution=ignore-duplicates'}),
+        body: JSON.stringify(inserts)
+      }).catch(function(e){ console.warn('autoSave feil:', e); });
+    });
+  })
+  .catch(function(e){ console.warn('autoSave sjekk feil:', e); });
 }
 
 function insertSale(obj, cb) {
