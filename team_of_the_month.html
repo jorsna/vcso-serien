@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VCSO Championship 2026 – Team of the Month</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cinzel:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#c9a84c; --gold2:#f0c96e; --gold3:#8a6414; --gold-bright:#ffe98a;
+  --ryen:#4a8fff; --fornebu:#27c98a; --lillestrom:#e8a020;
+  --bg:#03080f;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);font-family:'Rajdhani',sans-serif;color:#fff;overflow-x:hidden;}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.bg-deep{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 120% 60% at 10% 10%,rgba(74,143,255,0.07) 0%,transparent 55%),
+    radial-gradient(ellipse 80% 80% at 90% 85%,rgba(201,168,76,0.08) 0%,transparent 55%),#03080f;}
+.bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(74,143,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(74,143,255,0.025) 1px,transparent 1px);
+  background-size:70px 70px;mask-image:radial-gradient(ellipse 90% 90% at 50% 40%,black,transparent);}
+.grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0.04;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+@keyframes shimmer{0%{background-position:200% center;}100%{background-position:-200% center;}}
+@keyframes crownFloat{0%,100%{transform:translateY(0) scale(1) rotate(-3deg);filter:drop-shadow(0 0 24px rgba(201,168,76,0.7));}50%{transform:translateY(-16px) scale(1.06) rotate(3deg);filter:drop-shadow(0 0 50px rgba(201,168,76,1));}}
+@keyframes revealUp{from{opacity:0;transform:translateY(60px) scale(0.95);}to{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes revealFade{from{opacity:0;}to{opacity:1;}}
+@keyframes scanDown{0%{top:-4px;opacity:1;}80%{opacity:1;}100%{top:100vh;opacity:0;}}
+@keyframes tickerMove{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes statPop{0%{transform:scale(0.6);opacity:0;}75%{transform:scale(1.06);}100%{transform:scale(1);opacity:1;}}
+@keyframes glowPulse{0%,100%{opacity:0.5;}50%{opacity:1;}}
+@keyframes orbitSpin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+@keyframes orbitSpinCCW{from{transform:rotate(0deg);}to{transform:rotate(-360deg);}}
+@keyframes trophyGlow{0%,100%{filter:drop-shadow(0 0 20px rgba(201,168,76,0.6));}50%{filter:drop-shadow(0 0 50px rgba(201,168,76,1));}}
+@keyframes playerDrop{from{opacity:0;transform:translateY(-30px) scale(0.85);}to{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes pitchGlow{0%,100%{opacity:0.5;}50%{opacity:0.8;}}
+
+.r1{animation:revealUp 1s cubic-bezier(.16,1,.3,1) 0.08s both;}
+.r2{animation:revealUp 1s cubic-bezier(.16,1,.3,1) 0.22s both;}
+.r3{animation:revealUp 1s cubic-bezier(.16,1,.3,1) 0.38s both;}
+.r4{animation:revealUp 1s cubic-bezier(.16,1,.3,1) 0.52s both;}
+.r5{animation:revealUp 1s cubic-bezier(.16,1,.3,1) 0.66s both;}
+.r6{animation:revealUp 1s cubic-bezier(.16,1,.3,1) 0.80s both;}
+.rf{animation:revealFade 1.4s ease 0.2s both;}
+
+.gold-text{background:linear-gradient(90deg,var(--gold3),var(--gold),var(--gold2),var(--gold-bright),var(--gold),var(--gold3));
+  background-size:300% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 4s linear infinite;}
+
+.scan{position:fixed;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,rgba(74,143,255,0.9),rgba(201,168,76,0.9),transparent);z-index:999;pointer-events:none;animation:scanDown 2s cubic-bezier(.4,0,.2,1) 0.05s forwards;}
+.spin-ring{width:44px;height:44px;border-radius:50%;border:2px solid rgba(74,143,255,0.1);border-top-color:var(--gold);animation:spin 0.85s linear infinite;}
+
+/* HEADER */
+.header{position:relative;text-align:center;padding:72px 24px 52px;overflow:hidden;}
+.header::after{content:'';position:absolute;bottom:0;left:5%;right:5%;height:1px;background:linear-gradient(90deg,transparent,rgba(74,143,255,0.3),rgba(201,168,76,0.7),rgba(74,143,255,0.3),transparent);}
+.eyebrow{font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.55em;text-transform:uppercase;color:rgba(201,168,76,0.4);margin-bottom:18px;}
+.header-trophy{font-size:70px;display:inline-block;margin-bottom:16px;animation:trophyGlow 3s ease-in-out infinite;}
+.header-title{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(38px,10vw,68px);line-height:0.95;letter-spacing:-0.02em;margin-bottom:8px;}
+.header-sub{font-family:'Playfair Display',serif;font-style:italic;font-weight:400;font-size:clamp(16px,4vw,26px);color:rgba(255,255,255,0.2);letter-spacing:0.06em;margin-bottom:28px;}
+.month-badge{display:inline-flex;align-items:center;gap:10px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.25);border-radius:100px;padding:10px 26px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.22em;color:rgba(201,168,76,0.7);}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold);animation:glowPulse 2s ease-in-out infinite;}
+
+/* TICKER */
+.ticker-wrap{overflow:hidden;white-space:nowrap;border-top:1px solid rgba(74,143,255,0.08);border-bottom:1px solid rgba(74,143,255,0.08);padding:12px 0;background:rgba(74,143,255,0.018);}
+.ticker-inner{display:inline-block;animation:tickerMove 50s linear infinite;}
+.ticker-chunk{display:inline-block;font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.28em;color:rgba(201,168,76,0.35);padding:0 40px;}
+
+/* FORHANDLER CARD */
+.fotm-wrap{margin:28px 16px 20px;}
+.fotm-card{background:linear-gradient(160deg,#080f1a,#04090e,#061210);border-radius:28px;padding:44px 28px 40px;position:relative;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(74,143,255,0.15),0 0 80px rgba(201,168,76,0.07),0 40px 80px rgba(0,0,0,0.6);}
+.fotm-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,rgba(74,143,255,0.4),rgba(201,168,76,1),rgba(240,201,110,1),rgba(201,168,76,1),rgba(74,143,255,0.4),transparent);}
+.fotm-trophy{font-size:52px;text-align:center;margin-bottom:8px;display:block;animation:crownFloat 3s ease-in-out infinite;}
+.fotm-eyebrow{font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.42em;text-transform:uppercase;color:rgba(201,168,76,0.5);text-align:center;margin-bottom:14px;display:flex;align-items:center;gap:12px;}
+.fotm-eyebrow::before,.fotm-eyebrow::after{content:'';flex:1;height:1px;}
+.fotm-eyebrow::before{background:linear-gradient(90deg,transparent,rgba(201,168,76,0.3));}
+.fotm-eyebrow::after{background:linear-gradient(90deg,rgba(201,168,76,0.3),transparent);}
+.fotm-name{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(32px,9vw,56px);line-height:1.1;letter-spacing:-0.01em;text-align:center;margin-bottom:16px;}
+.fotm-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:28px;}
+.fotm-stat{background:rgba(0,0,0,0.35);border-radius:18px;padding:20px 8px 16px;text-align:center;position:relative;overflow:hidden;animation:statPop 0.7s cubic-bezier(.16,1,.3,1) both;}
+.fotm-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.4),transparent);}
+.fotm-stat-num{font-family:'Playfair Display',serif;font-weight:900;font-size:44px;line-height:1;margin-bottom:5px;}
+.fotm-stat-lbl{font-family:'Cinzel',serif;font-size:7px;letter-spacing:0.28em;text-transform:uppercase;color:rgba(255,255,255,0.16);}
+
+/* RANK MINI */
+.rank-title{font-family:'Cinzel',serif;font-size:8px;letter-spacing:0.35em;color:rgba(201,168,76,0.32);text-align:center;display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.rank-title::before,.rank-title::after{content:'';flex:1;height:1px;background:rgba(201,168,76,0.1);}
+.rank-row{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:14px;margin-bottom:5px;background:rgba(255,255,255,0.018);border:1px solid rgba(255,255,255,0.03);transition:all 0.22s;}
+.rank-row:hover{background:rgba(74,143,255,0.04);border-color:rgba(74,143,255,0.12);transform:translateX(4px);}
+.rank-num{font-family:'Playfair Display',serif;font-weight:700;font-size:20px;color:rgba(255,255,255,0.1);width:24px;text-align:center;flex-shrink:0;}
+.rank-name{flex:1;font-size:14px;font-weight:600;color:rgba(255,255,255,0.7);}
+.rank-dept{font-family:'Cinzel',serif;font-size:8px;letter-spacing:0.1em;color:rgba(255,255,255,0.25);margin-top:1px;}
+.rank-pts{font-family:'Playfair Display',serif;font-weight:700;font-size:22px;}
+
+/* BESTE SELGER */
+.sec{margin:0 16px 14px;background:linear-gradient(160deg,#070d18,#030709);border-radius:24px;border:1px solid rgba(74,143,255,0.1);padding:28px 26px;position:relative;overflow:hidden;}
+.sec-top{position:absolute;top:0;left:0;right:0;height:2px;}
+.sec-title{font-family:'Cinzel',serif;font-size:12px;letter-spacing:0.22em;color:rgba(201,168,76,0.72);margin-bottom:22px;display:flex;align-items:center;gap:12px;font-weight:600;}
+.sec-title::after{content:'';flex:1;height:1px;background:rgba(74,143,255,0.1);}
+.sec-name{font-family:'Playfair Display',serif;font-weight:700;font-size:28px;line-height:1;}
+.sec-sub{font-size:11px;font-weight:600;letter-spacing:0.12em;margin-top:6px;}
+
+/* STATS GRID */
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 16px 14px;}
+.stat-tile{background:linear-gradient(160deg,#070d18,#030709);border:1px solid rgba(74,143,255,0.1);border-radius:18px;padding:18px 8px 14px;text-align:center;position:relative;overflow:hidden;animation:statPop 0.7s cubic-bezier(.16,1,.3,1) both;}
+.stat-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.3),transparent);}
+.stat-tile-num{font-family:'Playfair Display',serif;font-weight:900;font-size:32px;line-height:1;margin-bottom:5px;}
+.stat-tile-lbl{font-family:'Cinzel',serif;font-size:6px;letter-spacing:0.25em;text-transform:uppercase;color:rgba(255,255,255,0.18);}
+
+/* ── PITCH / FOTBALLBANE ── */
+.pitch-wrap{margin:0 16px 20px;}
+.pitch-header{background:linear-gradient(135deg,#0a1628,#050d1a);border-radius:24px 24px 0 0;padding:22px 24px 18px;
+  border:1px solid rgba(74,143,255,0.12);border-bottom:2px solid rgba(201,168,76,0.25);display:flex;align-items:center;gap:16px;}
+.pitch-badge{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2),var(--gold3));
+  display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;box-shadow:0 0 24px rgba(201,168,76,0.35);}
+.pitch-title{font-family:'Cinzel',serif;font-size:13px;letter-spacing:0.3em;color:var(--gold);font-weight:700;}
+.pitch-sub{font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:0.1em;margin-top:3px;}
+
+.pitch{
+  position:relative;
+  background:linear-gradient(180deg,#0d2b14 0%,#0f3318 30%,#0d2b14 60%,#0a2010 100%);
+  border:1px solid rgba(74,143,255,0.1);border-top:none;
+  border-radius:0 0 24px 24px;
+  padding:28px 16px 32px;
+  overflow:hidden;
+}
+/* Gress-tekstur */
+.pitch::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(180deg,rgba(255,255,255,0.018) 0px,rgba(255,255,255,0.018) 28px,transparent 28px,transparent 56px);
+  pointer-events:none;
+}
+/* Pitch-linjer SVG */
+.pitch-lines{position:absolute;inset:0;pointer-events:none;}
+
+/* Pitch-formasjon grid: 3 rader (spiss / midtlinje / forsvar) */
+.pitch-formation{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;align-items:center;
+  gap:20px;
+}
+.pitch-row{display:flex;justify-content:center;gap:14px;}
+
+/* Spillerkort på banen */
+.player-tile{
+  display:flex;flex-direction:column;align-items:center;
+  width:88px;
+  animation:playerDrop 0.6s cubic-bezier(.16,1,.3,1) both;
+  cursor:default;
+}
+.player-tile:hover .player-photo-ring{transform:scale(1.07);box-shadow:var(--ring-shadow),0 0 30px var(--ring-color);}
+.player-photo-ring{
+  width:64px;height:64px;border-radius:50%;
+  border:2.5px solid var(--ring-color,#c9a84c);
+  overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.5);
+  transition:transform 0.25s,box-shadow 0.25s;
+  box-shadow:0 0 16px var(--ring-color,rgba(201,168,76,0.4)),0 4px 20px rgba(0,0,0,0.6);
+  position:relative;
+}
+.player-photo-ring img{width:100%;height:100%;object-fit:cover;}
+.player-photo-ring .initials{font-family:'Playfair Display',serif;font-weight:700;font-size:22px;color:var(--ring-color,#c9a84c);}
+.player-rank-badge{
+  position:absolute;top:-4px;right:-4px;
+  width:22px;height:22px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  border:2px solid #03080f;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Cinzel',serif;font-size:9px;font-weight:700;color:#000;
+  box-shadow:0 0 8px rgba(201,168,76,0.7);
+  z-index:3;
+}
+.player-nameplate{
+  margin-top:8px;
+  background:rgba(0,0,0,0.65);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:8px;
+  padding:6px 8px 5px;
+  text-align:center;
+  width:100%;
+  backdrop-filter:blur(6px);
+}
+.player-nameplate-name{
+  font-family:'Rajdhani',sans-serif;font-weight:700;font-size:12px;
+  color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  line-height:1;
+}
+.player-nameplate-dept{
+  font-family:'Cinzel',serif;font-size:7px;letter-spacing:0.12em;
+  margin-top:2px;
+}
+.player-nameplate-stats{
+  display:flex;justify-content:center;gap:6px;margin-top:5px;
+}
+.player-stat-chip{
+  font-family:'Playfair Display',serif;font-weight:700;font-size:13px;
+  padding:1px 6px;border-radius:4px;
+  background:rgba(255,255,255,0.06);
+  line-height:1.4;
+}
+.player-stat-label{
+  font-family:'Cinzel',serif;font-size:6px;letter-spacing:0.15em;
+  color:rgba(255,255,255,0.3);margin-top:1px;text-align:center;
+}
+
+/* FOOTER */
+.footer{text-align:center;padding:44px 24px 28px;}
+.footer-line{height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.2),transparent);margin-bottom:22px;}
+.footer-txt{font-family:'Cinzel',serif;font-size:8px;letter-spacing:0.4em;color:rgba(201,168,76,0.18);}
+
+.loading{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;}
+.loading-lbl{font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.4em;color:rgba(201,168,76,0.28);}
+.page{position:relative;z-index:2;min-height:100vh;}
+.content{max-width:520px;margin:0 auto;}
+.spacer{height:24px;}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div class="bg-deep"></div>
+<div class="bg-grid"></div>
+<div class="grain"></div>
+<div class="scan"></div>
+<div id="root" class="page"></div>
+
+<script>
+(function(){
+  const c=document.getElementById('particles'),ctx=c.getContext('2d');
+  let W,H,pts=[];
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  const COLS=[[74,143,255],[201,168,76],[240,201,110],[39,201,138],[255,215,0]];
+  for(let i=0;i<110;i++){
+    const col=COLS[Math.floor(Math.random()*COLS.length)];
+    pts.push({x:Math.random()*9999,y:Math.random()*9999,r:Math.random()*1.5+0.2,
+      vx:(Math.random()-0.5)*0.2,vy:-(Math.random()*0.35+0.05),
+      life:Math.random(),maxLife:Math.random()*0.6+0.4,col,
+      drift:Math.random()*Math.PI*2,driftS:Math.random()*0.01+0.003});
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.life+=0.0022;p.drift+=p.driftS;
+      if(p.life>p.maxLife){p.life=0;p.x=Math.random()*W;p.y=H+10;}
+      p.x+=p.vx+Math.sin(p.drift)*0.35;p.y+=p.vy;
+      const t=p.life/p.maxLife,a=t<0.15?t/0.15:t>0.8?(1-t)/0.2:1;
+      ctx.save();ctx.globalAlpha=a*0.5;
+      ctx.fillStyle=`rgb(${p.col.join(',')})`;
+      ctx.shadowBlur=10;ctx.shadowColor=`rgba(${p.col.join(',')},0.9)`;
+      ctx.beginPath();ctx.arc(p.x%W,p.y,p.r,0,Math.PI*2);ctx.fill();
+      ctx.restore();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+
+<script type="text/babel">
+const SB_URL="https://jffhdlmwvurnojoapcvs.supabase.co";
+const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmZmhkbG13dnVybm9qb2FwY3ZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MzIzNjcsImV4cCI6MjA5MzEwODM2N30.Mc_eKMsfR04kLmwfBeH5INn3NTYapv62Fnt0wMpBpMw";
+
+const SELGER_PHOTOS={
+  "thomas_dokken":"photos/thomas_dokken.jpg","emma_valen":"photos/emma_valen.jpg",
+  "william_ostby":"photos/william_ostby.jpg","norman_elton":"photos/norman_elton.jpg",
+  "alexander_karlsen":"photos/alexander_karlsen.jpg","fabian_bredaljorgensen":"photos/fabian_bredaljorgensen.jpg",
+  "henrik_ostby":"photos/henrik_ostby.jpg","johan_kalenius":"photos/johan_kalenius.jpg",
+  "odd_bjarne_bjorvik":"photos/odd_bjarne_bjorvik.jpg","ask_herlofsen":"photos/ask_herlofsen.jpg",
+  "emanuel_bereket":"photos/emanuel_bereket.jpg","daniel_k_johansen":"photos/daniel_k_johansen.jpg",
+  "linn_askmannolsen":"photos/linn_askmannolsen.jpg","simen_olsen":"photos/simen_olsen.jpg",
+  "andreas_lydersen":"photos/andreas_lydersen.jpg",
+};
+
+const DEPT={
+  ryen:      {label:"Ryen",       color:"#4a8fff",bg:"rgba(74,143,255,0.12)"},
+  fornebu:   {label:"Fornebu",    color:"#27c98a",bg:"rgba(39,201,138,0.12)"},
+  lillestrom:{label:"Lillestrøm", color:"#e8a020",bg:"rgba(232,160,32,0.12)"},
+};
+const GOALS={mai:{ryen:80,lillestrom:40,fornebu:80},juni:{ryen:112,lillestrom:96,fornebu:112}};
+const dc=loc=>DEPT[loc]?.color||"#c9a84c";
+const dl=loc=>DEPT[loc]?.label||loc;
+const {useState,useEffect}=React;
+
+function nameToId(n){
+  return n.toLowerCase().replace(/\s+/g,'_')
+    .replace(/æ/g,'ae').replace(/ø/g,'o').replace(/å/g,'aa').replace(/[^a-z0-9_]/g,'');
+}
+
+function getDisplayMonth(){
+  const now=new Date();
+  const m=now.getMonth()+1;
+  const y=now.getFullYear();
+  // Kampanje: mai=5, juni=6
+  // Vis ferdig måned (låst) hvis vi er forbi den
+  if(m===6){return{year:y,month:5,label:"Mai",key:"mai",live:false};}
+  if(m>6){ return{year:y,month:6,label:"Juni",key:"juni",live:false};}
+  const ml={5:"mai",6:"juni"}[m]||"mai";
+  const ll={5:"Mai",6:"Juni"}[m]||"Mai";
+  return{year:y,month:m,label:ll,key:ml,live:true};
+}
+function monthRange(year,month){
+  return{
+    start:new Date(Date.UTC(year,month-1,1,0,0,0)),
+    end:  new Date(Date.UTC(year,month,0,23,59,59,999))
+  };
+}
+function rankSellers(sales){
+  const m={};
+  sales.forEach(x=>{
+    if(!m[x.selger])m[x.selger]={salg:0,finansiert:0,loc:x.loc,firstTs:x.ts};
+    m[x.selger].salg++;
+    if(x.finansiert)m[x.selger].finansiert++;
+    if(x.ts<m[x.selger].firstTs)m[x.selger].firstTs=x.ts;
+  });
+  return Object.entries(m)
+    .map(([name,d])=>({name,...d,poeng:d.salg*3}))
+    .sort((a,b)=>b.salg-a.salg||b.finansiert-a.finansiert||a.firstTs.localeCompare(b.firstTs));
+}
+function rankDepts(sales){
+  const d={};
+  sales.forEach(s=>{if(s.loc)d[s.loc]=(d[s.loc]||0)+1;});
+  return Object.entries(d)
+    .map(([loc,salg])=>({loc,salg,finansiert:sales.filter(s=>s.loc===loc&&s.finansiert).length}))
+    .sort((a,b)=>b.salg-a.salg||b.finansiert-a.finansiert);
+}
+
+function AnimNum({value,color,suffix=""}){
+  const[n,setN]=useState(0);
+  useEffect(()=>{
+    if(!value)return;let start=null;
+    function step(ts){if(!start)start=ts;const p=Math.min((ts-start)/1100,1),e=1-Math.pow(1-p,4);setN(Math.round(e*value));if(p<1)requestAnimationFrame(step);}
+    requestAnimationFrame(step);
+  },[value]);
+  return <span style={{color}}>{n}{suffix}</span>;
+}
+
+function SmallAvatar({name,loc,size=38}){
+  const id=nameToId(name);const photo=SELGER_PHOTOS[id];
+  const init=name.split(" ").map(p=>p[0]).join("").slice(0,2).toUpperCase();const col=dc(loc);
+  return(
+    <div style={{width:size,height:size,borderRadius:'50%',overflow:'hidden',border:'1.5px solid '+col+'66',flexShrink:0,
+      background:DEPT[loc]?.bg||'rgba(74,143,255,0.1)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 0 12px '+col+'33'}}>
+      {photo?<img src={photo} style={{width:'100%',height:'100%',objectFit:'cover'}} alt={name}/>
+        :<span style={{fontFamily:"'Playfair Display',serif",fontSize:size*0.34,fontWeight:700,color:col}}>{init}</span>}
+    </div>
+  );
+}
+
+/* ── Pitch Lines SVG ── */
+function PitchLines(){
+  return(
+    <svg className="pitch-lines" viewBox="0 0 488 460" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <g stroke="rgba(255,255,255,0.07)" strokeWidth="1.5" fill="none">
+        {/* Ytre ramme */}
+        <rect x="16" y="12" width="456" height="436" rx="4"/>
+        {/* Midtlinje */}
+        <line x1="16" y1="230" x2="472" y2="230"/>
+        {/* Midtsirkel */}
+        <circle cx="244" cy="230" r="52"/>
+        <circle cx="244" cy="230" r="3" fill="rgba(255,255,255,0.12)" stroke="none"/>
+        {/* Felt øverst */}
+        <rect x="144" y="12" width="200" height="80"/>
+        <rect x="194" y="12" width="100" height="36"/>
+        {/* Felt nederst */}
+        <rect x="144" y="368" width="200" height="80"/>
+        <rect x="194" y="424" width="100" height="24"/>
+        {/* Hjørnebuer */}
+        <path d="M16,12 Q28,12 28,24"/>
+        <path d="M472,12 Q460,12 460,24"/>
+        <path d="M16,448 Q28,448 28,436"/>
+        <path d="M472,448 Q460,448 460,436"/>
+      </g>
+    </svg>
+  );
+}
+
+/* ── PlayerTile ── */
+function PlayerTile({player,rank,delay}){
+  const id=nameToId(player.name);
+  const photo=SELGER_PHOTOS[id];
+  const init=player.name.split(" ").map(p=>p[0]).join("").slice(0,2).toUpperCase();
+  const col=dc(player.loc);
+  const isTop=rank===1;
+  const medals=["","🥇","🥈","🥉","",""];
+
+  return(
+    <div className="player-tile" style={{animationDelay:`${delay}s`}}>
+      <div className="player-photo-ring" style={{"--ring-color":col,"--ring-shadow":`0 0 16px ${col}66`}}>
+        {photo
+          ?<img src={photo} alt={player.name}/>
+          :<span className="initials">{init}</span>
+        }
+        <div className="player-rank-badge">{rank}</div>
+      </div>
+      <div className="player-nameplate">
+        <div className="player-nameplate-name">{player.name.split(" ")[0]} {player.name.split(" ").slice(-1)[0]}</div>
+        <div className="player-nameplate-dept" style={{color:col+'cc'}}>{dl(player.loc)}</div>
+        <div className="player-nameplate-stats">
+          <div style={{textAlign:'center'}}>
+            <div className="player-stat-chip" style={{color:isTop?col:'rgba(255,255,255,0.75)',background:isTop?`${col}18`:'rgba(255,255,255,0.06)'}}>
+              {player.salg}
+            </div>
+            <div className="player-stat-label">BILER</div>
+          </div>
+          {player.finansiert>0&&(
+            <div style={{textAlign:'center'}}>
+              <div className="player-stat-chip" style={{color:'#f0c96e',background:'rgba(240,201,110,0.1)'}}>
+                {player.finansiert}
+              </div>
+              <div className="player-stat-label">FIN</div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Pitch / fotballbane ── */
+function PitchFormation({ranked}){
+  const top5=ranked.slice(0,5);
+  if(top5.length<1)return null;
+
+  // Formasjon: 1-2-2
+  // Rad 1 (topp / "angrep"): index 0 — beste selger
+  // Rad 2 (midten): index 1, 2
+  // Rad 3 (bunn / "forsvar"): index 3, 4
+  const rows=[
+    [top5[0]],
+    [top5[1],top5[2]].filter(Boolean),
+    [top5[3],top5[4]].filter(Boolean),
+  ].filter(r=>r.length>0);
+
+  return(
+    <div className="pitch-wrap r4">
+      <div className="pitch-header">
+        <div className="pitch-badge">👕</div>
+        <div>
+          <div className="pitch-title">Team of the Month</div>
+          <div className="pitch-sub">Formasjon 1 – 2 – 2</div>
+        </div>
+      </div>
+      <div className="pitch">
+        <PitchLines/>
+        {/* Gress-glød */}
+        <div style={{position:'absolute',inset:0,background:'radial-gradient(ellipse 70% 50% at 50% 50%,rgba(39,201,138,0.06),transparent 70%)',pointerEvents:'none',animation:'pitchGlow 4s ease-in-out infinite'}}/>
+        <div className="pitch-formation">
+          {rows.map((row,ri)=>(
+            <div key={ri} className="pitch-row">
+              {row.map((player,pi)=>{
+                const globalIdx=rows.slice(0,ri).reduce((a,r)=>a+r.length,0)+pi;
+                return <PlayerTile key={player.name} player={player} rank={globalIdx+1} delay={0.5+globalIdx*0.15}/>;
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Ticker ── */
+function Ticker({ranked,month,bestDept}){
+  const items=ranked.slice(0,5).map((r,i)=>`${i+1}. ${r.name} · ${r.salg} biler`).join("   ✦   ");
+  const full=`✦ TEAM OF THE MONTH · ${month.toUpperCase()} · VCSO CHAMPIONSHIP 2026 ✦   ${bestDept?`🏆 FORHANDLER: ${dl(bestDept.loc)}   ✦   `:""}${items}   `;
+  return(
+    <div className="ticker-wrap">
+      <div className="ticker-inner">
+        <span className="ticker-chunk">{full}</span>
+        <span className="ticker-chunk">{full}</span>
+      </div>
+    </div>
+  );
+}
+
+/* ── ForhandlerCard ── */
+function ForhandlerCard({depts,monthKey}){
+  if(!depts.length)return null;
+  const best=depts[0];const col=dc(best.loc);
+  const goal=GOALS[monthKey]?.[best.loc]||0;
+  const pct=goal?Math.round((best.salg/goal)*100):0;
+  return(
+    <div className="fotm-wrap r2">
+      <div className="fotm-card">
+        <div style={{position:'absolute',inset:0,background:`radial-gradient(ellipse 80% 60% at 50% 0%,${col}0a,transparent 60%)`,pointerEvents:'none'}}/>
+        <span className="fotm-trophy">🏆</span>
+        <div className="fotm-eyebrow">Forhandler of the Month</div>
+        <div className="fotm-name gold-text">{dl(best.loc)}</div>
+        <div style={{textAlign:'center'}}>
+          <span style={{display:'inline-flex',alignItems:'center',gap:8,background:DEPT[best.loc]?.bg,border:`1px solid ${col}44`,color:col,padding:'7px 20px',borderRadius:100,fontFamily:"'Cinzel',serif",fontSize:10,letterSpacing:'0.18em',fontWeight:600}}>
+            <span style={{width:7,height:7,borderRadius:'50%',background:col,boxShadow:`0 0 8px ${col}`,display:'inline-block'}}/>
+            VCSO Championship 2026
+          </span>
+        </div>
+        <div className="fotm-stats">
+          {[
+            {val:best.salg,lbl:'Biler solgt',col,delay:'0.5s'},
+            {val:best.finansiert,lbl:'Finansiert',col:'#f0c96e',delay:'0.65s'},
+            {val:pct,lbl:'Av mål',col:pct>=100?'#27c98a':col,delay:'0.8s',suffix:'%'},
+          ].map(({val,lbl,col:c,delay,suffix},i)=>(
+            <div key={i} className="fotm-stat" style={{animationDelay:delay}}>
+              <div className="fotm-stat-num"><AnimNum value={val} color={c} suffix={suffix||""}/></div>
+              <div className="fotm-stat-lbl">{lbl}</div>
+            </div>
+          ))}
+        </div>
+        {depts.length>1&&(
+          <div style={{marginTop:24}}>
+            <div className="rank-title">Avdelinger denne måneden</div>
+            {depts.map((d,i)=>{
+              const c=dc(d.loc);const g=GOALS[monthKey]?.[d.loc]||1;const p=Math.round(d.salg/g*100);
+              return(
+                <div key={d.loc} className="rank-row">
+                  <div className="rank-num" style={{color:i===0?'var(--gold2)':undefined}}>{i+1}</div>
+                  <div style={{width:34,height:34,borderRadius:'50%',background:DEPT[d.loc]?.bg,border:`1.5px solid ${c}55`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                    <span style={{fontFamily:"'Cinzel',serif",fontSize:8,fontWeight:700,color:c}}>{dl(d.loc).slice(0,2).toUpperCase()}</span>
+                  </div>
+                  <div style={{flex:1}}>
+                    <div className="rank-name" style={{color:'rgba(255,255,255,0.85)'}}>{dl(d.loc)}</div>
+                    <div className="rank-dept" style={{color:c+'99'}}>{d.salg} biler · {d.finansiert} fin</div>
+                  </div>
+                  <div style={{textAlign:'right'}}>
+                    <div className="rank-pts" style={{color:c}}>{d.salg}</div>
+                    <div style={{fontFamily:"'Cinzel',serif",fontSize:7,letterSpacing:'0.15em',color:'rgba(255,255,255,0.2)',marginTop:2}}>{p}% AV MÅL</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ── BesteSelger ── */
+function BesteSelgerCard({ranked}){
+  if(!ranked.length)return null;
+  const w=ranked[0];const col=dc(w.loc);
+  return(
+    <div className="sec r3">
+      <div className="sec-top" style={{background:`linear-gradient(90deg,transparent,${col}88,transparent)`}}/>
+      <div className="sec-title">⭐ Månedens beste selger</div>
+      <div style={{display:'flex',alignItems:'center',gap:16}}>
+        <SmallAvatar name={w.name} loc={w.loc} size={56}/>
+        <div style={{flex:1}}>
+          <div className="sec-name">{w.name}</div>
+          <div className="sec-sub" style={{color:col}}>{dl(w.loc)}</div>
+        </div>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8,marginTop:20}}>
+        {[
+          {val:w.salg,lbl:'Biler solgt',col},
+          {val:w.finansiert,lbl:'Finansiert',col:'#f0c96e'},
+          {val:w.salg*3,lbl:'Poeng',col:'#27c98a'},
+        ].map(({val,lbl,col:c},i)=>(
+          <div key={i} style={{background:'rgba(0,0,0,0.3)',borderRadius:14,padding:'16px 8px 12px',textAlign:'center',
+            border:'1px solid rgba(255,255,255,0.04)',animation:`statPop 0.7s cubic-bezier(.16,1,.3,1) ${0.4+i*0.12}s both`}}>
+            <div style={{fontFamily:"'Playfair Display',serif",fontWeight:900,fontSize:34,lineHeight:1,marginBottom:4}}>
+              <AnimNum value={val} color={c}/>
+            </div>
+            <div style={{fontFamily:"'Cinzel',serif",fontSize:7,letterSpacing:'0.25em',textTransform:'uppercase',color:'rgba(255,255,255,0.2)'}}>{lbl}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── MaanedStats ── */
+function MaanedStats({sales,monthLabel}){
+  const totSalg=sales.length;
+  const totFin=sales.filter(s=>s.finansiert).length;
+  const finPct=totSalg?Math.round(totFin/totSalg*100):0;
+  const activeDays=new Set(sales.map(s=>s.ts.slice(0,10))).size;
+  return(
+    <div className="r5">
+      <div style={{margin:'0 16px 8px'}}><div className="rank-title">{monthLabel} — nøkkeltall</div></div>
+      <div className="stats-bar">
+        {[
+          {val:totSalg,lbl:'Salg totalt',col:'var(--gold2)',delay:'0.6s'},
+          {val:totFin,lbl:'Finansiert',col:'#f0c96e',delay:'0.72s'},
+          {val:finPct,lbl:'Fin %',col:'#27c98a',delay:'0.84s',suffix:'%'},
+          {val:activeDays,lbl:'Salgsdager',col:'#4a8fff',delay:'0.96s'},
+        ].map(({val,lbl,col,delay,suffix},i)=>(
+          <div key={i} className="stat-tile" style={{animationDelay:delay}}>
+            <div className="stat-tile-num"><AnimNum value={val} color={col} suffix={suffix||""}/></div>
+            <div className="stat-tile-lbl">{lbl}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── App ── */
+function App(){
+  const[sales,setSales]=useState(null);
+  const[error,setError]=useState(null);
+  const dm=getDisplayMonth();
+
+  useEffect(()=>{
+    const{start,end}=monthRange(dm.year,dm.month);
+    const fmt=d=>d.toISOString().replace('Z','');
+    fetch(SB_URL+"/rest/v1/sales?select=*&ts=gte."+fmt(start)+"&ts=lte."+fmt(end)+"&deleted=eq.false&order=ts.asc",
+      {headers:{apikey:SB_KEY,Authorization:"Bearer "+SB_KEY}})
+    .then(r=>r.ok?r.json():Promise.reject(r.statusText))
+    .then(setSales).catch(e=>setError(String(e)));
+  },[]);
+
+  if(error)return(
+    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',color:'#ef4444',fontFamily:'Rajdhani',padding:24,textAlign:'center'}}>
+      <div><div style={{fontSize:36,marginBottom:12}}>⚠️</div>Feil: {error}</div>
+    </div>
+  );
+  if(!sales)return(
+    <div className="loading"><div className="spin-ring"/><div className="loading-lbl">Laster inn månedstall...</div></div>
+  );
+
+  const ranked=rankSellers(sales);
+  const depts=rankDepts(sales);
+  const bestDept=depts[0]||null;
+
+  return(
+    <div>
+      <div className="header rf">
+        <div className="eyebrow">VCSO Championship · 2026</div>
+        <div className="header-trophy">🏅</div>
+        <div className="header-title gold-text">Team of the Month</div>
+        <div className="header-sub">Månedsoversikt</div>
+        <div className="month-badge">
+          <div className="badge-dot"/>
+          {dm.label} {dm.year}
+          {dm.live&&<span style={{marginLeft:8,opacity:0.5,fontSize:9}}>· LIVE</span>}
+        </div>
+      </div>
+
+      {sales.length===0?(
+        <div style={{textAlign:'center',padding:'80px 24px',fontFamily:"'Playfair Display',serif",fontStyle:'italic',fontSize:18,color:'rgba(255,255,255,0.2)'}}>
+          Ingen data registrert for {dm.label}.
+        </div>
+      ):(
+        <div className="content">
+          <Ticker ranked={ranked} month={dm.label} bestDept={bestDept}/>
+          <div className="spacer"/>
+          <ForhandlerCard depts={depts} monthKey={dm.key}/>
+          <BesteSelgerCard ranked={ranked}/>
+          <PitchFormation ranked={ranked}/>
+          <MaanedStats sales={sales} monthLabel={dm.label}/>
+          <div className="footer r6">
+            <div className="footer-line"/>
+            <div className="footer-txt">VCSO Championship 2026 · Mai – Juni · Team of the Month</div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.render(<App/>,document.getElementById("root"));
+</script>
+</body>
+</html>
