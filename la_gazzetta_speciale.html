@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Gazzetta dello VCSO Championship – SPESIALUTGAVE</title>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Barlow:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #f5f0e8;
+  font-family: 'Barlow', sans-serif;
+  min-height: 100vh;
+}
+
+/* ── BREAKING BANNER ── */
+.breaking-banner {
+  background: #c00;
+  color: #fff;
+  text-align: center;
+  padding: 7px 20px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  animation: flashBanner 1.8s ease-in-out infinite;
+}
+@keyframes flashBanner {
+  0%, 100% { background: #c00; }
+  50% { background: #e00; }
+}
+
+/* ── MASTHEAD ── */
+.masthead {
+  background: #fff;
+  border-bottom: 3px solid #1a1a1a;
+  padding: 0;
+}
+.masthead-top {
+  background: #1a1a1a;
+  color: #f5f0e8;
+  text-align: center;
+  padding: 6px 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.masthead-title {
+  font-family: 'UnifrakturMaguntia', cursive;
+  font-size: clamp(32px, 7vw, 68px);
+  color: #1a1a1a;
+  text-align: center;
+  padding: 16px 20px 8px;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+.masthead-rule { height: 1px; background: #1a1a1a; margin: 0 20px; }
+.masthead-rule-thick { height: 3px; background: #1a1a1a; margin: 4px 20px 0; }
+.masthead-sub {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 20px 10px;
+  font-size: 11px;
+  color: #555;
+  font-style: italic;
+}
+.masthead-motto {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: #333;
+  text-align: center;
+}
+
+/* ── SPESIALUTGAVE BANNER ── */
+.special-edition-bar {
+  background: #1a1a1a;
+  text-align: center;
+  padding: 10px 20px;
+  border-top: 4px solid #c9a84c;
+  border-bottom: 4px solid #c9a84c;
+}
+.special-edition-bar span {
+  font-family: 'Barlow', sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: #c9a84c;
+}
+
+/* ── PAGE ── */
+.page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 16px 60px;
+}
+
+/* ── EDITION DATE ── */
+.edition-date {
+  text-align: center;
+  padding: 12px 0 16px;
+  font-size: 12px;
+  color: #888;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 28px;
+}
+
+/* ── ARTICLE ── */
+.article-wrap {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-top: none;
+  padding: 32px 32px 40px;
+}
+
+.article-kicker {
+  text-align: center;
+  font-family: 'Barlow', sans-serif;
+  font-weight: 900;
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #c00;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #c00;
+}
+
+.article-headline {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 5.5vw, 48px);
+  font-weight: 900;
+  line-height: 1.1;
+  color: #1a1a1a;
+  text-align: center;
+  margin-bottom: 10px;
+}
+.article-headline em {
+  font-style: italic;
+  color: #1a1a1a;
+}
+
+.article-deck {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  font-style: italic;
+  color: #555;
+  text-align: center;
+  margin-bottom: 24px;
+  line-height: 1.55;
+}
+.article-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 28px;
+}
+.article-divider::before,
+.article-divider::after { content: ''; flex: 1; height: 1px; background: #1a1a1a; }
+.article-divider-diamond { font-size: 10px; color: #1a1a1a; }
+
+.article-body {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  line-height: 1.85;
+  color: #1a1a1a;
+  columns: 2;
+  column-gap: 32px;
+}
+@media (max-width: 600px) {
+  .article-body { columns: 1; }
+  .article-wrap { padding: 20px 16px 28px; }
+}
+
+.article-body p { margin-bottom: 14px; }
+.article-body p:first-child::first-letter {
+  font-size: 58px;
+  font-weight: 900;
+  float: left;
+  line-height: 0.82;
+  margin: 6px 6px 0 0;
+  font-family: 'Playfair Display', serif;
+  color: #c00;
+}
+
+.article-pull {
+  column-span: all;
+  border-top: 2px solid #1a1a1a;
+  border-bottom: 2px solid #1a1a1a;
+  padding: 14px 0 10px;
+  margin: 22px 0;
+  font-family: 'Playfair Display', serif;
+  font-size: 19px;
+  font-style: italic;
+  font-weight: 700;
+  color: #1a1a1a;
+  text-align: center;
+}
+
+/* ── FACTS BOX ── */
+.facts-box {
+  column-span: all;
+  background: #1a1a1a;
+  color: #f5f0e8;
+  padding: 20px 24px;
+  margin: 24px 0;
+  border-left: 5px solid #c9a84c;
+}
+.facts-box-title {
+  font-family: 'Barlow', sans-serif;
+  font-weight: 900;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #c9a84c;
+  margin-bottom: 10px;
+}
+.facts-box ul {
+  list-style: none;
+  padding: 0;
+}
+.facts-box ul li {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px;
+  line-height: 1.6;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  color: #f5f0e8;
+}
+.facts-box ul li:last-child { border-bottom: none; }
+.facts-box ul li::before {
+  content: '◆ ';
+  color: #c9a84c;
+  font-size: 9px;
+}
+
+/* ── MODELL-GRID ── */
+.model-grid {
+  column-span: all;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 8px;
+  margin: 20px 0;
+}
+.model-chip {
+  background: #f5f0e8;
+  border: 1px solid #ddd;
+  text-align: center;
+  padding: 8px 4px 6px;
+  font-family: 'Barlow', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  color: #1a1a1a;
+  letter-spacing: 0.5px;
+}
+.model-chip.highlight {
+  background: #1a1a1a;
+  color: #c9a84c;
+  border-color: #1a1a1a;
+}
+.model-chip .chip-label {
+  font-size: 9px;
+  color: #888;
+  font-weight: 400;
+  margin-top: 2px;
+  display: block;
+}
+.model-chip.highlight .chip-label { color: rgba(201,168,76,0.6); }
+
+/* ── SIGNATURE ── */
+.article-signature {
+  column-span: all;
+  margin-top: 28px;
+  padding-top: 12px;
+  border-top: 1px solid #ddd;
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px;
+  color: #999;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-align: right;
+}
+
+/* ── FOOTER ── */
+.gazzetta-footer {
+  max-width: 800px;
+  margin: 20px auto 0;
+  padding: 0 16px 40px;
+  text-align: center;
+  font-size: 10px;
+  color: #bbb;
+  font-family: 'Barlow', sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ── ENTRANCE ANIMATION ── */
+.article-wrap {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: fadeUp 0.7s ease 0.2s forwards;
+}
+.breaking-banner {
+  animation: flashBanner 1.8s ease-in-out infinite, slideDown 0.4s ease forwards;
+}
+@keyframes fadeUp {
+  to { opacity: 1; transform: none; }
+}
+@keyframes slideDown {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+</style>
+</head>
+<body>
+
+<!-- BREAKING BANNER -->
+<div class="breaking-banner">⚡ Spesialutgave &nbsp;·&nbsp; Historisk kunngjøring &nbsp;·&nbsp; 15. juni 2026 ⚡</div>
+
+<!-- MASTHEAD -->
+<div class="masthead">
+  <div class="masthead-top">
+    <span>VCSO Championship 2026</span>
+    <span>La Gazzetta dello VCSO Championship</span>
+    <span>15. juni 2026</span>
+  </div>
+  <div class="masthead-title">La Gazzetta dello VCSO Championship</div>
+  <div class="masthead-rule"></div>
+  <div class="masthead-sub">
+    <span>Spesialutgave nr. I</span>
+    <span class="masthead-motto">«Biler, drama og scoringer»</span>
+    <span>Ekstraordinær utgave</span>
+  </div>
+  <div class="masthead-rule-thick"></div>
+</div>
+
+<!-- SPESIALUTGAVE-BANNER -->
+<div class="special-edition-bar">
+  <span>★ &nbsp; Ekstraordinær spesialutgave &nbsp; ★</span>
+</div>
+
+<!-- ARTICLE -->
+<div class="page">
+  <div class="article-wrap">
+
+    <div class="edition-date">Søndag 15. juni 2026 &nbsp;·&nbsp; Volvo Car Stor Oslo &nbsp;·&nbsp; Intern kunngjøring</div>
+
+    <div class="article-kicker">⚡ Ekstraordinær kunngjøring — Championship 2026</div>
+
+    <h1 class="article-headline">
+      Alle Biler Inn.<br>
+      <em>Kampen Åpner Seg.</em>
+    </h1>
+
+    <p class="article-deck">
+      Fra og med i dag gjelder Championship-konkurransen <em>alle</em> biler VCSO selger —<br>
+      ikke bare lager. Et nytt kapittel begynner nå.
+    </p>
+
+    <div class="article-divider"><span class="article-divider-diamond">◆</span></div>
+
+    <div class="article-body">
+
+      <p>Det er øyeblikk i historien til en konkurranse der alt endrer seg. Der reglene som en gang definerte kampen, viker for noe større, noe mer sant. Søndag 15. juni 2026 er et slikt øyeblikk for VCSO Championship.</p>
+
+      <p>Fra og med i dag er det ikke lenger snakk om å fylle lageret. Det handler om å selge biler. Alle biler. Uansett om det er en EX30 som venter på rampen, en XC90 hentet hjem på bestilling, eller en EX60 som nettopp har landet i showroom — <strong>hvert eneste salg teller</strong>. Hvert eneste kontrakt signert er et mål scoret.</p>
+
+      <div class="article-pull">
+        «Fra og med i dag gjelder det ikke hva som finnes på lager —<br>det gjelder hva du <em>selger</em>.»
+      </div>
+
+      <p>Redaksjonen har i lengre tid fulgt dette mesterskapet med beundring og brennende penn. Vi har registrert trekkrekorder, hat-tricks i solnedgang og avdelingskamper som fikk lufte seg over ukene. Men alltid innenfor én ramme: lagerbilen som valuta, lagerbilen som mål.</p>
+
+      <p>Den rammen er borte. I dag er valutaen kontrakter. I dag teller alt som bærer Volvo-logoen ut av showroom og inn i kundens liv. Rekkevidden av konkurransen strekker seg nå fra EX30 til XC90, fra ES90 til EX60 — hele arsenalet er åpent.</p>
+
+      <div class="facts-box">
+        <div class="facts-box-title">Hva dette betyr — fakta på bordet</div>
+        <ul>
+          <li>Alle solgte biler teller fra og med 15. juni 2026</li>
+          <li>Gjelder alle modeller — lager, ordre og inntakskontrakter</li>
+          <li>Scoringssystemet er uendret: 1 bil = 1 mål, finansiert = gullstempel</li>
+          <li>Hat-trick-regelen gjelder fortsatt: 3 biler på én dag</li>
+          <li>Ryen, Fornebu og Lillestrøm kjemper videre på like vilkår</li>
+          <li>Sesongtabellen nullstilles ikke — poengene fra før gjelder</li>
+        </ul>
+      </div>
+
+      <p>For selgerne betyr dette frihet. Ikke lenger bundet til det som kedsommelig måtte hete «tilgjengelig lagerbeholdning». Nå er det kundens behov som styrer — og selgerens kunst som avgjør. Den selgeren som kjenner kunden, som hører hva som ikke blir sagt, som vet hvilken bil som er riktig før kunden selv vet det — den selgeren er nå ubegrenset.</p>
+
+      <div class="model-grid">
+        <div class="model-chip highlight">EX30<span class="chip-label">Teller</span></div>
+        <div class="model-chip highlight">EX40<span class="chip-label">Teller</span></div>
+        <div class="model-chip highlight">EX60<span class="chip-label">Teller</span></div>
+        <div class="model-chip highlight">EX90<span class="chip-label">Teller</span></div>
+        <div class="model-chip highlight">EC40<span class="chip-label">Teller</span></div>
+        <div class="model-chip highlight">ES90<span class="chip-label">Teller</span></div>
+        <div class="model-chip highlight">XC40<span class="chip-label">Teller</span></div>
+        <div class="model-chip highlight">XC60<span class="chip-label">Teller</span></div>
+        <div class="model-chip highlight">XC90<span class="chip-label">Teller</span></div>
+      </div>
+
+      <p>La Gazzetta dello VCSO Championship vil følge denne nye epoken med den samme ubøyelige lidenskap som alltid. Dramatiske overskrifter vil komme. Store mål vil bli scoret. Hat-tricks vil bli feiret med konfetti og legendarisk minne.</p>
+
+      <p>Men aller mest: kampen er nå åpen. Enhver bil kan bli helten i morgendagens utgave. Enhver selger kan skrive sin egen legende. For dette er ikke lenger en kamp om hva som finnes. Det er en kamp om hvem du <em>er</em> som selger.</p>
+
+      <div class="article-pull">
+        «La kampen om kontraktene begynne.»
+      </div>
+
+      <p>Redaksjonen ønsker alle deltakere lykke til. Vi skriver historien — dere lever den.</p>
+
+      <div class="article-signature">
+        — Redaksjonen, La Gazzetta dello VCSO Championship &nbsp;·&nbsp; 15. juni 2026
+      </div>
+
+    </div><!-- .article-body -->
+  </div><!-- .article-wrap -->
+</div><!-- .page -->
+
+<div class="gazzetta-footer">
+  La Gazzetta dello VCSO Championship &nbsp;·&nbsp; Volvo Car Stor Oslo &nbsp;·&nbsp; Intern konkurranse 2026
+</div>
+
+</body>
+</html>
