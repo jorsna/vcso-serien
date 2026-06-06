@@ -954,6 +954,7 @@ function fetchSales() {
       renderAll();
       updateMVP();
       autoSaveWeeklyWinner();
+      autoSaveSeasonArchive();
     })
     .catch(function(e) { showStatus('Feil: ' + e.message, true); });
 }
@@ -1033,12 +1034,114 @@ function autoSaveWeeklyWinner() {
       });
       fetch(SUPABASE_URL+'/rest/v1/weekly_winners', {
         method:'POST',
-        headers: Object.assign({}, sbH(), {'Prefer':'resolution=merge-duplicates'}),
+        headers: Object.assign({}, sbH(), {'Prefer':'resolution=ignore-duplicates'}),
         body: JSON.stringify(inserts)
       }).catch(function(e){ console.warn('autoSave feil:', e); });
     });
   })
   .catch(function(e){ console.warn('autoSave sjekk feil:', e); });
+}
+
+
+// ─── AUTO-LAGRE SESONGARKIV ──────────────────────────────────────────
+function autoSaveSeasonArchive() {
+  var now = new Date();
+  var seasonEnd = new Date('2026-07-01T00:00:00');
+  if (now < seasonEnd) return; // Sesongen ikke over ennå
+
+  var seasonYear = 2026;
+  var seasonLabel = 'Mai–Juni 2026';
+
+  // Sjekk om vi allerede har lagret (minst én rad for dette året)
+  fetch(SUPABASE_URL+'/rest/v1/season_archive?season_year=eq.'+seasonYear+'&limit=1', {
+    headers: sbH()
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(existing){
+    if (existing && existing.length > 0) return; // Allerede lagret
+
+    // Hent alle salg for sesongen (mai + juni 2026)
+    fetch(API+'?order=ts.asc&deleted=is.false&ts=gte.2026-05-01T00:00:00&ts=lte.2026-06-30T23:59:59&limit=5000', {
+      headers: sbH()
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(allSales){
+      if (!Array.isArray(allSales) || !allSales.length) return;
+
+      // Summer per selger
+      var stats = {};
+      allSales.forEach(function(s){
+        if (!stats[s.selger]) stats[s.selger] = { loc:s.loc, salg:0, finansiert:0, days:{} };
+        stats[s.selger].salg++;
+        if (s.finansiert) stats[s.selger].finansiert++;
+        var d = (s.ts||'').substring(0,10);
+        stats[s.selger].days[d] = (stats[s.selger].days[d]||0)+1;
+      });
+
+      // Hent ukevinnere for å telle seiere og hat-tricks
+      fetch(SUPABASE_URL+'/rest/v1/weekly_winners?week_year=eq.'+seasonYear+'&limit=100', {
+        headers: sbH()
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(weekRows){
+        var winCount = {}, hatCount = {};
+
+        // Grupper per uke — finn vinner(e)
+        var byWeek = {};
+        (weekRows||[]).forEach(function(w){
+          if (!byWeek[w.week_nr]) byWeek[w.week_nr] = [];
+          byWeek[w.week_nr].push(w);
+        });
+        Object.keys(byWeek).forEach(function(wk){
+          var sorted = byWeek[wk].sort(function(a,b){
+            return b.pts-a.pts || (b.finansiert||0)-(a.finansiert||0);
+          });
+          var bestPts = sorted[0].pts;
+          var bestFin = sorted[0].finansiert||0;
+          sorted.filter(function(r){ return r.pts===bestPts && (r.finansiert||0)===bestFin; })
+            .forEach(function(w){
+              var navn = w.selger||'';
+              if (!winCount[navn] || w.week_nr < winCount[navn].firstWeek) {
+                winCount[navn] = { wins: (winCount[navn]?winCount[navn].wins:0)+1, firstWeek: w.week_nr };
+              } else {
+                winCount[navn].wins++;
+              }
+            });
+          // Hat-tricks
+          var hats = sorted[0].hat_tricks || [];
+          hats.forEach(function(navn){
+            if (!hatCount[navn]) hatCount[navn] = { count:0, firstWeek:parseInt(wk) };
+            else hatCount[navn].count++;
+          });
+        });
+
+        // Bygg insert-array
+        var inserts = Object.keys(stats).map(function(navn){
+          return {
+            season_year:       seasonYear,
+            season_label:      seasonLabel,
+            selger:            navn,
+            loc:               stats[navn].loc,
+            total_salg:        stats[navn].salg,
+            total_finansiert:  stats[navn].finansiert,
+            total_poeng:       stats[navn].salg * 3,
+            uke_seiere:        winCount[navn] ? winCount[navn].wins : 0,
+            hat_tricks:        hatCount[navn] ? hatCount[navn].count : 0
+          };
+        });
+
+        if (!inserts.length) return;
+
+        fetch(SUPABASE_URL+'/rest/v1/season_archive', {
+          method: 'POST',
+          headers: Object.assign({}, sbH(), {'Prefer':'resolution=merge-duplicates'}),
+          body: JSON.stringify(inserts)
+        }).then(function(){ console.log('Sesongarkiv lagret!'); })
+          .catch(function(e){ console.warn('Sesongarkiv feil:', e); });
+      });
+    });
+  })
+  .catch(function(e){ console.warn('Sesongarkiv sjekk feil:', e); });
 }
 
 function insertSale(obj, cb) {
@@ -1483,7 +1586,6 @@ function renderTeam() {
     // ── Live: hat-trick inneværende uke ──
     var thisHatDays = {};
     sales.forEach(function(x) {
-      if (x.deleted) return;
       if (getWeekNum(new Date(x.ts)) !== thisWeek) return;
       var ds = tsDate(x.ts);
       if (!thisHatDays[x.selger]) thisHatDays[x.selger] = {};
