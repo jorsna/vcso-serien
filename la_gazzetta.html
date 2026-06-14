@@ -323,7 +323,7 @@ body {
   <div class="masthead-rule"></div>
   <div class="masthead-sub">
     <span id="edition-label">Laster...</span>
-    <span class="masthead-motto">«Biler, drama og scoringer»</span>
+    <span class="masthead-motto">«Nybiler, drama og lagerbiler»</span>
     <span id="edition-num">Daglig utgave</span>
   </div>
   <div class="masthead-rule-thick"></div>
@@ -615,8 +615,8 @@ function genererTekst(salg, dato, alleSalg) {
   if (totalt === 0) {
     return Promise.resolve({
       overskrift: 'En stille dag i ' + norskDato(dato).split(' ').slice(0,2).join(' '),
-      ingress: 'Ingen biler ble levert ' + norskDato(dato) + '. Hvilerdag – eller stormens øye?',
-      tekst: 'Det er dager i bilsalgets verden der stillheten taler høyere enn noe salg noensinne kunne gjort. ' + norskDato(dato) + ' var en slik dag.\n\nIngen scoringer ble registrert. Selgerne ladet batteriene og forberedte seg på dagene som kommer.\n\n«Stormen som ikke kom, varsler alltid en større storm.»\n\nRedaksjonen holder øye med scoringsbordet og venter.',
+      ingress: 'Ingen nybiler ble levert ' + norskDato(dato) + '. Hvilerdag – eller stormens øye?',
+      tekst: 'Det er dager i nybilsalgets verden der stillheten taler høyere enn noe salg noensinne kunne gjort. ' + norskDato(dato) + ' var en slik dag.\n\nIngen scoringer ble registrert. Selgerne ladet batteriene og forberedte seg på dagene som kommer.\n\n«Stormen som ikke kom, varsler alltid en større storm.»\n\nRedaksjonen holder øye med lageret og venter.',
       stats: stats
     });
   }
@@ -646,7 +646,7 @@ function genererTekst(salg, dato, alleSalg) {
   var totalOppsummering = alleSalg && alleSalg.length > 0
     ? '\nSESONGTOTAL (til og med i går):\n- Totalt levert hele sesongen: '+totalSesongen+' biler\n- Avdelinger totalt: Ryen '+totalAvd.ryen+', Fornebu '+totalAvd.fornebu+', Lillestrøm '+totalAvd.lillestrom+'\n- Ledende selger totalt: '+(totalLeder||'ingen')+' ('+(totalSelger[totalLeder]||0)+' biler)' : '';
 
-  var prompt = 'Du er La Gazzetta dello VCSO Championship – en dramatisk italiensk-inspirert sportsavis for VCSO Championship 2026, en bilsalgskonkurranse (alle bilmerker og modeller) hos Volvo Car Stor Oslo (VCSO).\n\nKAMPRAPPORT – ' + norskDato(dato) + '\n\nSALG PER SELGER DENNE DAGEN:\n' + selgerListe + '\n\nSAMMENDRAG DENNE DAGEN:\n- Totalt: ' + totalt + ' biler\n- ' + mvpTekst + '\n- Avdelinger: Ryen ' + avdTelling.ryen + ', Fornebu ' + avdTelling.fornebu + ', Lillestrøm ' + avdTelling.lillestrom + '\n- Bestselger-modell: ' + (topModell||'ukjent') + ' (' + (modellTelling[topModell]||0) + ' stk)\n- Finansierte salg: ' + finTelling + '\n' + (hatTrickNavn.length?'- HAT-TRICK: '+hatTrickTekst+'\n':'') + totalOppsummering + '\n\nVIKTIG: Bruk eksakt riktig avdeling per selger. Skriv om DENNE DAGEN, men avslutt med kort sesongtotal-oppsummering.\n\nSkriv en dramatisk avisartikkel på NORSK:\n1. Dramatisk overskrift (maks 10 ord)\n2. Kort ingress (1 setning)\n3. 4-5 avsnitt ca 270 ord. Avsnitt skilles av \\n\\n. Siste avsnitt = sesongtotal. Inkluder et sitat i anførselstegn.\n\nSvar KUN med gyldig JSON:\n{"overskrift":"...","ingress":"...","tekst":"avsnitt1\\n\\navsnitt2\\n\\n\\"Sitat\\"\\n\\navsnitt3\\n\\nSesongtotal-avsnitt"}';
+  var prompt = 'Du er La Gazzetta dello VCSO Championship – en dramatisk italiensk-inspirert sportsavis for VCSO Championship 2026, en nybilsalgskonkurranse (lagerbiler) hos Volvo Car Stor Oslo (VCSO).\n\nKAMPRAPPORT – ' + norskDato(dato) + '\n\nSALG PER SELGER DENNE DAGEN:\n' + selgerListe + '\n\nSAMMENDRAG DENNE DAGEN:\n- Totalt: ' + totalt + ' biler\n- ' + mvpTekst + '\n- Avdelinger: Ryen ' + avdTelling.ryen + ', Fornebu ' + avdTelling.fornebu + ', Lillestrøm ' + avdTelling.lillestrom + '\n- Bestselger-modell: ' + (topModell||'ukjent') + ' (' + (modellTelling[topModell]||0) + ' stk)\n- Finansierte salg: ' + finTelling + '\n' + (hatTrickNavn.length?'- HAT-TRICK: '+hatTrickTekst+'\n':'') + totalOppsummering + '\n\nVIKTIG: Bruk eksakt riktig avdeling per selger.\n\nHVIS DET IKKE ER NOEN SALG DENNE DAGEN: ikke skriv en flau "ingenting skjedde"-artikkel. La heller redaksjonen dramatisere noe annet like episk – stillheten før stormen, stillingen i sesongen, jakten på tronen eller en hyllest til ledende avdeling. Du trenger ikke forklare at det ikke var salg.\n\nSkriv en EPISK og storslagen avisartikkel på NORSK, i ånden til La Gazzetta dello Sport – operadramatisk, høytidelig, med sans for det legendariske.\n\nSTEMME: Storslagen og begeistret, men alltid forankret i virkeligheten. Du løfter ekte tall og navn opp i det mytiske – du erstatter dem aldri med tåke. Hver setning skal bety noe konkret. Dramatikk er forsterkning av fakta, ikke flukt fra dem.\n\n1. OVERSKRIFT (maks 10 ord): Episk og slående, men MÅ inneholde minst ett konkret faktum – et navn, et tall eller en avdeling – slik at leseren umiddelbart skjønner hva som skjedde. Storhet kommer av å opphøye virkeligheten, ikke skjule den. GODE: «Hansen knuser alt: fire biler i Fornebus navn», «Ryen erobrer tronen mens Lillestrøm vakler». UNNGÅ (for gåtefulle): «Skjebnetimen slo til», «En dag for historiebøkene».\n2. INGRESS (1 setning): Slå an den storslagne tonen, men nevn dagens hovedfaktum.\n3. BRØDTEKST: 4-5 avsnitt, ca 270 ord. Avsnitt skilles av \\n\\n. Inkluder ett sitat i anførselstegn. Siste avsnitt = sesongtotal-oppsummering. Unngå klisjeer, blandede metaforer og tomme superlativer – la de ekte resultatene bære dramatikken.\n\nSvar KUN med gyldig JSON:\n{"overskrift":"...","ingress":"...","tekst":"avsnitt1\\n\\navsnitt2\\n\\n\\"Sitat\\"\\n\\navsnitt3\\n\\nSesongtotal-avsnitt"}';
 
   return fetch('https://resrjvztsqdxzqgiffeg.supabase.co/functions/v1/swift-api', {
     method: 'POST',
