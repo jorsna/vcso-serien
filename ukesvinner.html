@@ -84,20 +84,6 @@ body{background:var(--bg);font-family:'Rajdhani',sans-serif;color:#fff;overflow-
 .ticker-inner{display:inline-block;animation:tickerMove 40s linear infinite;}
 .ticker-chunk{display:inline-block;font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.28em;color:rgba(201,168,76,0.38);padding:0 40px;}
 
-/* TREBLE */
-.treble{margin:28px 16px;border-radius:32px;padding:64px 32px 56px;text-align:center;position:relative;overflow:hidden;
-  background:linear-gradient(160deg,#080f1a,#040910,#08100f);
-  box-shadow:0 0 100px rgba(74,143,255,0.1),0 0 60px rgba(201,168,76,0.08),0 40px 80px rgba(0,0,0,0.5);}
-.treble::before{content:'';position:absolute;inset:0;border-radius:32px;
-  background:linear-gradient(135deg,rgba(74,143,255,0.5),rgba(201,168,76,0.2) 35%,transparent 65%,rgba(201,168,76,0.4));
-  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
-  -webkit-mask-composite:xor;mask-composite:exclude;padding:2px;}
-.treble-halo{position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:500px;height:500px;border-radius:50%;
-  background:radial-gradient(circle,rgba(74,143,255,0.1),rgba(201,168,76,0.08),transparent 62%);animation:haloGlow 4s ease-in-out infinite;pointer-events:none;}
-.treble-crown{font-size:80px;display:inline-block;animation:crownFloat 2.8s ease-in-out infinite;margin-bottom:20px;}
-.treble-tag-row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:22px;}
-.treble-tag{font-family:'Cinzel',serif;font-size:8px;letter-spacing:0.2em;padding:5px 14px;border-radius:100px;border:1px solid rgba(201,168,76,0.22);color:rgba(201,168,76,0.55);background:rgba(201,168,76,0.04);}
-
 /* WINNER CARD */
 .w-wrap{margin:0 16px 20px;position:relative;}
 .w-glow{position:absolute;inset:-30px;border-radius:60px;background:radial-gradient(ellipse at 50% 30%,rgba(74,143,255,0.1),rgba(201,168,76,0.08),transparent 65%);pointer-events:none;animation:haloGlow 3s ease-in-out infinite;}
@@ -419,23 +405,6 @@ function SmallAvatar({name,loc,size=38}){
   );
 }
 
-/* ── TrebleBanner ── */
-function TrebleBanner({name}){
-  return(
-    <div className="treble r1">
-      <div className="treble-halo"/>
-      <div className="treble-crown">👑</div>
-      <div style={{fontFamily:"'Cinzel',serif",fontSize:8,letterSpacing:'0.5em',textTransform:'uppercase',color:'rgba(201,168,76,0.45)',marginBottom:18}}>
-        — The Treble — Historisk bragd —
-      </div>
-      <div className="gold-text" style={{fontFamily:"'Playfair Display',serif",fontWeight:900,fontSize:'clamp(52px,13vw,100px)',lineHeight:0.9,letterSpacing:'-0.02em',marginBottom:22}}>{name}</div>
-      <div className="treble-tag-row">
-        {["🏆 Ukens vinner","👑 Flest MVP-dager","🏟 Beste avdeling"].map(t=><span key={t} className="treble-tag">{t}</span>)}
-      </div>
-    </div>
-  );
-}
-
 /* ── WinnerCard ── */
 function WinnerCard({winners,ranked}){
   const w=winners[0],col=dc(w.loc);
@@ -506,6 +475,29 @@ function MVPCard({mvps}){
                 {mvp.mvpDays[i]&&<div style={{fontSize:14,marginTop:3}}>👑</div>}
               </div>
             ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ── RentehaiCard ── */
+function RentehaiCard({rentehaier}){
+  if(!rentehaier.length)return null;
+  return(
+    <div className="sec r4">
+      <div className="sec-top" style={{background:'linear-gradient(90deg,transparent,rgba(95,184,216,0.6),transparent)'}}/>
+      <div className="sec-title" style={{color:'rgba(95,184,216,0.5)'}}>🦈 {rentehaier.length>1?"Delt Rentehai":"Rentehai"}</div>
+      {rentehaier.map((r,idx)=>(
+        <div key={r.name}>
+          {idx>0&&<div style={{height:1,background:'rgba(95,184,216,0.08)',margin:'16px 0'}}/>}
+          <div style={{display:'flex',alignItems:'center',gap:14}}>
+            <SmallAvatar name={r.name} loc={r.loc} size={50}/>
+            <div>
+              <div className="sec-name">{r.name} 🦈</div>
+              <div className="sec-sub" style={{color:'#5fb8d8'}}>{r.finansiert} finansiert{r.finansiert>1?"e":""} salg</div>
+            </div>
           </div>
         </div>
       ))}
@@ -628,8 +620,8 @@ function App(){
   const htMap={};
   sales.forEach(s=>{const d=s.ts.slice(0,10);if(!htMap[s.selger])htMap[s.selger]={};htMap[s.selger][d]=(htMap[s.selger][d]||0)+1;});
   const hatters=Object.entries(htMap).filter(([,d])=>Object.values(d).some(c=>c>=3)).map(([name])=>({name,loc:sales.find(s=>s.selger===name)?.loc||""}));
-  const mvpNames=new Set(mvps.map(m=>m.name));
-  const trebleWinners=winners.filter(w=>mvpNames.has(w.name)&&bestDept?.locs.includes(w.loc));
+  const maxFin=Math.max(0,...ranked.map(r=>r.finansiert));
+  const rentehaier=maxFin>0?ranked.filter(r=>r.finansiert===maxFin):[];
   const{start,end}=weekDates(lw.year,lw.week);
 
   return(
@@ -649,9 +641,9 @@ function App(){
         :<div className="content">
           <Ticker sales={sales} week={lw.week}/>
           <div style={{height:28}}/>
-          {trebleWinners.length>0&&<TrebleBanner name={trebleWinners[0].name}/>}
           {winners.length>0&&<WinnerCard winners={winners} ranked={ranked}/>}
           {mvps.length>0&&<MVPCard mvps={mvps}/>}
+          {rentehaier.length>0&&<RentehaiCard rentehaier={rentehaier}/>}
           {hatters.length>0&&<HatTrickCard hatters={hatters} weekSales={sales}/>}
           {bestDept&&<DeptCard result={bestDept}/>}
           <AllSales sales={sales}/>
