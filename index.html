@@ -112,12 +112,16 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .hdr-btn:hover{background:rgba(255,215,0,.2)}
 
 /* TABS */
-.tabs{display:flex;flex-wrap:wrap;background:var(--card);border-bottom:1px solid var(--b1)}
-.tab{flex:1 1 20%;padding:9px 0;font-size:10px;font-weight:700;border:none;background:transparent;
+.tabs{display:flex;flex-direction:column;background:var(--card);border-bottom:1px solid var(--b1)}
+.tabs-row{display:flex;width:100%}
+.tabs-row+.tabs-row{border-top:1px solid var(--b1)}
+.tab{flex:1;padding:9px 0;font-size:11px;font-weight:700;border:none;background:transparent;
   color:var(--muted);cursor:pointer;font-family:'Barlow',sans-serif;
-  border-bottom:3px solid transparent;transition:all .2s;text-transform:uppercase;letter-spacing:.5px}
+  border-bottom:3px solid transparent;transition:all .2s;text-transform:uppercase;letter-spacing:.5px;
+  display:flex;flex-direction:column;align-items:center;gap:3px}
 .tab.on{color:var(--gold);border-bottom-color:var(--gold)}
-.tab.wide{flex:1 1 30%;font-size:11px}
+.tab-icon{font-size:16px;line-height:1}
+.tab-label{font-size:10px}
 
 /* MATCHDAY BAR */
 .mbar{background:var(--card);border-bottom:1px solid var(--b1);padding:9px 16px;
@@ -592,14 +596,18 @@ html, body {
 
 <!-- TABS -->
 <div class="tabs">
-  <button class="tab on" onclick="setTab('ind',this)">Selgere</button>
-  <button class="tab" onclick="setTab('team',this)">Avdelinger</button>
-  <button class="tab" onclick="setTab('stats',this)">Statistikk</button>
-  <button class="tab" onclick="setTab('scoring',this)">Scoringer</button>
-  <button class="tab wide" onclick="setTab('hof', this)">🏆 Hall of Fame</button>
-  <button class="tab wide" onclick="location.href='ukesvinner.html'">👑 Ukens vinner</button>
-  <button class="tab wide" onclick="setTab('tips', this)">💡 Salgsverktøy</button>
-  <button class="tab wide" onclick="window.open('la_gazzetta.html','_blank')">📰 La Gazzetta</button>
+  <div class="tabs-row">
+    <button class="tab on" onclick="setTab('ind',this)"><span class="tab-icon">⚽</span><span class="tab-label">Selgere</span></button>
+    <button class="tab" onclick="setTab('team',this)"><span class="tab-icon">🏟️</span><span class="tab-label">Avdelinger</span></button>
+    <button class="tab" onclick="setTab('stats',this)"><span class="tab-icon">📊</span><span class="tab-label">Statistikk</span></button>
+    <button class="tab" onclick="setTab('scoring',this)"><span class="tab-icon">🚗</span><span class="tab-label">Scoringer</span></button>
+  </div>
+  <div class="tabs-row">
+    <button class="tab" onclick="setTab('hof',this)"><span class="tab-icon">🏆</span><span class="tab-label">Hall of Fame</span></button>
+    <button class="tab" onclick="location.href='ukesvinner.html'"><span class="tab-icon">👑</span><span class="tab-label">Ukens vinner</span></button>
+    <button class="tab" onclick="setTab('tips',this)"><span class="tab-icon">💡</span><span class="tab-label">Salgsverktøy</span></button>
+    <button class="tab" onclick="window.open('la_gazzetta.html','_blank')"><span class="tab-icon">📰</span><span class="tab-label">La Gazzetta</span></button>
+  </div>
 </div>
 
 <!-- GAZZETTA TICKER -->
