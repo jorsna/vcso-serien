@@ -493,6 +493,35 @@ html, body {
   gtag('js', new Date());
   gtag('config', 'G-6NJ95NHF98');
 </script>
+<!-- Ukens vinner: mandagsbanner (vises foerste gang ny ISO-uke oppdages; sjekker ogsaa ved fokus + intervall, saa en aapen fane fanger ukeskiftet) -->
+<script>
+(function(){
+  var WIN='ukesvinner.html',KEY='vcso_uv_week_champ';
+  function isoWeek(){var d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()+3-((d.getDay()+6)%7));var w1=new Date(d.getFullYear(),0,4);return 1+Math.round(((d-w1)/86400000-3+((w1.getDay()+6)%7))/7);}
+  function dismiss(){var o=document.getElementById('uv-banner');if(o&&o.parentNode)o.parentNode.removeChild(o);}
+  function show(wk){
+    if(document.getElementById('uv-banner')||!document.body)return;
+    var o=document.createElement('div');o.id='uv-banner';
+    o.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.82);display:flex;align-items:center;justify-content:center;padding:20px;font-family:Barlow,system-ui,sans-serif';
+    o.innerHTML='<div style="background:var(--card);border:1.5px solid var(--gold);border-radius:16px;padding:26px 30px;text-align:center;max-width:330px;width:100%">'
+      +'<div style="font-size:38px;line-height:1">👑</div>'
+      +'<div style="font-family:Barlow,sans-serif;font-size:10px;font-weight:700;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);opacity:.8;margin-top:12px">Uke '+wk+'</div>'
+      +'<div style="font-family:Anton,sans-serif;font-size:26px;letter-spacing:0.02em;color:var(--gold);margin-top:6px;line-height:1.1">NY UKESVINNER<br>KÅRET</div>'
+      +'<div style="width:42px;height:1px;background:var(--gold);opacity:.4;margin:14px auto"></div>'
+      +'<div style="font-size:13px;color:var(--muted);margin-bottom:20px">Se hvem som tok seieren denne uka</div>'
+      +'<button id="uv-go" style="background:var(--gold);color:var(--bg);font-family:Barlow,sans-serif;font-weight:700;font-size:14px;border:none;cursor:pointer;padding:11px 26px;border-radius:100px">Se kåringen →</button>'
+      +'<div id="uv-close" style="font-size:12px;color:var(--muted);opacity:.7;margin-top:16px;letter-spacing:0.05em;cursor:pointer">Lukk</div>'
+      +'</div>';
+    document.body.appendChild(o);
+    o.addEventListener('click',function(e){if(e.target===o)dismiss();});
+    o.querySelector('#uv-go').addEventListener('click',function(){dismiss();location.href=WIN;});
+    o.querySelector('#uv-close').addEventListener('click',dismiss);
+  }
+  function check(){try{var wk=isoWeek(),s=String(wk),seen=localStorage.getItem(KEY);if(seen!==s){localStorage.setItem(KEY,s);show(wk);}}catch(e){}}
+  function init(){check();document.addEventListener('visibilitychange',function(){if(!document.hidden)check();});window.addEventListener('focus',check);setInterval(check,60000);}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
 </head>
 <body>
 
@@ -568,6 +597,7 @@ html, body {
   <button class="tab" onclick="setTab('stats',this)">Statistikk</button>
   <button class="tab" onclick="setTab('scoring',this)">Scoringer</button>
   <button class="tab wide" onclick="setTab('hof', this)">🏆 Hall of Fame</button>
+  <button class="tab wide" onclick="location.href='ukesvinner.html'">👑 Ukens vinner</button>
   <button class="tab wide" onclick="setTab('tips', this)">💡 Salgsverktøy</button>
   <button class="tab wide" onclick="window.open('la_gazzetta.html','_blank')">📰 La Gazzetta</button>
 </div>
