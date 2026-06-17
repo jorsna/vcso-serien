@@ -102,6 +102,10 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
   .hdr-cd{flex-direction:row}
   .hdr-cd-label{display:none}
 }
+@media(max-width:519px){
+  .t1{font-size:17px;letter-spacing:1.5px}
+  .crest{width:46px;height:46px;font-size:22px}
+}
 .login-badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;
   border-radius:8px;vertical-align:middle;margin-left:6px}
 .badge-selger{background:rgba(255,215,0,.15);color:var(--gold);border:1px solid rgba(255,215,0,.3)}
@@ -568,14 +572,14 @@ html, body {
         <div class="crest">&#9917;</div>
         <div>
           <div class="t1" style="background:linear-gradient(135deg,#fff 0%,var(--gold) 40%,#fff 70%,var(--gold) 100%);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:logoShine 3s linear infinite;filter:drop-shadow(0 0 8px rgba(255,215,0,.3))">VCSO CHAMPIONSHIP</div>
-          <div class="t2">Mai &amp; Juni 2026 &middot; Levering innen 30. juni
+          <div class="t2">Mai &amp; Juni 2026
             <span class="login-badge" id="role-badge"></span>
           </div>
         </div>
       </div>
       <div class="hdr-right">
         <button id="news-btn" onclick="openNews()" aria-label="Nyheter fra Podium" title="Nyheter fra Podium" style="position:relative;width:38px;height:38px;border-radius:50%;border:1px solid var(--gold);background:rgba(201,168,76,.08);font-size:17px;cursor:pointer;line-height:1;display:inline-flex;align-items:center;justify-content:center">📣<span id="news-dot" style="display:none;position:absolute;top:-2px;right:-2px;width:11px;height:11px;border-radius:50%;background:var(--gold);border:2px solid var(--card)"></span></button>
-        <button class="hdr-btn" onclick="showHelp()">? Slik fungerer det</button>
+        <button onclick="showHelp()" aria-label="Slik fungerer det" title="Slik fungerer det" style="width:38px;height:38px;border-radius:50%;border:1px solid var(--gold);background:rgba(201,168,76,.08);font-size:18px;font-weight:700;color:var(--gold);cursor:pointer;line-height:1;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">?</button>
   <div id="export-btn" style="display:none"></div>
       </div>
     </div>
