@@ -530,6 +530,11 @@ html, body {
 .wk-cell{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--txt);font-weight:600}
 .wk-dot{width:7px;height:7px;border-radius:50%}
 .wk-empty{font-size:11px;color:var(--muted)}
+/* ── NYHETSIKON: pulserende glød ved ny nyhet ── */
+@keyframes newsPulse{0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 13px 3px var(--gold)}}
+@keyframes newsDotPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.65}}
+#news-btn.news-new{animation:newsPulse 1.5s ease-in-out infinite}
+#news-btn.news-new #news-dot{animation:newsDotPulse 1.1s ease-in-out infinite}
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6NJ95NHF98"></script>
@@ -2850,7 +2855,7 @@ function buildTicker(items) {
   var MONTHS=['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'];
   function fmtDate(iso){try{var d=new Date(iso);return d.getDate()+'. '+MONTHS[d.getMonth()];}catch(e){return '';}}
   function newestId(){return NEWS.length?Math.max.apply(null,NEWS.map(function(n){return n.id;})):0;}
-  function updateDot(){var dot=document.getElementById('news-dot');if(!dot)return;var seen=0;try{seen=parseInt(localStorage.getItem(SEEN_KEY)||'0',10)||0;}catch(e){}dot.style.display=newestId()>seen?'block':'none';}
+  function updateDot(){var dot=document.getElementById('news-dot');var btn=document.getElementById('news-btn');if(!dot)return;var seen=0;try{seen=parseInt(localStorage.getItem(SEEN_KEY)||'0',10)||0;}catch(e){}var hasNew=newestId()>seen;dot.style.display=hasNew?'block':'none';if(btn)btn.classList.toggle('news-new',hasNew);}
   function markSeen(){try{localStorage.setItem(SEEN_KEY,String(newestId()));}catch(e){}updateDot();}
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
   function dismiss(){var o=document.getElementById('news-overlay');if(o&&o.parentNode)o.parentNode.removeChild(o);}
@@ -2885,6 +2890,9 @@ function buildTicker(items) {
       .catch(function(){});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',load);else load();
+  setInterval(load,60000);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)load();});
+  window.addEventListener('focus',load);
 })();
 </script>
 </body>
