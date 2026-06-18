@@ -494,24 +494,42 @@ html, body {
 
 
 /* ── AVDELINGSPALL ── */
-.pod-wrap{background:linear-gradient(160deg,var(--card),var(--card2));border:1px solid var(--b1);border-radius:16px;padding:18px 14px 14px;margin:0 0 12px}
-.pod-row{display:flex;align-items:flex-end;justify-content:center;gap:8px}
+.pod-wrap{background:linear-gradient(160deg,var(--card),var(--card2));border:1px solid var(--b1);border-radius:16px;padding:18px 14px 12px;margin:0 0 12px}
+.pod-row{display:flex;align-items:flex-end;justify-content:center;gap:10px}
 .pod-col{display:flex;flex-direction:column;align-items:center;width:31%}
-.pod-crown{font-size:15px;line-height:1;margin-bottom:1px}
+.pod-crown{font-size:14px;line-height:1;margin-bottom:1px}
 .pod-pps{font-family:'Anton',sans-serif;font-size:22px;line-height:1}
 .pod-lbl{font-size:8px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px}
-.pod-bar{width:100%;border-radius:8px 8px 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:8px;transform-origin:bottom;animation:podGrow .8s cubic-bezier(.16,1,.3,1) both}
+.pod-bar{width:100%;border-radius:8px 8px 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:7px;transform-origin:bottom;animation:podGrow .8s cubic-bezier(.16,1,.3,1) both}
 .pod-bar-lead{box-shadow:0 0 16px rgba(255,210,74,.3);border-top:2px solid var(--gold)}
 @keyframes podGrow{from{transform:scaleY(0);opacity:0}to{transform:scaleY(1);opacity:1}}
-.pod-init{font-family:'Anton',sans-serif;color:#fff;font-size:13px}
-.pod-rank{font-size:9px;margin-top:5px;text-align:center;line-height:1.2}
-/* ── AVDELINGSMÅL ── */
-.goals-wrap{background:var(--card);border:1px solid var(--b1);border-radius:12px;padding:12px 14px;margin:0 0 12px}
-.goals-head{font-family:'Anton',sans-serif;font-size:12px;letter-spacing:1.5px;color:var(--gold);margin-bottom:6px}
-.goals-team{padding:8px 0;border-bottom:1px solid var(--b1)}
-.goals-team:last-child{border-bottom:none}
-.goals-team-h{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--txt)}
-.goals-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.pod-medal{font-size:15px;line-height:1}
+.pod-name{font-family:'Anton',sans-serif;font-size:12px;margin-top:6px;text-align:center;line-height:1.1}
+.pod-rest-list{margin-top:12px;padding-top:10px;border-top:1px solid var(--b1)}
+.pod-rest{display:flex;align-items:center;gap:10px;padding:5px 0}
+.pod-rest-rank{font-family:'Anton',sans-serif;width:22px;height:22px;border-radius:50%;background:var(--faint);border:1px solid var(--b2);color:var(--muted);font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pod-rest-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.pod-rest-name{font-weight:700;color:var(--txt);font-size:14px}
+.pod-rest-pps{font-family:'Anton',sans-serif;margin-left:auto;font-size:16px;color:var(--txt)}
+.pod-rest-lbl{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+/* ── SALG MOT MÅL ── */
+.goals-wrap{background:var(--card);border:1px solid var(--b1);border-radius:12px;padding:13px 14px;margin:0 0 12px}
+.goals-head{font-family:'Anton',sans-serif;font-size:12px;letter-spacing:1.5px;color:var(--gold);margin-bottom:11px}
+.ring-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ring-card{display:flex;align-items:center;gap:11px;background:var(--card2);border:1px solid var(--b1);border-radius:10px;padding:10px 12px}
+.ring{width:42px;height:42px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.ring-in{width:30px;height:30px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--txt)}
+.ring-name{font-size:12px;font-weight:700;color:var(--txt)}
+.ring-sub{font-size:10px;color:var(--muted);margin-top:1px}
+.wk-section{margin-top:13px;padding-top:11px;border-top:1px solid var(--b1)}
+.wk-h{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;font-weight:700}
+.wk-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid var(--b1)}
+.wk-row:last-child{border-bottom:none}
+.wk-no{font-size:11px;color:var(--muted);font-weight:600;flex-shrink:0}
+.wk-cells{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+.wk-cell{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--txt);font-weight:600}
+.wk-dot{width:7px;height:7px;border-radius:50%}
+.wk-empty{font-size:11px;color:var(--muted)}
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6NJ95NHF98"></script>
@@ -685,23 +703,8 @@ html, body {
 <!-- AVDELINGER VIEW -->
 <div class="view" id="view-team">
   <div id="team-podium"></div>
-  <div id="team-table-wrap">
-  <div class="tbl-head" style="grid-template-columns:26px 28px 1fr 40px">
-    <div>#</div><div></div><div>Avdeling</div><div>P</div>
-  </div>
-  <div id="tbl-team"></div>
-  </div>
   <div id="team-goals"></div>
-  <div style="padding:10px 14px 4px;background:var(--card);border-top:1px solid var(--b1)">
-    
-  <div class="form-legend">
-    <div class="fl"><div class="fl-dot" style="background:var(--g)"></div>I rute (100%+)</div>
-    <div class="fl"><div class="fl-dot" style="background:var(--y)"></div>Solgt, men under tempo</div>
-    <div class="fl"><div class="fl-dot" style="background:var(--b1)"></div>Ingen salg denne uken</div>
-    <div class="fl" style="margin-left:auto;font-size:9px;color:var(--muted)">Innrammet = innev&#230;rende uke</div>
   </div>
-</div>
-</div>
 
 <!-- STATISTIKK VIEW -->
 <div class="view" id="view-stats">
@@ -1589,29 +1592,41 @@ function renderPodium(rows) {
   var el = document.getElementById('team-podium');
   if (!el) return;
   var top = rows.slice(0,3);
-  var heights = [104, 74, 58];   // 1., 2., 3.
-  var slots = [top[1], top[0], top[2]];  // venstre=2., midt=1., høyre=3.
+  var rest = rows.slice(3);
+  var heights = [104, 74, 58];
+  var medals = ['🥇','🥈','🥉'];
+  var slots = [top[1], top[0], top[2]];
   var slotRank = [1, 0, 2];
-  var html = '<div class="pod-wrap"><div class="pod-row">';
+  var cols = '';
   slots.forEach(function(r, idx) {
-    if (!r) { html += '<div class="pod-col" style="visibility:hidden"></div>'; return; }
+    if (!r) { cols += '<div class="pod-col" style="visibility:hidden"></div>'; return; }
     var rank = slotRank[idx];
     var isLeader = rank === 0;
-    html += '<div class="pod-col">'
+    cols += '<div class="pod-col">'
       + (isLeader ? '<div class="pod-crown">👑</div>' : '')
       + '<div class="pod-pps" style="color:'+(isLeader?'var(--gold)':r.color)+'">'+r.pps.toFixed(1)+'</div>'
       + '<div class="pod-lbl">pr. selger</div>'
-      + '<div class="pod-bar'+(isLeader?' pod-bar-lead':'')+'" style="height:'+heights[rank]+'px;background:linear-gradient(180deg,'+r.color+','+r.color+'33)"><span class="pod-init">'+r.initials+'</span></div>'
-      + '<div class="pod-rank" style="color:'+(isLeader?'var(--gold)':'var(--muted)')+'">'+(rank+1)+' · '+r.navn+'</div>'
+      + '<div class="pod-bar'+(isLeader?' pod-bar-lead':'')+'" style="height:'+heights[rank]+'px;background:linear-gradient(180deg,'+r.color+','+r.color+'33)"><span class="pod-medal">'+medals[rank]+'</span></div>'
+      + '<div class="pod-name" style="color:'+(isLeader?'var(--gold)':r.color)+'">'+r.navn+'</div>'
     + '</div>';
   });
-  html += '</div></div>';
-  el.innerHTML = html;
+  var restHtml = rest.map(function(r, i) {
+    return '<div class="pod-rest">'
+      + '<span class="pod-rest-rank">'+(i+4)+'</span>'
+      + '<span class="pod-rest-dot" style="background:'+r.color+'"></span>'
+      + '<span class="pod-rest-name">'+r.navn+'</span>'
+      + '<span class="pod-rest-pps">'+r.pps.toFixed(1)+'</span>'
+      + '<span class="pod-rest-lbl">pr. selger</span>'
+    + '</div>';
+  }).join('');
+  el.innerHTML = '<div class="pod-wrap"><div class="pod-row">' + cols + '</div>'
+    + (restHtml ? '<div class="pod-rest-list">' + restHtml + '</div>' : '')
+    + '</div>';
 }
 
 function renderTeam() {
-  var el = document.getElementById('tbl-team');
-  if (!el) return;
+  var podEl = document.getElementById('team-podium');
+  if (!podEl) return;
   var m = curMonth;
 
   var rows = TEAMS.map(function(t) {
@@ -1621,60 +1636,53 @@ function renderTeam() {
     return { id:t.id, navn:t.navn, initials:t.initials, color:t.color, bg:t.bg, g:g, pts:pts, members:members, pps:pts/members };
   }).sort(function(a,b) { return b.pps-a.pps || b.pts-a.pts || b.g-a.g; });
 
-  // ─── PALL (topp 3 på poeng per selger) ───
+  // ─── PALL (topp 3 + integrert 4. plass) ───
   renderPodium(rows);
 
-  // ─── TABELL (fra 4. plass og ned) ───
-  var rest = rows.slice(3);
-  var wrap = document.getElementById('team-table-wrap');
-  if (wrap) wrap.style.display = rest.length ? 'block' : 'none';
-  el.innerHTML = rest.map(function(r,i) {
-    var rank = i + 4;
-    return '<div class="trow zm" data-navn="'+r.navn+'" style="animation-delay:'+(i*0.06)+'s">'
-      + '<div class="pos-n" style="color:var(--muted)">'+rank+'</div>'
-      + '<div><div class="av" style="background:'+r.bg+';color:'+r.color+'">'+r.initials+'</div></div>'
-      + '<div class="name-c" style="width:100%">'
-        + '<div class="name-main">'+r.navn+'</div>'
-        + '<div class="name-sub">'+r.members+' selgere · '+r.g+' biler · '+r.pts+' poeng totalt</div>'
-      + '</div>'
-      + '<div class="sc pts" style="display:flex;flex-direction:column;align-items:flex-end;line-height:1.1"><span>'+r.pps.toFixed(1)+'</span><span style="font-size:8px;color:var(--muted);font-weight:600;letter-spacing:.5px">PR. SELGER</span></div>'
-    + '</div>';
-  }).join('');
-
-  // ─── MÅL-SEKSJON (ukebarer mot ukemål, alle avdelinger) ───
-  var months = m === 'all' ? ['mai','jun'] : [m];
+  // ─── SALG MOT MÅL: ringer (denne uken) + tidligere uker ───
   var goalsEl = document.getElementById('team-goals');
   if (goalsEl) {
-    goalsEl.innerHTML = '<div class="goals-wrap"><div class="goals-head">🎯 Mot ukemålet</div>'
-      + rows.map(function(r) {
-          var bars = '';
-          months.forEach(function(mnd) {
-            var weeks = getWeeksForMonth(mnd);
-            if (!weeks.length) return;
-            var wgoal = (WEEKLY_GOALS[mnd] && WEEKLY_GOALS[mnd][r.id]) || 20;
-            bars += '<div style="margin-top:6px">';
-            bars += '<div style="font-size:8px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px;font-weight:700">'
-              + (mnd==='mai'?'Mai':'Juni') + ' – ukemål: ' + wgoal + ' biler</div>';
-            bars += '<div style="display:flex;gap:4px;align-items:flex-end">';
-            weeks.forEach(function(w) {
-              var sold = teamSalesInWeek(r.id, w.week);
-              var pct  = Math.min(sold / wgoal * 100, 100);
-              var col  = pct >= 100 ? 'var(--g)' : pct >= 50 ? 'var(--y)' : sold > 0 ? 'var(--y)' : 'var(--b1)';
-              var isNow = getWeekNum(new Date()) === w.week;
-              var isOver = pct >= 100;
-              bars += '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">'
-                + '<div style="font-size:8px;color:'+(isOver?'var(--gold)':pct>=50?'var(--g)':'var(--muted)')+';font-weight:'+(isOver?'700':'400')+'">'+(isOver?'🔥':'')+sold+'</div>'
-                + '<div style="width:100%;height:28px;background:var(--faint);border-radius:3px;overflow:hidden;position:relative'+(isNow?';outline:1px solid '+r.color:'')+(isOver?';box-shadow:0 0 8px var(--gold)':'')+'">'
-                + '<div class="'+(isOver?'week-bar-over':'')+'" style="position:absolute;bottom:0;left:0;right:0;background:'+(isOver?'linear-gradient(180deg,var(--gold),var(--g))':col)+';height:'+Math.min(parseFloat(pct),100).toFixed(0)+'%;border-radius:2px;transition:height 1s cubic-bezier(.4,0,.2,1)"></div>'
-                + (isOver?'<div style="position:absolute;top:2px;left:0;right:0;text-align:center;font-size:9px;font-weight:700;color:#000;text-shadow:none">+'+Math.round(sold-wgoal)+'</div>':'')
-                + '</div>'
-                + '<div style="font-size:7px;color:'+(isOver?'var(--gold)':'var(--muted)')+'">U'+w.week+'</div>'
-                + '</div>';
-            });
-            bars += '</div></div>';
-          });
-          return '<div class="goals-team"><div class="goals-team-h"><span class="goals-dot" style="background:'+r.color+'"></span>'+r.navn+'</div>'+bars+'</div>';
-        }).join('')
+    var curWeek = getWeekNum(new Date());
+    var monthsG = m === 'all' ? ['mai','jun'] : [m];
+    var allWeeks = [];
+    monthsG.forEach(function(mnd) { getWeeksForMonth(mnd).forEach(function(w){ allWeeks.push(w.week); }); });
+    allWeeks = allWeeks.filter(function(v,i,a){ return a.indexOf(v)===i; }).sort(function(a,b){ return a-b; });
+
+    function goalForTeam(id) {
+      var gv = 20;
+      monthsG.forEach(function(mnd){ if (WEEKLY_GOALS[mnd] && WEEKLY_GOALS[mnd][id]) gv = WEEKLY_GOALS[mnd][id]; });
+      return gv;
+    }
+
+    var ringHtml = rows.map(function(r) {
+      var goalW = goalForTeam(r.id);
+      var sold = teamSalesInWeek(r.id, curWeek);
+      var pct = Math.min(Math.round(sold / goalW * 100), 100);
+      var done = sold >= goalW;
+      return '<div class="ring-card">'
+        + '<div class="ring" style="background:conic-gradient('+r.color+' '+pct+'%,var(--faint) 0)"><div class="ring-in">'+pct+'%</div></div>'
+        + '<div><div class="ring-name">'+r.navn+'</div><div class="ring-sub">'+sold+' / '+goalW+' biler'+(done?' ✅':'')+'</div></div>'
+      + '</div>';
+    }).join('');
+
+    var pastWeeks = allWeeks.filter(function(w){ return w < curWeek; }).reverse();
+    var wkHtml;
+    if (pastWeeks.length) {
+      wkHtml = pastWeeks.map(function(wk) {
+        var cells = rows.map(function(r) {
+          var sold = teamSalesInWeek(r.id, wk);
+          return '<span class="wk-cell"><span class="wk-dot" style="background:'+r.color+'"></span>'+sold+'</span>';
+        }).join('');
+        return '<div class="wk-row"><span class="wk-no">Uke '+wk+'</span><span class="wk-cells">'+cells+'</span></div>';
+      }).join('');
+    } else {
+      wkHtml = '<div class="wk-empty">Tidligere uker vises her etter hvert.</div>';
+    }
+
+    goalsEl.innerHTML = '<div class="goals-wrap">'
+      + '<div class="goals-head">🎯 Denne uken – uke ' + curWeek + '</div>'
+      + '<div class="ring-grid">' + ringHtml + '</div>'
+      + '<div class="wk-section"><div class="wk-h">Tidligere uker</div>' + wkHtml + '</div>'
     + '</div>';
   }
 
