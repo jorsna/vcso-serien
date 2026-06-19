@@ -138,7 +138,7 @@ body {
 }
 
 .article-body p { margin-bottom: 14px; }
-.article-body p:first-child::first-letter {
+.article-body p:first-of-type::first-letter {
   font-size: 52px;
   font-weight: 900;
   float: left;
@@ -509,14 +509,14 @@ function visTekst(row) {
     if (a.startsWith('«') || a.startsWith('"')) {
       return '<div class="article-pull">'+a+'<div class="article-pull-disclaimer">(Sitat generert etter beste evne basert på resultater av AI)</div></div>';
     }
-    return '<p>'+(i===0?photoHtml:'')+a+'</p>';
+    return '<p>'+a+'</p>';
   }).join('');
 
   // Sett inn stats etter andre avsnitt
   if (avsnitt.length > 2) {
     var deler = avsnitt.map(function(a, i) {
       if (a.startsWith('«') || a.startsWith('"')) return '<div class="article-pull">'+a+'<div class="article-pull-disclaimer">(Sitat generert etter beste evne basert på resultater av AI)</div></div>';
-      return '<p>'+(i===0?photoHtml:'')+a+'</p>';
+      return '<p>'+a+'</p>';
     });
     deler.splice(2, 0, statsHtml);
     avsnittsHtml = deler.join('');
@@ -528,7 +528,7 @@ function visTekst(row) {
     + '<h1 class="article-headline">'+escHtml(row.overskrift || 'Dagens utgave')+'</h1>'
     + (row.ingress ? '<p class="article-deck">'+escHtml(row.ingress)+'</p>' : '')
     + '<div class="article-divider"><span class="article-divider-diamond">◆</span></div>'
-    + '<div class="article-body">'+avsnittsHtml+'</div>'
+    + '<div class="article-body">'+photoHtml+avsnittsHtml+'</div>'
     + '</div>';
 }
 
