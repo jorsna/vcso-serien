@@ -121,8 +121,8 @@ body {
   margin: 0 0 28px;
 }
 .article-divider::before,
-.article-divider::after { content: ''; flex: 1; height: 1px; background: #1a1a1a; }
-.article-divider-diamond { font-size: 10px; color: #1a1a1a; }
+.article-divider::after { content: ''; flex: 1; height: 1px; background: #c9a84c; }
+.article-divider-diamond { font-size: 10px; color: #c9a84c; }
 
 .article-body {
   font-family: 'Playfair Display', serif;
@@ -144,13 +144,57 @@ body {
   float: left;
   line-height: 0.85;
   margin: 4px 6px 0 0;
+  color: #c9a84c;
   font-family: 'Playfair Display', serif;
+}
+
+.article-kicker {
+  text-align: center;
+  font-family: 'Barlow', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #c9a84c;
+  margin-bottom: 10px;
+}
+
+.mvp-photo {
+  float: left;
+  width: 128px;
+  margin: 2px 16px 8px 0;
+  break-inside: avoid;
+}
+.mvp-photo .frame { border: 1px solid #1a1a1a; padding: 4px; background: #fff; }
+.mvp-photo .duo {
+  position: relative;
+  aspect-ratio: 1 / 1.08;
+  background: #1a1a1a;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mvp-photo .duo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); }
+.mvp-photo .duo .init {
+  font-family: 'Playfair Display', serif;
+  font-size: 40px;
+  font-weight: 900;
+  color: #c9a84c;
+}
+.mvp-photo .cap {
+  font-size: 10.5px;
+  font-style: italic;
+  color: #666;
+  text-align: left;
+  margin-top: 5px;
+  line-height: 1.35;
 }
 
 .article-pull {
   column-span: all;
-  border-top: 2px solid #1a1a1a;
-  border-bottom: 2px solid #1a1a1a;
+  border-top: 2px solid #c9a84c;
+  border-bottom: 2px solid #c9a84c;
   padding: 14px 0 10px;
   margin: 20px 0;
   font-family: 'Playfair Display', serif;
@@ -174,7 +218,7 @@ body {
   column-span: all;
   background: #f5f0e8;
   border: 1px solid #ddd;
-  border-left: 4px solid #1a1a1a;
+  border-left: 4px solid #c9a84c;
   padding: 16px 20px;
   margin: 20px 0;
   display: flex;
@@ -459,18 +503,20 @@ function visTekst(row) {
       + '</div>';
   }
 
+  var photoHtml = (stats && stats.mvpNavn) ? mvpFotoHtml(stats.mvpNavn, stats.mvpAvd) : '';
+
   var avsnittsHtml = avsnitt.map(function(a, i) {
     if (a.startsWith('«') || a.startsWith('"')) {
       return '<div class="article-pull">'+a+'<div class="article-pull-disclaimer">(Sitat generert etter beste evne basert på resultater av AI)</div></div>';
     }
-    return '<p>'+a+'</p>';
+    return '<p>'+(i===0?photoHtml:'')+a+'</p>';
   }).join('');
 
   // Sett inn stats etter andre avsnitt
   if (avsnitt.length > 2) {
     var deler = avsnitt.map(function(a, i) {
       if (a.startsWith('«') || a.startsWith('"')) return '<div class="article-pull">'+a+'<div class="article-pull-disclaimer">(Sitat generert etter beste evne basert på resultater av AI)</div></div>';
-      return '<p>'+a+'</p>';
+      return '<p>'+(i===0?photoHtml:'')+a+'</p>';
     });
     deler.splice(2, 0, statsHtml);
     avsnittsHtml = deler.join('');
@@ -478,6 +524,7 @@ function visTekst(row) {
 
   content.innerHTML = '<div class="article-wrap">'
     + '<div class="edition-date">Omhandler ' + norskDato(row.dato) + ' &nbsp;·&nbsp; Publisert av redaksjonen</div>'
+    + '<div class="article-kicker">'+GZ_KICKER+'</div>'
     + '<h1 class="article-headline">'+escHtml(row.overskrift || 'Dagens utgave')+'</h1>'
     + (row.ingress ? '<p class="article-deck">'+escHtml(row.ingress)+'</p>' : '')
     + '<div class="article-divider"><span class="article-divider-diamond">◆</span></div>'
@@ -487,6 +534,27 @@ function visTekst(row) {
 
 function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+var GZ_KICKER = 'Championship';
+
+function gzSlug(navn) {
+  return String(navn).toLowerCase()
+    .replace(/\s+/g, '_')
+    .replace(/\u00e6/g, 'ae').replace(/\u00f8/g, 'o').replace(/\u00e5/g, 'aa')
+    .replace(/[^a-z0-9_]/g, '');
+}
+function gzInitials(navn) {
+  return String(navn).split(' ').map(function(x){ return x[0]||''; }).join('').slice(0,2).toUpperCase();
+}
+function mvpFotoHtml(navn, avd) {
+  if (!navn) return '';
+  var id = gzSlug(navn);
+  var cap = 'MVP: ' + escHtml(navn) + (avd ? ', ' + escHtml(avd) : '');
+  return '<span class="mvp-photo"><span class="frame"><span class="duo">'
+    + '<span class="init">' + gzInitials(navn) + '</span>'
+    + '<img src="photos/' + id + '.jpg" alt="" onerror="this.remove()">'
+    + '</span></span><span class="cap">' + cap + '</span></span>';
 }
 
 // ── GENERER (ADMIN) ──────────────────────────────────────────────────
@@ -513,7 +581,12 @@ function genererGazzetta() {
       console.log('Salg hentet for ' + igaar + ':', salg.length, salg.map(function(s){ return s.selger + ' ' + s.modell; }));
       btn.innerHTML = '<span class="spinner"></span>Skriver artikkel...';
       statusEl.textContent = 'Henter salgsdata og sender til AI...';
-      return genererTekst(salg, igaar, allSalg);
+      return fetch(SB_URL + '/rest/v1/championship_gazzetta?order=created_at.desc&limit=1', { headers: sbH() })
+        .then(function(r){ return r.json(); })
+        .then(function(prev){
+          var forrige = (Array.isArray(prev) && prev[0]) ? prev[0] : null;
+          return genererTekst(salg, igaar, allSalg, forrige);
+        });
     })
     .then(function(resultat) {
       // Lagre i Supabase
@@ -557,7 +630,7 @@ function genererGazzetta() {
 }
 
 // ── AI-GENERERING ────────────────────────────────────────────────────
-function genererTekst(salg, dato, alleSalg) {
+function genererTekst(salg, dato, alleSalg, forrige) {
   var totalt = salg.length;
   var selgerTelling = {}, avdTelling = {ryen:0,fornebu:0,lillestrom:0}, modellTelling = {}, finTelling = 0, hatTrickNavn = [];
 
@@ -608,6 +681,8 @@ function genererTekst(salg, dato, alleSalg) {
   var stats = {
     totalt: totalt,
     mvp: mvpListe.map(function(n){return n.split(' ')[0];}).join('/'),
+    mvpNavn: mvpListe.length === 1 ? mvpListe[0] : null,
+    mvpAvd: '',
     topAvd: topAvd ? avdNavn[topAvd] : null,
     hatTrick: hatTrickNavn.length > 0
   };
@@ -631,6 +706,8 @@ function genererTekst(salg, dato, alleSalg) {
     'Simen Olsen':'Lillestrøm','Andreas Lydersen':'Lillestrøm'
   };
 
+  stats.mvpAvd = stats.mvpNavn ? (SELGER_AVD[stats.mvpNavn] || '') : '';
+
   var selgerListe = Object.keys(selgerTelling).sort(function(a,b){return selgerTelling[b]-selgerTelling[a];}).map(function(n){
     var avd = SELGER_AVD[n]||'ukjent';
     var fin = salg.filter(function(s){return s.selger===n&&s.finansiert;}).length;
@@ -646,7 +723,11 @@ function genererTekst(salg, dato, alleSalg) {
   var totalOppsummering = alleSalg && alleSalg.length > 0
     ? '\nSESONGTOTAL (til og med i går):\n- Totalt levert hele sesongen: '+totalSesongen+' biler\n- Avdelinger totalt: Ryen '+totalAvd.ryen+', Fornebu '+totalAvd.fornebu+', Lillestrøm '+totalAvd.lillestrom+'\n- Ledende selger totalt: '+(totalLeder||'ingen')+' ('+(totalSelger[totalLeder]||0)+' biler)' : '';
 
-  var prompt = 'Du er La Gazzetta dello VCSO Championship – en dramatisk italiensk-inspirert sportsavis for VCSO Championship 2026, en nybilsalgskonkurranse (lagerbiler) hos Volvo Car Stor Oslo (VCSO).\n\nKAMPRAPPORT – ' + norskDato(dato) + '\n\nSALG PER SELGER DENNE DAGEN:\n' + selgerListe + '\n\nSAMMENDRAG DENNE DAGEN:\n- Totalt: ' + totalt + ' biler\n- ' + mvpTekst + '\n- Avdelinger: Ryen ' + avdTelling.ryen + ', Fornebu ' + avdTelling.fornebu + ', Lillestrøm ' + avdTelling.lillestrom + '\n- Bestselger-modell: ' + (topModell||'ukjent') + ' (' + (modellTelling[topModell]||0) + ' stk)\n- Finansierte salg: ' + finTelling + '\n' + (hatTrickNavn.length?'- HAT-TRICK: '+hatTrickTekst+'\n':'') + totalOppsummering + '\n\nVIKTIG: Bruk eksakt riktig avdeling per selger.\n\nHVIS DET IKKE ER NOEN SALG DENNE DAGEN: ikke skriv en flau "ingenting skjedde"-artikkel. La heller redaksjonen dramatisere noe annet like episk – stillheten før stormen, stillingen i sesongen, jakten på tronen eller en hyllest til ledende avdeling. Du trenger ikke forklare at det ikke var salg.\n\nSkriv en EPISK og storslagen avisartikkel på NORSK, i ånden til La Gazzetta dello Sport – operadramatisk, høytidelig, med sans for det legendariske.\n\nSTEMME: Storslagen og begeistret, men alltid forankret i virkeligheten. Du løfter ekte tall og navn opp i det mytiske – du erstatter dem aldri med tåke. Hver setning skal bety noe konkret. Dramatikk er forsterkning av fakta, ikke flukt fra dem.\n\n1. OVERSKRIFT (maks 10 ord): Episk og slående, men MÅ inneholde minst ett konkret faktum – et navn, et tall eller en avdeling – slik at leseren umiddelbart skjønner hva som skjedde. Storhet kommer av å opphøye virkeligheten, ikke skjule den. GODE: «Hansen knuser alt: fire biler i Fornebus navn», «Ryen erobrer tronen mens Lillestrøm vakler». UNNGÅ (for gåtefulle): «Skjebnetimen slo til», «En dag for historiebøkene».\n2. INGRESS (1 setning): Slå an den storslagne tonen, men nevn dagens hovedfaktum.\n3. BRØDTEKST: 4-5 avsnitt, ca 270 ord. Avsnitt skilles av \\n\\n. Inkluder ett sitat i anførselstegn. Siste avsnitt = sesongtotal-oppsummering. Unngå klisjeer, blandede metaforer og tomme superlativer – la de ekte resultatene bære dramatikken.\n\nSvar KUN med gyldig JSON:\n{"overskrift":"...","ingress":"...","tekst":"avsnitt1\\n\\navsnitt2\\n\\n\\"Sitat\\"\\n\\navsnitt3\\n\\nSesongtotal-avsnitt"}';
+  var forrigeBlokk = (forrige && forrige.tekst)
+    ? '\n\nGÅRSDAGENS UTGAVE (kun for kontinuitet – du kan bygge videre på løpende historier og rivalisering, men IKKE gjenta gårsdagens innhold):\nOverskrift: ' + forrige.overskrift + '\n' + forrige.tekst + '\n'
+    : '';
+
+  var prompt = 'Du er La Gazzetta dello VCSO Championship – en dramatisk italiensk-inspirert sportsavis for VCSO Championship 2026, en nybilsalgskonkurranse (lagerbiler) hos Volvo Car Stor Oslo (VCSO).\n\nKAMPRAPPORT – ' + norskDato(dato) + '\n\nSALG PER SELGER DENNE DAGEN:\n' + selgerListe + '\n\nSAMMENDRAG DENNE DAGEN:\n- Totalt: ' + totalt + ' biler\n- ' + mvpTekst + '\n- Avdelinger: Ryen ' + avdTelling.ryen + ', Fornebu ' + avdTelling.fornebu + ', Lillestrøm ' + avdTelling.lillestrom + '\n- Bestselger-modell: ' + (topModell||'ukjent') + ' (' + (modellTelling[topModell]||0) + ' stk)\n- Finansierte salg: ' + finTelling + '\n' + (hatTrickNavn.length?'- HAT-TRICK: '+hatTrickTekst+'\n':'') + totalOppsummering + forrigeBlokk + '\n\nVIKTIG: Bruk eksakt riktig avdeling per selger.\n\nHVIS DET IKKE ER NOEN SALG DENNE DAGEN: ikke skriv en flau "ingenting skjedde"-artikkel. La heller redaksjonen dramatisere noe annet like episk – stillheten før stormen, stillingen i sesongen, jakten på tronen eller en hyllest til ledende avdeling. Du trenger ikke forklare at det ikke var salg.\n\nSkriv en EPISK og storslagen avisartikkel på NORSK, i ånden til La Gazzetta dello Sport – operadramatisk, høytidelig, med sans for det legendariske.\n\nSTEMME: Storslagen og begeistret, men alltid forankret i virkeligheten. Du løfter ekte tall og navn opp i det mytiske – du erstatter dem aldri med tåke. Hver setning skal bety noe konkret. Dramatikk er forsterkning av fakta, ikke flukt fra dem.\n\nREGISTER: Vær breakneck og begeistret – korte, eksplosive setninger vekslet med lengre. Ett velplassert utropstegn er lov. Men energien skal komme fra konkrete tall og navn, aldri fra svulstig tåke.\n\n1. OVERSKRIFT (maks 10 ord): Episk og slående, men MÅ inneholde minst ett konkret faktum – et navn, et tall eller en avdeling – slik at leseren umiddelbart skjønner hva som skjedde. Storhet kommer av å opphøye virkeligheten, ikke skjule den. GODE: «Hansen knuser alt: fire biler i Fornebus navn», «Ryen erobrer tronen mens Lillestrøm vakler». UNNGÅ (for gåtefulle): «Skjebnetimen slo til», «En dag for historiebøkene».\n2. INGRESS (1 setning): Slå an den storslagne tonen, men nevn dagens hovedfaktum.\n3. BRØDTEKST: NØYAKTIG 4 stramme avsnitt, til sammen ca 200 ord. Avsnitt skilles av \\n\\n.\n- FØRSTE AVSNITT: Si rett ut hva som faktisk skjedde – hvem solgte hva, og stillingen – før dramatikken tar over. En leser skal kunne gjengi dagens viktigste hendelse etter å ha lest overskrift + ingress + første avsnitt.\n- Inkluder ETT sitat i anførselstegn som sitt eget avsnitt (helst avsnitt 3). Tillegg sitatet til redaksjonen eller en rolle (f.eks. «en jublende avdelingsleder»), ikke til en navngitt person.\n- SISTE AVSNITT = kort sesongtotal-oppsummering.\n- UNNGÅ disse klisjeene fullstendig: «skjebnetime», «historiebøkene», «tidenes», «en dag for evigheten», «det legendariske», tomme superlativer og blandede metaforer. La de ekte resultatene bære dramatikken.\n\nEKSEMPEL på ønsket tone (IKKE kopier innholdet – bare lær balansen mellom drama og konkret klarhet):\nOverskrift: «Hansen herjer: fire biler sikrer Fornebu tronen»\nIngress: «En vill tirsdag på Fornebu – Marius Hansen leverte fire kontrakter alene og skjøt avdelingen forbi Ryen på sesongtoppen.»\nAvsnitt 1: «Det startet rolig og endte i ekstase. Da klokken passerte 16, hadde Hansen signert sin fjerde kontrakt for dagen – nok til å løfte hele Fornebu forbi Ryen, 142 mot 138 poeng.»\n\nSvar KUN med gyldig JSON:\n{"overskrift":"...","ingress":"...","tekst":"avsnitt1\\n\\navsnitt2\\n\\n\\"Sitat\\"\\n\\nSesongtotal-avsnitt"}';
 
   return fetch('https://resrjvztsqdxzqgiffeg.supabase.co/functions/v1/swift-api', {
     method: 'POST',
