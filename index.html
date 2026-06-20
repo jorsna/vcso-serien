@@ -407,6 +407,19 @@ html, body {
 .modell-bar-count{font-size:10px;font-weight:700;color:#000}
 .modell-bar-pct{font-size:9px;color:var(--muted);width:30px;text-align:right;flex-shrink:0}
 
+/* ── STATISTIKK: GAUGE / MOMENTUM / PROGNOSE ── */
+.gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px 0 4px}
+.gauge{position:relative;width:96px;height:96px}
+.gauge-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Anton',sans-serif;font-size:25px;color:var(--gold);letter-spacing:1px}
+.gauge-sub{font-size:9px;color:var(--muted);text-align:center;letter-spacing:.3px}
+.mom-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 0 8px;min-height:96px}
+.mom-val{font-family:'Anton',sans-serif;font-size:32px;line-height:1;display:flex;align-items:center;gap:7px}
+.mom-sub{font-size:9px;color:var(--muted);text-align:center;letter-spacing:.3px;max-width:150px;line-height:1.35}
+.prognose-body{display:flex;align-items:center;gap:16px;padding:8px 4px 4px}
+.prognose-num{font-family:'Anton',sans-serif;font-size:46px;line-height:.9;color:var(--gold);text-shadow:0 0 24px rgba(255,215,0,.25);flex-shrink:0}
+.prognose-unit{font-size:13px;font-weight:700;color:var(--txt);letter-spacing:.5px}
+.prognose-sub{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.4}
+
 /* ── GAZZETTA TICKER ── */
 #gazzetta-ticker {
   position: relative;
@@ -718,20 +731,12 @@ html, body {
 <!-- STATISTIKK VIEW -->
 <div class="view" id="view-stats">
   <div class="stats-grid">
-    <div class="stat-card"><div class="stat-title">Toppscorere</div><div id="top-scorers"></div></div>
-    <div class="stat-card"><div class="stat-title">Siste 5 dager</div><div id="top-form"></div></div>
-    <div class="stat-card full"><div class="stat-title">Avdeling mot mål</div><div id="team-bars"></div></div>
+    <div class="stat-card full"><div class="stat-title">📈 Tempo-prognose</div><div id="prognose"></div></div>
+    <div class="stat-card"><div class="stat-title">💰 Finansieringsgrad</div><div id="fin-gauge"></div></div>
+    <div class="stat-card"><div class="stat-title">⚡ Momentum</div><div id="momentum"></div></div>
+    <div class="stat-card full"><div class="stat-title">🗓️ Salg per ukedag</div><div id="ukedag-stats"></div></div>
     <div class="stat-card full"><div class="stat-title">📊 Modell-statistikk</div><div id="modell-stats"></div></div>
-  </div>
-  <div style="padding:10px 14px 6px;background:var(--card);border-top:1px solid var(--b1)">
-    <div class="stat-title" style="margin-bottom:8px">🌡️ Press-indikator</div>
-  </div>
-  <div class="press-grid" id="press-grid"></div>
-  <div class="press-legend">
-    <span>☀️ I rute (&gt;75%)</span>
-    <span>🌥️ Beholder (50–75%)</span>
-    <span>🌧️ Bak (35–50%)</span>
-    <span>⛈️ Under press (&lt;35%)</span>
+    <div class="stat-card full"><div class="stat-title">🔥 Siste 5 dager</div><div id="top-form"></div></div>
   </div>
 </div>
 
@@ -1863,31 +1868,120 @@ function getWeekNum(d) {
   return 1 + Math.round(((date.getTime()-week1.getTime())/86400000 - 3 + (week1.getDay()+6)%7)/7);
 }
 
+function _saleDate(s) {
+  var dp = (s.ts || '').substring(0, 10).split('-');
+  if (dp.length < 3) return null;
+  var d = new Date(+dp[0], (+dp[1]) - 1, +dp[2]);
+  return isNaN(d.getTime()) ? null : d;
+}
+
 function renderStats() {
   var m = curMonth;
-  var scorers = SELGERE.map(function(s) {
-    return Object.assign({},s,{g:goalsFor(s.navn,m)});
-  }).sort(function(a,b) { return b.g-a.g; });
-  var maxG = scorers[0] ? scorers[0].g : 1;
+  var fSales = sales.filter(function(s) { return m === 'all' || s.mnd === m; });
 
-  var el1 = document.getElementById('top-scorers');
-  if (el1) el1.innerHTML = scorers.slice(0,8).map(function(s,i) {
-    var hasPhoto = typeof SELGER_PHOTOS !== 'undefined' && SELGER_PHOTOS[s.id];
-    var avHtml = hasPhoto
-      ? '<img src="'+SELGER_PHOTOS[s.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">'
-      : s.initials;
-    return '<div class="sc-row">'
-      + '<div class="sc-pos">'+(i+1)+'</div>'
-      + '<div class="sc-av" style="background:'+s.bg+';color:'+s.color+';overflow:hidden;padding:0">'+avHtml+'</div>'
-      + '<div style="flex:1"><div class="sc-name">'+s.navn+'</div>'
-        + '<div class="sc-sub">'+(LL[s.loc]||s.loc)+'</div>'
-        + '<div style="height:4px;background:var(--faint);border-radius:2px;margin-top:3px;overflow:hidden">'
-          + '<div style="width:'+Math.round(s.g/Math.max(maxG,1)*100)+'%;height:100%;background:'+s.color+';border-radius:2px;transition:width 1.2s"></div>'
-        + '</div>'
-      + '</div>'
-      + '<div class="sc-n">'+s.g+'</div>'
+  // ─── TEMPO-PROGNOSE (inneværende måned → månedsslutt) ───────────────
+  var elP = document.getElementById('prognose');
+  if (elP) {
+    var nowP = new Date();
+    var moAbbr = nowP.getMonth() === 4 ? 'mai' : 'jun';
+    var moNavn = moAbbr === 'mai' ? 'mai' : 'juni';
+    var daysInMo = moAbbr === 'mai' ? 31 : 30;
+    var dayNow = nowP.getDate();
+    var soFar = sales.filter(function(s) { return s.mnd === moAbbr; }).length;
+    var proj = dayNow > 0 ? Math.round(soFar / dayNow * daysInMo) : soFar;
+    elP.innerHTML = '<div class="prognose-body">'
+      + '<div class="prognose-num">' + proj + '</div>'
+      + '<div><div class="prognose-unit">biler i ' + moNavn + '</div>'
+      + '<div class="prognose-sub">' + soFar + ' solgt på ' + dayNow + ' dager &middot; om tempoet holder seg ut måneden</div></div>'
     + '</div>';
-  }).join('');
+  }
+
+  // ─── FINANSIERINGSGRAD (måler) ─────────────────────────────────────
+  var elF = document.getElementById('fin-gauge');
+  if (elF) {
+    var finN = fSales.filter(function(s) { return s.finansiert; }).length;
+    var finTot = fSales.length;
+    var finPct = finTot > 0 ? Math.round(finN / finTot * 100) : 0;
+    var CIRC = 263.9;
+    var off = CIRC * (1 - finPct / 100);
+    elF.innerHTML = '<div class="gauge-wrap"><div class="gauge">'
+      + '<svg viewBox="0 0 100 100" style="width:100%;height:100%;display:block">'
+        + '<circle cx="50" cy="50" r="42" fill="none" stroke="var(--faint)" stroke-width="8"/>'
+        + '<circle cx="50" cy="50" r="42" fill="none" stroke="var(--gold)" stroke-width="8" stroke-linecap="round" stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + off + '" transform="rotate(-90 50 50)" style="transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)"/>'
+      + '</svg>'
+      + '<div class="gauge-num">' + finPct + '%</div></div>'
+      + '<div class="gauge-sub">' + finN + ' av ' + finTot + ' finansiert</div></div>';
+  }
+
+  // ─── MOMENTUM (denne uka mot forrige, samme dag) ───────────────────
+  var elM = document.getElementById('momentum');
+  if (elM) {
+    var nowM = new Date();
+    var nowMid = new Date(nowM.getFullYear(), nowM.getMonth(), nowM.getDate());
+    var dow = (nowM.getDay() + 6) % 7; // 0=man ... 6=søn
+    var thisMon = new Date(nowMid); thisMon.setDate(nowMid.getDate() - dow);
+    var lastMon = new Date(thisMon); lastMon.setDate(thisMon.getDate() - 7);
+    var lastCut = new Date(lastMon); lastCut.setDate(lastMon.getDate() + dow);
+    var thisWk = 0, lastWk = 0;
+    sales.forEach(function(s) {
+      var d = _saleDate(s); if (!d) return;
+      if (d >= thisMon && d <= nowMid) thisWk++;
+      else if (d >= lastMon && d <= lastCut) lastWk++;
+    });
+    var momInner, momSub;
+    if (lastWk === 0) {
+      momInner = thisWk > 0
+        ? '<span style="color:var(--g)">▲ ny</span>'
+        : '<span style="color:var(--muted)">–</span>';
+      momSub = thisWk + ' denne uka · ingen i samme periode forrige uke';
+    } else {
+      var pct = Math.round((thisWk - lastWk) / lastWk * 100);
+      var up = thisWk >= lastWk;
+      var col = pct === 0 ? 'var(--muted)' : up ? 'var(--g)' : 'var(--r)';
+      var arr = pct === 0 ? '▬' : up ? '▲' : '▼';
+      momInner = '<span style="color:' + col + '">' + arr + ' ' + (pct > 0 ? '+' : '') + pct + '%</span>';
+      momSub = thisWk + ' denne uka mot ' + lastWk + ' forrige (t.o.m. samme ukedag)';
+    }
+    elM.innerHTML = '<div class="mom-wrap"><div class="mom-val">' + momInner + '</div>'
+      + '<div class="mom-sub">' + momSub + '</div></div>';
+  }
+
+  // ─── SALG PER UKEDAG (man–lør, hele konkurransen) ──────────────────
+  var elU = document.getElementById('ukedag-stats');
+  if (elU) {
+    var WDFULL = { 1:'Mandag', 2:'Tirsdag', 3:'Onsdag', 4:'Torsdag', 5:'Fredag', 6:'Lørdag' };
+    var order = [1,2,3,4,5,6];
+    var wc = {1:0,2:0,3:0,4:0,5:0,6:0};
+    fSales.forEach(function(s) {
+      var d = _saleDate(s); if (!d) return;
+      var g = d.getDay(); if (g >= 1 && g <= 6) wc[g]++;
+    });
+    var wtot = order.reduce(function(a,k){ return a + wc[k]; }, 0);
+    var wmax = Math.max.apply(null, order.map(function(k){ return wc[k]; }).concat([1]));
+    var topDay = order.slice().sort(function(a,b){ return wc[b] - wc[a]; })[0];
+    var trophy = wtot > 0
+      ? '<div class="modell-trophy"><span style="font-size:22px">🗓️</span>'
+        + '<div><div class="modell-trophy-name">' + WDFULL[topDay] + '</div>'
+        + '<div class="modell-trophy-sub">Toppdag · ' + wc[topDay] + ' biler totalt</div></div>'
+        + '<div style="margin-left:auto;background:rgba(255,215,0,0.12);border:1px solid rgba(255,215,0,0.4);border-radius:20px;padding:3px 10px;font-size:10px;color:var(--gold);font-weight:700">TOPPDAG 🏆</div></div>'
+      : '';
+    var bars = order.map(function(k) {
+      var c = wc[k];
+      var p = Math.round(c / wmax * 100);
+      var sp = wtot > 0 ? Math.round(c / wtot * 100) : 0;
+      var isTop = (k === topDay && wtot > 0);
+      var fill = isTop ? 'var(--gold)' : 'var(--b2)';
+      var glow = isTop ? ';box-shadow:0 0 12px rgba(255,215,0,.45)' : '';
+      var cCol = isTop ? '#000' : 'var(--txt)';
+      return '<div class="modell-bar-row"><div class="modell-bar-name">' + WDFULL[k] + '</div>'
+        + '<div class="modell-bar-bg"><div class="modell-bar-fill" style="width:' + Math.max(p,0) + '%;background:' + fill + glow + '">'
+        + (c > 0 ? '<span class="modell-bar-count" style="color:' + cCol + '">' + c + '</span>' : '')
+        + '</div></div><div class="modell-bar-pct">' + sp + '%</div></div>';
+    }).join('');
+    elU.innerHTML = wtot > 0
+      ? trophy + bars
+      : '<div style="font-size:12px;color:var(--muted);padding:8px 0">Ingen salg registrert ennå.</div>';
+  }
 
   var today = todayStr();
   var el2 = document.getElementById('top-form');
@@ -1907,19 +2001,6 @@ function renderStats() {
     + '</div>';
   }).join('');
 
-  // ─── UKEVINNERE ──────────────────────────────────────────────────────
-  var el3 = document.getElementById('team-bars');
-  if (el3) el3.innerHTML = TEAMS.map(function(t) {
-    var g = teamGoalsFor(t.id, m), goal = teamGoal(t.id, m);
-    var pct = goal > 0 ? Math.min(g/goal*100, 100) : 0;
-    var barCol = pct>=100?'var(--g)' : pct>=60?'var(--y)' : 'var(--r)';
-    return '<div class="bar-row">'
-      + '<div class="bar-lbl"><span style="color:'+t.color+'">'+t.navn+'</span>'
-        + '<span>'+g+' biler · '+Math.round(pct)+'%</span></div>'
-      + '<div class="bar-bg"><div class="bar-fill" style="width:'+pct.toFixed(1)+'%;background:'+barCol+'"></div></div>'
-    + '</div>';
-  }).join('');
-
   var el4 = document.getElementById('modell-stats');
   if (el4) {
     var mc={};
@@ -1929,21 +2010,6 @@ function renderStats() {
     var mx=ma.length?ma[0].antall:1;
     var MC=['#c9a84c','#3b82f6','#22c55e','#8b5cf6','#e8001a','#f59e0b','#06b6d4','#f43f5e','#84cc16'];
     el4.innerHTML=ma.length?(ma.length?'<div class="modell-trophy"><span style="font-size:22px">🏆</span><div><div class="modell-trophy-name">'+ma[0].navn+'</div><div class="modell-trophy-sub">Bestselger · '+ma[0].antall+' solgt</div></div><div style="margin-left:auto;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.4);border-radius:20px;padding:3px 10px;font-size:10px;color:var(--gold);font-weight:700">GULLBIL 🏅</div></div>':'')+ma.map(function(mv,i){var p=Math.round(mv.antall/Math.max(mx,1)*100);var sp=tot>0?Math.round(mv.antall/tot*100):0;return'<div class="modell-bar-row"><div class="modell-bar-name">'+mv.navn+'</div><div class="modell-bar-bg"><div class="modell-bar-fill" style="width:'+p+'%;background:'+MC[i%MC.length]+'"><span class="modell-bar-count">'+mv.antall+'</span></div></div><div class="modell-bar-pct">'+sp+'%</div></div>';}).join(''):'<div style="font-size:12px;color:var(--muted);padding:8px 0">Ingen salg ennå.</div>';
-  }
-
-  var pg=document.getElementById('press-grid');
-  if(pg){
-    var n2=new Date(),mo2=n2.getMonth()===4?'mai':'jun',el=n2.getDate()/(mo2==='mai'?31:30);
-    pg.innerHTML=TEAMS.map(function(t){
-      var gl=teamGoal(t.id,mo2)||1,ac=teamGoalsFor(t.id,mo2),pc=Math.min(ac/gl*100,100),op=Math.round(gl*el)>0?ac/Math.round(gl*el):1;
-      var w,wc,bc;
-      if(op>=0.75){w='☀️';wc='var(--g)';bc='var(--g)';}
-      else if(op>=0.50){w='🌥️';wc='var(--y)';bc='var(--y)';}
-      else if(op>=0.35){w='🌧️';wc='#f97316';bc='#f97316';}
-      else{w='⛈️';wc='var(--r)';bc='var(--r)';}
-      var st=op>=0.75?'I RUTE':op>=0.50?'BEHOLDER':op>=0.35?'BAKT':'UNDER PRESS';
-      return'<div class="press-card" style="border-left-color:'+t.color+'"><div class="press-avd-lbl" style="color:'+t.color+'">'+t.navn+'</div><div class="press-bar-bg"><div class="press-bar-fill" style="width:'+pc.toFixed(1)+'%;background:'+bc+'"></div></div><div class="press-status-row"><span style="font-size:14px">'+w+'</span><span style="color:'+wc+'">'+st+'</span></div><div class="press-pct-lbl">'+ac+' av '+gl+' · '+Math.round(pc)+'% av månedsmål</div></div>';
-    }).join('');
   }
 }
 function renderScoring() {
