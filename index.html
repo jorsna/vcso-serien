@@ -224,10 +224,10 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .rv{opacity:0;transform:translateY(14px)}
 .rv.in{opacity:1;transform:none;transition:opacity .5s ease,transform .5s cubic-bezier(.2,.8,.2,1)}
 /* åpne-flimmer: tre raske sveip over hele kortet */
-.fc-sheen{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}
-.fc-sheen::before{content:"";position:absolute;top:-10%;bottom:-10%;width:55%;left:-60%;transform:skewX(-18deg);
-  background:linear-gradient(100deg,transparent,rgba(255,255,255,.20),transparent);animation:fcSheen 1.5s ease-in-out .12s both}
-@keyframes fcSheen{0%{left:-60%}20%{left:130%}36%{left:-60%}56%{left:130%}72%{left:-60%}92%,100%{left:130%}}
+.fc-sheen{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden}
+.fc-sheen::before{content:"";position:absolute;top:-15%;bottom:-15%;width:50%;left:-60%;transform:skewX(-18deg);
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.22),transparent);animation:fcSheen 1s ease-in-out .15s both}
+@keyframes fcSheen{0%{left:-60%}100%{left:130%}}
 /* foto-ping: to gull-ringer pulser ut ved åpning */
 .fc-photo-wrap::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--gold);opacity:0;pointer-events:none;animation:fcPing 1.5s ease-out .2s 2}
 @keyframes fcPing{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.4);opacity:0}}
@@ -2524,8 +2524,8 @@ function openPlayerCard(id) {
 
   document.getElementById('pc-body').innerHTML =
     '<div class="fc'+(ms.fresh?' fresh':'')+'" style="--accent:'+sObj.color+';--accentBg:'+sObj.bg+';--accentGlow:'+(GLOW[loc]||'rgba(255,215,0,.18)')+';--accentTint:'+(TINT[loc]||'rgba(255,215,0,.12)')+';--rankCol:'+rankCol+'">'
-    + '<div class="fc-sheen"></div>'
     + '<div class="fc-hero">'
+      + '<div class="fc-sheen"></div>'
       + '<div class="fc-rating rv"><div class="r-n" data-count="'+poeng+'">0</div><div class="r-l">Poeng</div></div>'
       + '<div class="fc-photo-wrap rv"><div class="fc-photo">'+avInner+'</div><span class="fc-rank-badge">'+rankSym+'</span></div>'
       + '<div class="fc-name rv">'+navn+'</div>'
