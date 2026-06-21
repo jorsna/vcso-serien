@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <title>VCSO Championship 2026</title>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
 <style>
 @font-face {
   font-family: 'VolvoBroad';
@@ -167,31 +167,58 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .pc-sheet.open{transform:translate(-50%,0)}
 .pc-grab{width:38px;height:4px;border-radius:2px;background:var(--b2);margin:9px auto 0}
 .pc-x{position:absolute;top:12px;right:14px;width:30px;height:30px;border-radius:50%;border:1px solid var(--b1);background:transparent;color:var(--muted);font-size:16px;cursor:pointer;z-index:2}
-.pc-head{text-align:center;padding:14px 18px 4px}
-.pc-av{width:84px;height:84px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-family:'Anton',sans-serif;font-size:32px;border:3px solid var(--gold);overflow:hidden}
-.pc-av img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%)}
-.pc-name{font-family:'Anton',sans-serif;font-size:23px;letter-spacing:.5px;margin-top:10px;color:var(--txt)}
-.pc-dept{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
-.pc-stats{display:flex;margin:16px 18px 4px;background:var(--card2);border:1px solid var(--b1);border-radius:12px;overflow:hidden}
-.pc-stat{flex:1;text-align:center;padding:13px 6px;position:relative}
-.pc-stat+.pc-stat::before{content:"";position:absolute;left:0;top:20%;height:60%;width:1px;background:var(--b1)}
-.pc-stat .n{font-family:'Anton',sans-serif;font-size:25px;color:var(--gold);line-height:1}
-.pc-stat .l{font-size:8.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:4px}
-.pc-sec{padding:16px 18px 0}
-.pc-sec-h{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
-.pc-badges{display:flex;flex-wrap:wrap;gap:8px}
-.pc-badge{display:flex;align-items:center;gap:7px;background:var(--card2);border:1px solid var(--b1);border-radius:20px;padding:6px 11px 6px 7px;font-size:11.5px;font-weight:600;color:var(--txt)}
-.pc-badge .bi{width:22px;height:22px;border-radius:50%;background:rgba(255,215,0,.12);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
-.pc-badge.new{border-color:var(--gold);background:rgba(255,215,0,.09)}
-.pc-badge.new .bi{background:var(--gold)}
-.pc-empty{font-size:12px;color:var(--muted);font-style:italic}
-.pc-next{background:var(--card2);border:1px solid var(--b1);border-radius:12px;padding:13px 14px}
-.pc-next-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
-.pc-next-name{font-size:13px;font-weight:600;color:var(--txt)}
-.pc-next-frac{font-family:'Anton',sans-serif;font-size:15px;color:var(--gold)}
-.pc-bar{height:9px;border-radius:5px;background:var(--bg);overflow:hidden;border:1px solid var(--b1)}
-.pc-bar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#b8860b,var(--gold))}
-.pc-next-go{font-size:10px;color:var(--muted);margin-top:7px}
+.fc{position:relative}
+.fc-hero{position:relative;padding:20px 18px 16px;text-align:center;overflow:hidden}
+.fc-hero::before{content:"";position:absolute;inset:0;opacity:.9;background:radial-gradient(120% 90% at 50% -10%, var(--accentGlow) 0%, transparent 60%)}
+.fc-hero::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 35%,rgba(255,215,0,.16) 50%,transparent 65%);background-size:240% 100%;background-position:240% 0}
+.fc.fresh .fc-hero::after{animation:fcSweep 3.8s ease-in-out infinite}
+@keyframes fcSweep{0%{background-position:240% 0}55%,100%{background-position:-240% 0}}
+.fc-rating{position:absolute;top:8px;left:14px;z-index:3;text-align:center;line-height:.9}
+.fc-rating .r-n{font-family:'Anton',sans-serif;font-size:32px;color:var(--gold);filter:drop-shadow(0 2px 6px rgba(255,215,0,.35))}
+.fc-rating .r-l{font-size:8px;font-weight:700;letter-spacing:1.5px;color:var(--gold);opacity:.8;text-transform:uppercase}
+.fc-rank{position:absolute;top:8px;right:14px;z-index:3;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Anton',sans-serif;font-size:15px;background:rgba(0,0,0,.3);border:2px solid var(--rankCol);color:var(--rankCol)}
+.fc-photo{position:relative;z-index:2;width:100px;height:100px;border-radius:50%;margin:4px auto 0;display:flex;align-items:center;justify-content:center;font-family:'Anton',sans-serif;font-size:38px;border:3px solid var(--gold);overflow:hidden;background:var(--accentBg);color:var(--accent)}
+.fc-photo img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%)}
+.fc.fresh .fc-photo{animation:fcGlow 1.9s ease-in-out infinite}
+@keyframes fcGlow{0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 16px 3px rgba(255,215,0,.6),0 0 34px 8px rgba(255,180,0,.22)}}
+.fc-name{position:relative;z-index:2;font-family:'Anton',sans-serif;font-size:25px;letter-spacing:.5px;margin-top:11px;color:var(--txt)}
+.fc-dept{position:relative;z-index:2;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-top:3px;display:inline-flex;align-items:center;gap:6px}
+.fc-dept .dd{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.fc-tag{position:relative;z-index:2;display:inline-block;margin-top:10px;font-family:'Cinzel',serif;font-weight:700;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.35);border-radius:20px;padding:5px 14px}
+.fc-strip{display:flex;margin:4px 16px 0;background:var(--card2);border:1px solid var(--b1);border-radius:12px;overflow:hidden}
+.fc-st{flex:1;text-align:center;padding:13px 6px;position:relative}
+.fc-st+.fc-st::before{content:"";position:absolute;left:0;top:22%;height:56%;width:1px;background:var(--b1)}
+.fc-st .n{font-family:'Anton',sans-serif;font-size:25px;color:var(--gold);line-height:1}
+.fc-st .l{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-top:5px}
+.fc-sec{padding:16px 18px 0}
+.fc-sec-h{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:11px;display:flex;align-items:center;gap:8px}
+.fc-sec-h::after{content:"";flex:1;height:1px;background:var(--b1)}
+.fc-badges{display:flex;flex-wrap:wrap;gap:8px}
+.fc-badge{display:flex;align-items:center;gap:7px;background:var(--card2);border:1px solid var(--b1);border-radius:20px;padding:6px 12px 6px 7px;font-size:11.5px;font-weight:600;color:var(--txt)}
+.fc-badge .bi{width:23px;height:23px;border-radius:50%;background:rgba(255,215,0,.12);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.fc-badge.new{border-color:var(--gold);background:rgba(255,215,0,.09);animation:fcGlow 1.9s ease-in-out infinite}
+.fc-badge.new .bi{background:var(--gold)}
+.fc-empty{font-size:12px;color:var(--muted);font-style:italic;line-height:1.5}
+.fc-next{background:var(--card2);border:1px solid var(--b1);border-radius:12px;padding:14px}
+.fc-next-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.fc-next-name{font-size:13px;font-weight:600;color:var(--txt)}
+.fc-next-frac{font-family:'Anton',sans-serif;font-size:16px;color:var(--gold)}
+.fc-bar{height:10px;border-radius:6px;background:var(--bg);overflow:hidden;border:1px solid var(--b1)}
+.fc-bar-fill{height:100%;border-radius:6px;width:0;transition:width 1.1s cubic-bezier(.2,.8,.2,1);background:linear-gradient(90deg,#8a6d0b,var(--gold));position:relative}
+.fc-bar-fill::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 40%,rgba(255,255,255,.35) 50%,transparent 60%);background-size:300% 100%;animation:fcBarSheen 2.4s linear infinite}
+@keyframes fcBarSheen{to{background-position:-300% 0}}
+.fc-next-go{font-size:10.5px;color:var(--muted);margin-top:8px}
+.fc-form{display:flex;align-items:center;gap:10px}
+.fc-pills{display:flex;gap:6px}
+.fc-pill{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.fc-pill.w{background:rgba(34,197,94,.16);border:1px solid rgba(34,197,94,.45)}
+.fc-pill.x{background:var(--bg);border:1px solid var(--b1);color:var(--b2)}
+.fc-form-sum{margin-left:auto;font-family:'Anton',sans-serif;font-size:14px;color:var(--gold);text-align:right}
+.fc-form-sum span{font-family:'Barlow';font-size:9px;color:var(--muted);font-weight:600;display:block;letter-spacing:.5px}
+.fc-skjerf{margin:18px 18px 6px;width:calc(100% - 36px);padding:13px;border:none;border-radius:10px;cursor:pointer;font-family:'Anton',sans-serif;font-size:14px;letter-spacing:1px;text-transform:uppercase;color:#000;background:linear-gradient(135deg,#fff 0%,var(--gold) 45%,#e0b400 100%)}
+.rv{opacity:0;transform:translateY(14px)}
+.rv.in{opacity:1;transform:none;transition:opacity .5s ease,transform .5s cubic-bezier(.2,.8,.2,1)}
+@media(prefers-reduced-motion:reduce){.fc *{animation:none!important}.fc .rv{opacity:1;transform:none}.fc-bar-fill{transition:none}}
 .hdr-btn{background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.35);border-radius:4px;
   padding:0 10px;height:28px;color:var(--gold);font-size:11px;cursor:pointer;font-weight:700;
   flex-shrink:0;white-space:nowrap;display:flex;align-items:center;gap:5px}
@@ -418,42 +445,7 @@ html, body {
   animation: goldShimmer 1.5s linear infinite, barGlow 1s ease-in-out infinite !important;
 }
 
-/* ── SPILLERKORT HOVER ─────────────────────────────── */
 .trow{position:relative}
-.player-card{
-  position:fixed;z-index:9999;
-  width:220px;
-  background:linear-gradient(160deg,#0f1f10 0%,#09111e 70%);
-  border:1px solid rgba(255,215,0,.35);
-  border-radius:10px;overflow:hidden;
-  box-shadow:0 8px 40px rgba(0,0,0,.7),0 0 30px rgba(255,215,0,.1);
-  pointer-events:all;
-  opacity:0;transition:opacity .15s ease;
-}
-.player-card.show{opacity:1}
-.pc-top{background:linear-gradient(135deg,rgba(255,215,0,.15),rgba(255,215,0,.03));
-        border-bottom:1px solid rgba(255,215,0,.15);
-        padding:8px 12px;display:flex;justify-content:space-between;align-items:center}
-.pc-comp{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,215,0,.6)}
-.pc-week{font-size:8px;color:#5a7898}
-.pc-photo-wrap{padding:14px 0 0;display:flex;justify-content:center}
-.pc-photo{width:80px;height:80px;border-radius:50%;overflow:hidden;
-          border:3px solid var(--gold);
-          box-shadow:0 0 20px rgba(255,215,0,.25)}
-.pc-photo img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%)}
-.pc-photo-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;
-             font-size:22px;font-weight:900;color:var(--gold);background:rgba(255,215,0,.08)}
-.pc-name{font-family:'Anton',sans-serif;font-size:17px;color:#fff;
-         text-align:center;padding:8px 12px 2px;line-height:1}
-.pc-avd{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
-        text-align:center;margin-bottom:10px}
-.pc-stats{display:flex;border-top:1px solid rgba(255,215,0,.1)}
-.pc-stat{flex:1;padding:8px 4px;text-align:center;border-right:1px solid rgba(255,215,0,.08)}
-.pc-stat:last-child{border-right:none}
-.pc-stat-n{font-family:'Anton',sans-serif;font-size:20px;line-height:1}
-.pc-stat-l{font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#5a7898;margin-top:2px}
-.pc-form{display:flex;justify-content:center;gap:3px;padding:8px 12px 12px}
-.pc-dot{width:10px;height:10px;border-radius:50%}
 
 /* HOF - gull-animasjon */
 @keyframes goldSpin{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
@@ -2468,43 +2460,95 @@ function milestoneState(navn) {
 function openPlayerCard(id) {
   var sObj = SELGERE.find(function(x){ return x.id===id; });
   if (!sObj) return;
-  var navn = sObj.navn;
+  var navn = sObj.navn, loc = sObj.loc, m = curMonth;
   var ms = milestoneState(navn);
   var poeng = ms.salgN*3 + bonusFor(navn, 'all');
+  var fin = ms.finN;
+  var ht = (typeof hatTrickCount==='function') ? hatTrickCount(navn, m) : 0;
+
+  // rang i gjeldende visning
+  var standings = SELGERE.map(function(s){
+    return { navn:s.navn,
+             pts: goalsFor(s.navn,m)*PTS + bonusFor(s.navn,m),
+             fin: sales.filter(function(x){ return x.selger===s.navn && x.finansiert && (m==='all'||x.mnd===m); }).length };
+  }).sort(function(a,b){ return b.pts-a.pts || b.fin-a.fin || a.navn.localeCompare(b.navn); });
+  var rank = 1;
+  for (var ri=0; ri<standings.length; ri++){ if(standings[ri].navn===navn){ rank=ri+1; break; } }
+
+  // form siste 5 dager
+  var dmap = {};
+  sales.forEach(function(s){ if(s.selger===navn){ var d=(s.ts||'').slice(0,10); dmap[d]=(dmap[d]||0)+1; } });
+  var form = [];
+  for (var i=4;i>=0;i--){ var dd=new Date(); dd.setDate(dd.getDate()-i);
+    form.push(dmap[dd.getFullYear()+'-'+pad(dd.getMonth()+1)+'-'+pad(dd.getDate())]>0); }
+  var formSum = form.filter(Boolean).length;
+
+  var tag = ms.fresh ? 'NY MILEP\u00c6L'
+    : rank===1 ? 'TABELLTOPP'
+    : (ms.salgN>=5 && fin/ms.salgN>=0.5) ? 'FINANSIERINGSKONGE'
+    : formSum>=3 ? 'I FORM'
+    : 'P\u00c5 JAKT';
+
+  var GLOW = {ryen:'rgba(59,130,246,.35)',fornebu:'rgba(16,185,129,.32)',lillestrom:'rgba(245,158,11,.32)'};
+  var rankCol = rank===1?'#ffd700':rank===2?'#94a3b8':rank===3?'#cd7f32':'#5a7898';
+  var rankSym = rank<=3 ? ['','\u2460','\u2461','\u2462'][rank] : '#'+rank;
+
   var hasPhoto = typeof SELGER_PHOTOS !== 'undefined' && SELGER_PHOTOS[id];
   var avInner = hasPhoto ? '<img src="'+SELGER_PHOTOS[id]+'">' : sObj.initials;
 
   var badges = ms.achieved.length
-    ? ms.achieved.map(function(b){
-        return '<div class="pc-badge'+(b.fresh?' new':'')+'"><span class="bi">'+b.icon+'</span>'+b.label+'</div>';
-      }).join('')
-    : '<div class="pc-empty">Ingen milep\u00e6ler n\u00e5dd enn\u00e5 \u2014 f\u00f8rste er '+ms.next.goal+' salg.</div>';
+    ? ms.achieved.map(function(b){ return '<div class="fc-badge'+(b.fresh?' new':'')+'"><span class="bi">'+b.icon+'</span>'+b.label+'</div>'; }).join('')
+    : '<div class="fc-empty">Ingen milep\u00e6ler n\u00e5dd enn\u00e5 \u2014 f\u00f8rste er '+ms.next.goal+' salg. Fremdriften vises under.</div>';
 
   var pct = Math.max(0, Math.min(100, Math.round(ms.next.cur/ms.next.goal*100)));
-  var remaining = ms.next.goal - ms.next.cur;
+  var pills = form.map(function(f){ return '<div class="fc-pill '+(f?'w':'x')+'">'+(f?'\u26bd':'\u00b7')+'</div>'; }).join('');
+  var skjerfArgs = "'"+navn.replace(/'/g,"\\'")+"','"+id+"','"+loc+"',"+ms.salgN+","+poeng+","+fin+","+ht;
 
   document.getElementById('pc-body').innerHTML =
-    '<div class="pc-head">'
-      + '<div class="pc-av" style="background:'+sObj.bg+';color:'+sObj.color+'">'+avInner+'</div>'
-      + '<div class="pc-name">'+navn+'</div>'
-      + '<div class="pc-dept">'+(LL[sObj.loc]||sObj.loc)+'</div>'
+    '<div class="fc'+(ms.fresh?' fresh':'')+'" style="--accent:'+sObj.color+';--accentBg:'+sObj.bg+';--accentGlow:'+(GLOW[loc]||'rgba(255,215,0,.18)')+';--rankCol:'+rankCol+'">'
+    + '<div class="fc-hero">'
+      + '<div class="fc-rating rv"><div class="r-n" data-count="'+poeng+'">0</div><div class="r-l">Poeng</div></div>'
+      + '<div class="fc-rank rv">'+rankSym+'</div>'
+      + '<div class="fc-photo rv">'+avInner+'</div>'
+      + '<div class="fc-name rv">'+navn+'</div>'
+      + '<div class="fc-dept rv"><span class="dd"></span>'+(LL[loc]||loc)+'</div>'
+      + '<div class="fc-tag rv">'+tag+'</div>'
     + '</div>'
-    + '<div class="pc-stats">'
-      + '<div class="pc-stat"><div class="n">'+ms.salgN+'</div><div class="l">Salg</div></div>'
-      + '<div class="pc-stat"><div class="n">'+ms.finN+'</div><div class="l">Finansiert</div></div>'
-      + '<div class="pc-stat"><div class="n">'+poeng+'</div><div class="l">Poeng</div></div>'
+    + '<div class="fc-strip rv">'
+      + '<div class="fc-st"><div class="n" data-count="'+ms.salgN+'">0</div><div class="l">Salg</div></div>'
+      + '<div class="fc-st"><div class="n" data-count="'+fin+'">0</div><div class="l">Finansiert</div></div>'
+      + '<div class="fc-st"><div class="n">#'+rank+'</div><div class="l">Plassering</div></div>'
     + '</div>'
-    + '<div class="pc-sec"><div class="pc-sec-h">Milep\u00e6ler</div><div class="pc-badges">'+badges+'</div></div>'
-    + '<div class="pc-sec"><div class="pc-sec-h">Neste milep\u00e6l</div>'
-      + '<div class="pc-next"><div class="pc-next-top"><div class="pc-next-name">'+ms.next.goal+' salg</div>'
-      + '<div class="pc-next-frac">'+ms.next.cur+' / '+ms.next.goal+'</div></div>'
-      + '<div class="pc-bar"><div class="pc-bar-fill" style="width:'+pct+'%"></div></div>'
-      + '<div class="pc-next-go">'+remaining+' salg unna</div></div></div>'
-    + '<div class="pc-sec"><div class="pc-sec-h">Form \u2014 siste salgsdager</div>'
-      + '<div class="form-dots">'+selgerDots(navn)+'</div></div>';
+    + '<div class="fc-sec rv"><div class="fc-sec-h">Milep\u00e6ler</div><div class="fc-badges">'+badges+'</div></div>'
+    + '<div class="fc-sec rv"><div class="fc-sec-h">Neste milep\u00e6l</div>'
+      + '<div class="fc-next"><div class="fc-next-top"><div class="fc-next-name">'+ms.next.goal+' salg</div>'
+      + '<div class="fc-next-frac">'+ms.next.cur+' / '+ms.next.goal+'</div></div>'
+      + '<div class="fc-bar"><div class="fc-bar-fill" data-pct="'+pct+'"></div></div>'
+      + '<div class="fc-next-go">'+(ms.next.goal-ms.next.cur)+' salg unna</div></div></div>'
+    + '<div class="fc-sec rv"><div class="fc-sec-h">Form \u2014 siste 5 salgsdager</div>'
+      + '<div class="fc-form"><div class="fc-pills">'+pills+'</div>'
+      + '<div class="fc-form-sum">'+formSum+'/5<span>dager m/ salg</span></div></div></div>'
+    + '<button class="fc-skjerf rv" onclick="visSkjerf('+skjerfArgs+')">\uD83E\uDDE3 Del skjerf</button>'
+    + '</div>';
 
   document.getElementById('pc-bd').classList.add('open');
   document.getElementById('pc-sheet').classList.add('open');
+  animatePlayerCard();
+}
+
+function animatePlayerCard(){
+  var sheet = document.getElementById('pc-sheet');
+  if (!sheet) return;
+  sheet.querySelectorAll('.rv').forEach(function(el,i){ setTimeout(function(){ el.classList.add('in'); }, 80 + i*60); });
+  sheet.querySelectorAll('[data-count]').forEach(function(el){
+    var target = parseInt(el.getAttribute('data-count'),10)||0, start=null, dur=900;
+    function step(t){ if(!start)start=t; var p=Math.min(1,(t-start)/dur);
+      el.textContent = Math.round(target*(1-Math.pow(1-p,3)));
+      if(p<1) requestAnimationFrame(step); }
+    setTimeout(function(){ requestAnimationFrame(step); }, 250);
+  });
+  var bar = sheet.querySelector('.fc-bar-fill');
+  if (bar) setTimeout(function(){ bar.style.width = bar.getAttribute('data-pct')+'%'; }, 450);
 }
 
 function closePlayerCard(e){
@@ -2876,93 +2920,7 @@ setInterval(countdown, 1000);
 
 
 
-// ── SPILLERKORT HOVER ─────────────────────────────────────────────────────
-(function() {
-  var card = document.createElement('div');
-  card.className = 'player-card';
-  card.id = 'player-hover-card';
-  document.body.appendChild(card);
-
-  var hideTimer = null, frozen = false;
-
-  function getSelgerStats(navn) {
-    var per=0,fin=0,form=[],hatTricks=0,dmap={};
-    sales.forEach(function(s){
-      if(s.selger!==navn)return;
-      per++;if(s.finansiert)fin++;
-      dmap[s.ts.slice(0,10)]=(dmap[s.ts.slice(0,10)]||0)+1;
-    });
-    for(var i=0;i<=4;i++){
-      var d=new Date();d.setDate(d.getDate()-i);
-      var ds=d.getFullYear()+'-'+(d.getMonth()+1<10?'0':'')+(d.getMonth()+1)+'-'+(d.getDate()<10?'0':'')+d.getDate();
-      form.push(dmap[ds]>0);
-    }
-    Object.keys(dmap).forEach(function(d){if(dmap[d]>=3)hatTricks++;});
-    return{per:per,fin:fin,form:form,hatTricks:hatTricks};
-  }
-
-  function positionCard(e){
-    var x=e.clientX+14,y=e.clientY-60;
-    if(x+228>window.innerWidth)x=e.clientX-242;
-    if(y+340>window.innerHeight)y=window.innerHeight-350;
-    if(y<10)y=10;
-    card.style.left=x+'px';card.style.top=y+'px';
-  }
-
-  function showCard(navn,color,id,loc,e){
-    if(hideTimer){clearTimeout(hideTimer);hideTimer=null;}
-    frozen=false;
-    var stats=getSelgerStats(navn);
-    var photos=typeof SELGER_PHOTOS!=='undefined'?SELGER_PHOTOS:{};
-    var ini=id.replace(/_/g,' ').split(' ').map(function(w){return w[0]?w[0].toUpperCase():'';}).join('').slice(0,2);
-    var photoHtml=photos[id]
-      ?'<img src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">'
-      :'<div class="pc-photo-ph">'+ini+'</div>';
-    var locMap={ryen:'Ryen',fornebu:'Fornebu',lillestrom:'Lillestrøm'};
-    var locStr=locMap[loc]||loc;
-    var formDots=stats.form.map(function(f){return'<div class="pc-dot" style="background:'+(f?'#22c55e':'#ef4444')+'"></div>';}).join('');
-    card.innerHTML=
-      '<div class="pc-top"><div class="pc-comp">VCSO Championship</div><div class="pc-week">2026</div></div>'
-      +'<div class="pc-photo-wrap"><div class="pc-photo">'+photoHtml+'</div></div>'
-      +'<div class="pc-name">'+navn+'</div>'
-      +'<div class="pc-avd" style="color:'+color+'">'+locStr+'</div>'
-      +'<div class="pc-stats">'
-        +'<div class="pc-stat"><div class="pc-stat-n" style="color:var(--gold)">'+stats.per+'</div><div class="pc-stat-l">Salg</div></div>'
-        +'<div class="pc-stat"><div class="pc-stat-n" style="color:var(--gold2)">'+stats.per*3+'</div><div class="pc-stat-l">Poeng</div></div>'
-        +'<div class="pc-stat"><div class="pc-stat-n" style="color:#22c55e">'+stats.fin+'</div><div class="pc-stat-l">Finansiert</div></div>'
-        +(stats.hatTricks>0?'<div class="pc-stat"><div class="pc-stat-n" style="color:var(--gold)">'+stats.hatTricks+'</div><div class="pc-stat-l">Hat-trick</div></div>':'')
-      +'</div>'
-      +'<div class="pc-form">'+formDots+'</div>'
-      +'<button class="pc-skjerf-btn" onclick="visSkjerf(\''+navn+'\',\''+id+'\',\''+loc+'\','+stats.per+','+stats.per*3+','+stats.fin+','+stats.hatTricks+')">&#x1F9E3; Del skjerf</button>';
-    positionCard(e);card.classList.add('show');
-    card.onmouseenter=function(){frozen=true;if(hideTimer){clearTimeout(hideTimer);hideTimer=null;}};
-    card.onmouseleave=function(){frozen=false;hideTimer=setTimeout(function(){card.classList.remove('show');},80);};
-  }
-
-  function scheduleHide(){hideTimer=setTimeout(function(){if(!frozen)card.classList.remove('show');},120);}
-  function moveCard(e){if(!frozen)positionCard(e);}
-
-  function attachHovers(){
-    var tbl=document.getElementById('tbl-ind');
-    if(!tbl)return;
-    tbl.querySelectorAll('.trow').forEach(function(row){
-      if(row._hoverAttached)return;
-      row._hoverAttached=true;
-      var navn=row.getAttribute('data-navn');
-      if(!navn)return;
-      var sObj=SELGERE.find(function(s){return s.navn===navn;});
-      if(!sObj)return;
-      row.addEventListener('mouseenter',function(e){showCard(sObj.navn,sObj.color,sObj.id,sObj.loc,e);});
-      row.addEventListener('mousemove',moveCard);
-      row.addEventListener('mouseleave',scheduleHide);
-    });
-  }
-
-  var origRenderAll=typeof renderAll==='function'?renderAll:null;
-  if(origRenderAll){window.renderAll=function(){origRenderAll();setTimeout(attachHovers,100);};}
-  setTimeout(attachHovers,2000);
-  document.addEventListener('click',function(){setTimeout(attachHovers,200);});
-})();
+// (Hover-kortet er fjernet \u2014 erstattet av trykk-spillerkortet openPlayerCard.)
 
 // ── SKJERF ──────────────────────────────────────────────────────────────────
 var AVD_SKJERF={ryen:{color:'#3b82f6',dark:'#1e3a8a'},fornebu:{color:'#10b981',dark:'#065f46'},lillestrom:{color:'#f59e0b',dark:'#92400e'}};
