@@ -150,6 +150,48 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .sp-pop-btns button{flex:1;padding:13px;border-radius:8px;font-family:'Anton',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer;border:none}
 .sp-pop-yes{background:var(--gold);color:#000}
 .sp-pop-no{background:transparent;color:var(--muted);border:1px solid var(--b1)!important}
+/* ── MILEPÆL-GLØD ── */
+.av-wrap{position:relative;display:inline-block}
+.av-wrap.fresh .av{border:2px solid var(--gold)!important;animation:mileGlow 1.8s ease-in-out infinite}
+@keyframes mileGlow{0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 10px 2px rgba(255,215,0,.6),0 0 20px 5px rgba(255,180,0,.2)}}
+.mile-dot{position:absolute;top:-3px;right:-3px;width:15px;height:15px;border-radius:50%;background:var(--gold);
+  color:#000;border:2px solid var(--card);display:flex;align-items:center;justify-content:center;font-size:8px;z-index:2;animation:mileDot 1.6s ease-in-out infinite}
+@keyframes mileDot{0%,100%{transform:scale(.9)}50%{transform:scale(1.15)}}
+@media(prefers-reduced-motion:reduce){.av-wrap.fresh .av,.mile-dot{animation:none}}
+/* ── SPILLERKORT ── */
+.pc-bd{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:410;opacity:0;pointer-events:none;transition:opacity .25s}
+.pc-bd.open{opacity:1;pointer-events:auto}
+.pc-sheet{position:fixed;left:50%;bottom:0;transform:translate(-50%,100%);width:100%;max-width:520px;
+  background:var(--card);border-top:3px solid var(--gold);border-radius:18px 18px 0 0;z-index:411;
+  transition:transform .3s cubic-bezier(.2,.8,.2,1);max-height:88vh;overflow-y:auto;padding-bottom:24px}
+.pc-sheet.open{transform:translate(-50%,0)}
+.pc-grab{width:38px;height:4px;border-radius:2px;background:var(--b2);margin:9px auto 0}
+.pc-x{position:absolute;top:12px;right:14px;width:30px;height:30px;border-radius:50%;border:1px solid var(--b1);background:transparent;color:var(--muted);font-size:16px;cursor:pointer;z-index:2}
+.pc-head{text-align:center;padding:14px 18px 4px}
+.pc-av{width:84px;height:84px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-family:'Anton',sans-serif;font-size:32px;border:3px solid var(--gold);overflow:hidden}
+.pc-av img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%)}
+.pc-name{font-family:'Anton',sans-serif;font-size:23px;letter-spacing:.5px;margin-top:10px;color:var(--txt)}
+.pc-dept{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.pc-stats{display:flex;margin:16px 18px 4px;background:var(--card2);border:1px solid var(--b1);border-radius:12px;overflow:hidden}
+.pc-stat{flex:1;text-align:center;padding:13px 6px;position:relative}
+.pc-stat+.pc-stat::before{content:"";position:absolute;left:0;top:20%;height:60%;width:1px;background:var(--b1)}
+.pc-stat .n{font-family:'Anton',sans-serif;font-size:25px;color:var(--gold);line-height:1}
+.pc-stat .l{font-size:8.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:4px}
+.pc-sec{padding:16px 18px 0}
+.pc-sec-h{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.pc-badges{display:flex;flex-wrap:wrap;gap:8px}
+.pc-badge{display:flex;align-items:center;gap:7px;background:var(--card2);border:1px solid var(--b1);border-radius:20px;padding:6px 11px 6px 7px;font-size:11.5px;font-weight:600;color:var(--txt)}
+.pc-badge .bi{width:22px;height:22px;border-radius:50%;background:rgba(255,215,0,.12);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.pc-badge.new{border-color:var(--gold);background:rgba(255,215,0,.09)}
+.pc-badge.new .bi{background:var(--gold)}
+.pc-empty{font-size:12px;color:var(--muted);font-style:italic}
+.pc-next{background:var(--card2);border:1px solid var(--b1);border-radius:12px;padding:13px 14px}
+.pc-next-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
+.pc-next-name{font-size:13px;font-weight:600;color:var(--txt)}
+.pc-next-frac{font-family:'Anton',sans-serif;font-size:15px;color:var(--gold)}
+.pc-bar{height:9px;border-radius:5px;background:var(--bg);overflow:hidden;border:1px solid var(--b1)}
+.pc-bar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#b8860b,var(--gold))}
+.pc-next-go{font-size:10px;color:var(--muted);margin-top:7px}
 .hdr-btn{background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.35);border-radius:4px;
   padding:0 10px;height:28px;color:var(--gold);font-size:11px;cursor:pointer;font-weight:700;
   flex-shrink:0;white-space:nowrap;display:flex;align-items:center;gap:5px}
@@ -864,6 +906,15 @@ html, body {
 
 <!-- BONUS-BIL POPUP -->
 <div class="sp-pop-bd" id="sp-pop-bd"><div class="sp-pop" id="sp-pop"></div></div>
+
+<!-- SPILLERKORT -->
+<div class="pc-bd" id="pc-bd" onclick="closePlayerCard(event)">
+  <div class="pc-sheet" id="pc-sheet" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
+    <div class="pc-grab"></div>
+    <button class="pc-x" onclick="closePlayerCard()" aria-label="Lukk">&#10005;</button>
+    <div id="pc-body"></div>
+  </div>
+</div>
 
 <!-- HOF VIEW -->
 <div class="view" id="view-hof">
@@ -1622,9 +1673,10 @@ function renderInd() {
     var avHtml = hasPhoto
       ? '<img src="'+SELGER_PHOTOS[r.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">'
       : r.initials;
-    return '<div class="trow zm" data-navn="'+r.navn+'" style="animation-delay:'+(i*0.03)+'s">'
+    var ms = milestoneState(r.navn);
+    return '<div class="trow zm" data-navn="'+r.navn+'" onclick="openPlayerCard(\''+r.id+'\')" style="animation-delay:'+(i*0.03)+'s;cursor:pointer">'
       + '<div class="pos-n" style="color:'+pc+';font-size:'+(isTied?'11px':'13px')+'">'+(rankLabel)+'</div>'
-      + '<div><div class="av" style="background:'+r.bg+';color:'+r.color+';overflow:hidden;padding:0">'+avHtml+'</div></div>'
+      + '<div><div class="av-wrap'+(ms.fresh?' fresh':'')+'"><div class="av" style="background:'+r.bg+';color:'+r.color+';overflow:hidden;padding:0">'+avHtml+'</div>'+(ms.fresh?'<span class="mile-dot">&#9733;</span>':'')+'</div></div>'
       + '<div class="name-c">'
         + '<div class="name-main">'+r.navn+(ht>0?' '+Array(Math.min(ht,5)+1).join('&#11088;'):'')+(sk>=3?' &#128293;':'')+'</div>'
         + '<div class="name-sub">'+(LL[r.loc]||r.loc)+'</div>'
@@ -1636,7 +1688,7 @@ function renderInd() {
           var already=hasHeia(r.navn);
           var cnt=getHeiaCount(r.navn);
           return '<div style="display:flex;flex-direction:column;align-items:center;gap:2px">'
-            + '<button id="hb-'+r.id+'" onclick="heiaClick(\''+r.id+'\')"'
+            + '<button id="hb-'+r.id+'" onclick="event.stopPropagation();heiaClick(\''+r.id+'\')"'
             + ' title="'+(already?'Du har heia!':'Klikk for \u00e5 heie!')+'"'
             + ' style="background:none;border:none;padding:0;font-size:16px;cursor:'+(already?'default':'pointer')+';transition:transform .2s;line-height:1">&#128588;</button>'
             + '<span id="hn-'+r.id+'" style="font-size:10px;color:var(--muted)">'+( cnt||'')+'</span>'
@@ -2368,6 +2420,98 @@ function toggleFin() {
   if (badge) badge.style.opacity = on ? '1' : '0';
   if (label) label.classList.toggle('fin-active', on);
 }
+
+// ─── MILEPÆLER + SPILLERKORT ─────────────────────────────────────────
+function milestoneState(navn) {
+  var mine = sales.filter(function(s){ return s.selger===navn; })
+                  .slice().sort(function(a,b){ return (a.ts||'').localeCompare(b.ts||''); });
+  var salgN = mine.length;
+  var finSales = mine.filter(function(s){ return s.finansiert; });
+  var finN = finSales.length;
+  var modelCounts = {};
+  mine.forEach(function(s){ modelCounts[s.modell] = (modelCounts[s.modell]||0) + 1; });
+
+  var now = Date.now();
+  var FRESH = 7*24*60*60*1000;
+  var fresh = false;
+  var achieved = [];
+
+  function tsAt(arr, n){ return arr[n-1] ? arr[n-1].ts : null; }
+  function isFresh(ts){ return ts && (now - new Date(ts).getTime() <= FRESH); }
+
+  for (var t=25; t<=salgN; t+=25) {
+    var cts = tsAt(mine, t), fr = isFresh(cts);
+    if (fr) fresh = true;
+    achieved.push({ icon:'\uD83C\uDFC5', label:t+' salg', ts:cts, fresh:fr });
+  }
+  for (var f=25; f<=finN; f+=25) {
+    var fts = tsAt(finSales, f), frf = isFresh(fts);
+    if (frf) fresh = true;
+    achieved.push({ icon:'\uD83D\uDCB0', label:f+' finansiert', ts:fts, fresh:frf });
+  }
+  Object.keys(modelCounts).forEach(function(mod){
+    var c = modelCounts[mod];
+    if (c < 100) return;
+    var modSales = mine.filter(function(s){ return s.modell===mod; });
+    for (var k=100; k<=c; k+=100) {
+      var mts = tsAt(modSales, k), frm = isFresh(mts);
+      if (frm) fresh = true;
+      achieved.push({ icon:'\uD83D\uDE99', label:k+' '+mod, ts:mts, fresh:frm });
+    }
+  });
+
+  achieved.sort(function(a,b){ return (b.ts||'').localeCompare(a.ts||''); });
+  var nextGoal = (Math.floor(salgN/25)+1)*25;
+  return { salgN:salgN, finN:finN, achieved:achieved, next:{ cur:salgN, goal:nextGoal }, fresh:fresh };
+}
+
+function openPlayerCard(id) {
+  var sObj = SELGERE.find(function(x){ return x.id===id; });
+  if (!sObj) return;
+  var navn = sObj.navn;
+  var ms = milestoneState(navn);
+  var poeng = ms.salgN*3 + bonusFor(navn, 'all');
+  var hasPhoto = typeof SELGER_PHOTOS !== 'undefined' && SELGER_PHOTOS[id];
+  var avInner = hasPhoto ? '<img src="'+SELGER_PHOTOS[id]+'">' : sObj.initials;
+
+  var badges = ms.achieved.length
+    ? ms.achieved.map(function(b){
+        return '<div class="pc-badge'+(b.fresh?' new':'')+'"><span class="bi">'+b.icon+'</span>'+b.label+'</div>';
+      }).join('')
+    : '<div class="pc-empty">Ingen milep\u00e6ler n\u00e5dd enn\u00e5 \u2014 f\u00f8rste er '+ms.next.goal+' salg.</div>';
+
+  var pct = Math.max(0, Math.min(100, Math.round(ms.next.cur/ms.next.goal*100)));
+  var remaining = ms.next.goal - ms.next.cur;
+
+  document.getElementById('pc-body').innerHTML =
+    '<div class="pc-head">'
+      + '<div class="pc-av" style="background:'+sObj.bg+';color:'+sObj.color+'">'+avInner+'</div>'
+      + '<div class="pc-name">'+navn+'</div>'
+      + '<div class="pc-dept">'+(LL[sObj.loc]||sObj.loc)+'</div>'
+    + '</div>'
+    + '<div class="pc-stats">'
+      + '<div class="pc-stat"><div class="n">'+ms.salgN+'</div><div class="l">Salg</div></div>'
+      + '<div class="pc-stat"><div class="n">'+ms.finN+'</div><div class="l">Finansiert</div></div>'
+      + '<div class="pc-stat"><div class="n">'+poeng+'</div><div class="l">Poeng</div></div>'
+    + '</div>'
+    + '<div class="pc-sec"><div class="pc-sec-h">Milep\u00e6ler</div><div class="pc-badges">'+badges+'</div></div>'
+    + '<div class="pc-sec"><div class="pc-sec-h">Neste milep\u00e6l</div>'
+      + '<div class="pc-next"><div class="pc-next-top"><div class="pc-next-name">'+ms.next.goal+' salg</div>'
+      + '<div class="pc-next-frac">'+ms.next.cur+' / '+ms.next.goal+'</div></div>'
+      + '<div class="pc-bar"><div class="pc-bar-fill" style="width:'+pct+'%"></div></div>'
+      + '<div class="pc-next-go">'+remaining+' salg unna</div></div></div>'
+    + '<div class="pc-sec"><div class="pc-sec-h">Form \u2014 siste salgsdager</div>'
+      + '<div class="form-dots">'+selgerDots(navn)+'</div></div>';
+
+  document.getElementById('pc-bd').classList.add('open');
+  document.getElementById('pc-sheet').classList.add('open');
+}
+
+function closePlayerCard(e){
+  document.getElementById('pc-bd').classList.remove('open');
+  document.getElementById('pc-sheet').classList.remove('open');
+}
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closePlayerCard(); });
 
 // ─── SPOTLIGHT-MODELL ────────────────────────────────────────────────
 function fetchSpotlight() {
