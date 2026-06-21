@@ -167,7 +167,7 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .pc-sheet.open{transform:translate(-50%,0)}
 .pc-grab{position:absolute;top:9px;left:50%;transform:translateX(-50%);z-index:5;width:38px;height:4px;border-radius:2px;background:rgba(255,255,255,.28);margin:0}
 .pc-x{position:absolute;top:11px;right:13px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.35);color:#fff;font-size:15px;cursor:pointer;z-index:5}
-.fc{position:relative}
+.fc{position:relative;overflow:hidden;border-radius:16px 16px 0 0}
 .fc-hero{position:relative;padding:30px 18px 18px;text-align:center;overflow:hidden;border-radius:16px 16px 0 0;border-bottom:1px solid rgba(255,215,0,.13);
   background:radial-gradient(85% 62% at 50% -4%, rgba(255,215,0,.16), transparent 56%),linear-gradient(180deg, var(--accentTint) 0%, transparent 64%),var(--card)}
 .fc-hero::before{content:"";position:absolute;inset:0;background:radial-gradient(130% 95% at 50% -14%, var(--accentGlow) 0%, transparent 60%)}
@@ -183,7 +183,10 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .fc-photo img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%)}
 .fc.fresh .fc-photo{animation:fcGlow 1.9s ease-in-out infinite}
 @keyframes fcGlow{0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 16px 3px rgba(255,215,0,.6),0 0 34px 8px rgba(255,180,0,.22)}}
-.fc-name{position:relative;z-index:2;font-family:'Anton',sans-serif;font-size:25px;letter-spacing:.5px;margin-top:11px;color:var(--txt)}
+.fc-name{position:relative;z-index:2;font-family:'Anton',sans-serif;font-size:25px;letter-spacing:.5px;margin-top:11px;
+  background:linear-gradient(135deg,#fff 0%,var(--gold) 42%,#fff 64%,var(--gold) 100%);background-size:220% auto;
+  -webkit-background-clip:text;background-clip:text;color:transparent;animation:fcNameShine 3.6s linear infinite}
+@keyframes fcNameShine{to{background-position:220% center}}
 .fc-dept{position:relative;z-index:2;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-top:3px;display:inline-flex;align-items:center;gap:6px}
 .fc-dept .dd{width:7px;height:7px;border-radius:50%;background:var(--accent)}
 .fc-tag{position:relative;z-index:2;display:inline-block;margin-top:10px;font-family:'Cinzel',serif;font-weight:700;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.35);border-radius:20px;padding:5px 14px}
@@ -220,7 +223,15 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .fc-skjerf{margin:18px 18px 6px;width:calc(100% - 36px);padding:13px;border:none;border-radius:10px;cursor:pointer;font-family:'Anton',sans-serif;font-size:14px;letter-spacing:1px;text-transform:uppercase;color:#000;background:linear-gradient(135deg,#fff 0%,var(--gold) 45%,#e0b400 100%)}
 .rv{opacity:0;transform:translateY(14px)}
 .rv.in{opacity:1;transform:none;transition:opacity .5s ease,transform .5s cubic-bezier(.2,.8,.2,1)}
-@media(prefers-reduced-motion:reduce){.fc *{animation:none!important}.fc .rv{opacity:1;transform:none}.fc-bar-fill{transition:none}}
+/* åpne-flimmer: tre raske sveip over hele kortet */
+.fc-sheen{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}
+.fc-sheen::before{content:"";position:absolute;top:-10%;bottom:-10%;width:55%;left:-60%;transform:skewX(-18deg);
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.20),transparent);animation:fcSheen 1.5s ease-in-out .12s both}
+@keyframes fcSheen{0%{left:-60%}20%{left:130%}36%{left:-60%}56%{left:130%}72%{left:-60%}92%,100%{left:130%}}
+/* foto-ping: to gull-ringer pulser ut ved åpning */
+.fc-photo-wrap::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--gold);opacity:0;pointer-events:none;animation:fcPing 1.5s ease-out .2s 2}
+@keyframes fcPing{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.4);opacity:0}}
+@media(prefers-reduced-motion:reduce){.fc *{animation:none!important}.fc .rv{opacity:1;transform:none}.fc-bar-fill{transition:none}.fc-sheen::before,.fc-photo-wrap::after,.fc-name{animation:none!important}}
 .hdr-btn{background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.35);border-radius:4px;
   padding:0 10px;height:28px;color:var(--gold);font-size:11px;cursor:pointer;font-weight:700;
   flex-shrink:0;white-space:nowrap;display:flex;align-items:center;gap:5px}
@@ -2513,6 +2524,7 @@ function openPlayerCard(id) {
 
   document.getElementById('pc-body').innerHTML =
     '<div class="fc'+(ms.fresh?' fresh':'')+'" style="--accent:'+sObj.color+';--accentBg:'+sObj.bg+';--accentGlow:'+(GLOW[loc]||'rgba(255,215,0,.18)')+';--accentTint:'+(TINT[loc]||'rgba(255,215,0,.12)')+';--rankCol:'+rankCol+'">'
+    + '<div class="fc-sheen"></div>'
     + '<div class="fc-hero">'
       + '<div class="fc-rating rv"><div class="r-n" data-count="'+poeng+'">0</div><div class="r-l">Poeng</div></div>'
       + '<div class="fc-photo-wrap rv"><div class="fc-photo">'+avInner+'</div><span class="fc-rank-badge">'+rankSym+'</span></div>'
@@ -2523,7 +2535,7 @@ function openPlayerCard(id) {
     + '<div class="fc-strip rv">'
       + '<div class="fc-st"><div class="n" data-count="'+ms.salgN+'">0</div><div class="l">Salg</div></div>'
       + '<div class="fc-st"><div class="n" data-count="'+fin+'">0</div><div class="l">Finansiert</div></div>'
-      + '<div class="fc-st"><div class="n">#'+rank+'</div><div class="l">Plassering</div></div>'
+      + '<div class="fc-st"><div class="n" style="color:'+rankCol+'">#'+rank+'</div><div class="l">Plassering</div></div>'
     + '</div>'
     + '<div class="fc-sec rv"><div class="fc-sec-h">Prestasjoner</div><div class="fc-badges">'+badges+'</div></div>'
     + '<div class="fc-sec rv"><div class="fc-sec-h">Neste milep\u00e6l</div>'
