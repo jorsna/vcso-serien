@@ -110,6 +110,46 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
   border-radius:8px;vertical-align:middle;margin-left:6px}
 .badge-selger{background:rgba(255,215,0,.15);color:var(--gold);border:1px solid rgba(255,215,0,.3)}
 .badge-tilskuer{background:rgba(90,120,152,.15);color:var(--muted);border:1px solid var(--b1)}
+.badge-admin{background:rgba(255,215,0,.15);color:var(--gold);border:1px solid var(--gold)}
+/* ── SPOTLIGHT BANNER ── */
+.sp-banner{display:flex;align-items:center;gap:12px;padding:11px 16px;position:relative;overflow:hidden;
+  background:linear-gradient(100deg,var(--card) 0%,#1a2438 45%,var(--card) 100%);border-bottom:1px solid var(--b1)}
+.sp-banner::before{content:"";position:absolute;inset:0;background-size:220% 100%;animation:spShine 4.5s linear infinite;
+  background:linear-gradient(100deg,transparent 30%,rgba(255,215,0,.13) 50%,transparent 70%)}
+@keyframes spShine{to{background-position:-220% 0}}
+.sp-ico{width:34px;height:34px;border-radius:8px;background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.35);
+  display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;position:relative;z-index:1}
+.sp-txt{position:relative;z-index:1;flex:1;min-width:0}
+.sp-lbl{font-size:8.5px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1.2px}
+.sp-mod{font-family:'Anton',sans-serif;font-size:20px;letter-spacing:1px;line-height:1.05;margin-top:1px;color:var(--txt)}
+.sp-my{font-size:12px;color:#000;background:var(--gold);border-radius:4px;padding:1px 6px;vertical-align:middle;margin-left:5px;letter-spacing:.5px}
+.sp-sub{font-size:9.5px;color:var(--muted);margin-top:2px}
+.sp-pts{position:relative;z-index:1;font-family:'Anton',sans-serif;font-size:22px;color:#000;background:var(--gold);border-radius:7px;padding:5px 11px;line-height:1;flex-shrink:0}
+/* ── SPOTLIGHT ADMIN ── */
+.sp-admin{margin:0 14px 14px;background:var(--card2);border:1px solid var(--b1);border-radius:10px;padding:13px}
+.sp-admin-h{font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.sp-admin-h span{color:var(--muted);font-weight:500;text-transform:none;letter-spacing:0}
+.sp-admin-status{font-size:11px;color:var(--silver);background:var(--bg);border:1px solid var(--b1);border-radius:6px;padding:7px 9px;margin-bottom:10px}
+.sp-admin-row{display:flex;gap:8px;margin-bottom:9px}
+.sp-admin-row select,.sp-admin-row input{flex:1;min-width:0;background:var(--bg);color:var(--txt);border:1px solid var(--b1);border-radius:6px;padding:9px;font-family:'Barlow',sans-serif;font-size:13px}
+.sp-admin-row2{display:flex;gap:8px;align-items:stretch}
+.sp-bonus-seg{display:flex;border:1px solid var(--b1);border-radius:6px;overflow:hidden;flex:0 0 96px}
+.sp-bonus-seg button{flex:1;background:var(--bg);color:var(--muted);border:none;font-family:'Anton',sans-serif;font-size:14px;cursor:pointer}
+.sp-bonus-seg button.on{background:var(--gold);color:#000}
+.sp-save{flex:1;background:var(--gold);color:#000;border:none;border-radius:6px;font-family:'Anton',sans-serif;font-size:13px;letter-spacing:.5px;cursor:pointer;text-transform:uppercase;padding:9px}
+.sp-clear{width:100%;margin-top:9px;background:transparent;color:var(--muted);border:1px solid var(--b1);border-radius:6px;padding:8px;font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;text-transform:uppercase}
+/* ── BONUS POPUP ── */
+.sp-pop-bd{position:fixed;inset:0;background:rgba(0,0,0,.66);z-index:400;display:none;align-items:center;justify-content:center;padding:24px}
+.sp-pop-bd.open{display:flex}
+.sp-pop{width:100%;max-width:330px;background:var(--card);border:1px solid var(--b1);border-top:3px solid var(--gold);border-radius:14px;padding:20px 18px;text-align:center}
+.sp-pop-ico{font-size:30px}
+.sp-pop-q{font-family:'Anton',sans-serif;font-size:20px;margin-top:8px;letter-spacing:.5px;color:var(--txt)}
+.sp-pop-ctx{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.45}
+.sp-pop-ctx b{color:var(--gold)}
+.sp-pop-btns{display:flex;gap:10px;margin-top:18px}
+.sp-pop-btns button{flex:1;padding:13px;border-radius:8px;font-family:'Anton',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer;border:none}
+.sp-pop-yes{background:var(--gold);color:#000}
+.sp-pop-no{background:transparent;color:var(--muted);border:1px solid var(--b1)!important}
 .hdr-btn{background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.35);border-radius:4px;
   padding:0 10px;height:28px;color:var(--gold);font-size:11px;cursor:pointer;font-weight:700;
   flex-shrink:0;white-space:nowrap;display:flex;align-items:center;gap:5px}
@@ -685,6 +725,9 @@ html, body {
   </div>
 </div>
 
+<!-- SPOTLIGHT BANNER (vises kun når aktiv) -->
+<div class="sp-banner" id="sp-banner" style="display:none"></div>
+
 <!-- MATCHDAY BAR -->
 <div class="mbar">
   <div>
@@ -795,6 +838,32 @@ html, body {
     <div class="toast" id="toast"></div>
   </div>
 </div>
+
+<!-- SPOTLIGHT ADMIN (kun admin) -->
+<div class="sp-admin" id="sp-admin" style="display:none">
+  <div class="sp-admin-h">🎯 Spotlight-modell <span>· valgfritt — ikke hver uke</span></div>
+  <div class="sp-admin-status" id="sp-admin-status">Ingen aktiv spotlight</div>
+  <div class="sp-admin-row">
+    <select id="sp-mod">
+      <option value="">Modell...</option>
+      <option>EX30</option><option>EX40</option><option>EX60</option>
+      <option>EX90</option><option>EC40</option><option>ES90</option>
+      <option>XC40</option><option>XC60</option><option>XC90</option>
+    </select>
+    <input id="sp-my" type="text" placeholder="Årsmodell — tom = hele" autocomplete="off">
+  </div>
+  <div class="sp-admin-row2">
+    <div class="sp-bonus-seg" id="sp-bonus-seg">
+      <button type="button" onclick="spSetBonus(1,this)">+1</button>
+      <button type="button" class="on" onclick="spSetBonus(2,this)">+2</button>
+    </div>
+    <button class="sp-save" onclick="saveSpotlight()">Aktiver / lagre</button>
+  </div>
+  <button class="sp-clear" id="sp-clear" onclick="clearSpotlight()" style="display:none">Deaktiver spotlight</button>
+</div>
+
+<!-- BONUS-BIL POPUP -->
+<div class="sp-pop-bd" id="sp-pop-bd"><div class="sp-pop" id="sp-pop"></div></div>
 
 <!-- HOF VIEW -->
 <div class="view" id="view-hof">
@@ -1017,6 +1086,12 @@ var userRole    = null;   // 'selger' | 'tilskuer'
 var pushEnabled = false;
 var pendingDel  = null;
 var PASSORD     = 'vcso2026';
+var ADMIN_PASSORD = 'Salamander2026!';
+var isAdmin       = false;
+var activeSpotlight = null;
+var spBonus         = 2;
+var spPopCb         = null;
+var SPOT_API        = SUPABASE_URL + '/rest/v1/spotlight';
 
 // ─── SUPABASE ────────────────────────────────────────────────────────
 function sbH() {
@@ -1039,6 +1114,7 @@ function fetchSales() {
       updateMVP();
       autoSaveWeeklyWinner();
       autoSaveSeasonArchive();
+      fetchSpotlight();
     })
     .catch(function(e) { showStatus('Feil: ' + e.message, true); });
 }
@@ -1085,7 +1161,7 @@ function autoSaveWeeklyWinner() {
       weekSales.forEach(function(s){
         if(!stats[s.selger]) stats[s.selger] = { selger:s.selger, loc:s.loc, g:0, fin:0, pts:0, days:{} };
         var p = stats[s.selger];
-        p.g++; p.pts+=3;
+        p.g++; p.pts += 3 + (s.spotlight_bonus||0);
         if(s.finansiert) p.fin++;
         var d = (s.ts||'').substring(0,10);
         p.days[d] = (p.days[d]||0)+1;
@@ -1278,12 +1354,27 @@ function goalsFor(navn, m) {
     return s.selger === navn;
   }).length;
 }
+function bonusFor(navn, m) {
+  return sales.reduce(function(sum, s) {
+    if (m !== 'all' && s.mnd !== m) return sum;
+    if (s.selger !== navn) return sum;
+    return sum + (s.spotlight_bonus || 0);
+  }, 0);
+}
 function teamGoalsFor(teamId, m) {
   return sales.filter(function(s) {
     if (m !== 'all' && s.mnd !== m) return false;
     var sObj = SELGERE.find(function(x) { return x.navn === s.selger; });
     return sObj && sObj.loc === teamId;
   }).length;
+}
+function teamBonusFor(teamId, m) {
+  return sales.reduce(function(sum, s) {
+    if (m !== 'all' && s.mnd !== m) return sum;
+    var sObj = SELGERE.find(function(x) { return x.navn === s.selger; });
+    if (!sObj || sObj.loc !== teamId) return sum;
+    return sum + (s.spotlight_bonus || 0);
+  }, 0);
 }
 function teamGoal(teamId, m) {
   if (m === 'all') return (GOALS.mai[teamId] || 0) + (GOALS.jun[teamId] || 0);
@@ -1484,7 +1575,7 @@ function renderInd() {
     var g = goalsFor(s.navn, m);
     var thisWk = getWeekNum(new Date());
       var wk = sales.filter(function(x){ return x.selger===s.navn && !x.deleted && getWeekNum(new Date(x.ts))===thisWk; }).length;
-      return { navn:s.navn, loc:s.loc, id:s.id, initials:s.initials, color:s.color, bg:s.bg, g:g, pts:g*PTS, wk:wk };
+      return { navn:s.navn, loc:s.loc, id:s.id, initials:s.initials, color:s.color, bg:s.bg, g:g, pts:g*PTS + bonusFor(s.navn, m), wk:wk };
   }).map(function(s) {
     // Tell finansierte salg for tiebreaker
     var fin = sales.filter(function(x) {
@@ -1646,7 +1737,7 @@ function renderTeam() {
   var rows = TEAMS.map(function(t) {
     var g = teamGoalsFor(t.id, m);
     var members = SELGERE.filter(function(s) { return s.loc===t.id; }).length || 1;
-    var pts = g*PTS;
+    var pts = g*PTS + teamBonusFor(t.id, m);
     return { id:t.id, navn:t.navn, initials:t.initials, color:t.color, bg:t.bg, g:g, pts:pts, members:members, pps:pts/members };
   }).sort(function(a,b) { return b.pps-a.pps || b.pts-a.pts || b.g-a.g; });
 
@@ -2278,6 +2369,130 @@ function toggleFin() {
   if (label) label.classList.toggle('fin-active', on);
 }
 
+// ─── SPOTLIGHT-MODELL ────────────────────────────────────────────────
+function fetchSpotlight() {
+  fetch(SPOT_API + '?active=is.true&order=created_at.desc&limit=1', { headers: sbH() })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      activeSpotlight = (Array.isArray(data) && data.length) ? data[0] : null;
+      renderSpotlightBanner();
+      if (isAdmin) renderSpotlightAdmin();
+    })
+    .catch(function(){});
+}
+
+function renderSpotlightBanner() {
+  var el = document.getElementById('sp-banner');
+  if (!el) return;
+  if (!activeSpotlight) { el.style.display = 'none'; return; }
+  var s = activeSpotlight;
+  var myChip = s.arsmodell ? '<span class="sp-my">'+s.arsmodell+'</span>' : '';
+  var sub = s.arsmodell ? 'Kun denne \u00e5rsmodellen gir bonus' : 'Hele modellen gir bonus';
+  el.innerHTML =
+    '<div class="sp-ico">\uD83C\uDFAF</div>'
+    + '<div class="sp-txt"><div class="sp-lbl">Aktiv spotlight-modell</div>'
+    + '<div class="sp-mod">'+s.modell+myChip+'</div>'
+    + '<div class="sp-sub">'+sub+'</div></div>'
+    + '<div class="sp-pts">+'+s.bonus+'</div>';
+  el.style.display = 'flex';
+}
+
+function applyAdminUI() {
+  var sa = document.getElementById('sp-admin');
+  if (sa) sa.style.display = 'block';
+  updateRoleBadge();
+  renderSpotlightAdmin();
+}
+
+function spSetBonus(v, btn) {
+  spBonus = v;
+  var seg = document.getElementById('sp-bonus-seg');
+  if (seg) [].forEach.call(seg.querySelectorAll('button'), function(b){ b.classList.remove('on'); });
+  if (btn) btn.classList.add('on');
+}
+
+function renderSpotlightAdmin() {
+  var st = document.getElementById('sp-admin-status');
+  var clr = document.getElementById('sp-clear');
+  if (!st) return;
+  if (activeSpotlight) {
+    var s = activeSpotlight;
+    st.innerHTML = 'Aktiv: <b style="color:var(--gold)">'+s.modell+(s.arsmodell?' '+s.arsmodell:'')+'</b> \u00b7 +'+s.bonus;
+    var modSel = document.getElementById('sp-mod'); if (modSel) modSel.value = s.modell;
+    var myIn = document.getElementById('sp-my'); if (myIn) myIn.value = s.arsmodell || '';
+    spBonus = s.bonus;
+    var seg = document.getElementById('sp-bonus-seg');
+    if (seg) [].forEach.call(seg.querySelectorAll('button'), function(b){
+      b.classList.toggle('on', b.textContent.replace('+','') == String(s.bonus));
+    });
+    if (clr) clr.style.display = 'block';
+  } else {
+    st.textContent = 'Ingen aktiv spotlight';
+    if (clr) clr.style.display = 'none';
+  }
+}
+
+function saveSpotlight() {
+  var modell = document.getElementById('sp-mod').value;
+  var arsmodell = document.getElementById('sp-my').value.trim();
+  if (!modell) { toast('Velg en modell f\u00f8rst!'); return; }
+  var now = new Date();
+  var row = {
+    modell: modell,
+    arsmodell: arsmodell || null,
+    bonus: spBonus,
+    week_nr: getIsoWeek(now),
+    week_year: getIsoYear(now),
+    active: true
+  };
+  var btn = document.querySelector('.sp-save');
+  if (btn) { btn.disabled = true; btn.textContent = 'Lagrer...'; }
+  // Deaktiver eventuelle aktive f\u00f8rst, deretter sett ny
+  fetch(SPOT_API + '?active=is.true', {
+    method: 'PATCH', headers: sbH(), body: JSON.stringify({ active: false })
+  })
+  .then(function(){
+    return fetch(SPOT_API, { method: 'POST', headers: sbH(), body: JSON.stringify(row) });
+  })
+  .then(function(r){ if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+  .then(function(){
+    if (btn) { btn.disabled = false; btn.textContent = 'Aktiver / lagre'; }
+    toast('Spotlight aktivert: '+modell+(arsmodell?' '+arsmodell:'')+' (+'+spBonus+')');
+    fetchSpotlight();
+  })
+  .catch(function(e){
+    if (btn) { btn.disabled = false; btn.textContent = 'Aktiver / lagre'; }
+    toast('Feil ved lagring: '+e.message);
+  });
+}
+
+function clearSpotlight() {
+  fetch(SPOT_API + '?active=is.true', {
+    method: 'PATCH', headers: sbH(), body: JSON.stringify({ active: false })
+  })
+  .then(function(r){ if (!r.ok) throw new Error('HTTP '+r.status); })
+  .then(function(){ toast('Spotlight deaktivert.'); fetchSpotlight(); })
+  .catch(function(e){ toast('Feil: '+e.message); });
+}
+
+function askBonusBil(spot, cb) {
+  spPopCb = cb;
+  document.getElementById('sp-pop').innerHTML =
+    '<div class="sp-pop-ico">\uD83C\uDFAF</div>'
+    + '<div class="sp-pop-q">Var dette en bonusbil?</div>'
+    + '<div class="sp-pop-ctx">Spotlighten gjelder <b>'+spot.modell+' '+spot.arsmodell+'</b> (+'+spot.bonus+'). Var dette akkurat den \u00e5rsmodellen?</div>'
+    + '<div class="sp-pop-btns">'
+    + '<button class="sp-pop-no" onclick="spAnswer(false)">Nei</button>'
+    + '<button class="sp-pop-yes" onclick="spAnswer(true)">Ja \u2014 '+spot.arsmodell+'</button></div>';
+  document.getElementById('sp-pop-bd').classList.add('open');
+}
+
+function spAnswer(yes) {
+  document.getElementById('sp-pop-bd').classList.remove('open');
+  var cb = spPopCb; spPopCb = null;
+  if (cb) cb(yes);
+}
+
 function reg() {
   if (userRole !== 'selger') { toast('Logg inn som selger for \u00e5 registrere salg.'); return; }
   var selger = document.getElementById('sel-selger').value;
@@ -2293,10 +2508,28 @@ function reg() {
   var ts = now.getFullYear()+'-'+pad(mo)+'-'+pad(now.getDate())+'T'+pad(now.getHours())+':'+pad(now.getMinutes())+':00';
   var finansiert = document.getElementById('chk-fin').checked;
 
+  var saleObj = { selger:selger, modell:modell, loc:sObj.loc||'', mnd:mnd, ts:ts, finansiert:finansiert, spotlight_bonus:0 };
+
+  if (activeSpotlight && activeSpotlight.modell === modell) {
+    if (activeSpotlight.arsmodell) {
+      askBonusBil(activeSpotlight, function(isBonus) {
+        saleObj.spotlight_bonus = isBonus ? activeSpotlight.bonus : 0;
+        finalizeReg(saleObj, selger, modell, sObj);
+      });
+      return;
+    }
+    saleObj.spotlight_bonus = activeSpotlight.bonus;
+  }
+  finalizeReg(saleObj, selger, modell, sObj);
+}
+
+function finalizeReg(saleObj, selger, modell, sObj) {
+  var bonus = saleObj.spotlight_bonus || 0;
+  var totalPts = 3 + bonus;
   var btn = document.getElementById('reg-btn');
   btn.disabled = true; btn.textContent = 'Lagrer...';
 
-  insertSale({ selger:selger, modell:modell, loc:sObj.loc||'', mnd:mnd, ts:ts, finansiert:finansiert }, function(err) {
+  insertSale(saleObj, function(err) {
     btn.disabled = false; btn.textContent = 'Registrer scoring \u2014 +3 poeng!';
     if (err) { toast('Feil ved lagring: ' + err.message); return; }
 
@@ -2316,7 +2549,7 @@ function reg() {
 
     var total = sales.filter(function(s) { return s.selger === selger; }).length;
     var name = selger.split(' ')[0];
-    toast(name + ' SCORER! +3 poeng! ' + total + ' m\u00e5l totalt!');
+    toast(name + ' SCORER! +' + totalPts + ' poeng!' + (bonus ? ' (spotlight +'+bonus+')' : '') + ' ' + total + ' m\u00e5l totalt!');
     launchKonfetti(LC[sObj.loc] || '#ffd700');
     sendPush(selger, modell, sObj.loc);
     renderAll();
@@ -2411,7 +2644,10 @@ function closeIntro() {
 function updateRoleBadge() {
   var b = document.getElementById('role-badge');
   if (!b) return;
-  if (userRole === 'selger') {
+  if (isAdmin) {
+    b.className = 'login-badge badge-admin';
+    b.textContent = '\uD83D\uDC51 Admin';
+  } else if (userRole === 'selger') {
     b.className = 'login-badge badge-selger';
     b.textContent = '\u26bd Selger';
   } else {
@@ -2439,6 +2675,8 @@ function enterAsSelger() {
 
 function enterAsGuest() {
   userRole = 'tilskuer';
+  isAdmin = false;
+  sessionStorage.removeItem('vcso-admin');
   sessionStorage.setItem('vcso-role', 'tilskuer');
   closeIntro();
   var ro = document.getElementById('reg-outer');
@@ -2454,6 +2692,11 @@ function tryLogin() {
   var pw = document.getElementById('pw-input').value;
   if (pw === PASSORD) {
     enterAsSelger();
+  } else if (pw === ADMIN_PASSORD) {
+    isAdmin = true;
+    sessionStorage.setItem('vcso-admin', '1');
+    enterAsSelger();
+    applyAdminUI();
   } else {
     var err = document.getElementById('pw-err');
     if (err) {
@@ -2478,7 +2721,8 @@ setInterval(countdown, 1000);
 // Restore session
 (function() {
   var saved = sessionStorage.getItem('vcso-role');
-  if (saved === 'selger')    { enterAsSelger(); }
+  if (sessionStorage.getItem('vcso-admin') === '1') { isAdmin = true; enterAsSelger(); applyAdminUI(); }
+  else if (saved === 'selger')    { enterAsSelger(); }
   else if (saved === 'tilskuer') { enterAsGuest(); }
   // else: show intro/login screen
 })();
