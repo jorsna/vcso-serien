@@ -497,14 +497,14 @@ function visTekst(row) {
   var statsHtml = '';
   if (stats) {
     statsHtml = '<div class="stats-box">'
-      + (stats.totalt ? '<div class="stat-item"><div class="stat-n">'+stats.totalt+'</div><div class="stat-l">Salg totalt i VCSO i går</div></div>' : '')
-      + (stats.mvp ? '<div class="stat-item"><div class="stat-n" style="font-size:18px">'+stats.mvp+'</div><div class="stat-l">MVP</div></div>' : '')
+      + (stats.totalt ? '<div class="stat-item"><div class="stat-n">'+stats.totalt+'</div><div class="stat-l">'+(stats.ukesvinner?'Biler signert i uken':'Salg totalt i VCSO i går')+'</div></div>' : '')
+      + (stats.mvp ? '<div class="stat-item"><div class="stat-n" style="font-size:18px">'+stats.mvp+'</div><div class="stat-l">'+(stats.ukesvinner?'Ukens vinner':'MVP')+'</div></div>' : '')
       + (stats.topAvd ? '<div class="stat-item"><div class="stat-n" style="font-size:18px">'+stats.topAvd+'</div><div class="stat-l">Ledende avd.</div></div>' : '')
       + (stats.hatTrick ? '<div class="stat-item"><div class="stat-n">⭐</div><div class="stat-l">Hat-trick</div></div>' : '')
       + '</div>';
   }
 
-  var photoHtml = (stats && stats.mvpNavn) ? mvpFotoHtml(stats.mvpNavn, stats.mvpAvd) : '';
+  var photoHtml = (stats && stats.mvpNavn) ? mvpFotoHtml(stats.mvpNavn, stats.mvpAvd, (stats.ukesvinner ? (stats.vinnerAntall>1?'Ukens vinnere':'Ukens vinner') : 'MVP')) : '';
 
   var avsnittsHtml = avsnitt.map(function(a, i) {
     if (a.startsWith('«') || a.startsWith('"')) {
@@ -548,10 +548,10 @@ function gzSlug(navn) {
 function gzInitials(navn) {
   return String(navn).split(' ').map(function(x){ return x[0]||''; }).join('').slice(0,2).toUpperCase();
 }
-function mvpFotoHtml(navn, avd) {
+function mvpFotoHtml(navn, avd, label) {
   if (!navn) return '';
   var id = gzSlug(navn);
-  var cap = 'MVP: ' + escHtml(navn) + (avd ? ', ' + escHtml(avd) : '');
+  var cap = (label || 'MVP') + ': ' + escHtml(navn) + (avd ? ', ' + escHtml(avd) : '');
   return '<span class="mvp-photo"><span class="frame"><span class="duo">'
     + '<span class="init">' + gzInitials(navn) + '</span>'
     + '<img src="photos/' + id + '.jpg" alt="" onerror="this.remove()">'
@@ -662,7 +662,8 @@ function genererUkesvinnerTekst(R){
     var clean=raw; var jm=raw.match(/\{[\s\S]*\}/); if(jm) clean=jm[0]; else clean=raw.replace(/```json|```/g,'').trim();
     var parsed=JSON.parse(clean);
     if(!parsed.overskrift) throw new Error('Mangler overskrift. Svar: '+clean);
-    parsed.stats={ uke:b.weekNr, ar:b.weekYear, totalt:R.total, vinnere:R.winners.map(function(w){return w.selger;}), finansiert:R.finTot, ukesvinner:true };
+    var _topAvd=null,_tp=-1; R.depKeys.forEach(function(k){ if(R.dep[k].pts>_tp){_tp=R.dep[k].pts;_topAvd=avdNavnUke(k);} });
+    parsed.stats={ ukesvinner:true, uke:b.weekNr, ar:b.weekYear, totalt:R.total, mvp:(R.winners.length?R.winners.map(function(w){return w.selger;}).join(' & '):null), mvpNavn:(R.winners.length?R.winners[0].selger:null), mvpAvd:(R.winners.length?avdNavnUke(R.winners[0].loc):null), vinnerAntall:R.winners.length, topAvd:_topAvd, hatTrick:R.hatTricks.length>0, finansiert:R.finTot, vinnere:R.winners.map(function(w){return w.selger;}) };
     return parsed;
   });
 }
