@@ -138,6 +138,15 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .sp-bonus-seg button.on{background:var(--gold);color:#000}
 .sp-save{flex:1;background:var(--gold);color:#000;border:none;border-radius:6px;font-family:'Anton',sans-serif;font-size:13px;letter-spacing:.5px;cursor:pointer;text-transform:uppercase;padding:9px}
 .sp-clear{width:100%;margin-top:9px;background:transparent;color:var(--muted);border:1px solid var(--b1);border-radius:6px;padding:8px;font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;text-transform:uppercase}
+.sp-add{flex:0 0 auto;padding:0 14px;background:rgba(255,255,255,.06);color:var(--gold);border:1px solid var(--gold);border-radius:6px;font-family:'Barlow',sans-serif;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap}
+.sp-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px;min-height:4px}
+.sp-chips-empty{font-size:11px;color:var(--muted);opacity:.7}
+.sp-chip{display:inline-flex;align-items:center;gap:7px;background:var(--bg);border:1px solid var(--b1);border-radius:100px;padding:4px 7px 4px 11px;font-size:12px;color:var(--txt)}
+.sp-chip button{width:17px;height:17px;border-radius:50%;border:none;background:rgba(255,255,255,.14);color:var(--txt);font-size:12px;line-height:1;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center}
+.sp-krit-in{width:100%;box-sizing:border-box;background:var(--bg);color:var(--txt);border:1px solid var(--b1);border-radius:6px;padding:9px;font-family:'Barlow',sans-serif;font-size:13px;margin-bottom:9px}
+.sp-admin-dates{display:flex;gap:8px;margin-bottom:9px}
+.sp-admin-dates label{flex:1;display:flex;flex-direction:column;gap:3px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.sp-admin-dates input{width:100%;box-sizing:border-box;background:var(--bg);color:var(--txt);border:1px solid var(--b1);border-radius:6px;padding:8px;font-family:'Barlow',sans-serif;font-size:12px;color-scheme:dark}
 /* ── BONUS POPUP ── */
 .sp-pop-bd{position:fixed;inset:0;background:rgba(0,0,0,.66);z-index:10000;display:none;align-items:center;justify-content:center;padding:24px}
 .sp-pop-bd.open{display:flex}
@@ -888,16 +897,28 @@ html, body {
 
 <!-- SPOTLIGHT ADMIN (kun admin) -->
 <div class="sp-admin" id="sp-admin" style="display:none">
-  <div class="sp-admin-h">🎯 Spotlight-modell <span>· valgfritt — ikke hver uke</span></div>
+  <div class="sp-admin-h">🎯 Spotlight <span>· valgfritt — flere modeller, kriterium og periode</span></div>
   <div class="sp-admin-status" id="sp-admin-status">Ingen aktiv spotlight</div>
   <div class="sp-admin-row">
     <select id="sp-mod">
-      <option value="">Modell...</option>
-      <option>EX30</option><option>EX40</option><option>EX60</option>
-      <option>EX90</option><option>EC40</option><option>ES90</option>
-      <option>XC40</option><option>XC60</option><option>XC90</option>
+      <option value="">Velg modell...</option>
+      <option>EX30</option>
+      <option>EX40</option>
+      <option>EX60</option>
+      <option>EX90</option>
+      <option>EC40</option>
+      <option>ES90</option>
+      <option>XC40</option>
+      <option>XC60</option>
+      <option>XC90</option>
     </select>
-    <input id="sp-my" type="text" placeholder="Årsmodell — tom = hele" autocomplete="off">
+    <button type="button" class="sp-add" onclick="spAddModel()">Legg til</button>
+  </div>
+  <div class="sp-chips" id="sp-chips"><span class="sp-chips-empty">Ingen modeller valgt</span></div>
+  <input id="sp-krit" type="text" class="sp-krit-in" autocomplete="off" placeholder="Kriterium — f.eks. MY26 (tom = hele modellen)">
+  <div class="sp-admin-dates">
+    <label>Start<input id="sp-start" type="datetime-local"></label>
+    <label>Slutt<input id="sp-end" type="datetime-local"></label>
   </div>
   <div class="sp-admin-row2">
     <div class="sp-bonus-seg" id="sp-bonus-seg">
@@ -1145,6 +1166,7 @@ var PASSORD     = 'vcso2026';
 var ADMIN_PASSORD = 'Salamander2026!';
 var isAdmin       = false;
 var activeSpotlight = null;
+var spModels       = [];
 var spBonus         = 2;
 var spPopCb         = null;
 var SPOT_API        = SUPABASE_URL + '/rest/v1/spotlight';
@@ -2576,11 +2598,26 @@ function closePlayerCard(e){
 document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closePlayerCard(); });
 
 // ─── SPOTLIGHT-MODELL ────────────────────────────────────────────────
+function spotModels(s){ return (s && s.modeller && s.modeller.length) ? s.modeller : (s && s.modell ? [s.modell] : []); }
+function spotKrit(s){ return s ? (s.kriterium || s.arsmodell || '') : ''; }
+function spotWithin(s){
+  if (!s) return false;
+  var now = Date.now();
+  if (s.start_ts && now < new Date(s.start_ts).getTime()) return false;
+  if (s.end_ts && now > new Date(s.end_ts).getTime()) return false;
+  return true;
+}
+function spotlightFor(modell){
+  if (!activeSpotlight || !spotWithin(activeSpotlight)) return null;
+  return spotModels(activeSpotlight).indexOf(modell) !== -1 ? activeSpotlight : null;
+}
+
 function fetchSpotlight() {
   fetch(SPOT_API + '?active=is.true&order=created_at.desc&limit=1', { headers: sbH() })
     .then(function(r){ return r.json(); })
     .then(function(data){
-      activeSpotlight = (Array.isArray(data) && data.length) ? data[0] : null;
+      var row = (Array.isArray(data) && data.length) ? data[0] : null;
+      activeSpotlight = (row && spotWithin(row)) ? row : null;
       renderSpotlightBanner();
       if (isAdmin) renderSpotlightAdmin();
     })
@@ -2591,13 +2628,13 @@ function renderSpotlightBanner() {
   var el = document.getElementById('sp-banner');
   if (!el) return;
   if (!activeSpotlight) { el.style.display = 'none'; return; }
-  var s = activeSpotlight;
-  var myChip = s.arsmodell ? '<span class="sp-my">'+s.arsmodell+'</span>' : '';
-  var sub = s.arsmodell ? 'Kun denne \u00e5rsmodellen gir bonus' : 'Hele modellen gir bonus';
+  var s = activeSpotlight, mods = spotModels(s), krit = spotKrit(s);
+  var kChip = krit ? '<span class="sp-my">'+krit+'</span>' : '';
+  var sub = krit ? ('Kun ' + krit + ' gir bonus') : 'Alle disse modellene gir bonus';
   el.innerHTML =
     '<div class="sp-ico">\uD83C\uDFAF</div>'
-    + '<div class="sp-txt"><div class="sp-lbl">Aktiv spotlight-modell</div>'
-    + '<div class="sp-mod">'+s.modell+myChip+'</div>'
+    + '<div class="sp-txt"><div class="sp-lbl">Aktiv spotlight</div>'
+    + '<div class="sp-mod">'+mods.join(', ')+kChip+'</div>'
     + '<div class="sp-sub">'+sub+'</div></div>'
     + '<div class="sp-pts">+'+s.bonus+'</div>';
   el.style.display = 'flex';
@@ -2617,53 +2654,66 @@ function spSetBonus(v, btn) {
   if (btn) btn.classList.add('on');
 }
 
+function spPadDT(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes()); }
+function renderSpChips(){
+  var box = document.getElementById('sp-chips'); if (!box) return;
+  if (!spModels.length){ box.innerHTML = '<span class="sp-chips-empty">Ingen modeller valgt</span>'; return; }
+  box.innerHTML = spModels.map(function(m){
+    return '<span class="sp-chip">'+m+'<button type="button" onclick="spRemoveModel(\''+m+'\')" aria-label="Fjern">\u00d7</button></span>';
+  }).join('');
+}
+function spAddModel(){
+  var sel = document.getElementById('sp-mod'); if (!sel || !sel.value) return;
+  if (spModels.indexOf(sel.value) === -1) spModels.push(sel.value);
+  sel.value = '';
+  renderSpChips();
+}
+function spRemoveModel(m){
+  spModels = spModels.filter(function(x){ return x !== m; });
+  renderSpChips();
+}
+
 function renderSpotlightAdmin() {
   var st = document.getElementById('sp-admin-status');
   var clr = document.getElementById('sp-clear');
   if (!st) return;
   if (activeSpotlight) {
-    var s = activeSpotlight;
-    st.innerHTML = 'Aktiv: <b style="color:var(--gold)">'+s.modell+(s.arsmodell?' '+s.arsmodell:'')+'</b> \u00b7 +'+s.bonus;
-    var modSel = document.getElementById('sp-mod'); if (modSel) modSel.value = s.modell;
-    var myIn = document.getElementById('sp-my'); if (myIn) myIn.value = s.arsmodell || '';
-    spBonus = s.bonus;
-    var seg = document.getElementById('sp-bonus-seg');
-    if (seg) [].forEach.call(seg.querySelectorAll('button'), function(b){
-      b.classList.toggle('on', b.textContent.replace('+','') == String(s.bonus));
-    });
+    var s = activeSpotlight, mods = spotModels(s), krit = spotKrit(s);
+    st.innerHTML = 'Aktiv: <b style="color:var(--gold)">'+mods.join(', ')+(krit?' \u00b7 '+krit:'')+'</b> \u00b7 +'+s.bonus;
     if (clr) clr.style.display = 'block';
   } else {
     st.textContent = 'Ingen aktiv spotlight';
     if (clr) clr.style.display = 'none';
   }
+  spModels = activeSpotlight ? spotModels(activeSpotlight).slice() : [];
+  renderSpChips();
+  var kr = document.getElementById('sp-krit'); if (kr) kr.value = activeSpotlight ? spotKrit(activeSpotlight) : '';
+  var s1 = document.getElementById('sp-start'), s2 = document.getElementById('sp-end');
+  var now = new Date(), later = new Date(now.getTime()+7*24*60*60*1000);
+  if (s1) s1.value = (activeSpotlight && activeSpotlight.start_ts) ? spPadDT(new Date(activeSpotlight.start_ts)) : spPadDT(now);
+  if (s2) s2.value = (activeSpotlight && activeSpotlight.end_ts) ? spPadDT(new Date(activeSpotlight.end_ts)) : spPadDT(later);
+  spBonus = activeSpotlight ? activeSpotlight.bonus : spBonus;
+  var seg = document.getElementById('sp-bonus-seg');
+  if (seg) [].forEach.call(seg.querySelectorAll('button'), function(b){ b.classList.toggle('on', b.textContent.replace('+','') == String(spBonus)); });
 }
 
 function saveSpotlight() {
-  var modell = document.getElementById('sp-mod').value;
-  var arsmodell = document.getElementById('sp-my').value.trim();
-  if (!modell) { toast('Velg en modell f\u00f8rst!'); return; }
+  if (!spModels.length) { toast('Legg til minst \u00e9n modell!'); return; }
+  var krit = document.getElementById('sp-krit').value.trim();
+  var sv = document.getElementById('sp-start').value, ev = document.getElementById('sp-end').value;
+  var startISO = sv ? new Date(sv).toISOString() : null;
+  var endISO = ev ? new Date(ev).toISOString() : null;
+  if (startISO && endISO && new Date(endISO) <= new Date(startISO)) { toast('Slutt m\u00e5 v\u00e6re etter start!'); return; }
   var now = new Date();
-  var row = {
-    modell: modell,
-    arsmodell: arsmodell || null,
-    bonus: spBonus,
-    week_nr: getIsoWeek(now),
-    week_year: getIsoYear(now),
-    active: true
-  };
+  var row = { modeller: spModels.slice(), kriterium: krit || null, bonus: spBonus, start_ts: startISO, end_ts: endISO, week_nr: getIsoWeek(now), week_year: getIsoYear(now), active: true };
   var btn = document.querySelector('.sp-save');
   if (btn) { btn.disabled = true; btn.textContent = 'Lagrer...'; }
-  // Deaktiver eventuelle aktive f\u00f8rst, deretter sett ny
-  fetch(SPOT_API + '?active=is.true', {
-    method: 'PATCH', headers: sbH(), body: JSON.stringify({ active: false })
-  })
-  .then(function(){
-    return fetch(SPOT_API, { method: 'POST', headers: sbH(), body: JSON.stringify(row) });
-  })
-  .then(function(r){ if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+  fetch(SPOT_API + '?active=is.true', { method: 'PATCH', headers: sbH(), body: JSON.stringify({ active: false }) })
+  .then(function(){ return fetch(SPOT_API, { method: 'POST', headers: sbH(), body: JSON.stringify(row) }); })
+  .then(function(r){ if (!r.ok) return r.text().then(function(t){ throw new Error('HTTP '+r.status+': '+t); }); })
   .then(function(){
     if (btn) { btn.disabled = false; btn.textContent = 'Aktiver / lagre'; }
-    toast('Spotlight aktivert: '+modell+(arsmodell?' '+arsmodell:'')+' (+'+spBonus+')');
+    toast('Spotlight aktivert: '+spModels.join(', ')+(krit?' \u00b7 '+krit:'')+' (+'+spBonus+')');
     fetchSpotlight();
   })
   .catch(function(e){
@@ -2673,9 +2723,7 @@ function saveSpotlight() {
 }
 
 function clearSpotlight() {
-  fetch(SPOT_API + '?active=is.true', {
-    method: 'PATCH', headers: sbH(), body: JSON.stringify({ active: false })
-  })
+  fetch(SPOT_API + '?active=is.true', { method: 'PATCH', headers: sbH(), body: JSON.stringify({ active: false }) })
   .then(function(r){ if (!r.ok) throw new Error('HTTP '+r.status); })
   .then(function(){ toast('Spotlight deaktivert.'); fetchSpotlight(); })
   .catch(function(e){ toast('Feil: '+e.message); });
@@ -2683,13 +2731,14 @@ function clearSpotlight() {
 
 function askBonusBil(spot, cb) {
   spPopCb = cb;
+  var krit = spotKrit(spot);
   document.getElementById('sp-pop').innerHTML =
     '<div class="sp-pop-ico">\uD83C\uDFAF</div>'
     + '<div class="sp-pop-q">Var dette en bonusbil?</div>'
-    + '<div class="sp-pop-ctx">Spotlighten gjelder <b>'+spot.modell+' '+spot.arsmodell+'</b> (+'+spot.bonus+'). Var dette akkurat den \u00e5rsmodellen?</div>'
+    + '<div class="sp-pop-ctx">Spotlighten gjelder <b>'+krit+'</b> (+'+spot.bonus+'). Oppfyller bilen kriteriet?</div>'
     + '<div class="sp-pop-btns">'
     + '<button class="sp-pop-no" onclick="spAnswer(false)">Nei</button>'
-    + '<button class="sp-pop-yes" onclick="spAnswer(true)">Ja \u2014 '+spot.arsmodell+'</button></div>';
+    + '<button class="sp-pop-yes" onclick="spAnswer(true)">Ja \u2014 '+krit+'</button></div>';
   document.getElementById('sp-pop-bd').classList.add('open');
 }
 
@@ -2716,15 +2765,16 @@ function reg() {
 
   var saleObj = { selger:selger, modell:modell, loc:sObj.loc||'', mnd:mnd, ts:ts, finansiert:finansiert, spotlight_bonus:0 };
 
-  if (activeSpotlight && activeSpotlight.modell === modell) {
-    if (activeSpotlight.arsmodell) {
-      askBonusBil(activeSpotlight, function(isBonus) {
-        saleObj.spotlight_bonus = isBonus ? activeSpotlight.bonus : 0;
+  var spot = spotlightFor(modell);
+  if (spot) {
+    if (spotKrit(spot)) {
+      askBonusBil(spot, function(isBonus) {
+        saleObj.spotlight_bonus = isBonus ? spot.bonus : 0;
         finalizeReg(saleObj, selger, modell, sObj);
       });
       return;
     }
-    saleObj.spotlight_bonus = activeSpotlight.bonus;
+    saleObj.spotlight_bonus = spot.bonus;
   }
   finalizeReg(saleObj, selger, modell, sObj);
 }
