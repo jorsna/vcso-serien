@@ -161,11 +161,11 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 /* ── SPILLERKORT ── */
 .pc-bd{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10000;opacity:0;pointer-events:none;transition:opacity .25s}
 .pc-bd.open{opacity:1;pointer-events:auto}
-.pc-sheet{position:fixed;left:50%;bottom:0;transform:translate(-50%,100%);width:100%;max-width:520px;
-  background:var(--card);border-top:3px solid var(--gold);border-radius:18px 18px 0 0;
-  transition:transform .3s cubic-bezier(.2,.8,.2,1);max-height:88vh;overflow-y:auto;padding-bottom:24px;z-index:10001}
-.pc-sheet.open{transform:translate(-50%,0)}
-.pc-grab{position:absolute;top:9px;left:50%;transform:translateX(-50%);z-index:5;width:38px;height:4px;border-radius:2px;background:rgba(255,255,255,.28);margin:0}
+.pc-sheet{position:fixed;left:50%;top:50%;transform:translate(-50%,-48%) scale(.92);width:calc(100% - 32px);max-width:420px;
+  background:var(--card);border:1px solid rgba(255,255,255,.08);border-top:3px solid var(--gold);border-radius:18px;opacity:0;
+  transition:transform .34s cubic-bezier(.2,.8,.2,1),opacity .26s;max-height:90vh;overflow-y:auto;padding-bottom:24px;z-index:10001}
+.pc-sheet.open{transform:translate(-50%,-50%) scale(1);opacity:1}
+.pc-grab{display:none;position:absolute;top:9px;left:50%;transform:translateX(-50%);z-index:5;width:38px;height:4px;border-radius:2px;background:rgba(255,255,255,.28);margin:0}
 .pc-x{position:absolute;top:11px;right:13px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.35);color:#fff;font-size:15px;cursor:pointer;z-index:5}
 .fc{position:relative;overflow:hidden;border-radius:16px 16px 0 0}
 .fc-hero{position:relative;padding:30px 18px 18px;text-align:center;overflow:hidden;border-radius:16px 16px 0 0;border-bottom:1px solid rgba(255,215,0,.13);
@@ -2437,7 +2437,7 @@ function milestoneState(navn) {
   mine.forEach(function(s){ modelCounts[s.modell] = (modelCounts[s.modell]||0) + 1; });
 
   var now = Date.now();
-  var FRESH = 7*24*60*60*1000;
+  var FRESH = 24*60*60*1000;
   var fresh = false;
   var achieved = [];
 
