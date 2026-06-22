@@ -3,20 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Skriv nyhet · Podium</title>
+<title>Skriv nyhet · Championship</title>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0a1a0f;--card:#0f2014;--b1:#1e3d26;--txt:#e8f0e9;--muted:#5a8a65;--gold:#c9a84c}
+:root{--bg:#0a0e1a;--card:#111726;--b1:#26304a;--txt:#eaf0fb;--muted:#7d89a8;--gold:#ffd700}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--txt);font-family:'Barlow',system-ui,sans-serif;min-height:100vh;display:flex;justify-content:center;padding:24px 16px}
 .wrap{width:100%;max-width:460px}
 h1{font-family:'Anton',sans-serif;color:var(--gold);font-size:25px;letter-spacing:.05em;margin:0 0 4px;display:flex;align-items:center;gap:9px}
 .sub{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.14em;margin-bottom:22px}
 label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:14px 0 6px;font-weight:700}
-input,textarea,select{width:100%;background:#0a1410;border:1px solid var(--b1);border-radius:10px;color:var(--txt);font-family:inherit;font-size:15px;padding:11px 13px}
+input,textarea,select{width:100%;background:#0a1020;border:1px solid var(--b1);border-radius:10px;color:var(--txt);font-family:inherit;font-size:15px;padding:11px 13px}
 textarea{min-height:120px;resize:vertical;line-height:1.45}
 input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold)}
-.btn{width:100%;margin-top:18px;background:var(--gold);color:var(--bg);border:none;border-radius:100px;font-family:'Barlow',sans-serif;font-weight:700;font-size:15px;padding:13px;cursor:pointer;letter-spacing:.02em}
+.chk{display:flex;align-items:center;gap:10px;margin-top:16px;font-size:13px;text-transform:none;letter-spacing:0;color:var(--txt);font-weight:600;cursor:pointer}
+.chk input{width:18px;height:18px;flex:0 0 auto;accent-color:var(--gold);cursor:pointer}
+.chk-hint{font-size:11px;color:var(--muted);margin:6px 0 0 28px;line-height:1.4}
+.btn{width:100%;margin-top:18px;background:var(--gold);color:#000;border:none;border-radius:100px;font-family:'Barlow',sans-serif;font-weight:700;font-size:15px;padding:13px;cursor:pointer;letter-spacing:.02em}
 .btn:disabled{opacity:.5;cursor:default}
 .msg{margin-top:13px;font-size:13px;text-align:center;min-height:18px}
 .ok{color:#5fd08a}.err{color:#e06a6a}
@@ -27,6 +30,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold)}
 .nrow{border-top:1px solid var(--b1);padding:13px 0;display:flex;gap:11px;align-items:flex-start}
 .nrow:first-of-type{border-top:none}
 .ntag{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:3px 9px;border-radius:100px;border:1px solid var(--gold);color:var(--gold);white-space:nowrap}
+.npop{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:100px;background:var(--gold);color:#000;white-space:nowrap}
 .nttl{font-weight:700;font-size:14px;line-height:1.3}
 .ndt{font-size:10px;color:var(--muted);margin-top:2px}
 .del{background:none;border:none;color:#e06a6a;cursor:pointer;font-size:12px;padding:4px;white-space:nowrap}
@@ -36,7 +40,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold)}
 <body>
 <div class="wrap">
   <h1>📣 Skriv nyhet</h1>
-  <div class="sub">Nyheter fra Podium</div>
+  <div class="sub">Championship · Nyheter fra Podium</div>
 
   <div id="gate" class="card">
     <label for="pass">Passord</label>
@@ -50,15 +54,17 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold)}
       <label for="tag">Type</label>
       <select id="tag"><option>Nyhet</option><option>Endring</option></select>
       <label for="title">Overskrift</label>
-      <input id="title" maxlength="80" placeholder="F.eks. Sommerpausen nærmer seg">
+      <input id="title" maxlength="80" placeholder="F.eks. MY26 gir nå +2 poeng">
       <label for="body">Tekst</label>
       <textarea id="body" maxlength="600" placeholder="Skriv nyheten her …"></textarea>
+      <label class="chk"><input type="checkbox" id="popup"> Vis som pop-up i appen</label>
+      <div class="chk-hint">For viktige nyheter alle må få med seg. Vises som fullskjerm-varsel første gang (i tillegg til roperten).</div>
       <button class="btn" id="publish">Publiser</button>
       <div class="msg" id="msg"></div>
-      <div class="hint">Publiseres umiddelbart på både Selekt og Championship. Trykk 📣-ikonet i headeren der for å se den.</div>
+      <div class="hint">Publiseres kun på <b>Championship</b>. Trykk 📣-ikonet i appen for å se nyhetene.</div>
     </div>
     <div class="recent">
-      <h2>Siste nyheter</h2>
+      <h2>Siste nyheter (Championship)</h2>
       <div id="list"></div>
     </div>
   </div>
@@ -67,6 +73,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold)}
 var SB='https://resrjvztsqdxzqgiffeg.supabase.co/rest/v1/news';
 var KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlc3Jqdnp0c3FkeHpxZ2lmZmVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzg0MTMsImV4cCI6MjA5Mzc1NDQxM30.ouYcq-2hIUkqkn395Q5us5jYqa9JDVbOjJzORDBM72Y';
 var PASS='podium2026';
+var COMP='championship';
 var MONTHS=['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'];
 function H(){return{apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json'};}
 function fmt(iso){try{var d=new Date(iso);return d.getDate()+'. '+MONTHS[d.getMonth()];}catch(e){return '';}}
@@ -83,26 +90,26 @@ $('unlock').onclick=function(){
 $('pass').addEventListener('keydown',function(e){if(e.key==='Enter')$('unlock').click();});
 
 $('publish').onclick=function(){
-  var title=$('title').value.trim(), body=$('body').value.trim(), tag=$('tag').value, msg=$('msg');
+  var title=$('title').value.trim(), body=$('body').value.trim(), tag=$('tag').value, popup=$('popup').checked, msg=$('msg');
   if(!title||!body){msg.className='msg err';msg.textContent='Fyll inn overskrift og tekst.';return;}
   var btn=$('publish'); btn.disabled=true; msg.className='msg'; msg.textContent='Publiserer …';
-  fetch(SB,{method:'POST',headers:Object.assign(H(),{Prefer:'return=minimal'}),body:JSON.stringify({tag:tag,title:title,body:body})})
+  fetch(SB,{method:'POST',headers:Object.assign(H(),{Prefer:'return=minimal'}),body:JSON.stringify({tag:tag,title:title,body:body,comp:COMP,popup:popup})})
     .then(function(r){
       btn.disabled=false;
-      if(r.ok){msg.className='msg ok';msg.textContent='Publisert! Nå synlig på begge sidene.';$('title').value='';$('body').value='';loadList();}
+      if(r.ok){msg.className='msg ok';msg.textContent=popup?'Publisert som pop-up på Championship!':'Publisert på Championship!';$('title').value='';$('body').value='';$('popup').checked=false;loadList();}
       else{msg.className='msg err';msg.textContent='Noe gikk galt ('+r.status+'). Prøv igjen.';}
     })
     .catch(function(){btn.disabled=false;msg.className='msg err';msg.textContent='Nettverksfeil. Prøv igjen.';});
 };
 
 function loadList(){
-  fetch(SB+'?select=id,created_at,tag,title,body&order=created_at.desc&limit=20',{headers:H()})
+  fetch(SB+'?select=id,created_at,tag,title,body,popup&comp=in.('+COMP+',begge)&order=created_at.desc&limit=20',{headers:H()})
     .then(function(r){return r.json();})
     .then(function(d){
       var el=$('list');
       if(!Array.isArray(d)||!d.length){el.innerHTML='<div style="color:var(--muted);font-size:13px;padding:6px 0">Ingen nyheter ennå.</div>';return;}
       el.innerHTML=d.map(function(n){
-        return '<div class="nrow"><span class="ntag">'+esc(n.tag)+'</span>'
+        return '<div class="nrow"><span class="ntag">'+esc(n.tag)+'</span>'+(n.popup?'<span class="npop">Pop-up</span>':'')
           +'<div style="flex:1"><div class="nttl">'+esc(n.title)+'</div><div class="ndt">'+esc(fmt(n.created_at))+'</div></div>'
           +'<button class="del" data-id="'+n.id+'">Slett</button></div>';
       }).join('');

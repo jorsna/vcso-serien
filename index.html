@@ -147,6 +147,8 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .sp-admin-dates{display:flex;gap:8px;margin-bottom:9px}
 .sp-admin-dates label{flex:1;display:flex;flex-direction:column;gap:3px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .sp-admin-dates input{width:100%;box-sizing:border-box;background:var(--bg);color:var(--txt);border:1px solid var(--b1);border-radius:6px;padding:8px;font-family:'Barlow',sans-serif;font-size:12px;color-scheme:dark}
+.sp-ann{display:flex;align-items:center;gap:9px;margin:0 0 11px;font-size:12px;color:var(--txt);cursor:pointer}
+.sp-ann input{width:17px;height:17px;flex:0 0 auto;accent-color:var(--gold);cursor:pointer}
 /* ── BONUS POPUP ── */
 .sp-pop-bd{position:fixed;inset:0;background:rgba(0,0,0,.66);z-index:10000;display:none;align-items:center;justify-content:center;padding:24px}
 .sp-pop-bd.open{display:flex}
@@ -920,6 +922,7 @@ html, body {
     <label>Start<input id="sp-start" type="datetime-local"></label>
     <label>Slutt<input id="sp-end" type="datetime-local"></label>
   </div>
+  <label class="sp-ann"><input type="checkbox" id="sp-ann"> Annonser dette (pop-up + nyhet)</label>
   <div class="sp-admin-row2">
     <div class="sp-bonus-seg" id="sp-bonus-seg">
       <button type="button" onclick="spSetBonus(1,this)">+1</button>
@@ -1170,6 +1173,10 @@ var spModels       = [];
 var spBonus         = 2;
 var spPopCb         = null;
 var SPOT_API        = SUPABASE_URL + '/rest/v1/spotlight';
+var NEWS_POST_URL   = 'https://resrjvztsqdxzqgiffeg.supabase.co/rest/v1/news';
+var NEWS_POST_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlc3Jqdnp0c3FkeHpxZ2lmZmVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzg0MTMsImV4cCI6MjA5Mzc1NDQxM30.ouYcq-2hIUkqkn395Q5us5jYqa9JDVbOjJzORDBM72Y';
+var SPOT_ANN_COMP   = 'championship';
+var SPOT_ANN_POPUP  = true;
 
 // ─── SUPABASE ────────────────────────────────────────────────────────
 function sbH() {
@@ -2612,6 +2619,13 @@ function spotlightFor(modell){
   return spotModels(activeSpotlight).indexOf(modell) !== -1 ? activeSpotlight : null;
 }
 
+function spNiceDate(iso){ if(!iso) return ''; try{var M=['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'];var d=new Date(iso);return d.getDate()+'. '+M[d.getMonth()];}catch(e){return '';} }
+function postSpotlightNews(models, krit, bonus, endISO){
+  var navn = models.join(', ');
+  var title = 'Spotlight: ' + navn + (krit ? ' (' + krit + ')' : '');
+  var body = navn + ' gir n\u00e5 +' + bonus + ' ekstra poeng per salg' + (krit ? ' for ' + krit + '-biler' : '') + '.' + (endISO ? ' Aktiv til ' + spNiceDate(endISO) + '.' : '') + ' Husk \u00e5 registrere salget!';
+  return fetch(NEWS_POST_URL, { method:'POST', headers:{ apikey:NEWS_POST_KEY, Authorization:'Bearer '+NEWS_POST_KEY, 'Content-Type':'application/json', Prefer:'return=minimal' }, body: JSON.stringify({ tag:'Spotlight', title:title, body:body, comp:SPOT_ANN_COMP, popup:SPOT_ANN_POPUP }) }).catch(function(){});
+}
 function fetchSpotlight() {
   fetch(SPOT_API + '?active=is.true&order=created_at.desc&limit=1', { headers: sbH() })
     .then(function(r){ return r.json(); })
@@ -2713,7 +2727,9 @@ function saveSpotlight() {
   .then(function(r){ if (!r.ok) return r.text().then(function(t){ throw new Error('HTTP '+r.status+': '+t); }); })
   .then(function(){
     if (btn) { btn.disabled = false; btn.textContent = 'Aktiver / lagre'; }
-    toast('Spotlight aktivert: '+spModels.join(', ')+(krit?' \u00b7 '+krit:'')+' (+'+spBonus+')');
+    var annEl = document.getElementById('sp-ann');
+    if (annEl && annEl.checked) { postSpotlightNews(spModels.slice(), krit, spBonus, endISO); annEl.checked = false; toast('Spotlight + nyhet publisert!'); }
+    else { toast('Spotlight aktivert: '+spModels.join(', ')+(krit?' \u00b7 '+krit:'')+' (+'+spBonus+')'); }
     fetchSpotlight();
   })
   .catch(function(e){
@@ -3391,10 +3407,37 @@ function buildTicker(items) {
     o.querySelector('#news-close').addEventListener('click',dismiss);
     markSeen();
   };
+  var POPUP_KEY='vcso_news_popup_seen_id';
+  function maybePopup(){
+    if(!document.body) return;
+    if(document.getElementById('news-overlay')||document.getElementById('news-popup')) return;
+    var seen=0; try{seen=parseInt(localStorage.getItem(POPUP_KEY)||'0',10)||0;}catch(e){}
+    var pops=NEWS.filter(function(n){return n.popup && n.id>seen;});
+    if(!pops.length) return;
+    pops.sort(function(a,b){return b.id-a.id;});
+    showPopup(pops[0]);
+  }
+  function showPopup(n){
+    try{localStorage.setItem(POPUP_KEY,String(n.id));}catch(e){}
+    var o=document.createElement('div');o.id='news-popup';
+    o.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;font-family:Barlow,system-ui,sans-serif';
+    o.innerHTML='<div style="background:var(--card);border:1.5px solid var(--gold);border-radius:16px;padding:26px 26px 22px;max-width:360px;width:100%;text-align:center;max-height:88vh;overflow:auto">'
+      +'<div style="font-size:34px;line-height:1">\uD83D\uDCE3</div>'
+      +'<div style="font-family:Barlow,sans-serif;font-size:10px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);opacity:.85;margin-top:10px">'+esc(n.tag||'Nyhet')+'</div>'
+      +'<div style="font-family:Anton,sans-serif;font-size:23px;letter-spacing:.01em;color:var(--txt);margin-top:6px;line-height:1.15">'+esc(n.title)+'</div>'
+      +'<div style="width:42px;height:1px;background:var(--gold);opacity:.4;margin:14px auto"></div>'
+      +'<div style="font-size:13.5px;line-height:1.5;color:var(--muted);white-space:pre-wrap;text-align:left">'+esc(n.body)+'</div>'
+      +'<button id="np-ok" style="margin-top:20px;background:var(--gold);color:#000;font-family:Barlow,sans-serif;font-weight:700;font-size:14px;border:none;cursor:pointer;padding:11px 28px;border-radius:100px">Skj\u00f8nner!</button>'
+      +'</div>';
+    document.body.appendChild(o);
+    function close(){if(o&&o.parentNode)o.parentNode.removeChild(o);markSeen();}
+    o.addEventListener('click',function(e){if(e.target===o)close();});
+    o.querySelector('#np-ok').addEventListener('click',close);
+  }
   function load(){
-    fetch(NEWS_URL+'?select=id,created_at,tag,title,body&order=created_at.desc&limit=30',{headers:{apikey:NEWS_KEY,Authorization:'Bearer '+NEWS_KEY}})
+    fetch(NEWS_URL+'?select=id,created_at,tag,title,body,popup&comp=in.(championship,begge)&order=created_at.desc&limit=30',{headers:{apikey:NEWS_KEY,Authorization:'Bearer '+NEWS_KEY}})
       .then(function(r){return r.json();})
-      .then(function(d){if(Array.isArray(d))NEWS=d;updateDot();})
+      .then(function(d){if(Array.isArray(d))NEWS=d;updateDot();maybePopup();})
       .catch(function(){});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',load);else load();
