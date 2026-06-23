@@ -278,12 +278,12 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
   border-bottom:1px solid rgba(255,215,0,.2);align-items:center;gap:12px}
 
 /* TABLE */
-.tbl-head{display:grid;grid-template-columns:26px 40px 1fr 36px 40px 90px;
+.tbl-head{display:grid;grid-template-columns:26px 40px 1fr 36px 40px 90px 40px;
   padding:7px 12px;font-size:8.5px;font-weight:700;color:var(--muted);
   text-transform:uppercase;letter-spacing:.6px;background:var(--card2);border-bottom:1px solid var(--b1)}
 .tbl-head>*{text-align:center}
 .tbl-head>*:nth-child(3){text-align:left}
-.trow{display:grid;grid-template-columns:26px 40px 1fr 36px 40px 90px;
+.trow{display:grid;grid-template-columns:26px 40px 1fr 36px 40px 90px 40px;
   padding:8px 12px;align-items:center;border-bottom:1px solid var(--b1);
   transition:background .15s;animation:fadeIn .35s ease both}
 .trow>*{text-align:center}
@@ -360,6 +360,8 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
   justify-content:center;background:var(--faint);border-radius:4px;margin-bottom:6px;
   font-family:'Anton',sans-serif;font-size:14px;color:var(--muted)}
 .score-modell{font-family:'Anton',sans-serif;font-size:14px;color:var(--txt);letter-spacing:.5px}
+.score-spot{display:inline-block;font-family:'Anton',sans-serif;font-size:12px;line-height:1;background:var(--gold);color:#000;padding:3px 8px;border-radius:100px;margin-top:5px;animation:scoreSpotGlow 1.6s ease-in-out infinite}
+@keyframes scoreSpotGlow{0%,100%{box-shadow:0 0 4px 0 var(--gold)}50%{box-shadow:0 0 11px 2px var(--gold)}}
 .score-selger{font-size:11px;font-weight:600;color:var(--txt);margin-top:4px}
 .score-tid{font-size:9px;color:var(--muted);margin-top:1px}
 .score-loc-bar{position:absolute;bottom:0;left:0;right:0;height:3px}
@@ -439,11 +441,11 @@ html, body {
 }
 /* Prevent table overflow on mobile */
 .tbl-head, .trow {
-  grid-template-columns: 22px 40px 1fr 32px 36px 80px;
+  grid-template-columns: 22px 40px 1fr 32px 36px 80px 36px;
 }
 @media (max-width: 400px) {
   .tbl-head, .trow {
-    grid-template-columns: 20px 40px 1fr 28px 32px 70px;
+    grid-template-columns: 20px 40px 1fr 28px 32px 70px 32px;
   }
   .name-main { font-size: 12px; }
   .cd-n { font-size: 14px; }
@@ -814,7 +816,7 @@ html, body {
 <div class="view on" id="view-ind">
   <div class="tbl-head">
     <div>#</div><div></div><div>Spiller</div>
-    <div>M&#229;l</div><div>Poeng</div><div>Siste 5 dager</div>
+    <div>M&#229;l</div><div>Poeng</div><div>Siste 5 dager</div><div>&#128588;</div>
   </div>
   <div id="tbl-ind"></div>
   <div class="form-legend">
@@ -1610,6 +1612,48 @@ function hatTrickCount(navn, m) {
 }
 
 
+// ─── HEIA ────────────────────────────────────────────────────────────
+function getHeiaCount(navn) {
+  return JSON.parse(localStorage.getItem('vcso_heia_counts') || '{}')[navn] || 0;
+}
+function hasHeia(navn) {
+  return !!JSON.parse(localStorage.getItem('vcso_my_heias') || '{}')[navn];
+}
+function heiaClick(id) {
+  var sObj = SELGERE.find(function(s) { return s.id === id; });
+  if (!sObj || hasHeia(sObj.navn)) return;
+  var mine = JSON.parse(localStorage.getItem('vcso_my_heias') || '{}');
+  mine[sObj.navn] = true;
+  localStorage.setItem('vcso_my_heias', JSON.stringify(mine));
+  var counts = JSON.parse(localStorage.getItem('vcso_heia_counts') || '{}');
+  counts[sObj.navn] = (counts[sObj.navn] || 0) + 1;
+  localStorage.setItem('vcso_heia_counts', JSON.stringify(counts));
+  fetch(SUPABASE_URL + '/rest/v1/heia', {
+    method: 'POST', headers: sbH(), body: JSON.stringify({ selger: sObj.navn })
+  }).catch(function(){});
+  var btn = document.getElementById('hb-' + id);
+  var cnt = document.getElementById('hn-' + id);
+  if (btn) {
+    btn.title = 'Du har heia!';
+    btn.style.cursor = 'default';
+    btn.style.transform = 'scale(1.5)';
+    setTimeout(function(){ btn.style.transform = 'scale(1)'; }, 250);
+  }
+  if (cnt) cnt.textContent = counts[sObj.navn];
+  launchKonfetti('#ffd700');
+}
+function fetchHeias() {
+  fetch(SUPABASE_URL + '/rest/v1/heia?select=selger', { headers: sbH() })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (!Array.isArray(data)) return;
+      var counts = {};
+      data.forEach(function(h) { counts[h.selger] = (counts[h.selger] || 0) + 1; });
+      localStorage.setItem('vcso_heia_counts', JSON.stringify(counts));
+      if (curTab === 'ind') renderInd();
+    }).catch(function(){});
+}
+
 function renderInd() {
   var el = document.getElementById('tbl-ind');
   if (!el) return;
@@ -1676,6 +1720,16 @@ function renderInd() {
       + '<div class="sc" style="line-height:1">'+r.g+(r.wk>0?'<br><span style="font-size:8px;opacity:.4;font-weight:400">('+r.wk+')</span>':'')+'</div>'
       + '<div class="sc pts">'+r.pts+'</div>'
       + '<div><div class="form-dots">'+selgerDots(r.navn)+'</div></div>'
+      + (function(){
+          var already=hasHeia(r.navn);
+          var cnt=getHeiaCount(r.navn);
+          return '<div style="display:flex;flex-direction:column;align-items:center;gap:2px">'
+            + '<button id="hb-'+r.id+'" onclick="event.stopPropagation();heiaClick(\''+r.id+'\')"'
+            + ' title="'+(already?'Du har heia!':'Klikk for \u00e5 heie!')+'"'
+            + ' style="background:none;border:none;padding:0;font-size:16px;cursor:'+(already?'default':'pointer')+';transition:transform .2s;line-height:1">&#128588;</button>'
+            + '<span id="hn-'+r.id+'" style="font-size:10px;color:var(--muted)">'+( cnt||'')+'</span>'
+          + '</div>';
+        })()
     + '</div>';
   }).join('');
 }
@@ -2166,6 +2220,7 @@ function renderScoring() {
       + imgHtml
       + '<div class="score-modell">'+s.modell+'</div>'
       + (s.finansiert?'<div style="font-family:Anton,sans-serif;font-size:10px;letter-spacing:2px;color:var(--gold);margin-top:3px">\u25c6 FINANSIERT</div>':'')
+      + ((s.spotlight_bonus||0)>0?'<div class="score-spot">+'+s.spotlight_bonus+'</div>':'')
       + '<div class="score-selger">'+s.selger+'</div>'
       + '<div class="score-tid">'+lbl+' &middot; '+dateShow+' '+tp+'</div>'
       + '<div class="score-loc-bar" style="background:'+col+'"></div>'
@@ -2889,7 +2944,7 @@ function enterAsSelger() {
   buildSelgerDropdown();
   renderInd();
   fetchSales();
-
+  fetchHeias();
   requestPush();
 }
 
