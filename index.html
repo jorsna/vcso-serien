@@ -918,41 +918,6 @@ html, body {
   </div>
 </div>
 
-<!-- SPOTLIGHT ADMIN (kun admin) -->
-<div class="sp-admin" id="sp-admin" style="display:none">
-  <div class="sp-admin-h">🎯 Spotlight <span>· valgfritt — flere modeller, kriterium og periode</span></div>
-  <div class="sp-admin-status" id="sp-admin-status">Ingen aktiv spotlight</div>
-  <div class="sp-admin-row">
-    <select id="sp-mod">
-      <option value="">Velg modell...</option>
-      <option>EX30</option>
-      <option>EX40</option>
-      <option>EX60</option>
-      <option>EX90</option>
-      <option>EC40</option>
-      <option>ES90</option>
-      <option>XC40</option>
-      <option>XC60</option>
-      <option>XC90</option>
-    </select>
-    <button type="button" class="sp-add" onclick="spAddModel()">Legg til</button>
-  </div>
-  <div class="sp-chips" id="sp-chips"><span class="sp-chips-empty">Ingen modeller valgt</span></div>
-  <input id="sp-krit" type="text" class="sp-krit-in" autocomplete="off" placeholder="Kriterium — f.eks. MY26 (tom = hele modellen)">
-  <div class="sp-admin-dates">
-    <label>Start<input id="sp-start" type="datetime-local"></label>
-    <label>Slutt<input id="sp-end" type="datetime-local"></label>
-  </div>
-  <label class="sp-ann"><input type="checkbox" id="sp-ann"> Annonser dette (pop-up + nyhet)</label>
-  <div class="sp-admin-row2">
-    <div class="sp-bonus-seg" id="sp-bonus-seg">
-      <button type="button" onclick="spSetBonus(1,this)">+1</button>
-      <button type="button" class="on" onclick="spSetBonus(2,this)">+2</button>
-    </div>
-    <button class="sp-save" onclick="saveSpotlight()">Aktiver / lagre</button>
-  </div>
-  <button class="sp-clear" id="sp-clear" onclick="clearSpotlight()" style="display:none">Deaktiver spotlight</button>
-</div>
 
 <!-- BONUS-BIL POPUP -->
 <div class="sp-pop-bd" id="sp-pop-bd"><div class="sp-pop" id="sp-pop"></div></div>
@@ -989,6 +954,42 @@ html, body {
 <!-- SALGSVERKTØY VIEW -->
 <div class="view" id="view-tips">
   <div id="tips-container" style="padding:14px"></div>
+</div>
+
+<!-- SPOTLIGHT ADMIN (kun admin) -->
+<div class="sp-admin" id="sp-admin" style="display:none">
+  <div class="sp-admin-h">🎯 Spotlight <span>· valgfritt — flere modeller, kriterium og periode</span></div>
+  <div class="sp-admin-status" id="sp-admin-status">Ingen aktiv spotlight</div>
+  <div class="sp-admin-row">
+    <select id="sp-mod">
+      <option value="">Velg modell...</option>
+      <option>EX30</option>
+      <option>EX40</option>
+      <option>EX60</option>
+      <option>EX90</option>
+      <option>EC40</option>
+      <option>ES90</option>
+      <option>XC40</option>
+      <option>XC60</option>
+      <option>XC90</option>
+    </select>
+    <button type="button" class="sp-add" onclick="spAddModel()">Legg til</button>
+  </div>
+  <div class="sp-chips" id="sp-chips"><span class="sp-chips-empty">Ingen modeller valgt</span></div>
+  <input id="sp-krit" type="text" class="sp-krit-in" autocomplete="off" placeholder="Kriterium — f.eks. MY26 (tom = hele modellen)">
+  <div class="sp-admin-dates">
+    <label>Start<input id="sp-start" type="datetime-local"></label>
+    <label>Slutt<input id="sp-end" type="datetime-local"></label>
+  </div>
+  <label class="sp-ann"><input type="checkbox" id="sp-ann"> Annonser dette (pop-up + nyhet)</label>
+  <div class="sp-admin-row2">
+    <div class="sp-bonus-seg" id="sp-bonus-seg">
+      <button type="button" onclick="spSetBonus(1,this)">+1</button>
+      <button type="button" class="on" onclick="spSetBonus(2,this)">+2</button>
+    </div>
+    <button class="sp-save" onclick="saveSpotlight()">Aktiver / lagre</button>
+  </div>
+  <button class="sp-clear" id="sp-clear" onclick="clearSpotlight()" style="display:none">Deaktiver spotlight</button>
 </div>
 
 </div><!-- end .page -->
