@@ -95,6 +95,23 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .cd-n{font-family:'Anton',sans-serif;font-size:16px;line-height:1;color:var(--gold)}
 .cd-l{font-size:7px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
 .cd-sep{font-family:'Anton',sans-serif;font-size:13px;color:rgba(255,215,0,.3)}
+/* ── Sluttspurt-eskalering (sesongavslutning) ── */
+body.tier-sluttspurt .hdr{border-bottom-color:#f59e0b}
+body.tier-sluttspurt .crest{border-color:#f59e0b;animation:critPulseSoft 2s ease-in-out infinite}
+body.tier-sluttspurt .cd-box{border-color:rgba(245,158,11,.55)}
+body.tier-sluttspurt .cd-n{color:#f59e0b}
+body.tier-sluttspurt .hdr-cd-label{color:#f59e0b}
+body.tier-kritisk .hdr{border-bottom-color:#ef4444}
+body.tier-kritisk .crest{border-color:#ef4444;animation:critPulseHard 1.1s ease-in-out infinite}
+body.tier-kritisk .cd-box{border-color:rgba(239,68,68,.7)}
+body.tier-kritisk .cd-n{color:#ef4444}
+body.tier-kritisk .hdr-cd-label{color:#ef4444}
+@keyframes critPulseSoft{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,0)}50%{box-shadow:0 0 14px 2px rgba(245,158,11,.45)}}
+@keyframes critPulseHard{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}50%{box-shadow:0 0 20px 4px rgba(239,68,68,.7)}}
+#urgency-stripe{display:none;margin:12px 18px 4px;border-radius:10px;padding:11px 16px;text-align:center;font-weight:700;letter-spacing:.4px;font-size:14px}
+body.tier-sluttspurt #urgency-stripe{display:block;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);color:#f59e0b;animation:stripePulse 2s ease-in-out infinite}
+body.tier-kritisk #urgency-stripe{display:block;background:rgba(239,68,68,.14);border:1px solid rgba(239,68,68,.5);color:#ff8585;animation:stripePulse 2s ease-in-out infinite}
+@keyframes stripePulse{0%,100%{opacity:.85}50%{opacity:1}}
 /* Wider screens: put countdown inline with brand */
 @media(min-width:520px){
   .hdr-in{flex-direction:row;align-items:center;padding:12px 0;gap:10px}
@@ -754,10 +771,12 @@ html, body {
         <div class="cd-sep">:</div>
         <div class="cd-box"><div class="cd-n" id="cds">--</div><div class="cd-l">s</div></div>
       </div>
-      <div class="hdr-cd-label">Countdown til 30. juni</div>
+      <div class="hdr-cd-label" id="cdLabel">Countdown til 30. juni</div>
     </div>
   </div>
 </div>
+
+<div id="urgency-stripe"></div>
 
 <!-- TABS -->
 <div class="tabs">
@@ -2845,10 +2864,30 @@ function exportCSV() {
 }
 
 // ─── NEDTELLING ──────────────────────────────────────────────────────
+function applyUrgency(days){
+  var b=document.body,
+      lbl=document.getElementById('cdLabel'),
+      strp=document.getElementById('urgency-stripe');
+  b.classList.remove('tier-sluttspurt','tier-kritisk');
+  if(days<=3){
+    b.classList.add('tier-kritisk');
+    if(lbl)lbl.textContent='🔥 Siste sjanse';
+    if(strp)strp.innerHTML='🔥 Sesongen lukkes 30. juni — siste innspurt!';
+  }else if(days<=10){
+    b.classList.add('tier-sluttspurt');
+    if(lbl)lbl.textContent='⚡ Sluttspurt · bare '+days+' dager igjen';
+    if(strp)strp.innerHTML='⚡ Sluttspurten har startet — hvert salg teller nå';
+  }else{
+    if(lbl)lbl.textContent='Countdown til 30. juni';
+  }
+}
+
 function countdown() {
   var diff = new Date('2026-06-30T23:59:59') - new Date();
   if (diff <= 0) return;
-  document.getElementById('cdd').textContent = pad(Math.floor(diff/86400000));
+  var _days = Math.floor(diff/86400000);
+  document.getElementById('cdd').textContent = pad(_days);
+  applyUrgency(_days);
   document.getElementById('cdh').textContent = pad(Math.floor((diff%86400000)/3600000));
   document.getElementById('cdm').textContent = pad(Math.floor((diff%3600000)/60000));
   document.getElementById('cds').textContent = pad(Math.floor((diff%60000)/1000));
