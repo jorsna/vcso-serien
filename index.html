@@ -1054,7 +1054,7 @@ html, body {
 
       <div style="padding:12px 0;border-bottom:1px solid var(--b1)">
         <div style="font-family:'Anton',sans-serif;font-size:14px;color:var(--gold);letter-spacing:1px;margin-bottom:8px">SPESIALFUNKSJONER</div>
-        <div style="display:flex;flex-direction:column;gap:7px"><div><strong style="color:var(--txt)">&#128081; Dagens MVP</strong> – selgeren med flest salg i dag. Ved likt teller finansierte salg. Er det fortsatt likt vises begge som Delt MVP.</div><div><strong style="color:var(--txt)">&#128293; Streak</strong> – tre dager p&#229; rad med salg gir flamme-ikon. Bevares over helger.</div><div><strong style="color:var(--txt)">&#11088; Hat-trick</strong> – 3 eller flere biler p&#229; én dag. Gir gullstjerne bak navnet og vises umiddelbart i Hall of Fame.</div><div><strong style="color:var(--txt)">&#128276; Push-varsler</strong> – f&#229; varsel p&#229; telefonen n&#229;r noen scorer.</div><div><strong style="color:var(--txt)">&#128101; Tilskuer</strong> – se tabellen uten &#229; logge inn med selgerpassord.</div><div><strong style="color:var(--txt)">&#128260; Live-oppdatering</strong> – henter nye data hvert 2. minutt automatisk.</div></div>
+        <div style="display:flex;flex-direction:column;gap:7px"><div><strong style="color:var(--txt)">&#128081; Dagens MVP</strong> – selgeren med flest poeng i dag (3 per salg + spotlight-bonus). Ved likt teller finansierte salg. Er det fortsatt likt vises begge som Delt MVP.</div><div><strong style="color:var(--txt)">&#128293; Streak</strong> – tre dager p&#229; rad med salg gir flamme-ikon. Bevares over helger.</div><div><strong style="color:var(--txt)">&#11088; Hat-trick</strong> – 3 eller flere biler p&#229; én dag. Gir gullstjerne bak navnet og vises umiddelbart i Hall of Fame.</div><div><strong style="color:var(--txt)">&#128276; Push-varsler</strong> – f&#229; varsel p&#229; telefonen n&#229;r noen scorer.</div><div><strong style="color:var(--txt)">&#128101; Tilskuer</strong> – se tabellen uten &#229; logge inn med selgerpassord.</div><div><strong style="color:var(--txt)">&#128260; Live-oppdatering</strong> – henter nye data hvert 2. minutt automatisk.</div></div>
       </div>
 
       <div style="padding:12px 0">
@@ -1538,16 +1538,16 @@ function streakCount(navn) {
 
 // ─── MVP ─────────────────────────────────────────────────────────────
 function updateMVP() {
-  var today = todayStr(), counts = {};
-  sales.forEach(function(s) { if (tsDate(s.ts) === today) counts[s.selger] = (counts[s.selger]||0) + 1; });
+  var today = todayStr(), counts = {}, poeng = {};
+  sales.forEach(function(s) { if (tsDate(s.ts) === today) { counts[s.selger] = (counts[s.selger]||0) + 1; poeng[s.selger] = (poeng[s.selger]||0) + 3 + (s.spotlight_bonus||0); } });
   var banner = document.getElementById('mvp-banner');
   if (!banner) return;
-  var bestN = 0;
-  Object.keys(counts).forEach(function(n) { if (counts[n] > bestN) bestN = counts[n]; });
-  if (bestN === 0) { banner.style.display = 'none'; return; }
+  var bestPoeng = 0;
+  Object.keys(poeng).forEach(function(n) { if (poeng[n] > bestPoeng) bestPoeng = poeng[n]; });
+  if (bestPoeng === 0) { banner.style.display = 'none'; return; }
 
-  // Tiebreaker: tell finansierte salg i dag for selgere med likt antall
-  var tied = Object.keys(counts).filter(function(n) { return counts[n] === bestN; });
+  // MVP = flest poeng i dag (3 per salg + spotlight-bonus). Tiebreaker: finansierte salg.
+  var tied = Object.keys(poeng).filter(function(n) { return poeng[n] === bestPoeng; });
   var finCounts = {};
   tied.forEach(function(navn) {
     finCounts[navn] = sales.filter(function(s) {
@@ -1579,7 +1579,7 @@ function updateMVP() {
         '<div>'+
           '<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gold)">'+(delt?'Delt MVP':'Dagens MVP')+'</div>'+
           '<div style="font-size:14px;font-weight:700;color:var(--txt)">'+navn+'</div>'+
-          '<div style="font-size:11px;color:var(--muted)">'+bestN+(bestN>1?' biler i dag':' bil i dag')+'</div>'+
+          '<div style="font-size:11px;color:var(--muted)">'+poeng[navn]+' poeng \u00b7 '+counts[navn]+(counts[navn]>1?' biler':' bil')+'</div>'+
         '</div>'+
       '</div>';
   });
