@@ -389,7 +389,7 @@ body {
 <script>
 var SB_URL = 'https://jffhdlmwvurnojoapcvs.supabase.co';
 var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmZmhkbG13dnVybm9qb2FwY3ZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MzIzNjcsImV4cCI6MjA5MzEwODM2N30.Mc_eKMsfR04kLmwfBeH5INn3NTYapv62Fnt0wMpBpMw';
-var ADMIN_PW = 'vcso-admin';
+var ADMIN_PW = 'Salamander2026!';
 var SELGER_PW = 'selekt2026';
 
 
@@ -498,6 +498,7 @@ function visTekst(row) {
   if (stats) {
     statsHtml = '<div class="stats-box">'
       + (stats.totalt ? '<div class="stat-item"><div class="stat-n">'+stats.totalt+'</div><div class="stat-l">Salg totalt i VCSO i går</div></div>' : '')
+      + (stats.sesong ? '<div class="stat-item"><div class="stat-n">'+stats.sesong+'</div><div class="stat-l">I sesongen</div></div>' : '')
       + (stats.mvp ? '<div class="stat-item"><div class="stat-n" style="font-size:18px">'+stats.mvp+'</div><div class="stat-l">MVP</div></div>' : '')
       + (stats.topAvd ? '<div class="stat-item"><div class="stat-n" style="font-size:18px">'+stats.topAvd+'</div><div class="stat-l">Ledende avd.</div></div>' : '')
       + (stats.hatTrick ? '<div class="stat-item"><div class="stat-n">⭐</div><div class="stat-l">Hat-trick</div></div>' : '')
@@ -519,8 +520,7 @@ function visTekst(row) {
       if (a.startsWith('«') || a.startsWith('"')) return '<div class="article-pull">'+a+'<div class="article-pull-disclaimer">(Sitat generert etter beste evne basert på resultater av AI)</div></div>';
       return '<p>'+a+'</p>';
     });
-    deler.splice(2, 0, statsHtml);
-    avsnittsHtml = deler.join('');
+    // fakta-stripa rendres nå øverst (se under), ikke midt i artikkelen
   }
 
   content.innerHTML = '<div class="article-wrap">'
@@ -528,6 +528,7 @@ function visTekst(row) {
     + '<div class="article-kicker">'+GZ_KICKER+'</div>'
     + '<h1 class="article-headline">'+escHtml(row.overskrift || 'Dagens utgave')+'</h1>'
     + (row.ingress ? '<p class="article-deck">'+escHtml(row.ingress)+'</p>' : '')
+    + statsHtml
     + '<div class="article-divider"><span class="article-divider-diamond">◆</span></div>'
     + '<div class="article-body">'+photoHtml+avsnittsHtml+'</div>'
     + '</div>';
@@ -697,11 +698,29 @@ function genererTekst(salg, dato, alleSalg, forrige, spot) {
   });
   var totalLeder = Object.keys(totalSelger).sort(function(a,b){return totalSelger[b]-totalSelger[a];})[0]||null;
 
-  // topAvd bruker sesongtotal, ikke bare dagens salg
-  var topAvd = Object.keys(totalAvd).sort(function(a,b){ return totalAvd[b]-totalAvd[a]; })[0] || null;
+  // Ledende avdeling = POENG PER SELGER (samme som Avdelinger-fanen i appen),
+  // slik at en mindre avdeling kan konkurrere mot en større. Poeng = 3 per salg + spotlight-bonus.
+  var SELGER_AVD = {
+    'Thomas Dokken':'Ryen','Emma Valen':'Ryen','William Østby':'Ryen',
+    'Norman Elton':'Ryen','Alexander Karlsen':'Ryen',
+    'Fabian Bredal-Jørgensen':'Fornebu','Henrik Østby':'Fornebu',
+    'Johan Kalenius':'Fornebu','Odd Bjarne Bjørvik':'Fornebu',
+    'Ask Herlofsen':'Fornebu','Emanuel Bereket':'Fornebu',
+    'Daniel K. Johansen':'Lillestrøm','Linn Askmann-Olsen':'Lillestrøm',
+    'Simen Olsen':'Lillestrøm','Andreas Lydersen':'Lillestrøm'
+  };
+  var AVD_KEY = {'Ryen':'ryen','Fornebu':'fornebu','Lillestrøm':'lillestrom'};
+  var avdHode = {ryen:0,fornebu:0,lillestrom:0};
+  Object.keys(SELGER_AVD).forEach(function(n){ var k=AVD_KEY[SELGER_AVD[n]]; if(k && avdHode[k]!==undefined) avdHode[k]++; });
+  var avdPoeng = {ryen:0,fornebu:0,lillestrom:0};
+  (alleSalg||[]).forEach(function(s){ if(avdPoeng[s.loc]!==undefined) avdPoeng[s.loc] += 3 + (s.spotlight_bonus||0); });
+  var avdPpS = {ryen:0,fornebu:0,lillestrom:0};
+  Object.keys(avdPpS).forEach(function(k){ avdPpS[k] = avdHode[k]>0 ? avdPoeng[k]/avdHode[k] : 0; });
+  var topAvd = Object.keys(avdPpS).sort(function(a,b){ return avdPpS[b]-avdPpS[a]; })[0] || null;
 
   var stats = {
     totalt: totalt,
+    sesong: totalSesongen,
     mvp: mvpListe.map(function(n){return n.split(' ')[0];}).join('/'),
     mvpNavn: mvpListe.length === 1 ? mvpListe[0] : null,
     mvpAvd: '',
@@ -718,15 +737,6 @@ function genererTekst(salg, dato, alleSalg, forrige, spot) {
     });
   }
 
-  var SELGER_AVD = {
-    'Thomas Dokken':'Ryen','Emma Valen':'Ryen','William Østby':'Ryen',
-    'Norman Elton':'Ryen','Alexander Karlsen':'Ryen',
-    'Fabian Bredal-Jørgensen':'Fornebu','Henrik Østby':'Fornebu',
-    'Johan Kalenius':'Fornebu','Odd Bjarne Bjørvik':'Fornebu',
-    'Ask Herlofsen':'Fornebu','Emanuel Bereket':'Fornebu',
-    'Daniel K. Johansen':'Lillestrøm','Linn Askmann-Olsen':'Lillestrøm',
-    'Simen Olsen':'Lillestrøm','Andreas Lydersen':'Lillestrøm'
-  };
 
   stats.mvpAvd = stats.mvpNavn ? (SELGER_AVD[stats.mvpNavn] || '') : '';
 
@@ -785,7 +795,62 @@ function genererTekst(salg, dato, alleSalg, forrige, spot) {
     var bList = Object.keys(bPer).map(function(n){ var p=bPer[n]; return n+' ('+p.n+' bonusbil'+(p.n>1?'er':'')+', +'+p.b+' poeng)'; }).join('; ');
     bonusBlokk = '- SPOTLIGHT-BONUSBILER'+(bKrit?' ('+bKrit+')':'')+': '+bList+' \u2014 disse sikret ekstrapoeng via spotlight-ordningen'+(bKrit?' for '+bKrit+'-biler':'')+'; fremhev det som en bragd i artikkelen.\n';
   }
-  var prompt = 'Du er La Gazzetta dello VCSO Championship – en dramatisk italiensk-inspirert sportsavis for VCSO Championship 2026, en nybilsalgskonkurranse (lagerbiler) hos Volvo Car Stor Oslo (VCSO).\n\nKAMPRAPPORT – ' + norskDato(dato) + '\n\nSALG PER SELGER DENNE DAGEN:\n' + selgerListe + '\n\nSAMMENDRAG DENNE DAGEN:\n- Totalt: ' + totalt + ' biler\n- ' + mvpTekst + '\n- Avdelinger: Ryen ' + avdTelling.ryen + ', Fornebu ' + avdTelling.fornebu + ', Lillestrøm ' + avdTelling.lillestrom + '\n- Bestselger-modell: ' + (topModell||'ukjent') + ' (' + (modellTelling[topModell]||0) + ' stk)\n- Finansierte salg: ' + finTelling + '\n' + bonusBlokk + (hatTrickNavn.length?'- HAT-TRICK: '+hatTrickTekst+'\n':'') + totalOppsummering + tidslinje + forrigeBlokk + '\n\n' + marginInstruks + '\n\nVIKTIG: Bruk eksakt riktig avdeling per selger. Ikke finn på dag-tall, datoer eller hvor lenge konkurransen har pågått – bruk kun tidsfakta fra TIDSLINJE-seksjonen over, og hvis den mangler, ikke nevn tid i det hele tatt.\n\nINNRAMMING: Dette handler om SIGNERTE KONTRAKTER, ikke om biler som leveres eller fysisk forlater lokalet. Skriv ALDRI at biler «forlot», «rullet ut» eller «forsvant fra lageret» – skriv heller «signerte kontrakter», «sikret salget» eller «landet avtalen». Finansierte kontrakter er en TRIUMF og noe av det mest verdifulle en selger kan lande – løft dem alltid fram som en bragd, aldri nøytralt eller negativt.\n\nHVIS DET IKKE ER NOEN SALG DENNE DAGEN: ikke skriv en flau "ingenting skjedde"-artikkel. La heller redaksjonen dramatisere noe annet like episk – stillheten før stormen, stillingen i sesongen, jakten på tronen eller en hyllest til ledende avdeling. Du trenger ikke forklare at det ikke var salg.\n\nSkriv en EPISK og storslagen avisartikkel på NORSK, i den udødelige ånden til La Gazzetta dello Sport – operadramatisk, høytidelig og lidenskapelig, med sans for det heroiske og den italienske patosen. Tenk fotofinish på Giro-en, en duell i San Siro, en mester båret på gullstol gjennom gatene. Dette er ikke en nøktern rapport – det er en hyllest.\n\nSTEMME: Storslagen, lidenskapelig og begeistret, men alltid forankret i virkeligheten. Du løfter ekte tall og navn opp i det mytiske – du erstatter dem aldri med tåke. Hver setning skal bety noe konkret. Dramatikk er forsterkning av fakta, ikke flukt fra dem.\n\nPROPORSJONALITET (helt avgjørende): Intensiteten i språket MÅ matche marginen i DAGENS DUELL/MARGIN over. Et stort forsprang fortjener knusende ord. En seier avgjort på finansiering eller ett enkelt salg er en hårfin, gladiatorisk triumf – skriv den som et nervepirrende fotofinish, ALDRI som en massakre. Du skal ALDRI ydmyke den som tapte eller antyde at rivalene var sjanseløse – det dreper motivasjonen til alle som leser. Den beseirede rivalen er en verdig helt som falt med æren i behold.\n\nREGISTER: Vær breakneck og begeistret – korte, eksplosive setninger vekslet med lengre. Ett velplassert utropstegn er lov. Men energien skal komme fra konkrete tall og navn, aldri fra svulstig tåke.\n\nSPRÅK: Skriv feilfri norsk bokmål med korrekt rettskriving og tegnsetting. Ingen anglisismer, ingen slurvefeil. Les korrektur på deg selv før du svarer – dette skal fremstå som en profesjonell avis.\n\n1. OVERSKRIFT (maks 10 ord): Episk og slående, men MÅ inneholde minst ett konkret faktum – et navn, et tall eller en avdeling – slik at leseren umiddelbart skjønner hva som skjedde. Storhet kommer av å opphøye virkeligheten, ikke skjule den. GODE ved stort forsprang: «Hansen knuser alt: fire biler i Fornebus navn», «Ryen erobrer tronen mens Lillestrøm vakler». GODE ved knapp duell: «Wang vinner gladiatorduellen på en finansiering», «Likeverdige til siste sekund – Wang avgjør på målstreken». UNNGÅ (for gåtefulle): «Skjebnetimen slo til», «En dag for historiebøkene». UNNGÅ ved knapp margin: knusings-ord som «knuser», «herjer», «valser over», «sjanseløs».\n2. INGRESS (1 setning): Slå an den storslagne tonen, men nevn dagens hovedfaktum.\n3. BRØDTEKST: 5 avsnitt, ca 270 ord. Avsnitt skilles av \\n\\n.\n- FØRSTE AVSNITT: Si rett ut hva som faktisk skjedde – hvem solgte hva, og stillingen – før dramatikken tar over. En leser skal kunne gjengi dagens viktigste hendelse etter å ha lest overskrift + ingress + første avsnitt.\n- Inkluder ETT sitat i anførselstegn som sitt eget avsnitt (helst avsnitt 3). Tillegg sitatet til redaksjonen eller en rolle (f.eks. «en jublende avdelingsleder»), ikke til en navngitt person.\n- SISTE AVSNITT = kort sesongtotal-oppsummering.\n- UNNGÅ disse klisjeene fullstendig: «skjebnetime», «historiebøkene», «tidenes», «en dag for evigheten», «det legendariske», tomme superlativer og blandede metaforer. La de ekte resultatene bære dramatikken.\n\nEKSEMPEL på ønsket tone (IKKE kopier innholdet – bare lær balansen mellom drama og konkret klarhet):\nOverskrift: «Hansen herjer: fire biler sikrer Fornebu tronen»\nIngress: «En vill tirsdag på Fornebu – Marius Hansen leverte fire kontrakter alene og skjøt avdelingen forbi Ryen på sesongtoppen.»\nAvsnitt 1: «Det startet rolig og endte i ekstase. Da klokken passerte 16, hadde Hansen signert sin fjerde kontrakt for dagen – nok til å løfte hele Fornebu forbi Ryen, 142 mot 138 poeng.»\n\nSvar KUN med gyldig JSON:\n{"overskrift":"...","ingress":"...","tekst":"avsnitt1\\n\\navsnitt2\\n\\n\\"Sitat\\"\\n\\navsnitt3\\n\\nSesongtotal-avsnitt"}';
+  // ── TID PÅ DØGNET: overtid, tempo og avdelingsrace ──────────────────
+  function osloDeler(ts){
+    var parts = new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Oslo',weekday:'short',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date(ts));
+    var o={}; parts.forEach(function(p){o[p.type]=p.value;});
+    var hh=parseInt(o.hour,10)%24, mm=parseInt(o.minute,10);
+    return { min:hh*60+mm, hh:hh, mm:mm, wd:o.weekday, klokke:(('0'+hh).slice(-2)+':'+('0'+mm).slice(-2)) };
+  }
+  function stengetidMin(wd){
+    if (wd==='Sun') return -1;     // søndag: stengt – alt er overtid
+    if (wd==='Thu') return 19*60;  // torsdag 19:00
+    if (wd==='Sat') return 15*60;  // lørdag 15:00
+    return 17*60;                  // man, tirs, ons, fre 17:00
+  }
+  var UKEDAG_NO = {Mon:'mandag',Tue:'tirsdag',Wed:'onsdag',Thu:'torsdag',Fri:'fredag',Sat:'lørdag',Sun:'søndag'};
+  var overtidSalg = salg.filter(function(s){ if(!s.ts) return false; var k=osloDeler(s.ts); var st=stengetidMin(k.wd); return st<0 || k.min>st; });
+  var overtidBlokk = '';
+  if (overtidSalg.length){
+    var senestOT = overtidSalg.slice().sort(function(a,b){ return new Date(b.ts)-new Date(a.ts); })[0];
+    var skOT = osloDeler(senestOT.ts);
+    overtidBlokk = '\n- OVERTID: '+overtidSalg.length+' av '+totalt+' kontrakter ble signert ETTER stengetid. Seneste: '+(senestOT.selger||'en selger')+' kl. '+skOT.klokke+' ('+(UKEDAG_NO[skOT.wd]||'')+'). Dette er ekte kampvilje og pågangsmot – ram det inn som heltemot, aldri negativt. Nevn det bare hvis det styrker historien.';
+  }
+  var tempoBlokk = '';
+  if (totalt >= 3){
+    var timeTelling = {};
+    salg.forEach(function(s){ if(!s.ts) return; var h=osloDeler(s.ts).hh; timeTelling[h]=(timeTelling[h]||0)+1; });
+    var travlest = Object.keys(timeTelling).sort(function(a,b){ return timeTelling[b]-timeTelling[a]; })[0];
+    var forLunsj=0, etterLunsj=0;
+    salg.forEach(function(s){ if(!s.ts) return; (osloDeler(s.ts).hh<12 ? forLunsj++ : etterLunsj++); });
+    tempoBlokk = '\n- TEMPO: Travleste time var kl. '+travlest+'–'+(parseInt(travlest,10)+1)+' med '+timeTelling[travlest]+' salg. Fordeling: '+forLunsj+' før lunsj (før kl. 12), '+etterLunsj+' etter. Bruk KUN hvis det gir et naturlig narrativ (lynstart, eksplosjon på ettermiddagen e.l.) – ikke tving det inn.';
+  }
+  var racemattBlokk = '';
+  var avdRangert = Object.keys(avdPpS).sort(function(a,b){ return avdPpS[b]-avdPpS[a]; });
+  if (totalSesongen > 0 && avdRangert.length >= 2 && avdPpS[avdRangert[0]] > 0){
+    var lederAvd = avdRangert[0], toerAvd = avdRangert[1];
+    var salgUnna = Math.max(1, Math.ceil((avdPpS[lederAvd]*avdHode[toerAvd] - avdPoeng[toerAvd]) / 3 + 0.0001));
+    var dagerTekst = (typeof dagerIgjen !== 'undefined') ? (' med '+dagerIgjen+' dager igjen til sesongslutt') : '';
+    racemattBlokk = '\n- AVDELINGSRACE (poeng per selger, hele sesongen): '+avdNavn[lederAvd]+' leder med '+avdPpS[lederAvd].toFixed(1)+' p/selger, foran '+avdNavn[toerAvd]+' ('+avdPpS[toerAvd].toFixed(1)+' p/selger). '+avdNavn[toerAvd]+' er ca. '+salgUnna+' salg unna å ta tronen'+dagerTekst+'. Bruk gjerne dette til tittelkamp-dramatikk – men kun tallene her, aldri egne.';
+  }
+
+  // ── REKORDER & MILEPÆLER (deterministisk, fra alleSalg gruppert per Oslo-dato) ──
+  function osloDato(ts){ return new Date(ts).toLocaleDateString('sv-SE',{timeZone:'Europe/Oslo'}); }
+  var dagTotal = {}, dagSelger = {};
+  (alleSalg||[]).forEach(function(s){ if(!s.ts) return; var dd=osloDato(s.ts); dagTotal[dd]=(dagTotal[dd]||0)+1; if(!dagSelger[dd])dagSelger[dd]={}; var nm=s.selger||'ukjent'; dagSelger[dd][nm]=(dagSelger[dd][nm]||0)+1; });
+  var rekordLinjer = [];
+  var forrigeMaxDag = 0;
+  Object.keys(dagTotal).forEach(function(dd){ if(dd!==dato && dagTotal[dd]>forrigeMaxDag) forrigeMaxDag=dagTotal[dd]; });
+  if (totalt>0 && totalt>forrigeMaxDag){ rekordLinjer.push('NY DAGSREKORD: '+totalt+' salg på én dag – sesongens beste enkeltdag (forrige rekord '+forrigeMaxDag+'). Stor sak – løft den høyt.'); }
+  else if (totalt>0 && totalt===forrigeMaxDag && forrigeMaxDag>0){ rekordLinjer.push('TANGERT DAGSREKORD: '+totalt+' salg tangerer sesongens beste dag ('+forrigeMaxDag+').'); }
+  if (hatTrickNavn.length){ var tidligereHT=false; Object.keys(dagSelger).forEach(function(dd){ if(dd>=dato) return; Object.keys(dagSelger[dd]).forEach(function(nm){ if(dagSelger[dd][nm]>=3) tidligereHT=true; }); }); if(!tidligereHT) rekordLinjer.push('FØRSTE HAT-TRICK I SESONGEN: '+hatTrickNavn.join(', ')+' noterte sesongens aller første hat-trick (3+ salg på én dag).'); }
+  if (mvpListe.length===1){ var mvpNm=mvpListe[0], mvpForrBeste=0; Object.keys(dagSelger).forEach(function(dd){ if(dd===dato) return; var c=(dagSelger[dd][mvpNm]||0); if(c>mvpForrBeste) mvpForrBeste=c; }); if (maxSalg>mvpForrBeste && maxSalg>=2) rekordLinjer.push('PERSONLIG DAGSREKORD: '+mvpNm+' satte personlig rekord med '+maxSalg+' salg på én dag (tidligere beste '+mvpForrBeste+').'); }
+  var forrSesong = totalSesongen - totalt, rundeMP = 0;
+  [25,50,75,100,150,200,250,300,400,500,750,1000].forEach(function(m){ if(forrSesong < m && totalSesongen >= m) rundeMP=m; });
+  if (rundeMP) rekordLinjer.push('MILEPÆL: VCSO passerte '+rundeMP+' salg totalt i sesongen i dag.');
+  var rekorderBlokk = rekordLinjer.length ? ('\n- REKORDER & MILEPÆLER (bruk KUN det som står her, aldri egne tall – dette er store øyeblikk):\n  • '+rekordLinjer.join('\n  • ')) : '';
+
+  var prompt = 'Du er La Gazzetta dello VCSO Championship – en dramatisk italiensk-inspirert sportsavis for VCSO Championship 2026, en nybilsalgskonkurranse (lagerbiler) hos Volvo Car Stor Oslo (VCSO).\n\nKAMPRAPPORT – ' + norskDato(dato) + '\n\nSALG PER SELGER DENNE DAGEN:\n' + selgerListe + '\n\nSAMMENDRAG DENNE DAGEN:\n- Totalt: ' + totalt + ' biler\n- ' + mvpTekst + '\n- Avdelinger: Ryen ' + avdTelling.ryen + ', Fornebu ' + avdTelling.fornebu + ', Lillestrøm ' + avdTelling.lillestrom + '\n- Bestselger-modell: ' + (topModell||'ukjent') + ' (' + (modellTelling[topModell]||0) + ' stk)\n- Finansierte salg: ' + finTelling + '\n' + bonusBlokk + (hatTrickNavn.length?'- HAT-TRICK: '+hatTrickTekst+'\n':'') + totalOppsummering + tidslinje + overtidBlokk + tempoBlokk + racemattBlokk + rekorderBlokk + forrigeBlokk + '\n\n' + marginInstruks + '\n\nVIKTIG: Bruk eksakt riktig avdeling per selger. Ikke finn på dag-tall, datoer eller hvor lenge konkurransen har pågått – bruk kun tidsfakta fra TIDSLINJE-seksjonen over, og hvis den mangler, ikke nevn tid i det hele tatt.\n\nINNRAMMING: Dette handler om SIGNERTE KONTRAKTER, ikke om biler som leveres eller fysisk forlater lokalet. Skriv ALDRI at biler «forlot», «rullet ut» eller «forsvant fra lageret» – skriv heller «signerte kontrakter», «sikret salget» eller «landet avtalen». Finansierte kontrakter er en TRIUMF og noe av det mest verdifulle en selger kan lande – løft dem alltid fram som en bragd, aldri nøytralt eller negativt.\n\nHVIS DET IKKE ER NOEN SALG DENNE DAGEN: ikke skriv en flau "ingenting skjedde"-artikkel. La heller redaksjonen dramatisere noe annet like episk – stillheten før stormen, stillingen i sesongen, jakten på tronen eller en hyllest til ledende avdeling. Du trenger ikke forklare at det ikke var salg.\n\nSkriv en EPISK og storslagen avisartikkel på NORSK, i den udødelige ånden til La Gazzetta dello Sport – operadramatisk, høytidelig og lidenskapelig, med sans for det heroiske og den italienske patosen. Tenk fotofinish på Giro-en, en duell i San Siro, en mester båret på gullstol gjennom gatene. Dette er ikke en nøktern rapport – det er en hyllest.\n\nSTEMME: Storslagen, lidenskapelig og begeistret, men alltid forankret i virkeligheten. Du løfter ekte tall og navn opp i det mytiske – du erstatter dem aldri med tåke. Hver setning skal bety noe konkret. Dramatikk er forsterkning av fakta, ikke flukt fra dem.\n\nPROPORSJONALITET (helt avgjørende): Intensiteten i språket MÅ matche marginen i DAGENS DUELL/MARGIN over. Et stort forsprang fortjener knusende ord. En seier avgjort på finansiering eller ett enkelt salg er en hårfin, gladiatorisk triumf – skriv den som et nervepirrende fotofinish, ALDRI som en massakre. Du skal ALDRI ydmyke den som tapte eller antyde at rivalene var sjanseløse – det dreper motivasjonen til alle som leser. Den beseirede rivalen er en verdig helt som falt med æren i behold.\n\nREGISTER: Vær breakneck og begeistret – korte, eksplosive setninger vekslet med lengre. Ett velplassert utropstegn er lov. Men energien skal komme fra konkrete tall og navn, aldri fra svulstig tåke.\n\nSPRÅK: Skriv feilfri norsk bokmål med korrekt rettskriving og tegnsetting. Ingen anglisismer, ingen slurvefeil. Les korrektur på deg selv før du svarer – dette skal fremstå som en profesjonell avis.\n\n1. OVERSKRIFT (maks 10 ord): Episk og slående, men MÅ inneholde minst ett konkret faktum – et navn, et tall eller en avdeling – slik at leseren umiddelbart skjønner hva som skjedde. Storhet kommer av å opphøye virkeligheten, ikke skjule den. GODE ved stort forsprang: «Hansen knuser alt: fire biler i Fornebus navn», «Ryen erobrer tronen mens Lillestrøm vakler». GODE ved knapp duell: «Wang vinner gladiatorduellen på en finansiering», «Likeverdige til siste sekund – Wang avgjør på målstreken». UNNGÅ (for gåtefulle): «Skjebnetimen slo til», «En dag for historiebøkene». UNNGÅ ved knapp margin: knusings-ord som «knuser», «herjer», «valser over», «sjanseløs».\n2. INGRESS (1 setning): Slå an den storslagne tonen, men nevn dagens hovedfaktum.\n3. BRØDTEKST: 5 avsnitt, ca 270 ord. Avsnitt skilles av \\n\\n.\n- FØRSTE AVSNITT: Si rett ut hva som faktisk skjedde – hvem solgte hva, og stillingen – før dramatikken tar over. En leser skal kunne gjengi dagens viktigste hendelse etter å ha lest overskrift + ingress + første avsnitt.\n- Inkluder ETT sitat i anførselstegn som sitt eget avsnitt (helst avsnitt 3). Tillegg sitatet til redaksjonen eller en rolle (f.eks. «en jublende avdelingsleder»), ikke til en navngitt person.\n- SISTE AVSNITT = kort sesongtotal-oppsummering.\n- UNNGÅ disse klisjeene fullstendig: «skjebnetime», «historiebøkene», «tidenes», «en dag for evigheten», «det legendariske», tomme superlativer og blandede metaforer. La de ekte resultatene bære dramatikken.\n\nEKSEMPEL på ønsket tone (IKKE kopier innholdet – bare lær balansen mellom drama og konkret klarhet):\nOverskrift: «Hansen herjer: fire biler sikrer Fornebu tronen»\nIngress: «En vill tirsdag på Fornebu – Marius Hansen leverte fire kontrakter alene og skjøt avdelingen forbi Ryen på sesongtoppen.»\nAvsnitt 1: «Det startet rolig og endte i ekstase. Da klokken passerte 16, hadde Hansen signert sin fjerde kontrakt for dagen – nok til å løfte hele Fornebu forbi Ryen, 142 mot 138 poeng.»\n\nSvar KUN med gyldig JSON:\n{"overskrift":"...","ingress":"...","tekst":"avsnitt1\\n\\navsnitt2\\n\\n\\"Sitat\\"\\n\\navsnitt3\\n\\nSesongtotal-avsnitt"}';
 
   return fetch('https://resrjvztsqdxzqgiffeg.supabase.co/functions/v1/swift-api', {
     method: 'POST',
