@@ -509,7 +509,7 @@ function visTekst(row) {
 
   var avsnittsHtml = avsnitt.map(function(a, i) {
     if (a.startsWith('«') || a.startsWith('"')) {
-      return '<div class="article-pull">'+a+'<div class="article-pull-disclaimer">(Sitat generert etter beste evne basert på resultater av AI)</div></div>';
+      return '<div class="article-pull">'+a+'<div class="article-pull-disclaimer">(Sitatet er AI-generert basert på dagens resultater)</div></div>';
     }
     return '<p>'+a+'</p>';
   }).join('');
@@ -517,7 +517,7 @@ function visTekst(row) {
   // Sett inn stats etter andre avsnitt
   if (avsnitt.length > 2) {
     var deler = avsnitt.map(function(a, i) {
-      if (a.startsWith('«') || a.startsWith('"')) return '<div class="article-pull">'+a+'<div class="article-pull-disclaimer">(Sitat generert etter beste evne basert på resultater av AI)</div></div>';
+      if (a.startsWith('«') || a.startsWith('"')) return '<div class="article-pull">'+a+'<div class="article-pull-disclaimer">(Sitatet er AI-generert basert på dagens resultater)</div></div>';
       return '<p>'+a+'</p>';
     });
     // fakta-stripa rendres nå øverst (se under), ikke midt i artikkelen
@@ -645,6 +645,37 @@ function spotlightForDay(spots, dayStr){
   return cov.length ? cov[0] : (spots.length ? spots[0] : null);
 }
 
+// ── KORREKTUR-STEG: andre AI-runde som retter språket ─────────────
+// Faller alltid tilbake til originalteksten hvis korrekturen feiler.
+function korrekturles(art) {
+  var korrPrompt = 'Du er korrekturleser for en avis. Under får du en artikkel som JSON. '
+    + 'Rett ALLE feil i rettskriving, grammatikk og tegnsetting til feilfri norsk bokmål. '
+    + 'IKKE endre fakta, tall, navn, avdelinger eller meningsinnhold. IKKE endre stil, dramatikk eller lengde – behold tonen nøyaktig. '
+    + 'IKKE legg til eller fjern avsnitt. Behold doble linjeskift mellom avsnitt og anførselstegn rundt sitater nøyaktig som de er. '
+    + 'Svar KUN med korrigert JSON i nøyaktig samme form, uten noe annet:\n'
+    + JSON.stringify({ overskrift: art.overskrift, ingress: art.ingress, tekst: art.tekst });
+  return fetch('https://resrjvztsqdxzqgiffeg.supabase.co/functions/v1/swift-api', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlc3Jqdnp0c3FkeHpxZ2lmZmVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzg0MTMsImV4cCI6MjA5Mzc1NDQxM30.ouYcq-2hIUkqkn395Q5us5jYqa9JDVbOjJzORDBM72Y' },
+    body: JSON.stringify({ prompt: korrPrompt })
+  })
+  .then(function(r) { if (!r.ok) throw new Error('korrektur ' + r.status); return r.json(); })
+  .then(function(data) {
+    var content = data.content || (data.data && data.data.content);
+    var raw = content && content[0] ? content[0].text : null;
+    if (!raw) throw new Error('tomt korrektursvar');
+    var m = raw.match(/\{[\s\S]*\}/);
+    var clean = m ? m[0] : raw.replace(/```json|```/g, '').trim();
+    var rettet = JSON.parse(clean);
+    if (!rettet || !rettet.overskrift || !rettet.tekst) throw new Error('ugyldig korrektur');
+    return { overskrift: rettet.overskrift, ingress: rettet.ingress, tekst: rettet.tekst };
+  })
+  .catch(function(e) {
+    console.warn('Korrektur hoppet over, bruker originaltekst:', e.message);
+    return { overskrift: art.overskrift, ingress: art.ingress, tekst: art.tekst };
+  });
+}
+
 function genererTekst(salg, dato, alleSalg, forrige, spot) {
   var totalt = salg.length;
   var selgerTelling = {}, avdTelling = {ryen:0,fornebu:0,lillestrom:0}, modellTelling = {}, finTelling = 0, hatTrickNavn = [];
@@ -658,9 +689,12 @@ function genererTekst(salg, dato, alleSalg, forrige, spot) {
 
   Object.keys(selgerTelling).forEach(function(n){ if(selgerTelling[n]>=3) hatTrickNavn.push(n); });
 
-  // Finn MVP med finansiering som tiebreaker
-  var maxSalg = Math.max.apply(null, Object.values(selgerTelling).concat([0]));
-  var toppSelgere = Object.keys(selgerTelling).filter(function(n){ return selgerTelling[n]===maxSalg; });
+  // Finn MVP på POENG (3 per salg + spotlight-bonus), finansiering som tiebreaker
+  var PTS = 3;
+  var selgerPoeng = {};
+  salg.forEach(function(s){ selgerPoeng[s.selger] = (selgerPoeng[s.selger]||0) + PTS + (s.spotlight_bonus||0); });
+  var maxPoeng = Math.max.apply(null, Object.values(selgerPoeng).concat([0]));
+  var toppSelgere = Object.keys(selgerPoeng).filter(function(n){ return selgerPoeng[n]===maxPoeng; });
 
   var finPerSelger = {};
   salg.forEach(function(s){ if(s.finansiert) finPerSelger[s.selger] = (finPerSelger[s.selger]||0)+1; });
@@ -680,11 +714,13 @@ function genererTekst(salg, dato, alleSalg, forrige, spot) {
     mvpListe = toppSelgere;
   }
 
-  // Margin til nærmeste rival (for proporsjonal dramatikk)
-  var alleSalgstall = Object.keys(selgerTelling).map(function(n){ return selgerTelling[n]; }).sort(function(a,b){ return b-a; });
-  var nestBeste = 0;
-  for (var iM=0; iM<alleSalgstall.length; iM++){ if(alleSalgstall[iM] < maxSalg){ nestBeste = alleSalgstall[iM]; break; } }
-  var forsprang = maxSalg - nestBeste;
+  // MVPens salgsantall (for visning) + poengmargin til nærmeste rival
+  var mvpSalg = selgerTelling[mvpListe[0]] || 0;
+  var maxSalg = mvpSalg; // beholdt for personlig-rekord-linjen (salgsantall)
+  var allePoeng = Object.keys(selgerPoeng).map(function(n){ return selgerPoeng[n]; }).sort(function(a,b){ return b-a; });
+  var nestBestePoeng = 0;
+  for (var iM=0; iM<allePoeng.length; iM++){ if(allePoeng[iM] < maxPoeng){ nestBestePoeng = allePoeng[iM]; break; } }
+  var forsprangPoeng = maxPoeng - nestBestePoeng;
   var topModell = Object.keys(modellTelling).sort(function(a,b){ return modellTelling[b]-modellTelling[a]; })[0] || null;
   var avdNavn = {ryen:'Ryen',fornebu:'Fornebu',lillestrom:'Lillestrøm'};
 
@@ -747,20 +783,22 @@ function genererTekst(salg, dato, alleSalg, forrige, spot) {
   }).join('\n');
 
   var mvpTekst = mvpListe.length > 1
-    ? 'DELT MVP: ' + mvpListe.map(function(n){return n+' ('+(SELGER_AVD[n]||'ukjent')+', '+selgerTelling[n]+' salg, '+(finPerSelger[n]||0)+' finansiert)';}).join(' og ')
-    : 'MVP: ' + mvpListe[0] + ' (' + (SELGER_AVD[mvpListe[0]]||'ukjent') + ') med ' + maxSalg + ' salg og ' + (finPerSelger[mvpListe[0]]||0) + ' finansiert' + (varTiebreak ? ' – vant på finansiering som tiebreaker' : '');
+    ? 'DELT MVP: ' + mvpListe.map(function(n){return n+' ('+(SELGER_AVD[n]||'ukjent')+', '+selgerPoeng[n]+' poeng, '+(selgerTelling[n]||0)+' salg, '+(finPerSelger[n]||0)+' finansiert)';}).join(' og ')
+    : 'MVP: ' + mvpListe[0] + ' (' + (SELGER_AVD[mvpListe[0]]||'ukjent') + ') med ' + maxPoeng + ' poeng (' + mvpSalg + ' salg, ' + (finPerSelger[mvpListe[0]]||0) + ' finansiert)' + (varTiebreak ? ' – vant på finansiering som tiebreaker' : '');
 
-  // Proporsjonal dramatikk: fortell AI-en eksakt hvor stor seieren var
+  // Proporsjonal dramatikk: fortell AI-en eksakt hvor stor seieren var (POENG, ikke antall)
   var mvpFornavn = (mvpListe[0]||'').split(' ')[0];
   var marginInstruks;
   if (mvpListe.length > 1) {
-    marginInstruks = 'DAGENS DUELL: ' + mvpListe.map(function(n){return n.split(' ')[0];}).join(' og ') + ' endte HELT likt – samme antall salg OG samme antall finansieringer. Ær dem som likeverdige mestere; ikke kår én vinner over den andre.';
+    marginInstruks = 'DAGENS DUELL: ' + mvpListe.map(function(n){return n.split(' ')[0];}).join(' og ') + ' endte HELT likt – samme poengsum (' + maxPoeng + ') OG samme antall finansieringer. Ær dem som likeverdige mestere; ikke kår én vinner over den andre.';
   } else if (varTiebreak) {
-    marginInstruks = 'DAGENS DUELL: ' + mvpFornavn + ' og minst én rival hadde NØYAKTIG like mange salg (' + maxSalg + '). ' + mvpFornavn + ' vant duellen UTELUKKENDE på finansiering – en hårfin, gladiatorisk seier avgjort på det aller fineste av marginer. RAM INN SLIK: «vant duellen på en finansiering». ALDRI som en knusende seier. Rivalen(e) var fullstendig jevnbyrdig(e) og fortjener respekt – skriv ALDRI at noen ble «knust», «herjet», «valset over» eller var «sjanseløse».';
-  } else if (forsprang === 1) {
-    marginInstruks = 'DAGENS MARGIN: ' + mvpFornavn + ' vant med ett enkelt salgs margin (' + maxSalg + ' mot ' + nestBeste + '). En tett, nervepirrende triumf – ram den inn som en knapp seier på målstreken, ALDRI som en utklassing. Ingen ble «knust».';
+    marginInstruks = 'DAGENS DUELL: ' + mvpFornavn + ' og minst én rival hadde NØYAKTIG like mange poeng (' + maxPoeng + '). ' + mvpFornavn + ' vant duellen UTELUKKENDE på finansiering – en hårfin, gladiatorisk seier avgjort på det aller fineste av marginer. RAM INN SLIK: «vant duellen på en finansiering». ALDRI som en knusende seier. Rivalen(e) var fullstendig jevnbyrdig(e) og fortjener respekt – skriv ALDRI at noen ble «knust», «herjet», «valset over» eller var «sjanseløse».';
+  } else if (forsprangPoeng <= 2) {
+    marginInstruks = 'DAGENS MARGIN: ' + mvpFornavn + ' vant en hårfin duell, ' + maxPoeng + ' mot ' + nestBestePoeng + ' poeng – avgjort på det aller fineste av marginer (en spotlight-bonus skilte dem). Et nervepirrende fotofinish, ALDRI en utklassing. Ingen ble «knust».';
+  } else if (forsprangPoeng <= 3) {
+    marginInstruks = 'DAGENS MARGIN: ' + mvpFornavn + ' vant med ett enkelt salgs margin (' + maxPoeng + ' mot ' + nestBestePoeng + ' poeng). En tett, nervepirrende triumf – en knapp seier på målstreken, ALDRI en utklassing. Ingen ble «knust».';
   } else {
-    marginInstruks = 'DAGENS MARGIN: ' + mvpFornavn + ' ledet suverent med ' + maxSalg + ' salg, ' + forsprang + ' foran nærmeste rival (' + nestBeste + '). Her er stor, dominerende dramatikk fortjent.';
+    marginInstruks = 'DAGENS MARGIN: ' + mvpFornavn + ' ledet suverent med ' + maxPoeng + ' poeng, ' + forsprangPoeng + ' foran nærmeste rival (' + nestBestePoeng + ' poeng). Her er stor, dominerende dramatikk fortjent.';
   }
 
   var hatTrickTekst = hatTrickNavn.map(function(n){return n+' ('+(SELGER_AVD[n]||'ukjent')+')';}).join(', ');
@@ -877,8 +915,10 @@ function genererTekst(salg, dato, alleSalg, forrige, spot) {
     else clean = raw.replace(/```json|```/g,'').trim();
     var parsed = JSON.parse(clean);
     if (!parsed.overskrift) throw new Error('Mangler overskrift. Svar: ' + clean);
-    parsed.stats = stats;
-    return parsed;
+    return korrekturles(parsed).then(function(rettet) {
+      rettet.stats = stats;
+      return rettet;
+    });
   });
 }
 
