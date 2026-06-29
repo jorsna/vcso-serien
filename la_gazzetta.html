@@ -587,10 +587,26 @@ function genererGazzetta() {
         .then(function(r){ return r.json(); })
         .then(function(prev){
           var forrige = (Array.isArray(prev) && prev[0]) ? prev[0] : null;
-          return fetch(SB_URL + '/rest/v1/spotlight?order=created_at.desc&limit=8', { headers: sbH() })
+          var dagsGen = function(){
+            return fetch(SB_URL + '/rest/v1/spotlight?order=created_at.desc&limit=8', { headers: sbH() })
+              .then(function(r){ return r.json(); })
+              .then(function(spots){ return genererTekst(salg, igaar, allSalg, forrige, spotlightForDay(Array.isArray(spots)?spots:[], igaar)); })
+              .catch(function(){ return genererTekst(salg, igaar, allSalg, forrige, null); });
+          };
+          var idagOslo = new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Oslo',weekday:'short'}).format(new Date());
+          if (idagOslo !== 'Mon') return dagsGen();
+          // Mandag: ukesutgave hvis vi har en lagret ukesvinner
+          return fetch(SB_URL + '/rest/v1/weekly_winners?order=week_year.desc,week_nr.desc&limit=1', { headers: sbH() })
             .then(function(r){ return r.json(); })
-            .then(function(spots){ return genererTekst(salg, igaar, allSalg, forrige, spotlightForDay(Array.isArray(spots)?spots:[], igaar)); })
-            .catch(function(){ return genererTekst(salg, igaar, allSalg, forrige, null); });
+            .then(function(ww){
+              var win = (Array.isArray(ww) && ww[0]) ? ww[0] : null;
+              if (!win) return dagsGen();
+              var ws = String(win.week_start).slice(0,10), we = String(win.week_end).slice(0,10);
+              var ukesSalg = allSalg.filter(function(s){ if(!s.ts) return false; var d=new Date(s.ts).toLocaleDateString('sv-SE',{timeZone:'Europe/Oslo'}); return d >= ws && d <= we; });
+              statusEl.textContent = 'Mandag: skriver ukesoppsummering for uke ' + win.week_nr + '...';
+              return genererUkesTekst(ukesSalg, win, forrige);
+            })
+            .catch(function(){ return dagsGen(); });
         });
     })
     .then(function(resultat) {
@@ -673,6 +689,84 @@ function korrekturles(art) {
   .catch(function(e) {
     console.warn('Korrektur hoppet over, bruker originaltekst:', e.message);
     return { overskrift: art.overskrift, ingress: art.ingress, tekst: art.tekst };
+  });
+}
+
+// ── UKESUTGAVE (mandag): oppsummering + lagret ukesvinner ─────────────
+function genererUkesTekst(ukesSalg, win, forrige) {
+  function osloDato(ts){ return new Date(ts).toLocaleDateString('sv-SE',{timeZone:'Europe/Oslo'}); }
+  function fornavn(n){ return (n||'').split(' ')[0]; }
+  var SELGER_AVD = {
+    'Thomas Dokken':'Ryen','Emma Valen':'Ryen','William \u00d8stby':'Ryen','Norman Elton':'Ryen','Alexander Karlsen':'Ryen',
+    'Fabian Bredal-J\u00f8rgensen':'Fornebu','Henrik \u00d8stby':'Fornebu','Johan Kalenius':'Fornebu','Odd Bjarne Bj\u00f8rvik':'Fornebu','Ask Herlofsen':'Fornebu','Emanuel Bereket':'Fornebu',
+    'Daniel K. Johansen':'Lillestr\u00f8m','Linn Askmann-Olsen':'Lillestr\u00f8m','Simen Olsen':'Lillestr\u00f8m','Andreas Lydersen':'Lillestr\u00f8m'
+  };
+  var AVD_KEY = {'Ryen':'ryen','Fornebu':'fornebu','Lillestr\u00f8m':'lillestrom'};
+  var AVD_NAVN = {ryen:'Ryen',fornebu:'Fornebu',lillestrom:'Lillestr\u00f8m'};
+
+  var totalt = ukesSalg.length;
+  var finUke = ukesSalg.filter(function(s){ return s.finansiert; }).length;
+
+  var selgerPoeng = {};
+  ukesSalg.forEach(function(s){ var n=s.selger||'ukjent'; selgerPoeng[n]=(selgerPoeng[n]||0)+3+(s.spotlight_bonus||0); });
+  var rangSelgere = Object.keys(selgerPoeng).sort(function(a,b){ return selgerPoeng[b]-selgerPoeng[a]; });
+  var toer = rangSelgere.filter(function(n){ return n!==win.selger; })[0] || null;
+
+  var avdPoeng={ryen:0,fornebu:0,lillestrom:0}, avdHode={ryen:0,fornebu:0,lillestrom:0};
+  Object.keys(SELGER_AVD).forEach(function(n){ var k=AVD_KEY[SELGER_AVD[n]]; if(k && avdHode[k]!==undefined) avdHode[k]++; });
+  ukesSalg.forEach(function(s){ var k=AVD_KEY[SELGER_AVD[s.selger]]; if(k && avdPoeng[k]!==undefined) avdPoeng[k]+=3+(s.spotlight_bonus||0); });
+  var avdPpS={}; Object.keys(avdPoeng).forEach(function(k){ avdPpS[k]=avdHode[k]>0?avdPoeng[k]/avdHode[k]:0; });
+  var avdRang = Object.keys(avdPpS).sort(function(a,b){ return avdPpS[b]-avdPpS[a]; });
+  var lederAvd=avdRang[0], toerAvd=avdRang[1];
+  var avdMargin = (toerAvd!=null) ? (avdPpS[lederAvd]-avdPpS[toerAvd]).toFixed(1) : avdPpS[lederAvd].toFixed(1);
+
+  var dagTotal={}, dagSelger={};
+  ukesSalg.forEach(function(s){ if(!s.ts)return; var dd=osloDato(s.ts); dagTotal[dd]=(dagTotal[dd]||0)+1; if(!dagSelger[dd])dagSelger[dd]={}; var n=s.selger||'ukjent'; dagSelger[dd][n]=(dagSelger[dd][n]||0)+1; });
+  var besteDag=null,besteDagN=0; Object.keys(dagTotal).forEach(function(dd){ if(dagTotal[dd]>besteDagN){besteDagN=dagTotal[dd];besteDag=dd;} });
+  var htPer={}; Object.keys(dagSelger).forEach(function(dd){ Object.keys(dagSelger[dd]).forEach(function(n){ if(dagSelger[dd][n]>=3) htPer[n]=(htPer[n]||0)+1; }); });
+  var htHelter=Object.keys(htPer).sort(function(a,b){ return htPer[b]-htPer[a]; });
+  var htTekst = htHelter.slice(0,3).map(function(n){ return fornavn(n)+' ('+htPer[n]+')'; }).join(', ');
+
+  var vinnerAvd = AVD_NAVN[AVD_KEY[SELGER_AVD[win.selger]]] || (win.loc||'');
+  var stats = { totalt: totalt, sesong: null, mvp: fornavn(win.selger), mvpNavn: win.selger, mvpAvd: vinnerAvd, topAvd: AVD_NAVN[lederAvd]||null, hatTrick: htHelter.length>0, uke: win.week_nr };
+
+  var prompt = 'Du er La Gazzetta dello VCSO Championship \u2013 en dramatisk italiensk-inspirert sportsavis for VCSO Championship 2026, en nybilsalgskonkurranse hos Volvo Car Stor Oslo (VCSO).\n\n'
+    + 'DETTE ER UKENS STORE OPPSUMMERING \u2013 UKESUTGAVEN for UKE ' + win.week_nr + '. Skriv den som en h\u00f8ytidelig oppsummering av en hel ukes kamp, kr\u00f8net med uRO, og kron ukens vinner.\n\n'
+    + 'UKENS OFFISIELLE TALL (bruk KUN disse, aldri egne):\n'
+    + '- UKENS VINNER: ' + win.selger + ' (' + vinnerAvd + ') med ' + win.pts + ' poeng, ' + win.salg + ' biler, ' + win.finansiert + ' finansiert' + (win.hat_tricks ? ', ' + win.hat_tricks + ' hat-trick(s)' : '') + '.\n'
+    + (toer ? '- N\u00e6rmeste utfordrer: ' + toer + ' (' + selgerPoeng[toer] + ' poeng).\n' : '')
+    + '- Uketotal: ' + totalt + ' biler (' + finUke + ' finansiert).\n'
+    + '- VINNERAVDELING (poeng per selger): ' + AVD_NAVN[lederAvd] + ' med ' + avdPpS[lederAvd].toFixed(1) + ' p/selger' + (toerAvd!=null ? ', foran ' + AVD_NAVN[toerAvd] + ' (' + avdPpS[toerAvd].toFixed(1) + '), margin ' + avdMargin + ' p/selger' : '') + '.\n'
+    + (besteDag ? '- Ukens beste enkeltdag: ' + besteDagN + ' biler (' + norskDato(besteDag) + ').\n' : '')
+    + (htTekst ? '- Hat-trick-helter denne uka: ' + htTekst + '.\n' : '')
+    + '\nPROPORSJONALITET: La spr\u00e5ket matche marginene. En knapp seier er et nervepirrende fotofinish, ikke en massakre. Ydmyk ALDRI dem som ikke vant \u2013 hele feltet kjempet en hel uke, og den beseirede falt med \u00e6ren i behold.\n\n'
+    + 'INNRAMMING: Dette handler om SIGNERTE KONTRAKTER. Skriv aldri at biler \u00abforlot\u00bb eller \u00abrullet ut\u00bb \u2013 skriv \u00absignerte kontrakter\u00bb, \u00absikret salget\u00bb, \u00ablandet avtalen\u00bb. Finansierte kontrakter er en triumf.\n\n'
+    + 'Skriv en EPISK ukesoppsummering p\u00e5 feilfri norsk bokm\u00e5l, i \u00e5nden til La Gazzetta dello Sport \u2013 operadramatisk, h\u00f8ytidelig og lidenskapelig. Forankre all dramatikk i de ekte tallene og navnene over. Les korrektur p\u00e5 deg selv.\n\n'
+    + '1. OVERSKRIFT (maks 11 ord): M\u00e5 navngi ukens vinner eller vinneravdelingen og et tall.\n'
+    + '2. INGRESS (1 setning): Sl\u00e5 an ukestemningen og nevn hovedresultatet.\n'
+    + '3. BR\u00d8DTEKST: 5 avsnitt, ca 290 ord, skilt med \\n\\n.\n'
+    + '- Avsnitt 1: Kron ukens vinner rett ut \u2013 hvem, poeng/biler, og marginen til utfordreren.\n'
+    + '- Avsnitt 2: Ukens avdelingskamp (poeng per selger).\n'
+    + '- Avsnitt 3: Ukens rekorder, beste dag og hat-trick-helter.\n'
+    + '- Inkluder ETT sitat i anf\u00f8rselstegn som eget avsnitt (tillegg det redaksjonen eller en rolle som \u00aben stolt avdelingsleder\u00bb, ikke en navngitt person).\n'
+    + '- Siste avsnitt: et blikk framover mot uka som kommer.\n'
+    + '- UNNG\u00c5 klisjeene \u00abskjebnetime\u00bb, \u00abhistorieb\u00f8kene\u00bb, \u00abtidenes\u00bb, \u00aben uke for evigheten\u00bb.\n\n'
+    + 'Svar KUN med gyldig JSON:\n{"overskrift":"...","ingress":"...","tekst":"avsnitt1\\n\\navsnitt2\\n\\navsnitt3\\n\\n\\"Sitat\\"\\n\\navsnitt5"}';
+
+  return fetch('https://resrjvztsqdxzqgiffeg.supabase.co/functions/v1/swift-api', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlc3Jqdnp0c3FkeHpxZ2lmZmVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzg0MTMsImV4cCI6MjA5Mzc1NDQxM30.ouYcq-2hIUkqkn395Q5us5jYqa9JDVbOjJzORDBM72Y' },
+    body: JSON.stringify({ prompt: prompt })
+  })
+  .then(function(r){ if(!r.ok) throw new Error('AI-feil: '+r.status); return r.json(); })
+  .then(function(data){
+    var content = data.content || (data.data && data.data.content);
+    var raw = content && content[0] ? content[0].text : null;
+    if(!raw) throw new Error('Tomt svar fra AI');
+    var m = raw.match(/\{[\s\S]*\}/); var clean = m ? m[0] : raw.replace(/```json|```/g,'').trim();
+    var parsed = JSON.parse(clean);
+    if(!parsed.overskrift) throw new Error('Mangler overskrift');
+    return korrekturles(parsed).then(function(rettet){ rettet.stats = stats; return rettet; });
   });
 }
 
