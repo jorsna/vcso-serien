@@ -497,9 +497,9 @@ function visTekst(row) {
   var statsHtml = '';
   if (stats) {
     statsHtml = '<div class="stats-box">'
-      + (stats.totalt ? '<div class="stat-item"><div class="stat-n">'+stats.totalt+'</div><div class="stat-l">Salg totalt i VCSO i går</div></div>' : '')
+      + (stats.totalt ? '<div class="stat-item"><div class="stat-n">'+stats.totalt+'</div><div class="stat-l">'+(stats.uke?'Salg totalt i VCSO forrige uke':'Salg totalt i VCSO i går')+'</div></div>' : '')
       + (stats.sesong ? '<div class="stat-item"><div class="stat-n">'+stats.sesong+'</div><div class="stat-l">I sesongen</div></div>' : '')
-      + (stats.mvp ? '<div class="stat-item"><div class="stat-n" style="font-size:18px">'+stats.mvp+'</div><div class="stat-l">MVP</div></div>' : '')
+      + (stats.mvp ? '<div class="stat-item"><div class="stat-n" style="font-size:18px">'+stats.mvp+'</div><div class="stat-l">'+(stats.uke?'Ukesvinner':'MVP')+'</div></div>' : '')
       + (stats.topAvd ? '<div class="stat-item"><div class="stat-n" style="font-size:18px">'+stats.topAvd+'</div><div class="stat-l">Ledende avd.</div></div>' : '')
       + (stats.hatTrick ? '<div class="stat-item"><div class="stat-n">⭐</div><div class="stat-l">Hat-trick</div></div>' : '')
       + '</div>';
