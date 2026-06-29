@@ -84,9 +84,9 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .hdr-cd-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap}
 .brand{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
 @keyframes logoShine{to{background-position:300% center}}
-.crest{width:54px;height:54px;border-radius:50%;background:#1a3060;border:2px solid var(--gold);
+.crest{width:62px;height:62px;border-radius:50%;background:#1a3060;border:2px solid var(--gold);
   display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
-.t1{font-family:'VolvoBroad','Anton',sans-serif;font-size:22px;letter-spacing:3px;line-height:1;white-space:nowrap}
+.t1{font-family:'VolvoBroad','Anton',sans-serif;font-size:27px;letter-spacing:3px;line-height:1;white-space:nowrap}
 .t2{font-size:10px;color:var(--gold);letter-spacing:.6px;text-transform:uppercase;margin-top:2px}
 .hdr-right{display:flex;gap:6px;align-items:center;flex-shrink:0}
 .cd-row{display:flex;gap:3px;align-items:center}
@@ -108,20 +108,15 @@ body.tier-kritisk .cd-n{color:#ef4444}
 body.tier-kritisk .hdr-cd-label{color:#ef4444}
 @keyframes critPulseSoft{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,0)}50%{box-shadow:0 0 14px 2px rgba(245,158,11,.45)}}
 @keyframes critPulseHard{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}50%{box-shadow:0 0 20px 4px rgba(239,68,68,.7)}}
-#urgency-stripe{display:none;margin:12px 18px 4px;border-radius:10px;padding:11px 16px;text-align:center;font-weight:700;letter-spacing:.4px;font-size:14px}
-body.tier-sluttspurt #urgency-stripe{display:block;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);color:#f59e0b;animation:stripePulse 2s ease-in-out infinite}
-body.tier-kritisk #urgency-stripe{display:block;background:rgba(239,68,68,.14);border:1px solid rgba(239,68,68,.5);color:#ff8585;animation:stripePulse 2s ease-in-out infinite}
+#urgency-stripe{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin:12px 18px 4px;border-radius:10px;padding:11px 16px;text-align:center;font-weight:700;letter-spacing:.4px;font-size:14px;background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.18);color:var(--gold)}
+.cd-msg{font-weight:700;letter-spacing:.4px}
+body.tier-sluttspurt #urgency-stripe{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);color:#f59e0b;animation:stripePulse 2s ease-in-out infinite}
+body.tier-kritisk #urgency-stripe{background:rgba(239,68,68,.14);border:1px solid rgba(239,68,68,.5);color:#ff8585;animation:stripePulse 2s ease-in-out infinite}
 @keyframes stripePulse{0%,100%{opacity:.85}50%{opacity:1}}
-/* Wider screens: put countdown inline with brand */
-@media(min-width:520px){
-  .hdr-in{flex-direction:row;align-items:center;padding:12px 0;gap:10px}
-  .hdr-top{flex:1}
-  .hdr-cd{flex-direction:row}
-  .hdr-cd-label{display:none}
-}
+/* Countdown always on its own line under the brand */
 @media(max-width:519px){
-  .t1{font-size:17px;letter-spacing:1.5px}
-  .crest{width:46px;height:46px;font-size:22px}
+  .t1{font-size:21px;letter-spacing:1.5px}
+  .crest{width:54px;height:54px;font-size:22px}
 }
 .login-badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;
   border-radius:8px;vertical-align:middle;margin-left:6px}
@@ -767,23 +762,21 @@ html, body {
   <div id="export-btn" style="display:none"></div>
       </div>
     </div>
-    <!-- Bottom row: countdown -->
-    <div class="hdr-cd">
-      <div class="cd-row">
-        <div class="cd-box"><div class="cd-n" id="cdd">--</div><div class="cd-l">dag</div></div>
-        <div class="cd-sep">:</div>
-        <div class="cd-box"><div class="cd-n" id="cdh">--</div><div class="cd-l">t</div></div>
-        <div class="cd-sep">:</div>
-        <div class="cd-box"><div class="cd-n" id="cdm">--</div><div class="cd-l">m</div></div>
-        <div class="cd-sep">:</div>
-        <div class="cd-box"><div class="cd-n" id="cds">--</div><div class="cd-l">s</div></div>
-      </div>
-      <div class="hdr-cd-label" id="cdLabel">Countdown til 30. juni</div>
-    </div>
   </div>
 </div>
 
-<div id="urgency-stripe"></div>
+<div id="urgency-stripe">
+  <div class="cd-row">
+    <div class="cd-box"><div class="cd-n" id="cdd">--</div><div class="cd-l">dag</div></div>
+    <div class="cd-sep">:</div>
+    <div class="cd-box"><div class="cd-n" id="cdh">--</div><div class="cd-l">t</div></div>
+    <div class="cd-sep">:</div>
+    <div class="cd-box"><div class="cd-n" id="cdm">--</div><div class="cd-l">m</div></div>
+    <div class="cd-sep">:</div>
+    <div class="cd-box"><div class="cd-n" id="cds">--</div><div class="cd-l">s</div></div>
+  </div>
+  <div class="cd-msg" id="cdMsg">Countdown til 30. juni</div>
+</div>
 
 <!-- TABS -->
 <div class="tabs">
@@ -2877,19 +2870,16 @@ function exportCSV() {
 // ─── NEDTELLING ──────────────────────────────────────────────────────
 function applyUrgency(days){
   var b=document.body,
-      lbl=document.getElementById('cdLabel'),
-      strp=document.getElementById('urgency-stripe');
+      msg=document.getElementById('cdMsg');
   b.classList.remove('tier-sluttspurt','tier-kritisk');
   if(days<=3){
     b.classList.add('tier-kritisk');
-    if(lbl)lbl.textContent='🔥 Siste sjanse';
-    if(strp)strp.innerHTML='🔥 Sesongen lukkes 30. juni — siste innspurt!';
+    if(msg)msg.textContent='🔥 Sesongen lukkes 30. juni — siste innspurt!';
   }else if(days<=10){
     b.classList.add('tier-sluttspurt');
-    if(lbl)lbl.textContent='⚡ Sluttspurt · bare '+days+' dager igjen';
-    if(strp)strp.innerHTML='⚡ Sluttspurten har startet — hvert salg teller nå';
+    if(msg)msg.textContent='⚡ Sluttspurten har startet — hvert salg teller nå';
   }else{
-    if(lbl)lbl.textContent='Countdown til 30. juni';
+    if(msg)msg.textContent='Countdown til 30. juni';
   }
 }
 

@@ -859,11 +859,74 @@ function genererTekst(salg, dato, alleSalg, forrige, spot) {
   };
 
   if (totalt === 0) {
-    return Promise.resolve({
-      overskrift: 'En stille dag i ' + norskDato(dato).split(' ').slice(0,2).join(' '),
-      ingress: 'Ingen nybiler ble levert ' + norskDato(dato) + '. Hvilerdag – eller stormens øye?',
-      tekst: 'Det er dager i nybilsalgets verden der stillheten taler høyere enn noe salg noensinne kunne gjort. ' + norskDato(dato) + ' var en slik dag.\n\nIngen scoringer ble registrert. Selgerne ladet batteriene og forberedte seg på dagene som kommer.\n\n«Stormen som ikke kom, varsler alltid en større storm.»\n\nRedaksjonen holder øye med lageret og venter.',
-      stats: stats
+    // ── STILLE DAG: deterministiske fakta (tørke, ukedag, dager igjen) ──
+    var _osloDato = function(ts){ return new Date(ts).toLocaleDateString('sv-SE',{timeZone:'Europe/Oslo'}); };
+    var sisteSalgDato = null;
+    (alleSalg||[]).forEach(function(s){ if(!s.ts) return; var d=_osloDato(s.ts); if(sisteSalgDato===null || d>sisteSalgDato) sisteSalgDato=d; });
+    var torkeDager = sisteSalgDato ? Math.max(0, Math.round((new Date(dato+'T00:00:00Z') - new Date(sisteSalgDato+'T00:00:00Z'))/86400000)) : 0;
+    var ukedagIdx = new Date(dato+'T12:00:00Z').getUTCDay();
+    var UKEDAG_NO = ['søndag','mandag','tirsdag','onsdag','torsdag','fredag','lørdag'];
+    var ukedagNavn = UKEDAG_NO[ukedagIdx];
+    var erStengt = (ukedagIdx===0);
+    var dagerIgjenS = Math.max(0, Math.round((new Date('2026-06-30T00:00:00Z') - new Date(dato+'T00:00:00Z'))/86400000));
+    var lederAvdN = topAvd ? avdNavn[topAvd] : null;
+
+    var stilleData = 'DAGEN SOM DEKKES: ' + norskDato(dato) + ' (' + ukedagNavn + ')\n'
+      + '- Ingen kontrakter ble signert denne dagen.\n'
+      + (erStengt
+          ? '- Dette er en SØNDAG – forhandleren er normalt STENGT. Ram det inn som en velfortjent hviledag for gladiatorene, ALDRI som en skuffende tørke.\n'
+          : '- Forhandleren var åpen, men ingen signerte – stillheten før stormen.\n')
+      + (torkeDager>0 ? '- Det er ' + torkeDager + ' dag' + (torkeDager>1?'er':'') + ' siden forrige signerte kontrakt' + (sisteSalgDato ? ' (' + norskDato(sisteSalgDato) + ')' : '') + '.\n' : '')
+      + '- ' + dagerIgjenS + ' dager igjen til sesongslutt 30. juni 2026.\n'
+      + 'SESONGSTILLING (bruk KUN disse tallene, aldri egne):\n'
+      + '- Totalt signert i sesongen: ' + totalSesongen + ' kontrakter\n'
+      + (totalLeder ? '- Sammenlagtleder: ' + totalLeder + ' (' + (totalSelger[totalLeder]||0) + ' kontrakter)\n' : '')
+      + (lederAvdN ? '- Ledende avdeling (poeng per selger): ' + lederAvdN + '\n' : '');
+
+    var forrigeBlokkS = (forrige && forrige.tekst)
+      ? '\n\nGÅRSDAGENS UTGAVE (kun for kontinuitet – ikke gjenta innholdet):\nOverskrift: ' + forrige.overskrift + '\n' + forrige.tekst + '\n'
+      : '';
+
+    var stillePrompt = 'Du er La Gazzetta dello VCSO Championship – en dramatisk italiensk-inspirert sportsavis for VCSO Championship 2026, en nybilsalgskonkurranse hos Volvo Car Stor Oslo.\n\n'
+      + 'INGEN SALG denne dagen – men avisen kommer ALLTID ut. Skriv IKKE en flau «ingenting skjedde»-artikkel. Velg ÉN kreativ vinkel og skriv den med full italiensk patos:\n'
+      + '1. TØRKE-DRAMA (kun hvis forhandleren var åpen): dramatiser stillheten – «byen holder pusten», dagene uten en eneste signatur. Eskaler med tørkens lengde.\n'
+      + '2. REDAKSJONEN VENTER (lun humor): redaksjonen spisser blyanter, tipper på hvem som bryter stillheten, småkrangler godmodig om tabellen.\n'
+      + '3. MENS VI VENTER – TITTELKAMPEN: gjør dagen om til en dramatisk gjennomgang av sesongstillingen og avdelingsracet.\n'
+      + '4. FORHÅNDSVARSEL/ODDS: et lekent «værvarsel» for morgendagen – hvem er mest sannsynlig til å bryte stillheten, basert på sesongform.\n'
+      + '5. HYLLEST: et heltportrett av sammenlagtlederen eller den ledende avdelingen.\n'
+      + (erStengt ? 'I DAG ER SØNDAG/STENGT: bruk vinkel 3, 4 eller 5 med hviledag-ramme – IKKE tørke-vinkelen.\n' : '')
+      + 'Varier gjerne vinkel fra gårsdagens utgave hvis den finnes.\n\n'
+      + stilleData + forrigeBlokkS
+      + '\n\nVIKTIG: Ikke finn på tall, navn, datoer eller salg – bruk KUN fakta fra seksjonen over. Mangler et tall, ikke nevn det. Skriv ALDRI at noen «leverte» eller at biler «rullet ut» – dette handler om signerte kontrakter.\n\n'
+      + 'Skriv feilfri norsk bokmål, episk og storslagent i ånden til La Gazzetta dello Sport, men forankret i de reelle tallene. Korte, eksplosive setninger vekslet med lengre. Ett velplassert utropstegn er lov.\n\n'
+      + '1. OVERSKRIFT (maks 10 ord): slående, men konkret – forankret i sesongstillingen, tørken eller hviledagen. UNNGÅ gåtefulle titler uten innhold.\n'
+      + '2. INGRESS (1 setning): slå an den storslagne tonen.\n'
+      + '3. BRØDTEKST: 4 avsnitt, ca 200 ord, skilt med \\n\\n. Inkluder ETT sitat i anførselstegn som eget avsnitt, tillagt redaksjonen eller en rolle (f.eks. «en tålmodig redaktør»), aldri en navngitt person. UNNGÅ klisjeene «skjebnetime», «historiebøkene», «tidenes», «en dag for evigheten».\n\n'
+      + 'Svar KUN med gyldig JSON, uten noe annet:\n{"overskrift":"...","ingress":"...","tekst":"avsnitt1\\n\\navsnitt2\\n\\n\\"Sitat\\"\\n\\navsnitt4"}';
+
+    return fetch('https://resrjvztsqdxzqgiffeg.supabase.co/functions/v1/swift-api', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlc3Jqdnp0c3FkeHpxZ2lmZmVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzg0MTMsImV4cCI6MjA5Mzc1NDQxM30.ouYcq-2hIUkqkn395Q5us5jYqa9JDVbOjJzORDBM72Y' },
+      body: JSON.stringify({ prompt: stillePrompt })
+    })
+    .then(function(r){ if(!r.ok) throw new Error('AI-feil: ' + r.status + '. Sjekk Edge Function og secret i Supabase.'); return r.json(); })
+    .then(function(data){
+      var content = data.content || (data.data && data.data.content);
+      var raw = content && content[0] ? content[0].text : null;
+      if (!raw) throw new Error('Tomt svar fra AI.');
+      var clean = raw; var jm = raw.match(/\{[\s\S]*\}/); if (jm) clean = jm[0]; else clean = raw.replace(/```json|```/g,'').trim();
+      var parsed = JSON.parse(clean);
+      if (!parsed.overskrift) throw new Error('Mangler overskrift.');
+      return korrekturles(parsed).then(function(rettet){ rettet.stats = stats; return rettet; });
+    })
+    .catch(function(e){
+      console.warn('Stille-dag AI feilet, bruker trygg fallback:', e.message);
+      return {
+        overskrift: erStengt ? 'Hviledag for gladiatorene' : ('Stillhet før stormen i ' + norskDato(dato).split(' ').slice(0,2).join(' ')),
+        ingress: 'Ingen kontrakter ble signert ' + norskDato(dato) + '.' + (dagerIgjenS>0 ? ' ' + dagerIgjenS + ' dager gjenstår av sesongen.' : ''),
+        tekst: (erStengt ? 'Forhandleren holdt stengt, og gladiatorene fikk en velfortjent pust i bakken.' : 'En dag uten signaturer – men i nybilsalgets verden varsler stillheten ofte den neste stormen.') + '\n\n' + (totalLeder ? (totalLeder + ' troner fortsatt på sammenlagttoppen med ' + (totalSelger[totalLeder]||0) + ' kontrakter.') : 'Sesongen ruller ufortrødent videre.') + '\n\n«Vi venter, vi følger med – og vi er klare i det øyeblikket salgene kommer.»\n\nRedaksjonen holder øye med lageret.',
+        stats: stats
+      };
     });
   }
 
