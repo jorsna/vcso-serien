@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VCSO Championship – Sesongfinale · Q2 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cinzel:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#c9a84c; --gold2:#f0c96e; --gold3:#8a6414; --gold-bright:#ffe98a;
+  --ryen:#4a8fff; --fornebu:#27c98a; --lillestrom:#e8a020;
+  --bg:#03080f;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);font-family:'Rajdhani',sans-serif;color:#fff;overflow-x:hidden;}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.bg-deep{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 120% 60% at 10% 10%,rgba(74,143,255,0.07) 0%,transparent 55%),
+    radial-gradient(ellipse 80% 80% at 90% 85%,rgba(201,168,76,0.08) 0%,transparent 55%),#03080f;}
+.bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(74,143,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(74,143,255,0.025) 1px,transparent 1px);
+  background-size:70px 70px;mask-image:radial-gradient(ellipse 90% 90% at 50% 40%,black,transparent);}
+.grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0.04;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+@keyframes shimmer{0%{background-position:200% center;}100%{background-position:-200% center;}}
+@keyframes crownFloat{0%,100%{transform:translateY(0) scale(1) rotate(-3deg);filter:drop-shadow(0 0 24px rgba(201,168,76,0.7));}50%{transform:translateY(-16px) scale(1.06) rotate(3deg);filter:drop-shadow(0 0 50px rgba(201,168,76,1));}}
+@keyframes revealUp{from{opacity:0;transform:translateY(60px) scale(0.95);}to{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes revealFade{from{opacity:0;}to{opacity:1;}}
+@keyframes scanDown{0%{top:-4px;opacity:1;}80%{opacity:1;}100%{top:100vh;opacity:0;}}
+@keyframes tickerMove{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes statPop{0%{transform:scale(0.6);opacity:0;}75%{transform:scale(1.06);}100%{transform:scale(1);opacity:1;}}
+@keyframes glowPulse{0%,100%{opacity:0.5;}50%{opacity:1;}}
+@keyframes orbitSpin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+@keyframes orbitSpinCCW{from{transform:rotate(0deg);}to{transform:rotate(-360deg);}}
+@keyframes trophyGlow{0%,100%{filter:drop-shadow(0 0 20px rgba(201,168,76,0.6));}50%{filter:drop-shadow(0 0 50px rgba(201,168,76,1));}}
+@keyframes playerDrop{from{opacity:0;transform:translateY(-30px) scale(0.85);}to{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes pitchGlow{0%,100%{opacity:0.5;}50%{opacity:0.8;}}
+
+.r1{animation:revealUp 1s cubic-bezier(.16,1,.3,1) 0.08s both;}
+.r2{animation:revealUp 1s cubic-bezier(.16,1,.3,1) 0.22s both;}
+.r3{animation:revealUp 1s cubic-bezier(.16,1,.3,1) 0.38s both;}
+.r4{animation:revealUp 1s cubic-bezier(.16,1,.3,1) 0.52s both;}
+.r5{animation:revealUp 1s cubic-bezier(.16,1,.3,1) 0.66s both;}
+.r6{animation:revealUp 1s cubic-bezier(.16,1,.3,1) 0.80s both;}
+.rf{animation:revealFade 1.4s ease 0.2s both;}
+
+.gold-text{background:linear-gradient(90deg,var(--gold3),var(--gold),var(--gold2),var(--gold-bright),var(--gold),var(--gold3));
+  background-size:300% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 4s linear infinite;}
+
+.scan{position:fixed;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,rgba(74,143,255,0.9),rgba(201,168,76,0.9),transparent);z-index:999;pointer-events:none;animation:scanDown 2s cubic-bezier(.4,0,.2,1) 0.05s forwards;}
+.spin-ring{width:44px;height:44px;border-radius:50%;border:2px solid rgba(74,143,255,0.1);border-top-color:var(--gold);animation:spin 0.85s linear infinite;}
+
+/* HEADER */
+.header{position:relative;text-align:center;padding:72px 24px 52px;overflow:hidden;}
+.header::after{content:'';position:absolute;bottom:0;left:5%;right:5%;height:1px;background:linear-gradient(90deg,transparent,rgba(74,143,255,0.3),rgba(201,168,76,0.7),rgba(74,143,255,0.3),transparent);}
+.eyebrow{font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.55em;text-transform:uppercase;color:rgba(201,168,76,0.4);margin-bottom:18px;}
+.header-trophy{font-size:70px;display:inline-block;margin-bottom:16px;animation:trophyGlow 3s ease-in-out infinite;}
+.header-title{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(38px,10vw,68px);line-height:0.95;letter-spacing:-0.02em;margin-bottom:8px;}
+.header-sub{font-family:'Playfair Display',serif;font-style:italic;font-weight:400;font-size:clamp(16px,4vw,26px);color:rgba(255,255,255,0.2);letter-spacing:0.06em;margin-bottom:28px;}
+.month-badge{display:inline-flex;align-items:center;gap:10px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.25);border-radius:100px;padding:10px 26px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.22em;color:rgba(201,168,76,0.7);}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold);animation:glowPulse 2s ease-in-out infinite;}
+
+/* TICKER */
+.ticker-wrap{overflow:hidden;white-space:nowrap;border-top:1px solid rgba(74,143,255,0.08);border-bottom:1px solid rgba(74,143,255,0.08);padding:12px 0;background:rgba(74,143,255,0.018);}
+.ticker-inner{display:inline-block;animation:tickerMove 50s linear infinite;}
+.ticker-chunk{display:inline-block;font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.28em;color:rgba(201,168,76,0.35);padding:0 40px;}
+
+/* FORHANDLER CARD */
+.fotm-wrap{margin:28px 16px 20px;}
+.fotm-card{background:linear-gradient(160deg,#080f1a,#04090e,#061210);border-radius:28px;padding:44px 28px 40px;position:relative;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(74,143,255,0.15),0 0 80px rgba(201,168,76,0.07),0 40px 80px rgba(0,0,0,0.6);}
+.fotm-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,rgba(74,143,255,0.4),rgba(201,168,76,1),rgba(240,201,110,1),rgba(201,168,76,1),rgba(74,143,255,0.4),transparent);}
+.fotm-trophy{font-size:52px;text-align:center;margin-bottom:8px;display:block;animation:crownFloat 3s ease-in-out infinite;}
+.fotm-eyebrow{font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.42em;text-transform:uppercase;color:rgba(201,168,76,0.5);text-align:center;margin-bottom:14px;display:flex;align-items:center;gap:12px;}
+.fotm-eyebrow::before,.fotm-eyebrow::after{content:'';flex:1;height:1px;}
+.fotm-eyebrow::before{background:linear-gradient(90deg,transparent,rgba(201,168,76,0.3));}
+.fotm-eyebrow::after{background:linear-gradient(90deg,rgba(201,168,76,0.3),transparent);}
+.fotm-name{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(32px,9vw,56px);line-height:1.1;letter-spacing:-0.01em;text-align:center;margin-bottom:16px;}
+.fotm-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:28px;}
+.fotm-stat{background:rgba(0,0,0,0.35);border-radius:18px;padding:20px 8px 16px;text-align:center;position:relative;overflow:hidden;animation:statPop 0.7s cubic-bezier(.16,1,.3,1) both;}
+.fotm-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.4),transparent);}
+.fotm-stat-num{font-family:'Playfair Display',serif;font-weight:900;font-size:44px;line-height:1;margin-bottom:5px;}
+.fotm-stat-lbl{font-family:'Cinzel',serif;font-size:7px;letter-spacing:0.28em;text-transform:uppercase;color:rgba(255,255,255,0.16);}
+
+/* RANK MINI */
+.rank-title{font-family:'Cinzel',serif;font-size:8px;letter-spacing:0.35em;color:rgba(201,168,76,0.32);text-align:center;display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.rank-title::before,.rank-title::after{content:'';flex:1;height:1px;background:rgba(201,168,76,0.1);}
+.rank-row{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:14px;margin-bottom:5px;background:rgba(255,255,255,0.018);border:1px solid rgba(255,255,255,0.03);transition:all 0.22s;}
+.rank-row:hover{background:rgba(74,143,255,0.04);border-color:rgba(74,143,255,0.12);transform:translateX(4px);}
+.rank-num{font-family:'Playfair Display',serif;font-weight:700;font-size:20px;color:rgba(255,255,255,0.1);width:24px;text-align:center;flex-shrink:0;}
+.rank-name{flex:1;font-size:14px;font-weight:600;color:rgba(255,255,255,0.7);}
+.rank-dept{font-family:'Cinzel',serif;font-size:8px;letter-spacing:0.1em;color:rgba(255,255,255,0.25);margin-top:1px;}
+.rank-pts{font-family:'Playfair Display',serif;font-weight:700;font-size:22px;}
+
+/* BESTE SELGER */
+.sec{margin:0 16px 14px;background:linear-gradient(160deg,#070d18,#030709);border-radius:24px;border:1px solid rgba(74,143,255,0.1);padding:28px 26px;position:relative;overflow:hidden;}
+.sec-top{position:absolute;top:0;left:0;right:0;height:2px;}
+.sec-title{font-family:'Cinzel',serif;font-size:12px;letter-spacing:0.22em;color:rgba(201,168,76,0.72);margin-bottom:22px;display:flex;align-items:center;gap:12px;font-weight:600;}
+.sec-title::after{content:'';flex:1;height:1px;background:rgba(74,143,255,0.1);}
+.sec-name{font-family:'Playfair Display',serif;font-weight:700;font-size:28px;line-height:1;}
+.sec-sub{font-size:11px;font-weight:600;letter-spacing:0.12em;margin-top:6px;}
+
+/* STATS GRID */
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 16px 14px;}
+.stat-tile{background:linear-gradient(160deg,#070d18,#030709);border:1px solid rgba(74,143,255,0.1);border-radius:18px;padding:18px 8px 14px;text-align:center;position:relative;overflow:hidden;animation:statPop 0.7s cubic-bezier(.16,1,.3,1) both;}
+.stat-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.3),transparent);}
+.stat-tile-num{font-family:'Playfair Display',serif;font-weight:900;font-size:32px;line-height:1;margin-bottom:5px;}
+.stat-tile-lbl{font-family:'Cinzel',serif;font-size:6px;letter-spacing:0.25em;text-transform:uppercase;color:rgba(255,255,255,0.18);}
+
+/* ── PITCH / FOTBALLBANE ── */
+.pitch-wrap{margin:0 16px 20px;}
+.pitch-header{background:linear-gradient(135deg,#0a1628,#050d1a);border-radius:24px 24px 0 0;padding:22px 24px 18px;
+  border:1px solid rgba(74,143,255,0.12);border-bottom:2px solid rgba(201,168,76,0.25);display:flex;align-items:center;gap:16px;}
+.pitch-badge{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2),var(--gold3));
+  display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;box-shadow:0 0 24px rgba(201,168,76,0.35);}
+.pitch-title{font-family:'Cinzel',serif;font-size:13px;letter-spacing:0.3em;color:var(--gold);font-weight:700;}
+.pitch-sub{font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:0.1em;margin-top:3px;}
+
+.pitch{
+  position:relative;
+  background:linear-gradient(180deg,#0d2b14 0%,#0f3318 30%,#0d2b14 60%,#0a2010 100%);
+  border:1px solid rgba(74,143,255,0.1);border-top:none;
+  border-radius:0 0 24px 24px;
+  padding:28px 16px 32px;
+  overflow:hidden;
+}
+/* Gress-tekstur */
+.pitch::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(180deg,rgba(255,255,255,0.018) 0px,rgba(255,255,255,0.018) 28px,transparent 28px,transparent 56px);
+  pointer-events:none;
+}
+/* Pitch-linjer SVG */
+.pitch-lines{position:absolute;inset:0;pointer-events:none;}
+
+/* Pitch-formasjon grid: 3 rader (spiss / midtlinje / forsvar) */
+.pitch-formation{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;align-items:center;
+  gap:20px;
+}
+.pitch-row{display:flex;justify-content:center;gap:14px;}
+
+/* Spillerkort på banen */
+.player-tile{
+  display:flex;flex-direction:column;align-items:center;
+  width:88px;
+  animation:playerDrop 0.6s cubic-bezier(.16,1,.3,1) both;
+  cursor:default;
+}
+.player-tile:hover .player-photo-ring{transform:scale(1.07);box-shadow:var(--ring-shadow),0 0 30px var(--ring-color);}
+.player-photo-ring{
+  width:64px;height:64px;border-radius:50%;
+  border:2.5px solid var(--ring-color,#c9a84c);
+  overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.5);
+  transition:transform 0.25s,box-shadow 0.25s;
+  box-shadow:0 0 16px var(--ring-color,rgba(201,168,76,0.4)),0 4px 20px rgba(0,0,0,0.6);
+  position:relative;
+}
+.player-photo-ring img{width:100%;height:100%;object-fit:cover;}
+.player-photo-ring .initials{font-family:'Playfair Display',serif;font-weight:700;font-size:22px;color:var(--ring-color,#c9a84c);}
+.player-rank-badge{
+  position:absolute;top:-4px;right:-4px;
+  width:22px;height:22px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  border:2px solid #03080f;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Cinzel',serif;font-size:9px;font-weight:700;color:#000;
+  box-shadow:0 0 8px rgba(201,168,76,0.7);
+  z-index:3;
+}
+.player-nameplate{
+  margin-top:8px;
+  background:rgba(0,0,0,0.65);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:8px;
+  padding:6px 8px 5px;
+  text-align:center;
+  width:100%;
+  backdrop-filter:blur(6px);
+}
+.player-nameplate-name{
+  font-family:'Rajdhani',sans-serif;font-weight:700;font-size:12px;
+  color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  line-height:1;
+}
+.player-nameplate-dept{
+  font-family:'Cinzel',serif;font-size:7px;letter-spacing:0.12em;
+  margin-top:2px;
+}
+.player-nameplate-stats{
+  display:flex;justify-content:center;gap:6px;margin-top:5px;
+}
+.player-stat-chip{
+  font-family:'Playfair Display',serif;font-weight:700;font-size:13px;
+  padding:1px 6px;border-radius:4px;
+  background:rgba(255,255,255,0.06);
+  line-height:1.4;
+}
+.player-stat-label{
+  font-family:'Cinzel',serif;font-size:6px;letter-spacing:0.15em;
+  color:rgba(255,255,255,0.3);margin-top:1px;text-align:center;
+}
+
+/* FOOTER */
+.footer{text-align:center;padding:44px 24px 28px;}
+.footer-line{height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.2),transparent);margin-bottom:22px;}
+.footer-txt{font-family:'Cinzel',serif;font-size:8px;letter-spacing:0.4em;color:rgba(201,168,76,0.18);}
+
+.loading{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;}
+.loading-lbl{font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.4em;color:rgba(201,168,76,0.28);}
+.page{position:relative;z-index:2;min-height:100vh;}
+.content{max-width:520px;margin:0 auto;}
+.spacer{height:24px;}
+
+/* ── Sesongfinale-tillegg ── */
+.ht-row{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;margin-bottom:8px;background:rgba(39,201,138,0.05);border:1px solid rgba(39,201,138,0.14);}
+.ht-dot{width:8px;height:8px;border-radius:50%;background:#27c98a;box-shadow:0 0 10px #27c98a;flex-shrink:0;}
+.ht-ct{color:#27c98a;font-weight:700;font-size:14px;}
+.ht-dt{color:rgba(255,255,255,0.38);font-size:12px;}
+.gz-cta{display:flex;align-items:center;justify-content:center;gap:12px;padding:16px;border-radius:16px;border:1px solid rgba(201,168,76,0.4);background:rgba(201,168,76,0.06);font-family:'Cinzel',serif;font-size:12px;letter-spacing:0.12em;color:#f0c96e;text-decoration:none;text-transform:uppercase;transition:all 0.2s;}
+.gz-cta:hover{background:rgba(201,168,76,0.12);border-color:rgba(201,168,76,0.7);}
+
+/* ── Elevert sesongmester ── */
+.champ-wrap{margin:24px 16px 18px;}
+.champ-card{position:relative;overflow:hidden;border-radius:28px;padding:42px 24px 26px;text-align:center;
+  background:radial-gradient(ellipse 90% 55% at 50% 0%,rgba(201,168,76,0.13),transparent 60%),linear-gradient(160deg,#080f1a,#04090e,#061210);
+  box-shadow:0 0 0 1px rgba(201,168,76,0.18),0 0 90px rgba(201,168,76,0.08),0 40px 80px rgba(0,0,0,0.6);}
+.champ-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,rgba(74,143,255,0.4),rgba(201,168,76,1),rgba(240,201,110,1),rgba(201,168,76,1),rgba(74,143,255,0.4),transparent);}
+.champ-beam{position:absolute;top:-12%;left:50%;transform:translateX(-50%);width:72%;height:64%;pointer-events:none;background:radial-gradient(ellipse 50% 100% at 50% 0%,rgba(240,201,110,0.16),transparent 70%);}
+.champ-burst{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3;}
+.champ-sweep{position:absolute;top:0;bottom:0;width:40%;left:-50%;transform:skewX(-18deg);pointer-events:none;z-index:4;background:linear-gradient(100deg,transparent,rgba(255,255,255,0.10),transparent);animation:champSweep 1.8s ease-out 0.4s 1 both;}
+@keyframes champSweep{from{left:-50%;}to{left:130%;}}
+.champ-yr{font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:6px;position:relative;z-index:2;}
+.champ-eyebrow{font-family:'Cinzel',serif;font-size:13px;font-weight:900;letter-spacing:0.5em;margin-bottom:18px;position:relative;z-index:2;}
+.champ-crown{font-size:42px;line-height:1;position:relative;z-index:2;animation:crownFloat 3s ease-in-out infinite;}
+.champ-portrait-wrap{position:relative;width:170px;height:170px;margin:6px auto 2px;z-index:2;}
+.champ-portrait-ring{position:absolute;inset:0;border-radius:50%;padding:4px;background:conic-gradient(#8a6414,#f0c96e,#c9a84c,#ffe98a,#8a6414);box-shadow:0 0 42px rgba(201,168,76,0.45);animation:trophyGlow 3.5s ease-in-out infinite;}
+.champ-portrait-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:#03080f;border:2px solid #04090f;display:flex;align-items:center;justify-content:center;}
+.champ-portrait-inner img{width:100%;height:100%;object-fit:cover;}
+.champ-portrait-inner span{font-family:'Playfair Display',serif;font-weight:900;font-size:56px;color:#f0c96e;}
+.champ-laurel{position:absolute;top:50%;font-size:36px;opacity:0.85;}
+.champ-laurel-l{left:-16px;transform:translateY(-50%);}
+.champ-laurel-r{right:-16px;transform:translateY(-50%) scaleX(-1);}
+.champ-name{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(38px,11vw,58px);line-height:1.02;margin-top:10px;position:relative;z-index:2;}
+.champ-honor{font-family:'Playfair Display',serif;font-style:italic;font-size:17px;color:rgba(255,255,255,0.5);margin-top:8px;position:relative;z-index:2;}
+.champ-pill{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:7px 20px;border-radius:100px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.18em;font-weight:600;position:relative;z-index:2;}
+.champ-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:28px;position:relative;z-index:2;}
+.champ-stat{background:rgba(0,0,0,0.4);border-radius:18px;padding:20px 8px 15px;text-align:center;border-top:1px solid rgba(201,168,76,0.35);animation:statPop 0.7s cubic-bezier(.16,1,.3,1) both;}
+.champ-stat-num{font-family:'Playfair Display',serif;font-weight:900;font-size:42px;line-height:1;margin-bottom:5px;}
+.champ-stat-lbl{font-family:'Cinzel',serif;font-size:8px;letter-spacing:0.28em;text-transform:uppercase;color:rgba(255,255,255,0.3);}
+.champ-down{margin-top:22px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.3em;color:rgba(255,255,255,0.25);position:relative;z-index:2;}
+
+/* ── Moment-band (fargetonede kåringer) ── */
+@keyframes momFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-9px);}}
+.mom{margin:18px 16px;position:relative;}
+.mom-card{position:relative;overflow:hidden;border-radius:28px;padding:40px 24px 26px;text-align:center;}
+.mom-bar{position:absolute;top:0;left:0;right:0;height:3px;}
+.mom-beam{position:absolute;top:-12%;left:50%;transform:translateX(-50%);width:72%;height:64%;pointer-events:none;}
+.mom-burst{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3;}
+.mom-sweep{position:absolute;top:0;bottom:0;width:40%;left:-50%;transform:skewX(-18deg);pointer-events:none;z-index:4;background:linear-gradient(100deg,transparent,rgba(255,255,255,0.10),transparent);animation:champSweep 1.8s ease-out 0.5s 1 both;}
+.mom-yr{font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:6px;position:relative;z-index:2;}
+.mom-eyebrow{font-family:'Cinzel',serif;font-size:13px;font-weight:900;letter-spacing:0.5em;margin-bottom:18px;position:relative;z-index:2;}
+.mom-shimmer{-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;background-size:300% auto;animation:shimmer 4.5s linear infinite;}
+.mom-icon{font-size:40px;line-height:1;position:relative;z-index:2;animation:momFloat 3s ease-in-out infinite;}
+.mom-name{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(38px,11vw,58px);line-height:1.02;margin-top:12px;position:relative;z-index:2;}
+.mom-honor{font-family:'Playfair Display',serif;font-style:italic;font-size:17px;color:rgba(255,255,255,0.5);margin-top:8px;position:relative;z-index:2;}
+.mom-hero{display:inline-block;border-radius:18px;padding:16px 34px;margin-top:20px;border:1px solid;position:relative;z-index:2;}
+.mom-hero-num{font-family:'Playfair Display',serif;font-weight:900;font-size:52px;line-height:1;}
+.mom-hero-lbl{font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.28em;text-transform:uppercase;margin-top:4px;}
+.mom-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:24px;position:relative;z-index:2;}
+.mom-tile{background:rgba(0,0,0,0.4);border-radius:16px;padding:18px 6px 13px;text-align:center;animation:statPop 0.7s cubic-bezier(.16,1,.3,1) both;}
+.mom-tile-num{font-family:'Playfair Display',serif;font-weight:900;font-size:28px;line-height:1;}
+.mom-tile-lbl{font-family:'Cinzel',serif;font-size:7px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-top:4px;}
+.mom-portrait{position:relative;width:150px;height:150px;margin:6px auto 2px;z-index:2;}
+.mom-portrait-ring{position:absolute;inset:0;border-radius:50%;padding:4px;}
+.mom-portrait-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:#03080f;border:2px solid #04090f;display:flex;align-items:center;justify-content:center;}
+.mom-portrait-inner img{width:100%;height:100%;object-fit:cover;}
+.mom-portrait-inner span{font-family:'Playfair Display',serif;font-weight:900;font-size:50px;}
+.mom-crest{position:relative;width:148px;height:148px;margin:10px auto 6px;z-index:2;}
+.mom-crest-ring{position:absolute;inset:0;border-radius:30px;padding:4px;transform:rotate(45deg);}
+.mom-crest-inner{width:100%;height:100%;border-radius:26px;display:flex;align-items:center;justify-content:center;transform:rotate(-45deg);}
+.mom-crest-inner span{font-family:'Cinzel',serif;font-weight:900;font-size:44px;}
+.mom-sub-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);margin-bottom:6px;}
+.mom-shared{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:16px;position:relative;z-index:2;}
+.gz-cta-sec{border-color:rgba(255,255,255,0.14);background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.7);}
+.gz-cta-sec:hover{border-color:rgba(255,255,255,0.3);background:rgba(255,255,255,0.06);}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div class="bg-deep"></div>
+<div class="bg-grid"></div>
+<div class="grain"></div>
+<div class="scan"></div>
+<div id="root" class="page"></div>
+
+<script>
+(function(){
+  const c=document.getElementById('particles'),ctx=c.getContext('2d');
+  let W,H,pts=[];
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  const COLS=[[74,143,255],[201,168,76],[240,201,110],[39,201,138],[255,215,0]];
+  for(let i=0;i<110;i++){
+    const col=COLS[Math.floor(Math.random()*COLS.length)];
+    pts.push({x:Math.random()*9999,y:Math.random()*9999,r:Math.random()*1.5+0.2,
+      vx:(Math.random()-0.5)*0.2,vy:-(Math.random()*0.35+0.05),
+      life:Math.random(),maxLife:Math.random()*0.6+0.4,col,
+      drift:Math.random()*Math.PI*2,driftS:Math.random()*0.01+0.003});
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.life+=0.0022;p.drift+=p.driftS;
+      if(p.life>p.maxLife){p.life=0;p.x=Math.random()*W;p.y=H+10;}
+      p.x+=p.vx+Math.sin(p.drift)*0.35;p.y+=p.vy;
+      const t=p.life/p.maxLife,a=t<0.15?t/0.15:t>0.8?(1-t)/0.2:1;
+      ctx.save();ctx.globalAlpha=a*0.5;
+      ctx.fillStyle=`rgb(${p.col.join(',')})`;
+      ctx.shadowBlur=10;ctx.shadowColor=`rgba(${p.col.join(',')},0.9)`;
+      ctx.beginPath();ctx.arc(p.x%W,p.y,p.r,0,Math.PI*2);ctx.fill();
+      ctx.restore();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+
+<script type="text/babel">
+const SB_URL="https://jffhdlmwvurnojoapcvs.supabase.co";
+const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmZmhkbG13dnVybm9qb2FwY3ZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MzIzNjcsImV4cCI6MjA5MzEwODM2N30.Mc_eKMsfR04kLmwfBeH5INn3NTYapv62Fnt0wMpBpMw";
+
+/* ── FROSSEN MODUS ──────────────────────────────────────────────────
+   Settes ÉN gang 1. juli etter Tacdis-avstemmingen: lim inn sesongens
+   salgsrader (samme format som /rest/v1/sales) i arrayet under. Når den
+   er satt henter siden ingenting fra Supabase – den blir et permanent
+   monument som overlever nullstilling og sommerpause. */
+const FROZEN_SALES = null;
+
+const SEASON_LABEL = "Sesong 1 · Q2 2026";
+const GAZZETTA_URL = "la_gazzetta_finale.html";
+const TABELL_URL = "tabell.html";
+
+const SELGER_PHOTOS={
+  "thomas_dokken":"photos/thomas_dokken.jpg","emma_valen":"photos/emma_valen.jpg",
+  "william_ostby":"photos/william_ostby.jpg","norman_elton":"photos/norman_elton.jpg",
+  "alexander_karlsen":"photos/alexander_karlsen.jpg","fabian_bredaljorgensen":"photos/fabian_bredaljorgensen.jpg",
+  "henrik_ostby":"photos/henrik_ostby.jpg","johan_kalenius":"photos/johan_kalenius.jpg",
+  "odd_bjarne_bjorvik":"photos/odd_bjarne_bjorvik.jpg","ask_herlofsen":"photos/ask_herlofsen.jpg",
+  "emanuel_bereket":"photos/emanuel_bereket.jpg","daniel_k_johansen":"photos/daniel_k_johansen.jpg",
+  "linn_askmannolsen":"photos/linn_askmannolsen.jpg","simen_olsen":"photos/simen_olsen.jpg",
+  "andreas_lydersen":"photos/andreas_lydersen.jpg",
+};
+
+const DEPT={
+  ryen:      {label:"Ryen",       color:"#4a8fff",soft:"#8fc0ff",dark:"#27508f",bg:"rgba(74,143,255,0.12)"},
+  fornebu:   {label:"Fornebu",    color:"#27c98a",soft:"#7fe3bf",dark:"#176f4f",bg:"rgba(39,201,138,0.12)"},
+  lillestrom:{label:"Lillestrøm", color:"#e8a020",soft:"#ffd27a",dark:"#9a6810",bg:"rgba(232,160,32,0.12)"},
+};
+/* Full stall – rettferdig poeng-per-selger (ulik bemanning) */
+const ROSTER={
+  "Thomas Dokken":"ryen","Emma Valen":"ryen","William Østby":"ryen","Norman Elton":"ryen","Alexander Karlsen":"ryen",
+  "Fabian Bredal-Jørgensen":"fornebu","Henrik Østby":"fornebu","Johan Kalenius":"fornebu","Odd Bjarne Bjørvik":"fornebu","Ask Herlofsen":"fornebu","Emanuel Bereket":"fornebu",
+  "Daniel K. Johansen":"lillestrom","Linn Askmann-Olsen":"lillestrom","Simen Olsen":"lillestrom","Andreas Lydersen":"lillestrom",
+};
+const PTS=3;
+const dc=loc=>DEPT[loc]?.color||"#c9a84c";
+const dl=loc=>DEPT[loc]?.label||loc;
+const {useState,useEffect,useRef}=React;
+
+function nameToId(n){
+  return n.toLowerCase().replace(/\s+/g,'_')
+    .replace(/æ/g,'ae').replace(/ø/g,'o').replace(/å/g,'aa').replace(/[^a-z0-9_]/g,'');
+}
+function hexA(hex,a){
+  const h=hex.replace('#','');
+  const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+const shimGrad=(dark,accent,soft)=>`linear-gradient(90deg,${dark},${accent},${soft},#ffffff,${accent},${dark})`;
+const ringGrad=(dark,accent,soft)=>`conic-gradient(${dark},${soft},${accent},#ffffff,${soft},${dark})`;
+
+function useBurst(ref,colors,enabled){
+  useEffect(()=>{
+    if(!enabled)return;const c=ref.current;if(!c)return;
+    const ctx=c.getContext&&c.getContext("2d");if(!ctx)return;
+    const w=c.width=c.offsetWidth||320,h=c.height=c.offsetHeight||440;
+    const ps=[];
+    for(let i=0;i<70;i++)ps.push({x:w/2+(Math.random()-0.5)*w*0.55,y:h*0.16+Math.random()*24,
+      vx:(Math.random()-0.5)*2.4,vy:Math.random()*1.3+0.4,r:Math.random()*2.2+0.6,
+      col:colors[(Math.random()*colors.length)|0],life:0,max:Math.random()*55+70});
+    let raf,frame=0;
+    function step(){
+      ctx.clearRect(0,0,w,h);frame++;let alive=false;
+      ps.forEach(p=>{p.life++;if(p.life>p.max)return;alive=true;p.x+=p.vx;p.y+=p.vy;p.vy+=0.022;
+        ctx.save();ctx.globalAlpha=Math.max(0,1-p.life/p.max);ctx.fillStyle=p.col;ctx.shadowBlur=8;ctx.shadowColor=p.col;
+        ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();ctx.restore();});
+      if(alive&&frame<210)raf=requestAnimationFrame(step);else ctx.clearRect(0,0,w,h);
+    }
+    step();return ()=>{if(raf)cancelAnimationFrame(raf);};
+  },[enabled]);
+}
+
+function AnimNum({value,color,suffix=""}){
+  const[n,setN]=useState(0);
+  useEffect(()=>{
+    if(!value)return;let start=null;
+    function step(ts){if(!start)start=ts;const p=Math.min((ts-start)/1100,1),e=1-Math.pow(1-p,4);setN(Math.round(e*value));if(p<1)requestAnimationFrame(step);}
+    requestAnimationFrame(step);
+  },[value]);
+  return <span style={{color}}>{n}{suffix}</span>;
+}
+
+function SmallAvatar({name,loc,size=38}){
+  const id=nameToId(name);const photo=SELGER_PHOTOS[id];
+  const init=name.split(" ").map(p=>p[0]).join("").slice(0,2).toUpperCase();const col=dc(loc);
+  return(
+    <div style={{width:size,height:size,borderRadius:'50%',overflow:'hidden',border:'1.5px solid '+col+'66',flexShrink:0,
+      background:DEPT[loc]?.bg||'rgba(74,143,255,0.1)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 0 12px '+col+'33'}}>
+      {photo?<img src={photo} style={{width:'100%',height:'100%',objectFit:'cover'}} alt={name}/>
+        :<span style={{fontFamily:"'Playfair Display',serif",fontSize:size*0.34,fontWeight:700,color:col}}>{init}</span>}
+    </div>
+  );
+}
+
+/* ── Sesongberegning ──────────────────────────────────────────────── */
+function rankSeason(sales){
+  const m={};
+  sales.forEach(x=>{
+    const n=x.selger;if(!n)return;
+    if(!m[n])m[n]={name:n,salg:0,finansiert:0,pts:0,loc:x.loc,lastTs:x.ts};
+    m[n].salg++;m[n].pts+=PTS+(x.spotlight_bonus||0);
+    if(x.finansiert)m[n].finansiert++;
+    if(x.ts>m[n].lastTs)m[n].lastTs=x.ts;
+  });
+  return Object.values(m).sort((a,b)=>b.pts-a.pts||b.finansiert-a.finansiert||a.lastTs.localeCompare(b.lastTs));
+}
+function deptStandings(sales){
+  const head={ryen:0,fornebu:0,lillestrom:0};
+  Object.values(ROSTER).forEach(loc=>{if(head[loc]!=null)head[loc]++;});
+  const pts={ryen:0,fornebu:0,lillestrom:0},salg={ryen:0,fornebu:0,lillestrom:0};
+  sales.forEach(s=>{const l=s.loc;if(pts[l]!=null){pts[l]+=PTS+(s.spotlight_bonus||0);salg[l]++;}});
+  return Object.keys(pts).map(loc=>({loc,pts:pts[loc],salg:salg[loc],head:head[loc],pps:head[loc]?pts[loc]/head[loc]:0}))
+    .sort((a,b)=>b.pps-a.pps);
+}
+function getMVPs(ws){
+  const bd={};
+  ws.forEach(s=>{const day=s.ts.slice(0,10);if(!bd[day])bd[day]={};bd[day][s.selger]=(bd[day][s.selger]||0)+1;});
+  const days=Object.keys(bd).sort(),mc={};
+  days.forEach(day=>{const ds=bd[day],max=Math.max(...Object.values(ds));Object.entries(ds).forEach(([n,c])=>{if(c===max)mc[n]=(mc[n]||0)+1;});});
+  if(!Object.keys(mc).length)return[];
+  const sorted=Object.entries(mc).sort((a,b)=>b[1]-a[1]),top=sorted[0][1];
+  return sorted.filter(([,c])=>c===top).map(([name,count])=>({name,count,loc:ws.find(s=>s.selger===name)?.loc||"",days}));
+}
+
+/* ── Byggekloss: badge-portrett og crest ──────────────────────────── */
+function Portrait({name,loc,accent,soft}){
+  const id=nameToId(name);const photo=SELGER_PHOTOS[id];
+  const init=name.split(" ").map(p=>p[0]).join("").slice(0,2).toUpperCase();
+  return(
+    <div className="mom-portrait">
+      <div className="mom-portrait-ring" style={{background:ringGrad(DEPT[loc]?.dark||"#5a4a14",accent,soft),boxShadow:`0 0 40px ${hexA(accent,0.45)}`}}>
+        <div className="mom-portrait-inner">
+          {photo?<img src={photo} alt={name}/>:<span style={{color:soft}}>{init}</span>}
+        </div>
+      </div>
+    </div>
+  );
+}
+function Crest({initials,accent,soft,dark}){
+  return(
+    <div className="mom-crest">
+      <div className="mom-crest-ring" style={{background:ringGrad(dark,accent,soft),boxShadow:`0 0 38px ${hexA(accent,0.45)}`}}>
+        <div className="mom-crest-inner"><span style={{color:soft}}>{initials}</span></div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Generisk moment-band ─────────────────────────────────────────── */
+function Moment(p){
+  const ref=useRef(null);
+  useBurst(ref,[p.soft,p.accent,"#ffffff"],!!p.particles);
+  const grad=shimGrad(p.dark,p.accent,p.soft);
+  return(
+    <div className={"mom "+(p.rkey||"")}>
+      <div className="mom-card" style={{
+        background:`radial-gradient(ellipse 90% 55% at 50% 0%,${hexA(p.accent,0.14)},transparent 60%),linear-gradient(160deg,#0a1322,#04090e,#06101c)`,
+        boxShadow:`0 0 0 1px ${hexA(p.accent,0.2)},0 0 90px ${hexA(p.accent,0.08)},0 40px 80px rgba(0,0,0,0.55)`}}>
+        <div className="mom-bar" style={{background:`linear-gradient(90deg,transparent,${hexA(p.accent,0.4)},${p.accent},${p.soft},${p.accent},${hexA(p.accent,0.4)},transparent)`}}/>
+        <div className="mom-beam" style={{background:`radial-gradient(ellipse 50% 100% at 50% 0%,${hexA(p.soft,0.16)},transparent 70%)`}}/>
+        {p.particles&&<canvas ref={ref} className="mom-burst"/>}
+        <div className="mom-sweep"/>
+        <div className="mom-yr">{SEASON_LABEL}</div>
+        <div className="mom-eyebrow mom-shimmer" style={{backgroundImage:grad}}>★ {p.eyebrow} ★</div>
+        <div className="mom-icon" style={{filter:`drop-shadow(0 0 18px ${hexA(p.soft,0.8)})`}}>{p.icon}</div>
+        {p.badge}
+        <div className="mom-name mom-shimmer" style={{backgroundImage:grad}}>{p.name}</div>
+        <div className="mom-honor">{p.honor}</div>
+        {p.hero!=null&&(
+          <div className="mom-hero" style={{borderColor:hexA(p.accent,0.3),background:hexA(p.accent,0.08)}}>
+            <div className="mom-hero-num mom-shimmer" style={{backgroundImage:grad}}>{p.hero}</div>
+            <div className="mom-hero-lbl" style={{color:hexA(p.soft,0.78)}}>{p.heroLabel}</div>
+          </div>
+        )}
+        {p.tiles&&(
+          <div className="mom-tiles">
+            {p.tiles.map((t,i)=>(
+              <div key={i} className="mom-tile" style={{borderTop:`1px solid ${hexA(p.accent,0.32)}`,animationDelay:(0.5+i*0.12)+'s'}}>
+                <div className="mom-tile-num"><AnimNum value={t.num} color={t.col}/></div>
+                <div className="mom-tile-lbl">{t.lbl}</div>
+              </div>
+            ))}
+          </div>
+        )}
+        {p.sub}
+      </div>
+    </div>
+  );
+}
+
+/* ── Sesongmester (gull-headliner) ────────────────────────────────── */
+function ChampionCard({champ}){
+  if(!champ)return null;
+  const col=dc(champ.loc);const pid=nameToId(champ.name);const photo=SELGER_PHOTOS[pid];
+  const init=champ.name.split(" ").map(p=>p[0]).join("").slice(0,2).toUpperCase();
+  const ref=useRef(null);
+  useBurst(ref,["#f0c96e","#c9a84c","#ffe98a","#ffffff"],true);
+  const stats=[
+    {val:champ.pts,lbl:"Poeng",c:"#f0c96e",delay:"0.55s"},
+    {val:champ.salg,lbl:"Biler",c:col,delay:"0.7s"},
+    {val:champ.finansiert,lbl:"Finansiert",c:"#5fb8d8",delay:"0.85s"},
+  ];
+  return(
+    <div className="champ-wrap r2">
+      <div className="champ-card">
+        <div className="champ-beam"/>
+        <canvas ref={ref} className="champ-burst"/>
+        <div className="champ-sweep"/>
+        <div className="champ-yr">{SEASON_LABEL}</div>
+        <div className="champ-eyebrow gold-text">★ SESONGMESTER ★</div>
+        <div className="champ-crown">👑</div>
+        <div className="champ-portrait-wrap">
+          <div className="champ-portrait-ring">
+            <div className="champ-portrait-inner">
+              {photo?<img src={photo} alt={champ.name}/>:<span>{init}</span>}
+            </div>
+          </div>
+          <span className="champ-laurel champ-laurel-l">🌿</span>
+          <span className="champ-laurel champ-laurel-r">🌿</span>
+        </div>
+        <div className="champ-name gold-text">{champ.name}</div>
+        <div className="champ-honor">Vinner {SEASON_LABEL}</div>
+        <div style={{textAlign:'center'}}>
+          <span className="champ-pill" style={{background:DEPT[champ.loc]?.bg,border:`1px solid ${col}44`,color:col}}>
+            <span style={{width:7,height:7,borderRadius:'50%',background:col,boxShadow:`0 0 8px ${col}`,display:'inline-block'}}/>
+            {dl(champ.loc)}
+          </span>
+        </div>
+        <div className="champ-stats">
+          {stats.map((s,i)=>(
+            <div key={i} className="champ-stat" style={{animationDelay:s.delay}}>
+              <div className="champ-stat-num"><AnimNum value={s.val} color={s.c}/></div>
+              <div className="champ-stat-lbl">{s.lbl}</div>
+            </div>
+          ))}
+        </div>
+        <div className="champ-down">▾ &nbsp; PALLEN · VINNERAVDELING · RENTEHAI · MVP · REKORDER &nbsp; ▾</div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Sesongpallen (kompakt bro) ───────────────────────────────────── */
+function PallCard({ranked}){
+  if(ranked.length<2)return null;
+  const top=ranked.slice(0,3);const medals=["🥇","🥈","🥉"];const mc=["#f0c96e","#c0c0c0","#cd7f32"];
+  return(
+    <div className="sec r3" style={{margin:'18px 16px'}}>
+      <div className="sec-top" style={{background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.7),transparent)'}}/>
+      <div className="sec-title">🏅 Sesongpallen</div>
+      {top.map((p,i)=>{const col=dc(p.loc);return(
+        <div key={p.name} className="rank-row">
+          <div className="rank-num" style={{color:mc[i],fontSize:i===0?22:18}}>{medals[i]}</div>
+          <SmallAvatar name={p.name} loc={p.loc} size={i===0?44:38}/>
+          <div style={{flex:1}}>
+            <div className="rank-name" style={{color:i===0?'#fff':'rgba(255,255,255,0.78)',fontSize:i===0?15:14}}>{p.name}</div>
+            <div className="rank-dept" style={{color:col+'cc'}}>{dl(p.loc)} · {p.salg} biler · {p.finansiert} fin</div>
+          </div>
+          <div style={{textAlign:'right'}}>
+            <div className="rank-pts" style={{color:mc[i]}}>{p.pts}</div>
+            <div style={{fontFamily:"'Cinzel',serif",fontSize:7,letterSpacing:'0.15em',color:'rgba(255,255,255,0.25)',marginTop:2}}>POENG</div>
+          </div>
+        </div>
+      );})}
+    </div>
+  );
+}
+
+/* ── Vinneravdeling (headliner #2, avdelingsfarget) ───────────────── */
+function VinneravdelingMoment({depts}){
+  if(!depts.length)return null;
+  const best=depts[0];const D=DEPT[best.loc]||{};
+  const accent=D.color||"#4a8fff",soft=D.soft||"#8fc0ff",dark=D.dark||"#27508f";
+  const sub=(
+    <div style={{margin:'18px 4px 2px',position:'relative',zIndex:2}}>
+      <div style={{fontFamily:"'Cinzel',serif",fontSize:9,letterSpacing:'0.3em',color:'rgba(255,255,255,0.25)',textAlign:'center',marginBottom:12}}>— AVDELINGSKAMPEN —</div>
+      {depts.map((d,i)=>{const c=dc(d.loc);return(
+        <div key={d.loc} className="mom-sub-row">
+          <span style={{fontFamily:"'Playfair Display',serif",fontWeight:700,width:22,textAlign:'center',color:i===0?soft:'rgba(255,255,255,0.5)'}}>{i+1}</span>
+          <span style={{flex:1,fontWeight:600,color:i===0?'#fff':'rgba(255,255,255,0.7)'}}>{dl(d.loc)}</span>
+          <span style={{fontSize:11,color:c+'aa',marginRight:8}}>{d.salg} biler · {d.head} selgere</span>
+          <span style={{fontFamily:"'Playfair Display',serif",fontWeight:700,color:i===0?soft:'rgba(255,255,255,0.6)'}}>{d.pps.toFixed(1).replace('.',',')}</span>
+        </div>
+      );})}
+    </div>
+  );
+  return <Moment rkey="r3" particles={true} accent={accent} soft={soft} dark={dark}
+    icon="🏆" eyebrow="VINNERAVDELING" name={dl(best.loc)} honor="Sesongens beste avdeling"
+    badge={<Crest initials={dl(best.loc).slice(0,2).toUpperCase()} accent={accent} soft={soft} dark={dark}/>}
+    hero={best.pps.toFixed(1).replace('.',',')} heroLabel="POENG PER SELGER"
+    tiles={[{num:best.pts,lbl:'Poeng totalt',col:soft},{num:best.salg,lbl:'Biler',col:accent},{num:best.head,lbl:'Selgere',col:'#cfe2ff'}]}
+    sub={sub}/>;
+}
+
+/* ── Sesongens Rentehai ───────────────────────────────────────────── */
+function RentehaiMoment({rentehaier}){
+  if(!rentehaier.length)return null;
+  const r=rentehaier[0];const accent="#5fb8d8",soft="#a8e0f0",dark="#2a7a96";
+  const sub=rentehaier.length>1?(
+    <div className="mom-shared">
+      {rentehaier.slice(1).map(x=>(
+        <span key={x.name} style={{display:'inline-flex',alignItems:'center',gap:8,color:'rgba(255,255,255,0.7)',fontWeight:600,fontSize:14}}>
+          <SmallAvatar name={x.name} loc={x.loc} size={30}/>{x.name}
+        </span>
+      ))}
+    </div>
+  ):null;
+  return <Moment rkey="r4" accent={accent} soft={soft} dark={dark}
+    icon="🦈" eyebrow={rentehaier.length>1?"DELT SESONGENS RENTEHAI":"SESONGENS RENTEHAI"}
+    name={r.name} honor="Flest finansierte salg i sesongen"
+    badge={<Portrait name={r.name} loc={r.loc} accent={accent} soft={soft}/>}
+    hero={r.finansiert} heroLabel="FINANSIERTE SALG" sub={sub}/>;
+}
+
+/* ── Flest MVP-dager ──────────────────────────────────────────────── */
+function MVPMoment({mvps}){
+  if(!mvps.length)return null;
+  const m=mvps[0];const accent="#f0b552",soft="#ffdd8f",dark="#8a5e14";
+  const sub=mvps.length>1?(
+    <div className="mom-shared">
+      {mvps.slice(1).map(x=>(
+        <span key={x.name} style={{display:'inline-flex',alignItems:'center',gap:8,color:'rgba(255,255,255,0.7)',fontWeight:600,fontSize:14}}>
+          <SmallAvatar name={x.name} loc={x.loc} size={30}/>{x.name}
+        </span>
+      ))}
+    </div>
+  ):null;
+  return <Moment rkey="r4" accent={accent} soft={soft} dark={dark}
+    icon="👑" eyebrow={mvps.length>1?"DELT FLEST MVP-DAGER":"FLEST MVP-DAGER"}
+    name={m.name} honor={`MVP ${m.count} av ${m.days.length} salgsdag${m.days.length>1?"er":""}`}
+    badge={<Portrait name={m.name} loc={m.loc} accent={accent} soft={soft}/>}
+    hero={m.count} heroLabel="MVP-DAGER" sub={sub}/>;
+}
+
+/* ── Flest hat-tricks ─────────────────────────────────────────────── */
+function HatTrickMoment({hatters,sales}){
+  if(!hatters.length)return null;
+  const h=hatters[0];const accent="#27c98a",soft="#7fe3bf",dark="#176f4f";
+  const days={};
+  sales.filter(s=>s.selger===h.name).forEach(s=>{const d=s.ts.slice(0,10);days[d]=(days[d]||0)+1;});
+  const htDays=Object.entries(days).filter(([,c])=>c>=3).map(([d,c])=>({d,c})).sort((a,b)=>a.d.localeCompare(b.d));
+  const sub=(
+    <div style={{margin:'16px 2px 0',position:'relative',zIndex:2}}>
+      {htDays.map(({d,c})=>(
+        <div key={d} className="ht-row">
+          <div className="ht-dot"/><span className="ht-ct">{c} salg</span>
+          <span style={{color:'rgba(255,255,255,0.25)'}}>—</span>
+          <span className="ht-dt">{new Date(d).toLocaleDateString("no-NO",{weekday:"long",day:"numeric",month:"long"})}</span>
+        </div>
+      ))}
+      {hatters.length>1&&(
+        <div className="mom-shared" style={{marginTop:12}}>
+          {hatters.slice(1).map(x=>(
+            <span key={x.name} style={{display:'inline-flex',alignItems:'center',gap:8,color:'rgba(255,255,255,0.7)',fontWeight:600,fontSize:14}}>
+              <SmallAvatar name={x.name} loc={x.loc} size={30}/>{x.name} ({x.htCount})
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+  return <Moment rkey="r4" accent={accent} soft={soft} dark={dark}
+    icon="⭐" eyebrow="FLEST HAT-TRICKS" name={h.name}
+    honor={`${h.htCount} hat-trick-dag${h.htCount>1?"er":""} i sesongen`}
+    badge={<Portrait name={h.name} loc={h.loc} accent={accent} soft={soft}/>}
+    hero={h.htCount} heroLabel="HAT-TRICKS" sub={sub}/>;
+}
+
+/* ── Sesongen i tall ──────────────────────────────────────────────── */
+function SesongStats({sales}){
+  const totSalg=sales.length;
+  const totFin=sales.filter(s=>s.finansiert).length;
+  const finPct=totSalg?Math.round(totFin/totSalg*100):0;
+  const activeDays=new Set(sales.map(s=>s.ts.slice(0,10))).size;
+  return(
+    <div className="r5" style={{margin:'18px 0 0'}}>
+      <div style={{margin:'0 16px 8px'}}><div className="rank-title">Sesongen i tall</div></div>
+      <div className="stats-bar">
+        {[
+          {val:totSalg,lbl:'Biler totalt',col:'var(--gold2)',delay:'0.6s'},
+          {val:totFin,lbl:'Finansiert',col:'#f0c96e',delay:'0.72s'},
+          {val:finPct,lbl:'Fin %',col:'#27c98a',delay:'0.84s',suffix:'%'},
+          {val:activeDays,lbl:'Salgsdager',col:'#4a8fff',delay:'0.96s'},
+        ].map(({val,lbl,col,delay,suffix},i)=>(
+          <div key={i} className="stat-tile" style={{animationDelay:delay}}>
+            <div className="stat-tile-num"><AnimNum value={val} color={col} suffix={suffix||""}/></div>
+            <div className="stat-tile-lbl">{lbl}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── Ticker ───────────────────────────────────────────────────────── */
+function Ticker({ranked,champ}){
+  const items=ranked.slice(0,5).map((r,i)=>`${i+1}. ${r.name} · ${r.pts} p`).join("   ✦   ");
+  const full=`✦ SESONGFINALE · ${SEASON_LABEL.toUpperCase()} · VCSO CHAMPIONSHIP ✦   ${champ?`👑 VINNER: ${champ.name}   ✦   `:""}${items}   `;
+  return(
+    <div className="ticker-wrap">
+      <div className="ticker-inner">
+        <span className="ticker-chunk">{full}</span>
+        <span className="ticker-chunk">{full}</span>
+      </div>
+    </div>
+  );
+}
+
+/* ── App ──────────────────────────────────────────────────────────── */
+function App(){
+  const[sales,setSales]=useState(null);
+  const[error,setError]=useState(null);
+  useEffect(()=>{
+    if(FROZEN_SALES){setSales(FROZEN_SALES);return;}
+    fetch(SB_URL+"/rest/v1/sales?select=*&deleted=eq.false&order=ts.asc",
+      {headers:{apikey:SB_KEY,Authorization:"Bearer "+SB_KEY}})
+    .then(r=>r.ok?r.json():Promise.reject(r.statusText))
+    .then(setSales).catch(e=>setError(String(e)));
+  },[]);
+
+  if(error)return(
+    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',color:'#ef4444',fontFamily:'Rajdhani',padding:24,textAlign:'center'}}>
+      <div><div style={{fontSize:36,marginBottom:12}}>⚠️</div>Feil: {error}</div>
+    </div>
+  );
+  if(!sales)return(
+    <div className="loading"><div className="spin-ring"/><div className="loading-lbl">Kroner sesongmesteren...</div></div>
+  );
+
+  const ranked=rankSeason(sales);
+  const champ=ranked[0]||null;
+  const depts=deptStandings(sales);
+  const mvps=getMVPs(sales);
+  const maxFin=Math.max(0,...ranked.map(r=>r.finansiert));
+  const rentehaier=maxFin>0?ranked.filter(r=>r.finansiert===maxFin):[];
+  const htMap={};
+  sales.forEach(s=>{const d=s.ts.slice(0,10);if(!htMap[s.selger])htMap[s.selger]={};htMap[s.selger][d]=(htMap[s.selger][d]||0)+1;});
+  const hatters=Object.entries(htMap)
+    .filter(([,d])=>Object.values(d).some(c=>c>=3))
+    .map(([name])=>({name,loc:sales.find(s=>s.selger===name)?.loc||"",htCount:Object.values(htMap[name]).filter(c=>c>=3).length}))
+    .sort((a,b)=>b.htCount-a.htCount);
+
+  return(
+    <div>
+      <div className="header rf">
+        <div className="eyebrow">VCSO Championship · 2026</div>
+        <div className="header-trophy">🏆</div>
+        <div className="header-title gold-text">Sesongfinale</div>
+        <div className="header-sub">Den store kåringen</div>
+        <div className="month-badge"><div className="badge-dot"/>{SEASON_LABEL}</div>
+      </div>
+
+      {sales.length===0?(
+        <div style={{textAlign:'center',padding:'80px 24px',fontFamily:"'Playfair Display',serif",fontStyle:'italic',fontSize:18,color:'rgba(255,255,255,0.2)'}}>
+          Ingen salg registrert i sesongen.
+        </div>
+      ):(
+        <div className="content">
+          <Ticker ranked={ranked} champ={champ}/>
+          <div className="spacer"/>
+          <ChampionCard champ={champ}/>
+          <PallCard ranked={ranked}/>
+          <VinneravdelingMoment depts={depts}/>
+          <RentehaiMoment rentehaier={rentehaier}/>
+          <MVPMoment mvps={mvps}/>
+          <HatTrickMoment hatters={hatters} sales={sales}/>
+          <SesongStats sales={sales}/>
+          <div style={{margin:'18px 16px 24px',display:'flex',flexDirection:'column',gap:10}}>
+            <a className="gz-cta" href={GAZZETTA_URL}>
+              <span style={{fontSize:20}}>📰</span>
+              <span>Les La Gazzetta — sesongoppsummering</span>
+              <span style={{opacity:0.6}}>→</span>
+            </a>
+            <a className="gz-cta gz-cta-sec" href={TABELL_URL}>
+              <span style={{fontSize:18}}>📊</span>
+              <span>Se hele sluttabellen</span>
+              <span style={{opacity:0.6}}>→</span>
+            </a>
+          </div>
+          <div className="footer r6">
+            <div className="footer-line"/>
+            <div className="footer-txt">VCSO Championship · {SEASON_LABEL} · Sesongfinale</div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.render(<App/>,document.getElementById("root"));
+</script>
+</body>
+</html>

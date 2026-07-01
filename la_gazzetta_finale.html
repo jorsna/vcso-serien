@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Gazzetta dello VCSO Championship – Sesongfinale</title>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Barlow:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #f5f0e8; font-family: 'Barlow', sans-serif; min-height: 100vh; }
+
+/* ── FINALE-BANNER ── */
+.finale-banner {
+  background: #1a1a1a; color: #c9a84c; text-align: center; padding: 8px 20px;
+  font-size: 11px; font-weight: 900; letter-spacing: 4px; text-transform: uppercase;
+  border-bottom: 2px solid #c9a84c; animation: slideDown 0.4s ease forwards;
+}
+
+/* ── MASTHEAD ── */
+.masthead { background: #fff; border-bottom: 3px solid #1a1a1a; }
+.masthead-top {
+  background: #1a1a1a; color: #f5f0e8; text-align: center; padding: 6px 20px;
+  font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.masthead-title {
+  font-family: 'UnifrakturMaguntia', cursive; font-size: clamp(32px, 7vw, 68px);
+  color: #1a1a1a; text-align: center; padding: 16px 20px 8px; letter-spacing: 1px; line-height: 1;
+}
+.masthead-rule { height: 1px; background: #1a1a1a; margin: 0 20px; }
+.masthead-rule-thick { height: 3px; background: #1a1a1a; margin: 4px 20px 0; }
+.masthead-sub {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 20px 10px; font-size: 11px; color: #555; font-style: italic;
+}
+.masthead-motto { font-family: 'Playfair Display', serif; font-style: italic; font-size: 13px; color: #333; text-align: center; }
+
+/* ── SPESIALUTGAVE-BANNER ── */
+.special-edition-bar {
+  background: #1a1a1a; text-align: center; padding: 11px 20px;
+  border-top: 4px solid #c9a84c; border-bottom: 4px solid #c9a84c;
+}
+.special-edition-bar span {
+  font-family: 'Barlow', sans-serif; font-weight: 900; font-size: 13px;
+  letter-spacing: 5px; text-transform: uppercase; color: #c9a84c;
+}
+
+.page { max-width: 800px; margin: 0 auto; padding: 0 16px 60px; }
+.edition-date {
+  text-align: center; padding: 12px 0 16px; font-size: 12px; color: #888;
+  letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid #ddd; margin-bottom: 28px;
+}
+
+/* ── ARTICLE ── */
+.article-wrap { background: #fff; border: 1px solid #ddd; border-top: none; padding: 32px 32px 40px;
+  opacity: 0; transform: translateY(12px); animation: fadeUp 0.7s ease 0.2s forwards; }
+.article-kicker {
+  text-align: center; font-family: 'Barlow', sans-serif; font-weight: 900; font-size: 10px;
+  letter-spacing: 4px; text-transform: uppercase; color: #b8902e; margin-bottom: 10px;
+  padding-bottom: 8px; border-bottom: 1px solid #c9a84c;
+}
+.article-headline {
+  font-family: 'Playfair Display', serif; font-size: clamp(28px, 5.5vw, 48px); font-weight: 900;
+  line-height: 1.1; color: #1a1a1a; text-align: center; margin-bottom: 10px;
+}
+.article-headline em { font-style: italic; }
+.article-deck {
+  font-family: 'Playfair Display', serif; font-size: 16px; font-style: italic; color: #555;
+  text-align: center; margin-bottom: 24px; line-height: 1.55;
+}
+.article-divider { display: flex; align-items: center; gap: 12px; margin: 0 0 28px; }
+.article-divider::before, .article-divider::after { content: ''; flex: 1; height: 1px; background: #1a1a1a; }
+.article-divider-diamond { font-size: 10px; color: #1a1a1a; }
+.article-body { font-family: 'Playfair Display', serif; font-size: 15px; line-height: 1.85; color: #1a1a1a; columns: 2; column-gap: 32px; }
+@media (max-width: 600px) { .article-body { columns: 1; } .article-wrap { padding: 20px 16px 28px; } }
+.article-body p { margin-bottom: 14px; }
+.article-body p:first-child::first-letter {
+  font-size: 58px; font-weight: 900; float: left; line-height: 0.82; margin: 6px 6px 0 0;
+  font-family: 'Playfair Display', serif; color: #b8902e;
+}
+.article-pull {
+  column-span: all; border-top: 2px solid #1a1a1a; border-bottom: 2px solid #1a1a1a;
+  padding: 14px 0 10px; margin: 22px 0; font-family: 'Playfair Display', serif;
+  font-size: 19px; font-style: italic; font-weight: 700; color: #1a1a1a; text-align: center;
+}
+.facts-box { column-span: all; background: #1a1a1a; color: #f5f0e8; padding: 20px 24px; margin: 24px 0; border-left: 5px solid #c9a84c; }
+.facts-box-title { font-family: 'Barlow', sans-serif; font-weight: 900; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #c9a84c; margin-bottom: 10px; }
+.facts-box ul { list-style: none; padding: 0; }
+.facts-box ul li { font-family: 'Playfair Display', serif; font-size: 13px; line-height: 1.6; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.facts-box ul li:last-child { border-bottom: none; }
+.facts-box ul li::before { content: '◆ '; color: #c9a84c; font-size: 9px; }
+.article-signature {
+  column-span: all; margin-top: 28px; padding-top: 12px; border-top: 1px solid #ddd;
+  font-family: 'Barlow', sans-serif; font-size: 10px; color: #999; letter-spacing: 1px; text-transform: uppercase; text-align: right;
+}
+
+/* ── PLASSHOLDER (før 1. juli) ── */
+.placeholder { text-align: center; padding: 60px 20px; }
+.placeholder .ph-icon { font-size: 40px; margin-bottom: 16px; }
+.placeholder .ph-title { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 24px; color: #1a1a1a; margin-bottom: 10px; }
+.placeholder .ph-text { font-family: 'Playfair Display', serif; font-style: italic; font-size: 15px; color: #777; line-height: 1.6; max-width: 440px; margin: 0 auto; }
+
+/* ── NAV / FOOTER ── */
+.gazzetta-nav { max-width: 800px; margin: 18px auto 0; padding: 0 16px; text-align: center; }
+.gazzetta-nav a {
+  display: inline-block; font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 11px;
+  letter-spacing: 2px; text-transform: uppercase; color: #1a1a1a; text-decoration: none;
+  border: 1px solid #1a1a1a; padding: 10px 22px; transition: all 0.15s;
+}
+.gazzetta-nav a:hover { background: #1a1a1a; color: #c9a84c; }
+.gazzetta-footer {
+  max-width: 800px; margin: 20px auto 0; padding: 0 16px 40px; text-align: center;
+  font-size: 10px; color: #bbb; font-family: 'Barlow', sans-serif; letter-spacing: 1px; text-transform: uppercase;
+}
+
+@keyframes fadeUp { to { opacity: 1; transform: none; } }
+@keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: none; opacity: 1; } }
+</style>
+</head>
+<body>
+
+<div class="finale-banner">★ &nbsp; Sesongfinale &nbsp;·&nbsp; Sesong 1 er over &nbsp;·&nbsp; Q2 2026 &nbsp; ★</div>
+
+<div class="masthead">
+  <div class="masthead-top">
+    <span>VCSO Championship 2026</span>
+    <span>Sesongfinale</span>
+    <span>30. juni 2026</span>
+  </div>
+  <div class="masthead-title">La Gazzetta dello VCSO Championship</div>
+  <div class="masthead-rule"></div>
+  <div class="masthead-sub">
+    <span>Sesongfinale</span>
+    <span class="masthead-motto">«Biler, drama og scoringer»</span>
+    <span>Sesong 1 · Q2 2026</span>
+  </div>
+  <div class="masthead-rule-thick"></div>
+</div>
+
+<div class="special-edition-bar">
+  <span>★ &nbsp; Sesongfinale &nbsp;·&nbsp; Sesong 1 · Q2 2026 &nbsp; ★</span>
+</div>
+
+<div class="page">
+  <div class="article-wrap" id="art"></div>
+</div>
+
+<div class="gazzetta-nav">
+  <a href="sesongfinale.html">← Tilbake til kåringen</a>
+</div>
+
+<div class="gazzetta-footer">
+  La Gazzetta dello VCSO Championship &nbsp;·&nbsp; Volvo Car Stor Oslo &nbsp;·&nbsp; Sesongfinale 2026
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════════
+   FINALE-ARTIKKEL — fylles ÉN gang 1. juli.
+
+   Slik gjør vi det: etter Tacdis-avstemmingen genereres recap-teksten via
+   swift-api med sesongens grunnede fakta (mester, pall, vinneravdeling på
+   poeng/selger, rentehai, MVP-konge, hat-trick-konge, totaler, beste dag).
+   Du leser og godkjenner, og den godkjente HTML-en limes inn under.
+   Regel: «aldri finn på tall» — kun grunnede fakta.
+
+   Bruk klassene som finnes i arket:
+     <div class="article-kicker">…</div>
+     <h1 class="article-headline">…<em>…</em></h1>
+     <p class="article-deck">…</p>
+     <div class="article-divider"><span class="article-divider-diamond">◆</span></div>
+     <div class="article-body">
+       <p>…</p>
+       <div class="article-pull">«…»</div>
+       <div class="facts-box"><div class="facts-box-title">Sesongen i tall</div><ul><li>…</li></ul></div>
+       <div class="article-signature">— Redaksjonen … · 30. juni 2026</div>
+     </div>
+   ══════════════════════════════════════════════════════════════════════ */
+const FINALE_ARTIKKEL = null;
+
+const PLACEHOLDER = `
+  <div class="placeholder">
+    <div class="ph-icon">📰</div>
+    <div class="ph-title">Finale-utgaven kommer</div>
+    <div class="ph-text">Sesongoppsummeringen genereres og bakes inn 1. juli, etter at sesongen er avstemt mot Tacdis. Da kåres mesteren her — i ord.</div>
+  </div>`;
+
+document.getElementById('art').innerHTML = FINALE_ARTIKKEL || PLACEHOLDER;
+</script>
+
+</body>
+</html>
