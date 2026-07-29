@@ -3156,7 +3156,6 @@ function switchHofTab(tab) {
     btnLeg.style.background   = 'var(--card)';  btnLeg.style.color   = 'var(--gold)';  btnLeg.style.borderBottom   = '2px solid var(--gold)';
     // Lazy-load legender første gang
     var el = document.getElementById('legender-container');
-    if (el && el.innerHTML.indexOf('Laster') === -1 && el.innerHTML.trim() === '') return;
     if (el && (el.innerHTML.trim() === '' || el.innerHTML.indexOf('Laster') !== -1)) renderLegender();
   }
 }
