@@ -711,13 +711,15 @@ html, body {
 </script>
 
 <style id="atmo-css">
-/* ═══ SESONG 2 ATMOSFÆRE (additivt lag) ═══ */
+/* ═══ SESONG 2 ATMOSFÆRE (additivt lag, tema: champ) ═══ */
 html{background:#070b16}
 body{background:transparent !important}
 .atmo{position:fixed;inset:0;pointer-events:none;z-index:-1}
 .atmo-sky{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% -20%,#16203c 0%,#0b1020 45%,#05080f 100%)}
 .atmo-pitch{position:absolute;inset:0;opacity:.05}
 .atmo-pitch svg{width:100%;height:100%}
+.atmo-pitch circle,.atmo-pitch line,.atmo-pitch path{stroke:#ffd700}
+.atmo-pitch circle[r="4"]{fill:#ffd700;stroke:none}
 .beam{position:absolute;top:-12%;width:65vw;height:120vh;opacity:.10;background:linear-gradient(180deg,rgba(255,235,170,.9),transparent 62%);filter:blur(28px);transform-origin:top center;animation:beamSway 14s ease-in-out infinite}
 .beam.l{left:-24vw;transform:rotate(20deg)}
 .beam.r{right:-24vw;transform:rotate(-20deg);animation-delay:-7s}
@@ -727,9 +729,9 @@ body{background:transparent !important}
 .aurora.b{background:radial-gradient(circle,#8a6d1f,transparent 65%);bottom:-25vw;right:-20vw;animation:auraB 32s ease-in-out infinite alternate}
 @keyframes auraA{to{transform:translate(14vw,10vh) scale(1.15)}}
 @keyframes auraB{to{transform:translate(-12vw,-8vh) scale(1.2)}}
-.godrays{position:absolute;top:-6%;left:50%;width:150vw;height:150vw;transform:translateX(-50%);background:conic-gradient(from 0deg,transparent 0 14deg,rgba(255,230,150,.05) 17deg 20deg,transparent 23deg 40deg,rgba(255,230,150,.04) 43deg 46deg,transparent 49deg 78deg,rgba(255,230,150,.05) 81deg 84deg,transparent 87deg 120deg,rgba(255,230,150,.04) 123deg 126deg,transparent 129deg 360deg);border-radius:50%;animation:raySpin 70s linear infinite;-webkit-mask-image:radial-gradient(circle at 50% 12%,#000 0%,transparent 42%);mask-image:radial-gradient(circle at 50% 12%,#000 0%,transparent 42%)}
+.godrays{position:absolute;top:-6%;left:50%;width:150vw;height:150vw;transform:translateX(-50%);background:conic-gradient(from 0deg,transparent 0 14deg,#ffe6960d 17deg 20deg,transparent 23deg 40deg,#ffe6960a 43deg 46deg,transparent 49deg 78deg,#ffe6960d 81deg 84deg,transparent 87deg 120deg,#ffe6960a 123deg 126deg,transparent 129deg 360deg);border-radius:50%;animation:raySpin 70s linear infinite;-webkit-mask-image:radial-gradient(circle at 50% 12%,#000 0%,transparent 42%);mask-image:radial-gradient(circle at 50% 12%,#000 0%,transparent 42%)}
 @keyframes raySpin{to{transform:translateX(-50%) rotate(360deg)}}
-.dust i{position:absolute;width:3px;height:3px;border-radius:50%;background:radial-gradient(circle,#ffe9a0,rgba(255,215,0,0));animation:drift linear infinite;opacity:0}
+.dust i{position:absolute;width:3px;height:3px;border-radius:50%;background:radial-gradient(circle,#ffe9a0,#ffd70000);animation:drift linear infinite;opacity:0}
 @keyframes drift{0%{transform:translateY(15vh) translateX(0);opacity:0}12%{opacity:.7}88%{opacity:.4}100%{transform:translateY(-110vh) translateX(6vw);opacity:0}}
 .crowd{position:absolute;left:0;right:0;bottom:0;height:110px}
 .crowd svg{position:absolute;inset:0;width:100%;height:100%}
@@ -739,9 +741,9 @@ body{background:transparent !important}
 @keyframes grainShift{0%{transform:translate(0,0)}33%{transform:translate(-6%,4%)}66%{transform:translate(5%,-5%)}100%{transform:translate(0,0)}}
 .atmo-vig{position:absolute;inset:0;background:radial-gradient(140% 100% at 50% 55%,transparent 55%,rgba(0,0,0,.55) 100%)}
 /* scoreboard-fliser på eksisterende countdown */
-.cd-box{background:linear-gradient(180deg,#1c2544 48%,#121a30 52%) !important;border:1px solid rgba(212,175,55,.35) !important;border-radius:7px !important;min-width:52px;padding:8px 6px 6px !important;box-shadow:0 10px 24px -12px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.06) !important;position:relative}
+#urgency-stripe .cd-box,.cd-box{background:linear-gradient(180deg,#1c2544 48%,#121a30 52%) !important;border:1px solid rgba(212,175,55,.35) !important;border-radius:7px !important;min-width:52px;padding:8px 6px 6px !important;box-shadow:0 10px 24px -12px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.06) !important;position:relative}
 .cd-box::before{content:"";position:absolute;left:4px;right:4px;top:50%;height:1px;background:rgba(0,0,0,.55)}
-.cd-n{font-family:'Anton',sans-serif !important;color:#ffd700 !important;text-shadow:0 0 14px #ffd70059 !important;font-size:22px !important;line-height:1 !important}
+#urgency-stripe .cd-n,.cd-n,body.tier-sluttspurt .cd-n,body.tier-kritisk .cd-n{font-family:'Anton',sans-serif !important;color:#ffd700 !important;text-shadow:0 0 14px #ffd70059 !important;font-size:22px !important;line-height:1 !important}
 .cd-l{letter-spacing:.24em !important;text-transform:uppercase;font-size:8px !important}
 .cd-sep{color:#8a6d1f !important}
 @media (prefers-reduced-motion:reduce){.beam,.dust i,.grain,.aurora,.godrays,.flash{animation:none}.godrays{display:none}}
