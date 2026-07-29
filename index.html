@@ -2926,152 +2926,104 @@ function renderLegender() {
   if (!el) return;
   el.innerHTML = '<div style="font-size:11px;color:var(--muted);font-style:italic;padding:16px 14px">Laster legender...</div>';
 
-  var SEASONS_DEF = [
-    { label: 'Sesong 2 \u00b7 Q3 2026', from: '2026-07-01', to: '2026-10-01' },
-    { label: 'Sesong 1 \u00b7 Q2 2026', from: '2026-04-01', to: '2026-07-01' }
-  ];
+  var MIN_SALG_FINANS = 5; // minste antall salg for \u00e5 kvalifisere til finanskongen
 
-  Promise.all([
-    fetch(SUPABASE_URL + '/rest/v1/season_archive?select=*&order=pts.desc&limit=500', { mode:'cors', headers: sbH() })
-      .then(function(r){ return r.ok ? r.json() : []; }),
-    fetch(SUPABASE_URL + '/rest/v1/weekly_winners?order=week_year.asc,week_nr.asc&limit=200', { mode:'cors', headers: sbH() })
-      .then(function(r){ return r.ok ? r.json() : []; })
-  ]).then(function(res){
-    var archive = Array.isArray(res[0]) ? res[0] : [];
-    var weeks   = Array.isArray(res[1]) ? res[1] : [];
-
-    var seasons = SEASONS_DEF.map(function(def){
-      var arch = archive.filter(function(a){ return a.season_label === def.label; });
-      var wk = weeks.filter(function(w){
-        var d = w.week_start || '';
-        return d >= def.from && d < def.to;
-      });
-      return { def: def, archive: arch, weeks: wk };
-    }).filter(function(s){ return s.archive.length || s.weeks.length; });
-
-    if (!seasons.length) {
-      el.innerHTML = '<div style="font-size:11px;color:var(--muted);font-style:italic;padding:16px 14px">Ingen data enn\u00e5 \u2014 kom tilbake etter f\u00f8rste uke.</div>';
-      return;
-    }
-
-    function avHtml(sObj, size) {
-      var sz = size || 40;
-      var hasPhoto = typeof SELGER_PHOTOS!=='undefined' && sObj.id && SELGER_PHOTOS[sObj.id];
-      var inner = hasPhoto
-        ? '<img src="'+SELGER_PHOTOS[sObj.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">'
-        : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:'+(sz*0.32)+'px;font-weight:900;color:'+(sObj.color||'var(--gold)')+'">'+(sObj.initials||'?')+'</div>';
-      return '<div style="width:'+sz+'px;height:'+sz+'px;border-radius:50%;padding:2px;'
-        +'background:linear-gradient(135deg,#f5e642,#ffd700,#c8960c,#ffd700,#f5e642);'
-        +'background-size:300% 300%;animation:goldSpin 3s ease infinite,hofGlow 2.5s ease-in-out infinite;flex-shrink:0">'
-        +'<div style="width:100%;height:100%;border-radius:50%;overflow:hidden;border:1.5px solid #0a0a14">'
-        +inner+'</div></div>';
-    }
-    function secTitle(emoji, txt) {
-      return '<div style="font-family:Anton,sans-serif;font-size:10px;letter-spacing:3px;color:var(--gold);opacity:.7;margin-bottom:12px">'+emoji+' '+txt+'</div>';
-    }
-    function personRow(navn, sub, right, rightSub, i, big) {
-      var medalEmoji = ['\ud83d\udc51','\ud83e\udd48','\ud83e\udd49'];
-      var medalColors = ['#ffd700','#c0c0c0','#cd7f32'];
-      var sObj = SELGERE.find(function(s){ return s.navn===navn; }) || {};
-      var medal = i < 3 ? medalEmoji[i] : (i+1)+'.';
-      var col = i < 3 ? medalColors[i] : 'var(--muted)';
-      return '<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--b1)">'
-        +'<div style="font-size:'+(i===0?'22':'16')+'px;width:28px;text-align:center;flex-shrink:0">'+medal+'</div>'
-        +avHtml(sObj, i===0&&big?48:36)
-        +'<div style="flex:1">'
-          +'<div style="font-family:Anton,sans-serif;font-size:'+(i===0?'16':'13')+'px;color:var(--txt);letter-spacing:.5px">'+navn+'</div>'
-          +'<div style="font-size:9px;color:var(--muted);margin-top:2px">'+(sub||LL[sObj.loc]||sObj.loc||'')+'</div>'
-        +'</div>'
-        +'<div style="text-align:right;flex-shrink:0">'
-          +'<div style="font-family:Anton,sans-serif;font-size:'+(i===0?'22':'16')+'px;color:'+col+'">'+right+'</div>'
-          +'<div style="font-size:8px;color:var(--muted)">'+rightSub+'</div>'
-        +'</div>'
-      +'</div>';
-    }
-
-    function buildSeason(season) {
-      var html = '';
-      var arch = season.archive.slice().sort(function(a,b){
-        return (b.pts||0)-(a.pts||0) || (b.finansiert||0)-(a.finansiert||0);
-      });
-
-      // \u2500\u2500 Sesongpall \u2500\u2500
-      if (arch.length) {
-        html += '<div style="padding:14px 14px 6px">'+secTitle('\ud83c\udfc6','SESONGPALL');
-        arch.slice(0,3).forEach(function(a, i){
-          var sObj = SELGERE.find(function(s){ return s.navn===a.selger; }) || {};
-          html += personRow(a.selger, (a.salg||0)+' salg  \u00b7  '+(LL[a.loc]||sObj.loc||a.loc||''), (a.pts||0), 'POENG', i, true);
-        });
-        html += '</div>';
-      } else {
-        html += '<div style="padding:14px 14px 6px">'+secTitle('\ud83c\udfc6','SESONGPALL')
-          +'<div style="font-size:11px;color:var(--muted);font-style:italic;padding:4px 0 10px">Sesongen p\u00e5g\u00e5r \u2014 pallen arkiveres ved sesongslutt.</div></div>';
+  fetch(SUPABASE_URL + '/rest/v1/season_archive?select=*&order=pts.desc&limit=500', { mode:'cors', headers: sbH() })
+    .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(function(archive){
+      if (!Array.isArray(archive) || !archive.length) {
+        el.innerHTML = '<div style="font-size:11px;color:var(--muted);font-style:italic;padding:16px 14px">Ingen fullf\u00f8rte sesonger enn\u00e5 \u2014 f\u00f8rste sesong arkiveres ved sesongslutt.</div>';
+        return;
       }
 
-      // \u2500\u2500 Ukevinnere \u2500\u2500
-      var winnerCount = {}, hatCount = {}, weekNrs = {};
-      var byWeek = {};
-      season.weeks.forEach(function(w){
-        var k = (w.week_year||0)+'-'+w.week_nr;
-        if (!byWeek[k]) byWeek[k] = [];
-        byWeek[k].push(w);
+      var bySeason = {};
+      archive.forEach(function(a){
+        var k = a.season_label || ('Sesong ' + (a.season_year || ''));
+        if (!bySeason[k]) bySeason[k] = [];
+        bySeason[k].push(a);
       });
-      Object.keys(byWeek).forEach(function(wk){
-        var rows = byWeek[wk].sort(function(a,b){
-          return b.pts-a.pts || (b.finansiert||b.tens||0)-(a.finansiert||a.tens||0);
+      var labels = Object.keys(bySeason).sort().reverse(); // nyeste sesong \u00f8verst
+
+      function avHtml(navn, size) {
+        var sObj = SELGERE.find(function(s){ return s.navn===navn; }) || {};
+        var sz = size || 40;
+        var hasPhoto = typeof SELGER_PHOTOS!=='undefined' && sObj.id && SELGER_PHOTOS[sObj.id];
+        var inner = hasPhoto
+          ? '<img src="'+SELGER_PHOTOS[sObj.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">'
+          : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:'+(sz*0.32)+'px;font-weight:900;color:'+(sObj.color||'var(--gold)')+'">'+(sObj.initials||'?')+'</div>';
+        return '<div style="width:'+sz+'px;height:'+sz+'px;border-radius:50%;padding:2px;'
+          +'background:linear-gradient(135deg,#f5e642,#ffd700,#c8960c,#ffd700,#f5e642);'
+          +'background-size:300% 300%;animation:goldSpin 3s ease infinite,hofGlow 2.5s ease-in-out infinite;flex-shrink:0">'
+          +'<div style="width:100%;height:100%;border-radius:50%;overflow:hidden;border:1.5px solid #0a0a14">'
+          +inner+'</div></div>';
+      }
+      function secTitle(emoji, txt) {
+        return '<div style="font-family:Anton,sans-serif;font-size:10px;letter-spacing:3px;color:var(--gold);opacity:.7;margin-bottom:12px">'+emoji+' '+txt+'</div>';
+      }
+
+      function buildSeason(label) {
+        var rows = bySeason[label].slice().sort(function(a,b){
+          return (b.pts||0)-(a.pts||0) || (b.finansiert||0)-(a.finansiert||0);
         });
-        var bestPts = rows[0].pts, bestTb = rows[0].finansiert || rows[0].tens || 0;
-        rows.filter(function(r){ return r.pts===bestPts && (r.finansiert||r.tens||0)===bestTb; })
-          .forEach(function(w){
-            var navn = w.selger || w.pst || '';
-            winnerCount[navn] = (winnerCount[navn]||0) + 1;
-            if (!weekNrs[navn]) weekNrs[navn] = [];
-            weekNrs[navn].push(w.week_nr);
+        var html = '';
+
+        // \u2500\u2500 Sesongoverskrift \u2500\u2500
+        html += '<div style="text-align:center;padding:20px 14px 4px">'
+          +'<div style="font-family:Anton,sans-serif;font-size:19px;letter-spacing:3px;'
+          +'background:linear-gradient(135deg,#fff 0%,var(--gold) 40%,#fff 70%,var(--gold) 100%);background-size:200% auto;'
+          +'-webkit-background-clip:text;background-clip:text;color:transparent;animation:logoShine 3s linear infinite">'
+          +label.toUpperCase()+'</div>'
+          +'<div style="height:2px;width:70px;margin:8px auto 0;background:linear-gradient(90deg,transparent,var(--gold),transparent)"></div>'
+        +'</div>';
+
+        // \u2500\u2500 Sesongmester \u2500\u2500
+        var mester = rows[0];
+        if (mester) {
+          html += '<div style="padding:12px 14px 6px">'+secTitle('\ud83c\udfc6','SESONGMESTER')
+            +'<div style="display:flex;align-items:center;gap:14px;padding:6px 0 10px">'
+              +'<div style="font-size:26px;flex-shrink:0">\ud83d\udc51</div>'
+              +avHtml(mester.selger, 56)
+              +'<div style="flex:1">'
+                +'<div style="font-family:Anton,sans-serif;font-size:18px;color:var(--txt);letter-spacing:.5px">'+mester.selger+'</div>'
+                +'<div style="font-size:10px;color:var(--muted);margin-top:2px">'+(mester.salg||0)+' salg \u00b7 '+(LL[mester.loc]||mester.loc||'')+'</div>'
+              +'</div>'
+              +'<div style="text-align:right;flex-shrink:0">'
+                +'<div style="font-family:Anton,sans-serif;font-size:26px;color:#ffd700">'+(mester.pts||0)+'</div>'
+                +'<div style="font-size:8px;color:var(--muted)">POENG</div>'
+              +'</div>'
+            +'</div>'
+          +'</div>';
+        }
+
+        // \u2500\u2500 Finanskongen (finansgrad) \u2500\u2500
+        var finList = rows.filter(function(a){ return (a.salg||0) >= MIN_SALG_FINANS; })
+          .map(function(a){ return { a:a, grad: (a.finansiert||0)/(a.salg||1) }; })
+          .sort(function(x,y){ return y.grad-x.grad || (y.a.finansiert||0)-(x.a.finansiert||0); })
+          .slice(0,3);
+        if (finList.length) {
+          var medalEmoji = ['\ud83d\udcb0','\ud83e\udd48','\ud83e\udd49'];
+          var medalColors = ['#ffd700','#c0c0c0','#cd7f32'];
+          html += '<div style="padding:12px 14px 6px;border-top:1px solid var(--b1)">'+secTitle('\ud83d\udcb0','FINANSKONGEN \u00b7 FINANSGRAD');
+          finList.forEach(function(f, i){
+            html += '<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--b1)">'
+              +'<div style="font-size:'+(i===0?'20':'15')+'px;width:28px;text-align:center;flex-shrink:0">'+medalEmoji[i]+'</div>'
+              +avHtml(f.a.selger, i===0?44:34)
+              +'<div style="flex:1">'
+                +'<div style="font-family:Anton,sans-serif;font-size:'+(i===0?'15':'12')+'px;color:var(--txt)">'+f.a.selger+'</div>'
+                +'<div style="font-size:9px;color:var(--muted);margin-top:2px">'+(f.a.finansiert||0)+' av '+(f.a.salg||0)+' salg finansiert</div>'
+              +'</div>'
+              +'<div style="text-align:right;flex-shrink:0">'
+                +'<div style="font-family:Anton,sans-serif;font-size:'+(i===0?'20':'15')+'px;color:'+medalColors[i]+'">'+Math.round(f.grad*100)+'%</div>'
+                +'<div style="font-size:8px;color:var(--muted)">FINANSGRAD</div>'
+              +'</div>'
+            +'</div>';
           });
-        (rows[0].hat_tricks || []).forEach(function(navn){
-          hatCount[navn] = (hatCount[navn]||0) + 1;
-        });
-      });
-      var winnerList = Object.keys(winnerCount).map(function(navn){
-        return { navn:navn, wins:winnerCount[navn], hats:hatCount[navn]||0, weeks:weekNrs[navn]||[] };
-      }).sort(function(a,b){ return b.wins-a.wins || b.hats-a.hats; });
-      if (winnerList.length) {
-        html += '<div style="padding:14px 14px 6px;border-top:1px solid var(--b1)">'+secTitle('\ud83d\udc51','FLEST UKESSEIRE');
-        winnerList.forEach(function(p, i){
-          var sub = (p.weeks.length ? 'Uke '+p.weeks.join(', ')+'  \u00b7  ' : '');
-          var sObj = SELGERE.find(function(s){ return s.navn===p.navn; }) || {};
-          html += personRow(p.navn, sub+(LL[sObj.loc]||sObj.loc||''), p.wins, 'UKE'+(p.wins===1?'':'R'), i, true);
-        });
-        html += '</div>';
-      }
+          html += '</div>';
+        }
 
-      // \u2500\u2500 Hat-trick-kongen \u2500\u2500
-      var hatList = Object.keys(hatCount).map(function(navn){
-        return { navn:navn, hats:hatCount[navn], wins:winnerCount[navn]||0 };
-      }).sort(function(a,b){ return b.hats-a.hats || b.wins-a.wins; });
-      if (hatList.length) {
-        html += '<div style="padding:14px 14px 6px;border-top:1px solid var(--b1)">'+secTitle('\u26bd','HAT-TRICK-KONGEN');
-        hatList.forEach(function(p, i){
-          html += personRow(p.navn, '', p.hats+' \u2b50', 'HAT-TRICK'+(p.hats===1?'':'S'), i, false);
-        });
-        html += '</div>';
-      }
-
-      // \u2500\u2500 Finanskongen \u2500\u2500
-      var finList = arch.filter(function(a){ return (a.finansiert||0) > 0; })
-        .slice().sort(function(a,b){ return (b.finansiert||0)-(a.finansiert||0) || (b.pts||0)-(a.pts||0); });
-      if (finList.length) {
-        html += '<div style="padding:14px 14px 6px;border-top:1px solid var(--b1)">'+secTitle('\ud83d\udcb0','FINANSKONGEN');
-        finList.slice(0,3).forEach(function(a, i){
-          html += personRow(a.selger, (a.salg||0)+' salg', (a.finansiert||0), 'FINANSIERT', i, false);
-        });
-        html += '</div>';
-      }
-
-      // \u2500\u2500 Vinneravdeling (poeng per selger) \u2500\u2500
-      if (arch.length) {
+        // \u2500\u2500 Vinneravdeling (poeng per selger) \u2500\u2500
         var locAgg = {};
-        arch.forEach(function(a){
+        rows.forEach(function(a){
           var l = a.loc || '';
           if (!locAgg[l]) locAgg[l] = { pts:0, n:0 };
           locAgg[l].pts += (a.pts||0); locAgg[l].n += 1;
@@ -3079,64 +3031,34 @@ function renderLegender() {
         var locList = Object.keys(locAgg).map(function(l){
           return { loc:l, pps: locAgg[l].n ? locAgg[l].pts/locAgg[l].n : 0, pts: locAgg[l].pts, n: locAgg[l].n };
         }).sort(function(a,b){ return b.pps-a.pps; });
-        html += '<div style="padding:14px 14px 14px;border-top:1px solid var(--b1)">'+secTitle('\ud83c\udfdf\ufe0f','VINNERAVDELING');
-        locList.forEach(function(t, i){
-          var col = i===0 ? '#ffd700' : 'var(--muted)';
-          html += '<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--b1)">'
-            +'<div style="font-size:'+(i===0?'20':'15')+'px;width:28px;text-align:center;flex-shrink:0">'+(i===0?'\ud83c\udfc6':(i+1)+'.')+'</div>'
-            +'<div style="width:12px;height:12px;border-radius:3px;background:'+(LC[t.loc]||'var(--gold)')+';flex-shrink:0"></div>'
-            +'<div style="flex:1">'
-              +'<div style="font-family:Anton,sans-serif;font-size:'+(i===0?'15':'13')+'px;color:var(--txt);letter-spacing:.5px">'+(LL[t.loc]||t.loc)+'</div>'
-              +'<div style="font-size:9px;color:var(--muted);margin-top:2px">'+t.pts+' poeng \u00b7 '+t.n+' selgere</div>'
-            +'</div>'
-            +'<div style="text-align:right;flex-shrink:0">'
-              +'<div style="font-family:Anton,sans-serif;font-size:'+(i===0?'20':'15')+'px;color:'+col+'">'+t.pps.toFixed(1)+'</div>'
-              +'<div style="font-size:8px;color:var(--muted)">POENG/SELGER</div>'
-            +'</div>'
-          +'</div>';
-        });
-        html += '</div>';
+        if (locList.length) {
+          html += '<div style="padding:12px 14px 16px;border-top:1px solid var(--b1)">'+secTitle('\ud83c\udfdf\ufe0f','VINNERAVDELING');
+          locList.forEach(function(t, i){
+            var col = i===0 ? '#ffd700' : 'var(--muted)';
+            html += '<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--b1)">'
+              +'<div style="font-size:'+(i===0?'20':'15')+'px;width:28px;text-align:center;flex-shrink:0">'+(i===0?'\ud83c\udfc6':(i+1)+'.')+'</div>'
+              +'<div style="width:12px;height:12px;border-radius:3px;background:'+(LC[t.loc]||'var(--gold)')+';flex-shrink:0"></div>'
+              +'<div style="flex:1">'
+                +'<div style="font-family:Anton,sans-serif;font-size:'+(i===0?'15':'13')+'px;color:var(--txt);letter-spacing:.5px">'+(LL[t.loc]||t.loc)+'</div>'
+                +'<div style="font-size:9px;color:var(--muted);margin-top:2px">'+t.pts+' poeng \u00b7 '+t.n+' selgere</div>'
+              +'</div>'
+              +'<div style="text-align:right;flex-shrink:0">'
+                +'<div style="font-family:Anton,sans-serif;font-size:'+(i===0?'20':'15')+'px;color:'+col+'">'+t.pps.toFixed(1)+'</div>'
+                +'<div style="font-size:8px;color:var(--muted)">POENG/SELGER</div>'
+              +'</div>'
+            +'</div>';
+          });
+          html += '</div>';
+        }
+
+        return html;
       }
 
-      return html || '<div style="font-size:11px;color:var(--muted);font-style:italic;padding:16px 14px">Ingen data for denne sesongen enn\u00e5.</div>';
-    }
-
-    var activeIdx = 0;
-    var tabsHtml = '';
-    if (seasons.length > 1) {
-      tabsHtml = '<div style="display:flex;gap:1px;background:var(--b1);border-bottom:1px solid var(--b1)">'
-        + seasons.map(function(s, i){
-            return '<button id="leg-tab-'+i+'" onclick="switchLegenderSesong('+i+')" '
-              +'style="flex:1;padding:8px;font-family:Anton,sans-serif;font-size:11px;letter-spacing:1px;'
-              +'background:'+(i===activeIdx?'var(--card)':'var(--card2)')+';'
-              +'color:'+(i===activeIdx?'var(--gold)':'var(--muted)')+';'
-              +'border:none;cursor:pointer;transition:all .2s">'+s.def.label+'</button>';
-          }).join('')
-        +'</div>';
-    }
-
-    el.innerHTML = tabsHtml
-      + '<div id="legender-content">'
-      + buildSeason(seasons[activeIdx])
-      + '</div>';
-
-    el._seasons = seasons;
-    el._buildSeason = buildSeason;
-
-  }).catch(function(){
-    el.innerHTML = '<div style="font-size:11px;color:var(--muted);font-style:italic;padding:16px 14px">Kunne ikke laste legender.</div>';
-  });
-}
-
-function switchLegenderSesong(idx) {
-  var el = document.getElementById('legender-container');
-  if (!el || !el._seasons || !el._seasons[idx]) return;
-  document.querySelectorAll('[id^="leg-tab-"]').forEach(function(btn){
-    var isActive = btn.id === 'leg-tab-'+idx;
-    btn.style.background = isActive ? 'var(--card)' : 'var(--card2)';
-    btn.style.color = isActive ? 'var(--gold)' : 'var(--muted)';
-  });
-  document.getElementById('legender-content').innerHTML = el._buildSeason(el._seasons[idx]);
+      el.innerHTML = labels.map(buildSeason).join('');
+    })
+    .catch(function(){
+      el.innerHTML = '<div style="font-size:11px;color:var(--muted);font-style:italic;padding:16px 14px">Kunne ikke laste legender.</div>';
+    });
 }
 
 function switchHofTab(tab) {
