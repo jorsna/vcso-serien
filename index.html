@@ -709,8 +709,69 @@ html, body {
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
+
+<style id="atmo-css">
+/* ═══ SESONG 2 ATMOSFÆRE (additivt lag) ═══ */
+html{background:#070b16}
+body{background:transparent !important}
+.atmo{position:fixed;inset:0;pointer-events:none;z-index:-1}
+.atmo-sky{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% -20%,#16203c 0%,#0b1020 45%,#05080f 100%)}
+.atmo-pitch{position:absolute;inset:0;opacity:.05}
+.atmo-pitch svg{width:100%;height:100%}
+.beam{position:absolute;top:-12%;width:65vw;height:120vh;opacity:.10;background:linear-gradient(180deg,rgba(255,235,170,.9),transparent 62%);filter:blur(28px);transform-origin:top center;animation:beamSway 14s ease-in-out infinite}
+.beam.l{left:-24vw;transform:rotate(20deg)}
+.beam.r{right:-24vw;transform:rotate(-20deg);animation-delay:-7s}
+@keyframes beamSway{0%,100%{opacity:.07}50%{opacity:.14}}
+.aurora{position:absolute;width:70vw;height:70vw;border-radius:50%;filter:blur(90px);opacity:.09;mix-blend-mode:screen}
+.aurora.a{background:radial-gradient(circle,#ffd700,transparent 65%);top:-15vw;left:-20vw;animation:auraA 26s ease-in-out infinite alternate}
+.aurora.b{background:radial-gradient(circle,#8a6d1f,transparent 65%);bottom:-25vw;right:-20vw;animation:auraB 32s ease-in-out infinite alternate}
+@keyframes auraA{to{transform:translate(14vw,10vh) scale(1.15)}}
+@keyframes auraB{to{transform:translate(-12vw,-8vh) scale(1.2)}}
+.godrays{position:absolute;top:-6%;left:50%;width:150vw;height:150vw;transform:translateX(-50%);background:conic-gradient(from 0deg,transparent 0 14deg,rgba(255,230,150,.05) 17deg 20deg,transparent 23deg 40deg,rgba(255,230,150,.04) 43deg 46deg,transparent 49deg 78deg,rgba(255,230,150,.05) 81deg 84deg,transparent 87deg 120deg,rgba(255,230,150,.04) 123deg 126deg,transparent 129deg 360deg);border-radius:50%;animation:raySpin 70s linear infinite;-webkit-mask-image:radial-gradient(circle at 50% 12%,#000 0%,transparent 42%);mask-image:radial-gradient(circle at 50% 12%,#000 0%,transparent 42%)}
+@keyframes raySpin{to{transform:translateX(-50%) rotate(360deg)}}
+.dust i{position:absolute;width:3px;height:3px;border-radius:50%;background:radial-gradient(circle,#ffe9a0,rgba(255,215,0,0));animation:drift linear infinite;opacity:0}
+@keyframes drift{0%{transform:translateY(15vh) translateX(0);opacity:0}12%{opacity:.7}88%{opacity:.4}100%{transform:translateY(-110vh) translateX(6vw);opacity:0}}
+.crowd{position:absolute;left:0;right:0;bottom:0;height:110px}
+.crowd svg{position:absolute;inset:0;width:100%;height:100%}
+.flash{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:0;animation:blitz 4s linear infinite}
+@keyframes blitz{0%,96%,100%{opacity:0}97%{opacity:.95}98%{opacity:.2}99%{opacity:.7}}
+.grain{position:absolute;inset:-100%;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E");animation:grainShift 1.4s steps(3) infinite}
+@keyframes grainShift{0%{transform:translate(0,0)}33%{transform:translate(-6%,4%)}66%{transform:translate(5%,-5%)}100%{transform:translate(0,0)}}
+.atmo-vig{position:absolute;inset:0;background:radial-gradient(140% 100% at 50% 55%,transparent 55%,rgba(0,0,0,.55) 100%)}
+/* scoreboard-fliser på eksisterende countdown */
+.cd-box{background:linear-gradient(180deg,#1c2544 48%,#121a30 52%) !important;border:1px solid rgba(212,175,55,.35) !important;border-radius:7px !important;min-width:52px;padding:8px 6px 6px !important;box-shadow:0 10px 24px -12px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.06) !important;position:relative}
+.cd-box::before{content:"";position:absolute;left:4px;right:4px;top:50%;height:1px;background:rgba(0,0,0,.55)}
+.cd-n{font-family:'Anton',sans-serif !important;color:#ffd700 !important;text-shadow:0 0 14px #ffd70059 !important;font-size:22px !important;line-height:1 !important}
+.cd-l{letter-spacing:.24em !important;text-transform:uppercase;font-size:8px !important}
+.cd-sep{color:#8a6d1f !important}
+@media (prefers-reduced-motion:reduce){.beam,.dust i,.grain,.aurora,.godrays,.flash{animation:none}.godrays{display:none}}
+</style>
 </head>
 <body>
+<div class="atmo" aria-hidden="true">
+  <div class="atmo-sky"></div>
+  <div class="atmo-pitch">
+    <svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="200" cy="400" r="150" fill="none" stroke="#c9a24a" stroke-width="1.5"/>
+      <circle cx="200" cy="400" r="4" fill="#c9a24a"/>
+      <line x1="-50" y1="400" x2="450" y2="400" stroke="#c9a24a" stroke-width="1.5"/>
+      <path d="M-50 60 h500 M-50 740 h500" stroke="#c9a24a" stroke-width="1"/>
+    </svg>
+  </div>
+  <div class="aurora a"></div><div class="aurora b"></div>
+  <div class="godrays"></div>
+  <div class="beam l"></div><div class="beam r"></div>
+  <div class="dust" id="atmo-dust"></div>
+  <div class="crowd" id="atmo-crowd">
+    <svg viewBox="0 0 400 110" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 110 V70 q6 -7 12 0 q5 -9 11 -1 q6 -8 12 0 q5 -7 11 0 q6 -9 12 -1 q5 -7 11 0 q6 -8 12 0 q5 -9 11 -1 q6 -7 12 0 q5 -8 11 0 q6 -9 12 -1 q5 -7 11 0 q6 -8 12 0 q5 -7 11 0 q6 -9 12 -1 q5 -7 11 0 q6 -8 12 0 q5 -9 11 -1 q6 -7 12 0 q5 -8 11 0 q6 -9 12 -1 q5 -7 11 0 q6 -8 12 0 q5 -7 11 0 q6 -9 12 -1 q5 -7 11 0 q6 -8 12 0 q5 -9 11 -1 q6 -7 12 0 q5 -8 11 0 q6 -9 12 -1 q5 -7 11 0 L400 110 Z" fill="#03050b"/>
+      <path d="M0 110 V88 q8 -6 16 0 q7 -7 15 0 q8 -6 16 0 q7 -8 15 -1 q8 -6 16 0 q7 -7 15 0 q8 -6 16 0 q7 -8 15 -1 q8 -6 16 0 q7 -7 15 0 q8 -6 16 0 q7 -8 15 -1 q8 -6 16 0 q7 -7 15 0 q8 -6 16 0 q7 -8 15 -1 q8 -6 16 0 q7 -7 15 0 q8 -6 16 0 q7 -8 15 -1 q8 -6 16 0 q7 -7 15 0 q8 -6 16 0 q7 -8 15 0 L400 110 Z" fill="#01030a"/>
+    </svg>
+  </div>
+  <div class="grain"></div>
+  <div class="atmo-vig"></div>
+</div>
+
 
 <!-- INTRO / LOGIN -->
 <div id="intro-overlay">
@@ -748,7 +809,7 @@ html, body {
     <div class="hdr-top" style="position:relative;display:block;padding:4px 0 2px">
       <div style="text-align:center">
         <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:1px">
-          <div class="crest" style="margin:0">&#9917;</div>
+          <svg width="34" height="38" viewBox="0 0 74 84" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 3px 10px rgba(0,0,0,.5))"><defs><linearGradient id="crestG" x1="0" y1="0" x2="74" y2="84"><stop offset="0" stop-color="#ffe452"/><stop offset=".5" stop-color="#c9a24a"/><stop offset="1" stop-color="#8a6d1f"/></linearGradient><linearGradient id="crestBg" x1="0" y1="0" x2="74" y2="84"><stop offset="0" stop-color="#1a2440"/><stop offset="1" stop-color="#0c1222"/></linearGradient></defs><path d="M37 2 L70 12 V44 C70 63 56 76 37 82 C18 76 4 63 4 44 V12 Z" fill="url(#crestBg)" stroke="url(#crestG)" stroke-width="2.5"/><path d="M37 20 l4.7 9.5 10.5 1.5 -7.6 7.4 1.8 10.4 -9.4 -4.9 -9.4 4.9 1.8 -10.4 -7.6 -7.4 10.5 -1.5 Z" fill="url(#crestG)"/><path d="M18 62 q19 11 38 0" stroke="url(#crestG)" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
           <div style="font-family:'Anton',sans-serif;font-size:14px;letter-spacing:7px;color:var(--muted);padding-left:7px">VCSO</div>
         </div>
         <div style="display:flex;align-items:center;justify-content:center;gap:11px">
@@ -3261,6 +3322,41 @@ function buildTicker(items) {
   setInterval(load,60000);
   document.addEventListener('visibilitychange',function(){if(!document.hidden)load();});
   window.addEventListener('focus',load);
+})();
+</script>
+
+<script>
+/* ═══ ATMOSFÆRE-EFFEKTER ═══ */
+(function(){
+  var host = document.getElementById('atmo-dust');
+  if (host) for (var i = 0; i < 22; i++) {
+    var p = document.createElement('i');
+    p.style.left = (Math.random()*100) + 'vw';
+    p.style.animationDuration = (14 + Math.random()*18) + 's';
+    p.style.animationDelay = (-Math.random()*20) + 's';
+    var s = 2 + Math.random()*2.5;
+    p.style.width = s+'px'; p.style.height = s+'px';
+    host.appendChild(p);
+  }
+  var crowd = document.getElementById('atmo-crowd');
+  if (crowd) for (var j = 0; j < 16; j++) {
+    var f = document.createElement('i');
+    f.className = 'flash';
+    f.style.left = (2+Math.random()*96) + '%';
+    f.style.bottom = (8+Math.random()*55) + 'px';
+    f.style.animationDelay = (Math.random()*7).toFixed(2) + 's';
+    f.style.animationDuration = (3+Math.random()*5).toFixed(2) + 's';
+    crowd.appendChild(f);
+  }
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var pitch = document.querySelector('.atmo-pitch');
+    var rays  = document.querySelector('.godrays');
+    addEventListener('scroll', function(){
+      var y = scrollY;
+      if (pitch) pitch.style.transform = 'translateY(' + (y * 0.18) + 'px)';
+      if (rays)  rays.style.opacity = Math.max(0, 1 - y/500);
+    }, { passive:true });
+  }
 })();
 </script>
 </body>

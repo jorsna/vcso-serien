@@ -3,466 +3,364 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VCSO Championship 2026</title>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Barlow+Condensed:wght@400;700;900&display=swap" rel="stylesheet">
+<title>Sesong 2 · Q3 2026 — Avspark 3. august</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
+:root{
+  --navy-950:#070b16;--navy-900:#0c1222;--navy-800:#121a30;--navy-700:#1a2440;
+  --hair:rgba(255,255,255,.07);--hair-gold:rgba(212,175,55,.35);
+  --txt:#eef1f8;--muted:#8b93a7;--dim:#5a6379;
+  --gold:#ffd700;--gold-metal:#c9a24a;--gold-deep:#8a6d1f;
+  --selekt:#c9a84c;--osat:#f97316;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{background:#070b16;scroll-behavior:smooth}
+body{background:transparent;color:var(--txt);font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:520px;margin:0 auto;padding:0 16px 70px;position:relative;z-index:1}
+.display{font-family:'Anton',sans-serif;text-transform:uppercase;font-weight:400}
+.eyebrow{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold-metal)}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+@keyframes shine{to{background-position:200% center}}
+.goldshine{background:linear-gradient(110deg,#fff 0%,var(--gold) 38%,#fff8d8 52%,var(--gold) 66%,#fff 100%);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 4.5s linear infinite}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.rise{opacity:0;animation:rise .6s cubic-bezier(.2,.7,.2,1) forwards}
+@media (prefers-reduced-motion:reduce){.rise{animation:none;opacity:1}.goldshine{animation:none}}
 
-canvas { position: fixed; inset: 0; width: 100%; height: 100%; }
-#bg  { z-index: 0; }
-#fx  { z-index: 2; pointer-events: none; }
+/* ── ATMOSFÆRE ── */
+.atmo{position:fixed;inset:0;pointer-events:none;z-index:-1}
+.atmo-sky{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% -20%,#16203c 0%,#0b1020 45%,#05080f 100%)}
+.atmo-pitch{position:absolute;inset:0;opacity:.05}
+.atmo-pitch svg{width:100%;height:100%}
+.beam{position:absolute;top:-12%;width:65vw;height:120vh;opacity:.10;background:linear-gradient(180deg,rgba(255,235,170,.9),transparent 62%);filter:blur(28px);transform-origin:top center;animation:beamSway 14s ease-in-out infinite}
+.beam.l{left:-24vw;transform:rotate(20deg)}
+.beam.r{right:-24vw;transform:rotate(-20deg);animation-delay:-7s}
+@keyframes beamSway{0%,100%{opacity:.07}50%{opacity:.14}}
+.aurora{position:absolute;width:70vw;height:70vw;border-radius:50%;filter:blur(90px);opacity:.09;mix-blend-mode:screen}
+.aurora.a{background:radial-gradient(circle,#d4af37,transparent 65%);top:-15vw;left:-20vw;animation:auraA 26s ease-in-out infinite alternate}
+.aurora.b{background:radial-gradient(circle,#7a5f22,transparent 65%);bottom:-25vw;right:-20vw;animation:auraB 32s ease-in-out infinite alternate}
+@keyframes auraA{to{transform:translate(14vw,10vh) scale(1.15)}}
+@keyframes auraB{to{transform:translate(-12vw,-8vh) scale(1.2)}}
+.godrays{position:absolute;top:-6%;left:50%;width:150vw;height:150vw;transform:translateX(-50%);background:conic-gradient(from 0deg,transparent 0 14deg,rgba(255,230,150,.05) 17deg 20deg,transparent 23deg 40deg,rgba(255,230,150,.04) 43deg 46deg,transparent 49deg 78deg,rgba(255,230,150,.05) 81deg 84deg,transparent 87deg 120deg,rgba(255,230,150,.04) 123deg 126deg,transparent 129deg 360deg);border-radius:50%;animation:raySpin 70s linear infinite;-webkit-mask-image:radial-gradient(circle at 50% 12%,#000 0%,transparent 42%);mask-image:radial-gradient(circle at 50% 12%,#000 0%,transparent 42%)}
+@keyframes raySpin{to{transform:translateX(-50%) rotate(360deg)}}
+.dust i{position:absolute;width:3px;height:3px;border-radius:50%;background:radial-gradient(circle,#ffe9a0,rgba(255,215,0,0));animation:drift linear infinite;opacity:0}
+@keyframes drift{0%{transform:translateY(15vh) translateX(0);opacity:0}12%{opacity:.7}88%{opacity:.4}100%{transform:translateY(-110vh) translateX(6vw);opacity:0}}
+.crowd{position:absolute;left:0;right:0;bottom:0;height:110px}
+.crowd svg{position:absolute;inset:0;width:100%;height:100%}
+.flash{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:0;animation:blitz 4s linear infinite}
+@keyframes blitz{0%,96%,100%{opacity:0}97%{opacity:.95}98%{opacity:.2}99%{opacity:.7}}
+.grain{position:absolute;inset:-100%;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E");animation:grainShift 1.4s steps(3) infinite}
+@keyframes grainShift{0%{transform:translate(0,0)}33%{transform:translate(-6%,4%)}66%{transform:translate(5%,-5%)}100%{transform:translate(0,0)}}
+.atmo-vig{position:absolute;inset:0;background:radial-gradient(140% 100% at 50% 55%,transparent 55%,rgba(0,0,0,.55) 100%)}
+@media (prefers-reduced-motion:reduce){.beam,.dust i,.grain,.aurora,.godrays,.flash{animation:none}.godrays{display:none}}
 
-.ui { position: fixed; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+/* ── CHYRON ── */
+.chyron{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:stretch;height:30px;background:linear-gradient(180deg,rgba(7,11,22,.95),rgba(7,11,22,.85));border-bottom:1px solid var(--hair-gold);backdrop-filter:blur(6px)}
+.chyron .tag{display:flex;align-items:center;gap:6px;padding:0 12px;background:linear-gradient(180deg,#ffe452,#c9a24a);color:#161001;font-family:'Anton',sans-serif;font-size:10px;letter-spacing:.14em;white-space:nowrap;clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%)}
+.chyron .belt{flex:1;overflow:hidden;display:flex;align-items:center}
+.chyron .track{display:inline-flex;gap:44px;white-space:nowrap;padding-left:100%;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:11px;letter-spacing:.16em;color:var(--muted);text-transform:uppercase;animation:chyronRoll 26s linear infinite}
+.chyron .track b{color:var(--gold-metal)}
+@keyframes chyronRoll{to{transform:translateX(-100%)}}
+@media (prefers-reduced-motion:reduce){.chyron .track{animation:none;padding-left:12px}}
 
-/* CORNER BRACKETS */
-.corner { position: fixed; width: 32px; height: 32px; z-index: 20; }
-.corner::before, .corner::after { content: ''; position: absolute; background: rgba(255,215,0,.6); }
-.corner::before { width: 100%; height: 2px; top: 0; left: 0; }
-.corner::after  { width: 2px; height: 100%; top: 0; left: 0; }
-.corner.tl { top: 20px; left: 20px; }
-.corner.tr { top: 20px; right: 20px; transform: scaleX(-1); }
-.corner.bl { bottom: 20px; left: 20px; transform: scaleY(-1); }
-.corner.br { bottom: 20px; right: 20px; transform: scale(-1); }
-.corner { opacity: 0; animation: popIn .3s ease forwards; }
-.corner.tl { animation-delay: 2.8s; }
-.corner.tr { animation-delay: 2.9s; }
-.corner.bl { animation-delay: 3.0s; }
-.corner.br { animation-delay: 3.1s; }
+/* ── TEPPE ── */
+.curtain{position:fixed;inset:0;z-index:100;background:radial-gradient(120% 90% at 50% 30%,#101a33,#05080f);display:flex;align-items:center;justify-content:center;animation:curtainOut .8s ease 1s forwards}
+.curtain svg{width:88px;height:100px;filter:drop-shadow(0 0 30px rgba(212,175,55,.5));animation:crestIn .8s cubic-bezier(.2,.7,.2,1) both}
+@keyframes crestIn{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
+@keyframes curtainOut{to{opacity:0;visibility:hidden}}
+@media (prefers-reduced-motion:reduce){.curtain{display:none}}
 
-/* SCANLINES */
-.scanlines {
-  position: fixed; inset: 0; z-index: 15; pointer-events: none;
-  background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,.06) 3px, rgba(0,0,0,.06) 4px);
-}
+/* ── HERO ── */
+.hero{position:relative;text-align:center;padding:70px 0 26px}
+.crest-main{width:74px;height:84px;margin:0 auto 14px;filter:drop-shadow(0 6px 18px rgba(212,175,55,.25))}
+.hero-club{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:13px;letter-spacing:.5em;color:var(--muted);padding-left:.5em}
+.hero-mark{font-size:clamp(52px,15vw,76px);line-height:1;margin-top:2px;letter-spacing:.02em}
+.hero-sub{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:.3em;color:var(--gold-metal);text-transform:uppercase;margin-top:8px}
 
-/* TOP/BOTTOM BARS */
-.bar-top, .bar-bottom {
-  position: fixed; left: 0; right: 0; height: 3px; z-index: 20;
-  opacity: 0; animation: fadeIn .4s ease forwards;
-}
-.bar-top    { top: 0;    animation-delay: 3.2s; background: linear-gradient(90deg, transparent 0%, #E8001A 20%, #FFD700 50%, #E8001A 80%, transparent 100%); }
-.bar-bottom { bottom: 0; animation-delay: 3.3s; background: linear-gradient(90deg, transparent 0%, #C9960C 30%, #FFD700 50%, #C9960C 70%, transparent 100%); }
+/* ── SCOREBOARD ── */
+.board{display:inline-block;margin-top:22px}
+.board-cap{display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.24em;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
+.board .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.35}}
+.tiles{display:flex;align-items:center;gap:7px;justify-content:center}
+.tile{position:relative;background:linear-gradient(180deg,#1c2544 48%,#121a30 52%);border:1px solid var(--hair-gold);border-radius:7px;min-width:60px;padding:10px 6px 8px;box-shadow:0 10px 24px -12px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.06)}
+.tile::before{content:"";position:absolute;left:4px;right:4px;top:50%;height:1px;background:rgba(0,0,0,.55)}
+.tile b{display:block;font-family:'Anton',sans-serif;font-size:28px;line-height:1;color:var(--gold);text-shadow:0 0 14px rgba(255,215,0,.35)}
+.tile b.tick{animation:tickFlip .35s ease}
+@keyframes tickFlip{0%{transform:rotateX(70deg);opacity:.2}100%{transform:rotateX(0);opacity:1}}
+.tile span{display:block;font-family:'Barlow Condensed',sans-serif;font-size:8px;letter-spacing:.24em;color:var(--dim);text-transform:uppercase;margin-top:4px}
+.colon{font-family:'Anton',sans-serif;color:var(--gold-deep);font-size:20px}
+@media (prefers-reduced-motion:reduce){.board .dot,.tile b.tick{animation:none}}
 
-/* FLASH OVERLAY */
-.flash { position: fixed; inset: 0; z-index: 50; background: #fff; opacity: 0; pointer-events: none; }
+/* ── MODUL ── */
+.mod{position:relative;background:linear-gradient(180deg,var(--navy-800),var(--navy-900));border:1px solid var(--hair);border-radius:10px;margin-top:26px;box-shadow:0 20px 40px -24px rgba(0,0,0,.8);overflow:hidden}
+.mod::before{content:"";position:absolute;top:0;left:0;width:44px;height:3px;background:linear-gradient(90deg,var(--gold),transparent)}
+.mod-h{display:flex;align-items:baseline;justify-content:space-between;padding:16px 18px 12px;border-bottom:1px solid var(--hair)}
+.mod-t{font-family:'Anton',sans-serif;font-size:15px;letter-spacing:.14em;text-transform:uppercase}
+.mod-sub{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.2em;color:var(--dim);text-transform:uppercase}
 
-/* LOGO BADGE */
-.badge-wrap {
-  opacity: 0; transform: scale(0.4) rotate(-20deg);
-  animation: badgePop .6s cubic-bezier(.17,.67,.35,1.4) 1.2s forwards;
-  margin-bottom: 20px;
-}
-.badge {
-  width: 80px; height: 80px; border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #1e3a6e, #07101e);
-  border: 2.5px solid #C9960C;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 36px;
-  box-shadow: 0 0 0 0 rgba(255,215,0,.4), 0 0 60px rgba(255,215,0,.2);
-  animation: badgePulse 2s ease 2s infinite;
-}
-@keyframes badgePop {
-  to { opacity: 1; transform: scale(1) rotate(0deg); }
-}
-@keyframes badgePulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(255,215,0,.4), 0 0 40px rgba(255,215,0,.15); }
-  50%      { box-shadow: 0 0 0 16px rgba(255,215,0,.0), 0 0 60px rgba(255,215,0,.3); }
-}
+/* ── PRODUKTKORT ── */
+.prods{display:flex;flex-direction:column;gap:10px;padding:16px 18px 18px}
+.prod{position:relative;display:flex;align-items:center;gap:14px;background:var(--navy-900);border:1px solid var(--hair);border-radius:8px;padding:14px 16px;overflow:hidden;transition:transform .2s,border-color .2s}
+.prod:hover{transform:translateY(-2px)}
+.prod::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px}
+.prod.p-champ::before{background:linear-gradient(180deg,#ffe452,#8a6d1f)}
+.prod.p-selekt::before{background:linear-gradient(180deg,#e3c878,#7a5f22)}
+.prod.p-osat::before{background:linear-gradient(180deg,#fb923c,#c2410c)}
+.prod .pn{font-family:'Anton',sans-serif;font-size:16px;letter-spacing:.08em}
+.prod.p-champ .pn{color:var(--gold)}
+.prod.p-selekt .pn{color:var(--selekt)}
+.prod.p-osat .pn{color:var(--osat)}
+.prod .pd{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.2em;color:var(--dim);text-transform:uppercase;margin-top:2px}
+.prod .go{margin-left:auto;font-family:'Anton',sans-serif;font-size:12px;letter-spacing:.1em;color:var(--muted)}
 
-/* VCSO TITLE - letter by letter */
-.title-row { display: flex; align-items: baseline; gap: 4px; }
-.letter {
-  font-family: 'Anton', sans-serif;
-  font-size: clamp(72px, 16vw, 140px);
-  line-height: 1;
-  letter-spacing: 4px;
-  color: transparent;
-  background: linear-gradient(160deg, #fff 0%, #FFD700 45%, #fff 55%, #FFD700 100%);
-  background-size: 300% auto;
-  -webkit-background-clip: text; background-clip: text;
-  opacity: 0; transform: translateY(-60px) skewX(-8deg);
-  animation: letterDrop .5s cubic-bezier(.17,.67,.35,1.3) forwards, shine 3s linear 2s infinite;
-}
-.letter:nth-child(1) { animation-delay: .0s, 2s; }
-.letter:nth-child(2) { animation-delay: .1s, 2s; }
-.letter:nth-child(3) { animation-delay: .2s, 2s; }
-.letter:nth-child(4) { animation-delay: .3s, 2s; }
-@keyframes letterDrop {
-  to { opacity: 1; transform: translateY(0) skewX(0); }
-}
-@keyframes shine { to { background-position: 300% center; } }
+/* ── NYTT I SESONG 2 ── */
+.news{padding:8px 18px 18px}
+.nitem{display:flex;gap:14px;padding:13px 0;border-bottom:1px solid var(--hair)}
+.nitem:last-child{border-bottom:none}
+.nitem .ic{width:34px;height:34px;border-radius:8px;background:rgba(212,175,55,.08);border:1px solid var(--hair-gold);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.nitem b{display:block;font-size:14px;font-weight:700}
+.nitem p{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
 
-/* CHAMPIONSHIP */
-.championship {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(22px, 5vw, 46px);
-  letter-spacing: 14px;
-  color: #C9960C;
-  opacity: 0; transform: scaleX(0.3);
-  transform-origin: center;
-  animation: stretchIn .7s cubic-bezier(.16,1,.3,1) .6s forwards;
-  margin-top: -6px;
-  text-shadow: 0 0 30px rgba(201,150,12,.4);
-}
-@keyframes stretchIn { to { opacity: 1; transform: scaleX(1); } }
+/* ── LEGENDER ── */
+.leg{margin:16px 18px 20px;position:relative;background:linear-gradient(120deg,var(--navy-700),var(--navy-800) 70%);border:1px solid var(--hair-gold);border-radius:8px;padding:15px 16px 15px 20px;overflow:hidden}
+.leg::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--gold),var(--gold-deep))}
+.leg .cap{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.3em;color:var(--gold-metal);text-transform:uppercase}
+.leg .who{font-family:'Anton',sans-serif;font-size:21px;letter-spacing:.03em;margin-top:3px}
+.leg .stat{display:flex;gap:16px;margin-top:9px}
+.leg .stat b{font-family:'Anton',sans-serif;font-size:15px;display:block}
+.leg .stat span{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+.leg.l-selekt{border-color:rgba(201,168,76,.4)}
+.leg.l-selekt::before{background:linear-gradient(180deg,#e3c878,#7a5f22)}
+.leg.l-selekt .cap{color:var(--selekt)}
+.leg.l-osat{border-color:rgba(249,115,22,.4)}
+.leg.l-osat::before{background:linear-gradient(180deg,#fb923c,#c2410c)}
+.leg.l-osat .cap{color:var(--osat)}
+.leg .who.gs-selekt{background:linear-gradient(110deg,#fff,#c9a84c 40%,#fff 70%,#c9a84c);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 4.5s linear infinite}
+.leg .who.gs-osat{background:linear-gradient(110deg,#fff,#f97316 40%,#fff 70%,#f97316);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 4.5s linear infinite}
+@media (prefers-reduced-motion:reduce){.leg .who{animation:none}}
 
-/* GOLD LINE */
-.gold-line {
-  width: 0; height: 2px;
-  background: linear-gradient(90deg, transparent, #FFD700, transparent);
-  margin: 18px 0;
-  animation: lineGrow .8s ease 1.0s forwards;
-}
-@keyframes lineGrow { to { width: min(300px, 75vw); } }
-
-/* SUBTITLE */
-.subtitle {
-  font-size: clamp(11px, 2vw, 15px);
-  letter-spacing: 6px;
-  text-transform: uppercase;
-  color: rgba(255,255,255,.35);
-  opacity: 0;
-  animation: fadeUp .5s ease 1.1s forwards;
-}
-
-/* DATE SECTION */
-.date-wrap {
-  margin-top: 32px;
-  text-align: center;
-  opacity: 0;
-  animation: fadeUp .6s ease 1.4s forwards;
-}
-.starts-label {
-  font-size: 11px; letter-spacing: 7px; text-transform: uppercase;
-  color: #C9960C; font-weight: 700; margin-bottom: 6px;
-  animation: flicker 4s ease 3s infinite;
-}
-@keyframes flicker {
-  0%,95%,100% { opacity: 1; }
-  96% { opacity: .3; }
-  97% { opacity: 1; }
-  98% { opacity: .5; }
-}
-.date-main {
-  font-family: 'Anton', sans-serif;
-  font-size: clamp(32px, 7vw, 64px);
-  letter-spacing: 3px;
-  color: #F0F4FF;
-  text-shadow: 0 0 40px rgba(255,215,0,.25), 0 2px 0 rgba(0,0,0,.5);
-  animation: dateGlow 2s ease 2s infinite alternate;
-}
-@keyframes dateGlow {
-  from { text-shadow: 0 0 30px rgba(255,215,0,.2); }
-  to   { text-shadow: 0 0 60px rgba(255,215,0,.45), 0 0 100px rgba(255,215,0,.1); }
-}
-.date-sub {
-  font-size: 12px; letter-spacing: 5px; color: rgba(255,255,255,.3);
-  text-transform: uppercase; margin-top: 4px;
-}
-
-/* THIN LINE */
-.thin-line {
-  width: 0; height: 1px;
-  background: rgba(255,255,255,.08);
-  margin: 24px 0;
-  animation: lineGrow .6s ease 1.6s forwards;
-}
-
-/* TEAMS */
-.teams {
-  display: flex; gap: clamp(16px, 4vw, 40px); align-items: center;
-  opacity: 0; animation: fadeUp .5s ease 1.8s forwards;
-}
-.team { text-align: center; }
-.team-name {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(18px, 3.5vw, 28px);
-  letter-spacing: 4px;
-  text-shadow: 0 0 20px currentColor;
-}
-.team-bar {
-  height: 2px; width: 0; margin: 6px auto 0; border-radius: 1px;
-  transition: width .4s;
-}
-.team.active .team-bar { width: 100%; }
-.team-ryen    .team-name { color: #3b82f6; }
-.team-ryen    .team-bar  { background: #3b82f6; box-shadow: 0 0 8px #3b82f6; width: 100%; }
-.team-fornebu .team-name { color: #10b981; }
-.team-fornebu .team-bar  { background: #10b981; box-shadow: 0 0 8px #10b981; width: 100%; }
-.team-lstr    .team-name { color: #f59e0b; }
-.team-lstr    .team-bar  { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; width: 100%; }
-.sep { font-family: 'Anton', sans-serif; font-size: 18px; color: rgba(255,215,0,.2); }
-
-/* TAGLINE */
-.tagline {
-  position: fixed; bottom: 28px; left: 0; right: 0;
-  text-align: center;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(16px, 3vw, 24px);
-  letter-spacing: 8px;
-  color: rgba(255,255,255,.15);
-  opacity: 0; animation: fadeIn .6s ease 3.4s forwards;
-  z-index: 10;
-}
-
-/* COUNTDOWN TICKER (top) */
-.ticker {
-  position: fixed; top: 14px; right: 24px;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 11px; letter-spacing: 3px;
-  color: rgba(255,215,0,.4);
-  opacity: 0; animation: fadeIn .4s ease 3.5s forwards;
-  z-index: 20;
-}
-
-/* HELPERS */
-@keyframes popIn  { to { opacity: 1; } }
-@keyframes fadeIn { to { opacity: 1; } }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+.foot{text-align:center;margin-top:44px;padding-top:22px;border-top:1px solid var(--hair)}
+.foot .md{font-family:'Anton',sans-serif;font-size:15px;letter-spacing:.3em}
+.foot .md b{color:var(--gold)}
+.foot .sl{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.24em;color:var(--dim);margin-top:6px;text-transform:uppercase}
 </style>
 </head>
 <body>
 
-<canvas id="bg"></canvas>
-<canvas id="fx"></canvas>
-<div class="scanlines"></div>
-<div class="bar-top"></div>
-<div class="bar-bottom"></div>
-<div class="corner tl"></div>
-<div class="corner tr"></div>
-<div class="corner bl"></div>
-<div class="corner br"></div>
-<div class="flash" id="flash"></div>
-
-<div class="ticker" id="ticker">VCSO · MAI & JUNI 2026</div>
-
-<div class="ui">
-  <div class="badge-wrap"><div class="badge">⚽</div></div>
-
-  <div class="title-row">
-    <span class="letter">V</span>
-    <span class="letter">C</span>
-    <span class="letter">S</span>
-    <span class="letter">O</span>
-  </div>
-  <div class="championship">Championship</div>
-
-  <div class="gold-line"></div>
-  <div class="subtitle">Volvo Car Stor Oslo &nbsp;·&nbsp; Season 2026</div>
-
-  <div class="date-wrap">
-    <div class="starts-label">Starter</div>
-    <div class="date-main">Mandag 4. mai</div>
-    <div class="date-sub">Mai &amp; Juni 2026</div>
-  </div>
-
-  <div class="thin-line"></div>
-
-  <div class="teams">
-    <div class="team team-ryen">
-      <div class="team-name">Ryen</div>
-      <div class="team-bar"></div>
-    </div>
-    <div class="sep">◆</div>
-    <div class="team team-fornebu">
-      <div class="team-name">Fornebu</div>
-      <div class="team-bar"></div>
-    </div>
-    <div class="sep">◆</div>
-    <div class="team team-lstr">
-      <div class="team-name">Lillestrøm</div>
-      <div class="team-bar"></div>
-    </div>
-  </div>
+<div class="chyron" aria-hidden="true">
+  <span class="tag">&#128240; LA GAZZETTA</span>
+  <span class="belt"><span class="track">Sesong 2 sparkes i gang mandag 3. august kl. 08:00 &nbsp;&middot;&nbsp; <b>Daniel K. Johansen</b> forsvarer Championship-tronen &nbsp;&middot;&nbsp; <b>Fabian Noraker</b> regjerer i Selekt Cup &nbsp;&middot;&nbsp; OSAT-mester <b>Mathuran Sandrakumar</b> sikter mot ny tittel &nbsp;&middot;&nbsp; Nye regler &middot; nytt design &middot; nye Legender</span></span>
 </div>
 
-<div class="tagline">La kampen om lagerbilene begynne</div>
+<div class="curtain" id="curtain">
+  <svg viewBox="0 0 74 84" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="cg" x1="0" y1="0" x2="74" y2="84"><stop offset="0" stop-color="#ffe452"/><stop offset=".5" stop-color="#c9a24a"/><stop offset="1" stop-color="#8a6d1f"/></linearGradient></defs>
+    <path d="M37 2 L70 12 V44 C70 63 56 76 37 82 C18 76 4 63 4 44 V12 Z" fill="none" stroke="url(#cg)" stroke-width="2.5"/>
+    <path d="M37 20 l4.7 9.5 10.5 1.5 -7.6 7.4 1.8 10.4 -9.4 -4.9 -9.4 4.9 1.8 -10.4 -7.6 -7.4 10.5 -1.5 Z" fill="url(#cg)"/>
+  </svg>
+</div>
+
+<div class="atmo" aria-hidden="true">
+  <div class="atmo-sky"></div>
+  <div class="atmo-pitch">
+    <svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="200" cy="400" r="150" fill="none" stroke="#c9a24a" stroke-width="1.5"/>
+      <circle cx="200" cy="400" r="4" fill="#c9a24a"/>
+      <line x1="-50" y1="400" x2="450" y2="400" stroke="#c9a24a" stroke-width="1.5"/>
+      <path d="M-50 60 h500 M-50 740 h500" stroke="#c9a24a" stroke-width="1"/>
+    </svg>
+  </div>
+  <div class="aurora a"></div><div class="aurora b"></div>
+  <div class="godrays"></div>
+  <div class="beam l"></div><div class="beam r"></div>
+  <div class="dust" id="dust"></div>
+  <div class="crowd" id="crowd">
+    <svg viewBox="0 0 400 110" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 110 V70 q6 -7 12 0 q5 -9 11 -1 q6 -8 12 0 q5 -7 11 0 q6 -9 12 -1 q5 -7 11 0 q6 -8 12 0 q5 -9 11 -1 q6 -7 12 0 q5 -8 11 0 q6 -9 12 -1 q5 -7 11 0 q6 -8 12 0 q5 -7 11 0 q6 -9 12 -1 q5 -7 11 0 q6 -8 12 0 q5 -9 11 -1 q6 -7 12 0 q5 -8 11 0 q6 -9 12 -1 q5 -7 11 0 q6 -8 12 0 q5 -7 11 0 q6 -9 12 -1 q5 -7 11 0 q6 -8 12 0 q5 -9 11 -1 q6 -7 12 0 q5 -8 11 0 q6 -9 12 -1 q5 -7 11 0 L400 110 Z" fill="#03050b"/>
+      <path d="M0 110 V88 q8 -6 16 0 q7 -7 15 0 q8 -6 16 0 q7 -8 15 -1 q8 -6 16 0 q7 -7 15 0 q8 -6 16 0 q7 -8 15 -1 q8 -6 16 0 q7 -7 15 0 q8 -6 16 0 q7 -8 15 -1 q8 -6 16 0 q7 -7 15 0 q8 -6 16 0 q7 -8 15 -1 q8 -6 16 0 q7 -7 15 0 q8 -6 16 0 q7 -8 15 -1 q8 -6 16 0 q7 -7 15 0 q8 -6 16 0 q7 -8 15 0 L400 110 Z" fill="#01030a"/>
+    </svg>
+  </div>
+  <div class="grain"></div>
+  <div class="atmo-vig"></div>
+</div>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero rise" style="animation-delay:.1s">
+    <svg class="crest-main" viewBox="0 0 74 84" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="hg" x1="0" y1="0" x2="74" y2="84"><stop offset="0" stop-color="#ffe452"/><stop offset=".5" stop-color="#c9a24a"/><stop offset="1" stop-color="#8a6d1f"/></linearGradient>
+      <linearGradient id="hb" x1="0" y1="0" x2="74" y2="84"><stop offset="0" stop-color="#1a2440"/><stop offset="1" stop-color="#0c1222"/></linearGradient></defs>
+      <path d="M37 2 L70 12 V44 C70 63 56 76 37 82 C18 76 4 63 4 44 V12 Z" fill="url(#hb)" stroke="url(#hg)" stroke-width="2.5"/>
+      <path d="M37 20 l4.7 9.5 10.5 1.5 -7.6 7.4 1.8 10.4 -9.4 -4.9 -9.4 4.9 1.8 -10.4 -7.6 -7.4 10.5 -1.5 Z" fill="url(#hg)"/>
+      <path d="M18 62 q19 11 38 0" stroke="url(#hg)" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </svg>
+    <div class="hero-club">VOLVO CAR STOR OSLO</div>
+    <div class="display goldshine hero-mark">Sesong 2</div>
+    <div class="hero-sub">Q3 2026 &middot; Tre konkurranser &middot; &Eacute;n arena</div>
+    <div class="board">
+      <div class="board-cap"><span class="dot"></span>Avspark mandag 3. august kl. 08:00</div>
+      <div class="tiles num">
+        <div class="tile"><b id="td">--</b><span>Dager</span></div>
+        <div class="colon">:</div>
+        <div class="tile"><b id="th">--</b><span>Timer</span></div>
+        <div class="colon">:</div>
+        <div class="tile"><b id="tm">--</b><span>Min</span></div>
+        <div class="colon">:</div>
+        <div class="tile"><b id="ts">--</b><span>Sek</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KONKURRANSENE -->
+  <div class="mod rise" style="animation-delay:.25s">
+    <div class="mod-h"><span class="mod-t">Konkurransene</span><span class="mod-sub">Tre titler i spill</span></div>
+    <div class="prods">
+      <a class="prod p-champ" href="https://jorsna.github.io/vcso-serien/" style="text-decoration:none;color:inherit">
+        <div><div class="pn">Championship</div><div class="pd">Nybil &middot; Ryen &middot; Fornebu &middot; Lillestr&oslash;m</div></div>
+        <span class="go">&rarr;</span>
+      </a>
+      <a class="prod p-selekt" href="https://jorsna.github.io/selekt-cup/" style="text-decoration:none;color:inherit">
+        <div><div class="pn">Selekt Cup</div><div class="pd">Bruktbil &middot; Volvo &middot; Zeekr &middot; Polestar</div></div>
+        <span class="go">&rarr;</span>
+      </a>
+      <a class="prod p-osat" href="https://jorsna.github.io/OSAT-League/" style="text-decoration:none;color:inherit">
+        <div><div class="pn">OSAT League</div><div class="pd">Kundetilfredshet &middot; Ryen &middot; Fornebu</div></div>
+        <span class="go">&rarr;</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- NYTT I SESONG 2 -->
+  <div class="mod rise" style="animation-delay:.4s">
+    <div class="mod-h"><span class="mod-t">Nytt i Sesong 2</span><span class="mod-sub">Oppgraderinger</span></div>
+    <div class="news">
+      <div class="nitem">
+        <div class="ic">&#127976;</div>
+        <div><b>Helt nytt stadiondesign</b><p>Flomlys, tribune og gullst&oslash;v &mdash; hele arenaen er bygget om. Du ser det med &eacute;n gang du &aring;pner appen.</p></div>
+      </div>
+      <div class="nitem">
+        <div class="ic">&#128203;</div>
+        <div><b>Registrering med ordrenummer</b><p>Hver scoring knyttes til ordren i Tacdis. &Eacute;n registrering per nummer &mdash; rent, rettferdig og klart for s&oslash;ndagsavstemming.</p></div>
+      </div>
+      <div class="nitem">
+        <div class="ic">&#128197;</div>
+        <div><b>Etterregistrering</b><p>Glemte du &aring; legge inn i g&aring;r? N&aring; kan du velge riktig salgsdato &mdash; maks &eacute;n dag tilbake.</p></div>
+      </div>
+      <div class="nitem">
+        <div class="ic">&#129309;</div>
+        <div><b>Tillitsreglene</b><p>Oppdatert regelverk for hele sesongen ligger klart i bruksanvisningen. Stikkpr&oslash;ver mot Tacdis flere ganger i uken.</p></div>
+      </div>
+      <div class="nitem">
+        <div class="ic">&#127775;</div>
+        <div><b>Legender i Hall of Fame</b><p>Fullf&oslash;rte sesonger f&aring;r sitt eget arkiv: sesongmester, finanskonge og vinneravdeling &mdash; for alltid.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEGENDENE FRA SESONG 1 -->
+  <div class="mod rise" style="animation-delay:.55s">
+    <div class="mod-h"><span class="mod-t">Legendene fra Sesong 1</span><span class="mod-sub">Kan de forsvare tronen?</span></div>
+    <div class="leg">
+      <div class="cap">&#127942; Championship-mester &middot; Sesong 1</div>
+      <div class="who goldshine">Daniel K. Johansen</div>
+      <div class="stat num">
+        <div><b>72</b><span>Poeng</span></div>
+        <div><b>24</b><span>Salg</span></div>
+        <div><b>Lillestr&oslash;m</b><span>Avdeling</span></div>
+      </div>
+    </div>
+    <div class="leg l-selekt">
+      <div class="cap">&#127942; Selekt-mester &middot; Sesong 1</div>
+      <div class="who gs-selekt">Fabian Noraker</div>
+      <div class="stat num">
+        <div><b>69</b><span>Poeng</span></div>
+        <div><b>23</b><span>Salg</span></div>
+        <div><b>Ryen</b><span>Avdeling</span></div>
+      </div>
+    </div>
+    <div class="leg l-osat">
+      <div class="cap">&#127942; OSAT-mester &middot; Sesong 1</div>
+      <div class="who gs-osat">Mathuran Sandrakumar</div>
+      <div class="stat num">
+        <div><b>81</b><span>Poeng</span></div>
+        <div><b>27</b><span>Scores</span></div>
+        <div><b>Fornebu</b><span>Avdeling</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot rise" style="animation-delay:.7s">
+    <div class="md">MATCH<b>DAY</b></div>
+    <div class="sl">Et produkt fra SnarLink &middot; &copy; 2026</div>
+  </div>
+
+</div>
 
 <script>
-// ── BACKGROUND CANVAS ────────────────────────────────────────────────
-const bg  = document.getElementById('bg');
-const bgc = bg.getContext('2d');
-const fx  = document.getElementById('fx');
-const fxc = fx.getContext('2d');
-
-let W, H;
-function resize() {
-  W = bg.width = fx.width = window.innerWidth;
-  H = bg.height = fx.height = window.innerHeight;
-}
-resize();
-window.addEventListener('resize', resize);
-
-// Particles
-const particles = Array.from({length: 160}, () => ({
-  x: Math.random() * window.innerWidth,
-  y: Math.random() * window.innerHeight,
-  vx: (Math.random() - .5) * .4,
-  vy: (Math.random() - .5) * .4,
-  r: Math.random() * 1.8 + .2,
-  a: Math.random() * .35 + .05,
-  col: Math.random() > .65 ? '#FFD700' : Math.random() > .5 ? '#3b82f6' : '#fff'
-}));
-
-// Shooting stars
-const stars = [];
-function spawnStar() {
-  stars.push({
-    x: Math.random() * W,
-    y: Math.random() * H * .5,
-    len: Math.random() * 120 + 60,
-    speed: Math.random() * 8 + 6,
-    angle: Math.PI / 4 + (Math.random() - .5) * .3,
-    life: 1,
-    decay: Math.random() * .02 + .015
-  });
-}
-setInterval(spawnStar, 900);
-
-// Energy lines
-const energyLines = Array.from({length: 6}, (_, i) => ({
-  x: (i / 5) * window.innerWidth,
-  phase: Math.random() * Math.PI * 2,
-  speed: .003 + Math.random() * .003,
-  amp: 20 + Math.random() * 40,
-  col: i % 2 === 0 ? 'rgba(255,215,0,' : 'rgba(255,255,255,'
-}));
-
-// Flash on load
-setTimeout(() => {
-  const flash = document.getElementById('flash');
-  flash.style.transition = 'opacity .08s';
-  flash.style.opacity = '0.9';
-  setTimeout(() => { flash.style.transition = 'opacity .4s'; flash.style.opacity = '0'; }, 80);
-}, 800);
-
-// Second flash
-setTimeout(() => {
-  const flash = document.getElementById('flash');
-  flash.style.transition = 'opacity .05s';
-  flash.style.opacity = '0.6';
-  setTimeout(() => { flash.style.transition = 'opacity .3s'; flash.style.opacity = '0'; }, 50);
-}, 1150);
-
-let t = 0;
-function draw() {
-  t += .012;
-
-  // BG
-  bgc.fillStyle = '#07101E';
-  bgc.fillRect(0, 0, W, H);
-
-  // Grid
-  bgc.strokeStyle = 'rgba(255,255,255,0.025)';
-  bgc.lineWidth = 1;
-  const gs = 80;
-  for (let x = 0; x < W; x += gs) {
-    bgc.beginPath(); bgc.moveTo(x, 0); bgc.lineTo(x, H); bgc.stroke();
+// Gullstøv
+(function(){
+  var host = document.getElementById('dust');
+  if (!host) return;
+  for (var i = 0; i < 22; i++) {
+    var p = document.createElement('i');
+    p.style.left = (Math.random()*100) + 'vw';
+    p.style.animationDuration = (14 + Math.random()*18) + 's';
+    p.style.animationDelay = (-Math.random()*20) + 's';
+    var s = 2 + Math.random()*2.5;
+    p.style.width = s+'px'; p.style.height = s+'px';
+    host.appendChild(p);
   }
-  for (let y = 0; y < H; y += gs) {
-    bgc.beginPath(); bgc.moveTo(0, y); bgc.lineTo(W, y); bgc.stroke();
+})();
+// Kamerablitser
+(function(){
+  var crowd = document.getElementById('crowd');
+  if (!crowd) return;
+  for (var i = 0; i < 16; i++) {
+    var f = document.createElement('i');
+    f.className = 'flash';
+    f.style.left = (2+Math.random()*96) + '%';
+    f.style.bottom = (8+Math.random()*55) + 'px';
+    f.style.animationDelay = (Math.random()*7).toFixed(2) + 's';
+    f.style.animationDuration = (3+Math.random()*5).toFixed(2) + 's';
+    crowd.appendChild(f);
   }
-
-  // Particles
-  for (const p of particles) {
-    p.x += p.vx; p.y += p.vy;
-    if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
-    if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
-    bgc.beginPath();
-    bgc.arc(p.x, p.y, p.r, 0, Math.PI*2);
-    bgc.fillStyle = p.col;
-    bgc.globalAlpha = p.a;
-    bgc.fill();
+})();
+// Parallakse
+(function(){
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var pitch = document.querySelector('.atmo-pitch');
+  var rays  = document.querySelector('.godrays');
+  addEventListener('scroll', function(){
+    var y = scrollY;
+    if (pitch) pitch.style.transform = 'translateY(' + (y * 0.18) + 'px)';
+    if (rays)  rays.style.opacity = Math.max(0, 1 - y/500);
+  }, { passive:true });
+})();
+// Live nedtelling til avspark
+(function(){
+  var end = new Date('2026-08-03T08:00:00');
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function tick(){
+    var diff = Math.max(0, end - new Date());
+    var vals = {
+      td: Math.floor(diff/864e5),
+      th: Math.floor(diff%864e5/36e5),
+      tm: Math.floor(diff%36e5/6e4),
+      ts: Math.floor(diff%6e4/1e3)
+    };
+    Object.keys(vals).forEach(function(id){
+      var el = document.getElementById(id);
+      if (!el) return;
+      var v = pad(vals[id]);
+      if (el.textContent !== v) {
+        el.textContent = v;
+        el.classList.remove('tick'); void el.offsetWidth; el.classList.add('tick');
+      }
+    });
   }
-  bgc.globalAlpha = 1;
-
-  // Center radial glow
-  const grd = bgc.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.min(W,H)*.65);
-  grd.addColorStop(0,  'rgba(20, 40, 80, 0.0)');
-  grd.addColorStop(.5, 'rgba(7, 16, 30, 0.4)');
-  grd.addColorStop(1,  'rgba(3, 8, 15, 0.92)');
-  bgc.fillStyle = grd;
-  bgc.fillRect(0, 0, W, H);
-
-  // FX canvas
-  fxc.clearRect(0, 0, W, H);
-
-  // Energy lines (horizontal waves near top/bottom)
-  for (const el of energyLines) {
-    el.phase += el.speed;
-    fxc.beginPath();
-    for (let x = 0; x < W; x += 2) {
-      const y = (H * .12) + Math.sin(x * .015 + el.phase) * el.amp;
-      x === 0 ? fxc.moveTo(x, y) : fxc.lineTo(x, y);
-    }
-    fxc.strokeStyle = el.col + '0.04)';
-    fxc.lineWidth = 1;
-    fxc.stroke();
-    fxc.beginPath();
-    for (let x = 0; x < W; x += 2) {
-      const y = (H * .88) + Math.sin(x * .015 + el.phase + Math.PI) * el.amp;
-      x === 0 ? fxc.moveTo(x, y) : fxc.lineTo(x, y);
-    }
-    fxc.strokeStyle = el.col + '0.04)';
-    fxc.stroke();
-  }
-
-  // Shooting stars
-  for (let i = stars.length - 1; i >= 0; i--) {
-    const s = stars[i];
-    const ex = s.x + Math.cos(s.angle) * s.len;
-    const ey = s.y + Math.sin(s.angle) * s.len;
-    const grad = fxc.createLinearGradient(s.x, s.y, ex, ey);
-    grad.addColorStop(0, `rgba(255,215,0,0)`);
-    grad.addColorStop(1, `rgba(255,215,0,${s.life * .8})`);
-    fxc.beginPath();
-    fxc.moveTo(s.x, s.y); fxc.lineTo(ex, ey);
-    fxc.strokeStyle = grad;
-    fxc.lineWidth = 1.5;
-    fxc.stroke();
-    s.x += Math.cos(s.angle) * s.speed;
-    s.y += Math.sin(s.angle) * s.speed;
-    s.life -= s.decay;
-    if (s.life <= 0 || s.x > W || s.y > H) stars.splice(i, 1);
-  }
-
-  // Gold pulse rings from center
-  const rings = [0, .6, 1.2];
-  for (const offset of rings) {
-    const phase = ((t * .3) + offset) % 1;
-    const radius = phase * Math.min(W, H) * .55;
-    const alpha = (1 - phase) * .12;
-    fxc.beginPath();
-    fxc.arc(W/2, H/2, radius, 0, Math.PI*2);
-    fxc.strokeStyle = `rgba(255,215,0,${alpha})`;
-    fxc.lineWidth = 1.5;
-    fxc.stroke();
-  }
-
-  requestAnimationFrame(draw);
-}
-draw();
-
-// Ticker updates
-const msgs = [
-  'VCSO · MAI & JUNI 2026',
-  '3 POENG PER SALG',
-  'RYEN · FORNEBU · LILLESTRØM',
-  'STARTER MANDAG 4. MAI',
-  'LA KAMPEN BEGYNNE',
-];
-let mi = 0;
-const ticker = document.getElementById('ticker');
-setInterval(() => {
-  ticker.style.transition = 'opacity .3s';
-  ticker.style.opacity = '0';
-  setTimeout(() => {
-    mi = (mi + 1) % msgs.length;
-    ticker.textContent = msgs[mi];
-    ticker.style.opacity = '';
-  }, 300);
-}, 2800);
+  tick(); setInterval(tick, 1000);
+})();
 </script>
 </body>
 </html>
