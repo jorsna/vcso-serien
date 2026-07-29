@@ -10,7 +10,7 @@
   --navy-950:#070b16;--navy-900:#0c1222;--navy-800:#121a30;--navy-700:#1a2440;
   --hair:rgba(255,255,255,.07);--hair-gold:rgba(212,175,55,.35);
   --txt:#eef1f8;--muted:#8b93a7;--dim:#5a6379;
-  --gold:#ffd700;--gold-metal:#c9a24a;--gold-deep:#8a6d1f;
+  --gold:#c9a84c;--gold-metal:#c9a84c;--gold-deep:#7a5f22;
   --selekt:#c9a84c;--osat:#f97316;
 }
 *{margin:0;padding:0;box-sizing:border-box}
@@ -21,7 +21,7 @@ body{background:transparent;color:var(--txt);font-family:'Barlow',sans-serif;-we
 .eyebrow{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold-metal)}
 .num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
 @keyframes shine{to{background-position:200% center}}
-.goldshine{background:linear-gradient(110deg,#fff 0%,var(--gold) 38%,#fff8d8 52%,var(--gold) 66%,#fff 100%);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 4.5s linear infinite}
+.goldshine{background:linear-gradient(110deg,#fff 0%,var(--gold) 38%,#f5ecce 52%,var(--gold) 66%,#fff 100%);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 4.5s linear infinite}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .rise{opacity:0;animation:rise .6s cubic-bezier(.2,.7,.2,1) forwards}
 @media (prefers-reduced-motion:reduce){.rise{animation:none;opacity:1}.goldshine{animation:none}}
@@ -36,13 +36,13 @@ body{background:transparent;color:var(--txt);font-family:'Barlow',sans-serif;-we
 .beam.r{right:-24vw;transform:rotate(-20deg);animation-delay:-7s}
 @keyframes beamSway{0%,100%{opacity:.07}50%{opacity:.14}}
 .aurora{position:absolute;width:70vw;height:70vw;border-radius:50%;filter:blur(90px);opacity:.09;mix-blend-mode:screen}
-.aurora.a{background:radial-gradient(circle,#c9a24a,transparent 65%);top:-15vw;left:-20vw;animation:auraA 26s ease-in-out infinite alternate}
-.aurora.b{background:radial-gradient(circle,#8a6d1f,transparent 65%);bottom:-25vw;right:-20vw;animation:auraB 32s ease-in-out infinite alternate}
+.aurora.a{background:radial-gradient(circle,#c9a84c,transparent 65%);top:-15vw;left:-20vw;animation:auraA 26s ease-in-out infinite alternate}
+.aurora.b{background:radial-gradient(circle,#7a5f22,transparent 65%);bottom:-25vw;right:-20vw;animation:auraB 32s ease-in-out infinite alternate}
 @keyframes auraA{to{transform:translate(14vw,10vh) scale(1.15)}}
 @keyframes auraB{to{transform:translate(-12vw,-8vh) scale(1.2)}}
 .godrays{position:absolute;top:-6%;left:50%;width:150vw;height:150vw;transform:translateX(-50%);background:conic-gradient(from 0deg,transparent 0 14deg,#ffe6960d 17deg 20deg,transparent 23deg 40deg,#ffe6960a 43deg 46deg,transparent 49deg 78deg,#ffe6960d 81deg 84deg,transparent 87deg 120deg,#ffe6960a 123deg 126deg,transparent 129deg 360deg);border-radius:50%;animation:raySpin 70s linear infinite;-webkit-mask-image:radial-gradient(circle at 50% 12%,#000 0%,transparent 42%);mask-image:radial-gradient(circle at 50% 12%,#000 0%,transparent 42%)}
 @keyframes raySpin{to{transform:translateX(-50%) rotate(360deg)}}
-.dust i{position:absolute;width:3px;height:3px;border-radius:50%;background:radial-gradient(circle,#ffe9a0,#ffd70000);animation:drift linear infinite;opacity:0}
+.dust i{position:absolute;width:3px;height:3px;border-radius:50%;background:radial-gradient(circle,#ffe9a0,#c9a84c00);animation:drift linear infinite;opacity:0}
 @keyframes drift{0%{transform:translateY(15vh) translateX(0);opacity:0}12%{opacity:.7}88%{opacity:.4}100%{transform:translateY(-110vh) translateX(6vw);opacity:0}}
 .crowd{position:absolute;left:0;right:0;bottom:0;height:110px}
 .crowd svg{position:absolute;inset:0;width:100%;height:100%}
@@ -55,7 +55,7 @@ body{background:transparent;color:var(--txt);font-family:'Barlow',sans-serif;-we
 
 /* ── CHYRON ── */
 .chyron{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:stretch;height:30px;background:linear-gradient(180deg,rgba(7,11,22,.95),rgba(7,11,22,.85));border-bottom:1px solid var(--hair-gold);backdrop-filter:blur(6px)}
-.chyron .tag{display:flex;align-items:center;gap:6px;padding:0 12px;background:linear-gradient(180deg,#ffe452,#c9a24a);color:#161001;font-family:'Anton',sans-serif;font-size:10px;letter-spacing:.14em;white-space:nowrap;clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%)}
+.chyron .tag{display:flex;align-items:center;gap:6px;padding:0 12px;background:linear-gradient(180deg,#e3c878,#c9a84c);color:#161001;font-family:'Anton',sans-serif;font-size:10px;letter-spacing:.14em;white-space:nowrap;clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%)}
 .chyron .belt{flex:1;overflow:hidden;display:flex;align-items:center}
 .chyron .track{display:inline-flex;gap:44px;white-space:nowrap;padding-left:100%;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:11px;letter-spacing:.16em;color:var(--muted);text-transform:uppercase;animation:chyronRoll 26s linear infinite}
 .chyron .track b{color:var(--gold-metal)}
@@ -84,7 +84,7 @@ body{background:transparent;color:var(--txt);font-family:'Barlow',sans-serif;-we
 .tiles{display:flex;align-items:center;gap:7px;justify-content:center}
 .tile{position:relative;background:linear-gradient(180deg,#1c2544 48%,#121a30 52%);border:1px solid var(--hair-gold);border-radius:7px;min-width:60px;padding:10px 6px 8px;box-shadow:0 10px 24px -12px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.06)}
 .tile::before{content:"";position:absolute;left:4px;right:4px;top:50%;height:1px;background:rgba(0,0,0,.55)}
-.tile b{display:block;font-family:'Anton',sans-serif;font-size:28px;line-height:1;color:var(--gold);text-shadow:0 0 14px #ffd70059}
+.tile b{display:block;font-family:'Anton',sans-serif;font-size:28px;line-height:1;color:var(--gold);text-shadow:0 0 14px #c9a84c59}
 .tile b.tick{animation:tickFlip .35s ease}
 @keyframes tickFlip{0%{transform:rotateX(70deg);opacity:.2}100%{transform:rotateX(0);opacity:1}}
 .tile span{display:block;font-family:'Barlow Condensed',sans-serif;font-size:8px;letter-spacing:.24em;color:var(--dim);text-transform:uppercase;margin-top:4px}
@@ -103,7 +103,7 @@ body{background:transparent;color:var(--txt);font-family:'Barlow',sans-serif;-we
 .prod{position:relative;display:flex;align-items:center;gap:14px;background:var(--navy-900);border:1px solid var(--hair);border-radius:8px;padding:14px 16px;overflow:hidden;transition:transform .2s,border-color .2s}
 .prod:hover{transform:translateY(-2px)}
 .prod::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px}
-.prod.p-champ::before{background:linear-gradient(180deg,#ffe452,#8a6d1f)}
+.prod.p-champ::before{background:linear-gradient(180deg,#e3c878,#7a5f22)}
 .prod.p-selekt::before{background:linear-gradient(180deg,#e3c878,#7a5f22)}
 .prod.p-osat::before{background:linear-gradient(180deg,#fb923c,#c2410c)}
 .prod .pn{font-family:'Anton',sans-serif;font-size:16px;letter-spacing:.08em}
@@ -154,7 +154,7 @@ body{background:transparent;color:var(--txt);font-family:'Barlow',sans-serif;-we
 
 <div class="curtain" id="curtain">
   <svg viewBox="0 0 74 84" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <defs><linearGradient id="cg" x1="0" y1="0" x2="74" y2="84"><stop offset="0" stop-color="#ffe452"/><stop offset=".5" stop-color="#c9a24a"/><stop offset="1" stop-color="#8a6d1f"/></linearGradient></defs>
+    <defs><linearGradient id="cg" x1="0" y1="0" x2="74" y2="84"><stop offset="0" stop-color="#e3c878"/><stop offset=".5" stop-color="#c9a84c"/><stop offset="1" stop-color="#7a5f22"/></linearGradient></defs>
     <path d="M37 2 L70 12 V44 C70 63 56 76 37 82 C18 76 4 63 4 44 V12 Z" fill="none" stroke="url(#cg)" stroke-width="2.5"/>
     <path d="M37 20 l4.7 9.5 10.5 1.5 -7.6 7.4 1.8 10.4 -9.4 -4.9 -9.4 4.9 1.8 -10.4 -7.6 -7.4 10.5 -1.5 Z" fill="url(#cg)"/>
   </svg>
@@ -164,10 +164,10 @@ body{background:transparent;color:var(--txt);font-family:'Barlow',sans-serif;-we
   <div class="atmo-sky"></div>
   <div class="atmo-pitch">
     <svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="200" cy="400" r="150" fill="none" stroke="#c9a24a" stroke-width="1.5"/>
-      <circle cx="200" cy="400" r="4" fill="#c9a24a"/>
-      <line x1="-50" y1="400" x2="450" y2="400" stroke="#c9a24a" stroke-width="1.5"/>
-      <path d="M-50 60 h500 M-50 740 h500" stroke="#c9a24a" stroke-width="1"/>
+      <circle cx="200" cy="400" r="150" fill="none" stroke="#c9a84c" stroke-width="1.5"/>
+      <circle cx="200" cy="400" r="4" fill="#c9a84c"/>
+      <line x1="-50" y1="400" x2="450" y2="400" stroke="#c9a84c" stroke-width="1.5"/>
+      <path d="M-50 60 h500 M-50 740 h500" stroke="#c9a84c" stroke-width="1"/>
     </svg>
   </div>
   <div class="aurora a"></div><div class="aurora b"></div>
@@ -189,7 +189,7 @@ body{background:transparent;color:var(--txt);font-family:'Barlow',sans-serif;-we
   <!-- HERO -->
   <div class="hero rise" style="animation-delay:.1s">
     <svg class="crest-main" viewBox="0 0 74 84" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <defs><linearGradient id="hg" x1="0" y1="0" x2="74" y2="84"><stop offset="0" stop-color="#ffe452"/><stop offset=".5" stop-color="#c9a24a"/><stop offset="1" stop-color="#8a6d1f"/></linearGradient>
+      <defs><linearGradient id="hg" x1="0" y1="0" x2="74" y2="84"><stop offset="0" stop-color="#e3c878"/><stop offset=".5" stop-color="#c9a84c"/><stop offset="1" stop-color="#7a5f22"/></linearGradient>
       <linearGradient id="hb" x1="0" y1="0" x2="74" y2="84"><stop offset="0" stop-color="#1a2440"/><stop offset="1" stop-color="#0c1222"/></linearGradient></defs>
       <path d="M37 2 L70 12 V44 C70 63 56 76 37 82 C18 76 4 63 4 44 V12 Z" fill="url(#hb)" stroke="url(#hg)" stroke-width="2.5"/>
       <path d="M37 20 l4.7 9.5 10.5 1.5 -7.6 7.4 1.8 10.4 -9.4 -4.9 -9.4 4.9 1.8 -10.4 -7.6 -7.4 10.5 -1.5 Z" fill="url(#hg)"/>
