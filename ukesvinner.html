@@ -71,10 +71,10 @@ body{background:var(--bg);font-family:'Rajdhani',sans-serif;color:#fff;overflow-
 .spin-ring{width:44px;height:44px;border-radius:50%;border:2px solid rgba(74,143,255,0.1);border-top-color:var(--gold);animation:spin 0.85s linear infinite;}
 
 /* HEADER */
-.header{position:relative;text-align:center;padding:72px 24px 56px;overflow:hidden;}
+.header{position:relative;text-align:center;padding:72px 24px 56px;overflow:visible;}
 .header::after{content:'';position:absolute;bottom:0;left:5%;right:5%;height:1px;background:linear-gradient(90deg,transparent,rgba(74,143,255,0.3),rgba(201,168,76,0.7),rgba(74,143,255,0.3),transparent);}
 .eyebrow{font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.55em;text-transform:uppercase;color:rgba(201,168,76,0.4);margin-bottom:22px;}
-.header-num{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(72px,18vw,130px);line-height:0.85;letter-spacing:-0.03em;margin-bottom:4px;}
+.header-num{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(72px,18vw,130px);line-height:1.06;letter-spacing:-0.03em;margin:0 0 4px;padding:0.08em 0;overflow:visible;}
 .header-word{font-family:'Playfair Display',serif;font-style:italic;font-weight:400;font-size:clamp(20px,5vw,34px);color:rgba(255,255,255,0.2);letter-spacing:0.06em;margin-bottom:32px;}
 .week-badge{display:inline-flex;align-items:center;gap:10px;background:rgba(74,143,255,0.06);border:1px solid rgba(74,143,255,0.2);border-radius:100px;padding:10px 26px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.22em;color:rgba(201,168,76,0.65);}
 .badge-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold);animation:glowPulse 2s ease-in-out infinite;}
