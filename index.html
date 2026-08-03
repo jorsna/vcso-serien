@@ -823,7 +823,7 @@ body{background:transparent !important}
         </div>
       </div>
       <div class="hdr-right" style="position:absolute;top:0;right:0">
-        <button id="news-btn" onclick="openNews()" aria-label="Nyheter fra Podium" title="Nyheter fra Podium" style="position:relative;width:38px;height:38px;border-radius:50%;border:1px solid var(--gold);background:rgba(201,168,76,.08);font-size:17px;cursor:pointer;line-height:1;display:inline-flex;align-items:center;justify-content:center">📣<span id="news-dot" style="display:none;position:absolute;top:-2px;right:-2px;width:11px;height:11px;border-radius:50%;background:var(--gold);border:2px solid var(--card)"></span></button>
+        <button id="news-btn" onclick="openNews()" aria-label="Nyheter fra Matchday" title="Nyheter fra Matchday" style="position:relative;width:38px;height:38px;border-radius:50%;border:1px solid var(--gold);background:rgba(201,168,76,.08);font-size:17px;cursor:pointer;line-height:1;display:inline-flex;align-items:center;justify-content:center">📣<span id="news-dot" style="display:none;position:absolute;top:-2px;right:-2px;width:11px;height:11px;border-radius:50%;background:var(--gold);border:2px solid var(--card)"></span></button>
         <button onclick="location.href='bruksanvisning_championship.html'" aria-label="Slik fungerer det" title="Slik fungerer det" style="width:38px;height:38px;border-radius:50%;border:1px solid var(--gold);background:rgba(201,168,76,.08);font-size:18px;font-weight:700;color:var(--gold);cursor:pointer;line-height:1;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">?</button>
   <div id="export-btn" style="display:none"></div>
       </div>
@@ -3248,7 +3248,7 @@ function buildTicker(items) {
 })();
 </script>
 
-<!-- Nyheter fra Podium (leses fra delt Supabase-tabell; rediger via skriv_nyhet.html) -->
+<!-- Nyheter fra Matchday (leses fra delt Supabase-tabell; rediger via skriv_nyhet.html) -->
 <script>
 (function(){
   var NEWS_URL='https://resrjvztsqdxzqgiffeg.supabase.co/rest/v1/news';
@@ -3277,7 +3277,7 @@ function buildTicker(items) {
     o.style.cssText='position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,0.82);display:flex;align-items:flex-start;justify-content:center;padding:40px 20px;overflow:auto;font-family:Barlow,system-ui,sans-serif';
     o.innerHTML='<div style="background:var(--card);border:1.5px solid var(--gold);border-radius:16px;max-width:440px;width:100%;padding:22px">'
       +'<div style="display:flex;align-items:center;justify-content:space-between">'
-      +'<div style="font-family:Anton,sans-serif;color:var(--gold);font-size:18px;letter-spacing:.06em">📣 NYHETER FRA PODIUM</div>'
+      +'<div style="font-family:Anton,sans-serif;color:var(--gold);font-size:18px;letter-spacing:.06em">📣 NYHETER FRA MATCHDAY</div>'
       +'<div id="news-close" style="cursor:pointer;color:var(--muted);font-size:24px;line-height:1;padding:0 4px">×</div></div>'
       +'<div style="width:46px;height:2px;background:var(--gold);opacity:.5;margin:8px 0 4px"></div>'
       +inner+'</div>';
