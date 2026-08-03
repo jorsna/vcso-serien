@@ -321,6 +321,9 @@ body.tier-kritisk #urgency-stripe{background:rgba(239,68,68,.14);border:1px soli
 .fd{width:13px;height:13px;border-radius:50%;cursor:default;flex-shrink:0}
 .fd.sold{background:var(--g)}.fd.empty{background:var(--r)}.fd.future{background:var(--b1)}
 .fd.pace-good{background:var(--g)}.fd.pace-partial{background:var(--y)}.fd.pace-miss{background:var(--r)}
+.fd.hot{background:var(--gold);box-shadow:0 0 6px rgba(201,168,76,.55)}
+#httwatch{display:none;margin:10px 18px 0;text-align:center;font-family:'Anton',sans-serif;letter-spacing:.06em;font-size:14px;color:var(--gold);background:rgba(201,168,76,.10);border:1px solid rgba(201,168,76,.35);border-radius:10px;padding:9px 14px;animation:httPulse 2.4s ease-in-out infinite}
+@keyframes httPulse{0%,100%{box-shadow:0 0 0 rgba(201,168,76,0)}50%{box-shadow:0 0 18px rgba(201,168,76,.25)}}
 .form-legend{display:flex;gap:12px;padding:8px 12px;background:var(--card2);
   border-top:1px solid var(--b1);font-size:9px;color:var(--muted);flex-wrap:wrap}
 .fl{display:flex;align-items:center;gap:4px}
@@ -843,6 +846,8 @@ body{background:transparent !important}
   </div>
   <div class="cd-msg" id="cdMsg">Countdown til 30. september</div>
 </div>
+
+<div id="httwatch"></div>
 
 <!-- TABS -->
 <div class="tabs">
@@ -1406,7 +1411,7 @@ function selgerDots(navn) {
   return [0,1,2,3,4].map(function(i) {
     var d = daysAgo(i), lbl = dayLabel(i);
     var n = sales.filter(function(s) { return s.selger === navn && tsDate(s.ts) === d; }).length;
-    return '<div class="fd ' + (n > 0 ? 'sold' : 'empty') + '" title="' + lbl + ': ' + (n ? n + ' bil' : 'Ingen') + '"></div>';
+    return '<div class="fd ' + (n >= 2 ? 'hot' : n > 0 ? 'sold' : 'empty') + '" title="' + lbl + ': ' + (n ? n + ' bil' : 'Ingen') + '"></div>';
   }).join('');
 }
 function teamDots(teamId) {
@@ -2815,19 +2820,83 @@ function applyUrgency(days){
     b.classList.add('tier-sluttspurt');
     if(msg)msg.textContent='⚡ Sluttspurten har startet — hvert salg teller nå';
   }else{
-    if(msg)msg.textContent='Countdown til 30. september';
+    if(msg)msg.textContent='\ud83c\udfc1 Innspurt \u2014 sesongen avgj\u00f8res 30. september';
+  }
+}
+
+function nextSundayEnd() {
+  var d = new Date();
+  var add = 6 - ((d.getDay()+6)%7);
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate() + add, 23, 59, 59);
+}
+
+function weekLeaderMsg() {
+  var wk = getWeekNum(new Date());
+  var byName = {};
+  sales.forEach(function(s) {
+    if (getWeekNum(new Date(s.ts)) !== wk) return;
+    byName[s.selger] = (byName[s.selger]||0) + 1;
+  });
+  var names = Object.keys(byName);
+  if (!names.length) return '\uD83D\uDC51 Ukens vinner k\u00e5res s\u00f8ndag \u2014 f\u00f8rste scoring tar ledelsen!';
+  var max = 0;
+  names.forEach(function(n) { if (byName[n] > max) max = byName[n]; });
+  var leaders = names.filter(function(n) { return byName[n] === max; });
+  var who = leaders.length === 1 ? leaders[0].split(' ')[0]
+          : leaders.length === 2 ? leaders[0].split(' ')[0] + ' og ' + leaders[1].split(' ')[0]
+          : leaders.length + ' selgere';
+  return '\uD83D\uDC51 ' + who + ' leder uka med ' + max + ' m\u00e5l \u2014 k\u00e5ring s\u00f8ndag 23:59';
+}
+
+function updateHatTrick() {
+  var el = document.getElementById('httwatch');
+  if (!el) return;
+  var n = new Date();
+  var today = n.getFullYear() + '-' + pad(n.getMonth()+1) + '-' + pad(n.getDate());
+  var byName = {};
+  sales.forEach(function(s) { if (tsDate(s.ts) === today) byName[s.selger] = (byName[s.selger]||0) + 1; });
+  var names = Object.keys(byName);
+  var max = 0;
+  names.forEach(function(nm) { if (byName[nm] > max) max = byName[nm]; });
+  var txt = '';
+  if (max >= 2) {
+    var hot = names.filter(function(nm) { return byName[nm] === max; });
+    var who = hot.length === 1 ? hot[0].split(' ')[0]
+            : hot.length === 2 ? hot[0].split(' ')[0] + ' og ' + hot[1].split(' ')[0]
+            : hot.length + ' selgere';
+    txt = max >= 3
+      ? '\uD83C\uDFA9 HAT-TRICK! ' + who + ' har ' + max + ' m\u00e5l i dag!'
+      : '\u26BD\u26BD ' + who + ' har 2 m\u00e5l i dag \u2014 hat-trick watch!';
+  }
+  if (el.getAttribute('data-t') !== txt) {
+    el.setAttribute('data-t', txt);
+    el.textContent = txt;
+    el.style.display = txt ? 'block' : 'none';
   }
 }
 
 function countdown() {
-  var diff = new Date('2026-09-30T23:59:59') - new Date();
-  if (diff <= 0) return;
+  var now = new Date();
+  var toEnd = new Date('2026-09-30T23:59:59') - now;
+  if (toEnd <= 0) return;
+  var daysEnd = Math.floor(toEnd/86400000);
+  var diff;
+  if (daysEnd > 14) {
+    diff = nextSundayEnd() - now;
+    if (diff < 0) diff = 0;
+    document.body.classList.remove('tier-sluttspurt','tier-kritisk');
+    var msg = document.getElementById('cdMsg');
+    if (msg) msg.textContent = weekLeaderMsg();
+  } else {
+    diff = toEnd;
+    applyUrgency(daysEnd);
+  }
   var _days = Math.floor(diff/86400000);
   document.getElementById('cdd').textContent = pad(_days);
-  applyUrgency(_days);
   document.getElementById('cdh').textContent = pad(Math.floor((diff%86400000)/3600000));
   document.getElementById('cdm').textContent = pad(Math.floor((diff%3600000)/60000));
   document.getElementById('cds').textContent = pad(Math.floor((diff%60000)/1000));
+  updateHatTrick();
 }
 
 // ─── INNLOGGING ──────────────────────────────────────────────────────
