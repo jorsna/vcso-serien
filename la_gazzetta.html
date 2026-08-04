@@ -360,15 +360,15 @@ body {
 <!-- MASTHEAD -->
 <div class="masthead">
   <div class="masthead-top">
-    <span id="top-left">VCSO Championship 2026</span>
+    <span id="top-left">VCSO Championship 2026 &middot; Sesong 2</span>
     <span>La Gazzetta dello VCSO Championship</span>
-    <span id="top-right">Mai &ndash; Juni 2026</span>
+    <span id="top-right">August &ndash; September 2026</span>
   </div>
   <div class="masthead-title">La Gazzetta dello VCSO Championship</div>
   <div class="masthead-rule"></div>
   <div class="masthead-sub">
     <span id="edition-label">Laster...</span>
-    <span class="masthead-motto">«Nybiler, drama og lagerbiler»</span>
+    <span class="masthead-motto">«Kamp, drama og nybiler»</span>
     <span id="edition-num">Daglig utgave</span>
   </div>
   <div class="masthead-rule-thick"></div>
@@ -390,7 +390,7 @@ body {
 var SB_URL = 'https://jffhdlmwvurnojoapcvs.supabase.co';
 var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmZmhkbG13dnVybm9qb2FwY3ZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MzIzNjcsImV4cCI6MjA5MzEwODM2N30.Mc_eKMsfR04kLmwfBeH5INn3NTYapv62Fnt0wMpBpMw';
 var ADMIN_PW = 'Salamander2026!';
-var SELGER_PW = 'selekt2026';
+var SELGER_PW = 'vcso2026';
 
 
 var isAdmin = false;
@@ -601,6 +601,10 @@ function genererGazzetta() {
             .then(function(ww){
               var win = (Array.isArray(ww) && ww[0]) ? ww[0] : null;
               if (!win) return dagsGen();
+              // Vakt: bruk kun ukesvinner fra forrige uke (maks 8 dager gammel) – aldri en rest fra forrige sesong
+              var _weG = String(win.week_end).slice(0,10);
+              var _dgSiden = Math.round((new Date(igaar+'T00:00:00Z') - new Date(_weG+'T00:00:00Z'))/86400000);
+              if (_dgSiden < 0 || _dgSiden > 8) return dagsGen();
               var ws = String(win.week_start).slice(0,10), we = String(win.week_end).slice(0,10);
               var ukesSalg = allSalg.filter(function(s){ if(!s.ts) return false; var d=new Date(s.ts).toLocaleDateString('sv-SE',{timeZone:'Europe/Oslo'}); return d >= ws && d <= we; });
               statusEl.textContent = 'Mandag: skriver ukesoppsummering for uke ' + win.week_nr + '...';
@@ -731,7 +735,7 @@ function genererUkesTekst(ukesSalg, win, forrige) {
   var stats = { totalt: totalt, sesong: null, mvp: fornavn(win.selger), mvpNavn: win.selger, mvpAvd: vinnerAvd, topAvd: AVD_NAVN[lederAvd]||null, hatTrick: htHelter.length>0, uke: win.week_nr };
 
   var prompt = 'Du er La Gazzetta dello VCSO Championship \u2013 en dramatisk italiensk-inspirert sportsavis for VCSO Championship 2026, en nybilsalgskonkurranse hos Volvo Car Stor Oslo (VCSO).\n\n'
-    + 'DETTE ER UKENS STORE OPPSUMMERING \u2013 UKESUTGAVEN for UKE ' + win.week_nr + '. Skriv den som en h\u00f8ytidelig oppsummering av en hel ukes kamp, kr\u00f8net med uRO, og kron ukens vinner.\n\n'
+    + 'DETTE ER UKENS STORE OPPSUMMERING \u2013 UKESUTGAVEN for UKE ' + win.week_nr + '. Skriv den som en h\u00f8ytidelig oppsummering av en hel ukes kamp, og kron ukens vinner.\n\n'
     + 'UKENS OFFISIELLE TALL (bruk KUN disse, aldri egne):\n'
     + '- UKENS VINNER: ' + win.selger + ' (' + vinnerAvd + ') med ' + win.pts + ' poeng, ' + win.salg + ' biler, ' + win.finansiert + ' finansiert' + (win.hat_tricks ? ', ' + win.hat_tricks + ' hat-trick(s)' : '') + '.\n'
     + (toer ? '- N\u00e6rmeste utfordrer: ' + toer + ' (' + selgerPoeng[toer] + ' poeng).\n' : '')
@@ -868,7 +872,7 @@ function genererTekst(salg, dato, alleSalg, forrige, spot) {
     var UKEDAG_NO = ['søndag','mandag','tirsdag','onsdag','torsdag','fredag','lørdag'];
     var ukedagNavn = UKEDAG_NO[ukedagIdx];
     var erStengt = (ukedagIdx===0);
-    var dagerIgjenS = Math.max(0, Math.round((new Date('2026-06-30T00:00:00Z') - new Date(dato+'T00:00:00Z'))/86400000));
+    var dagerIgjenS = Math.max(0, Math.round((new Date('2026-09-30T00:00:00Z') - new Date(dato+'T00:00:00Z'))/86400000));
     var lederAvdN = topAvd ? avdNavn[topAvd] : null;
 
     var stilleData = 'DAGEN SOM DEKKES: ' + norskDato(dato) + ' (' + ukedagNavn + ')\n'
@@ -877,7 +881,7 @@ function genererTekst(salg, dato, alleSalg, forrige, spot) {
           ? '- Dette er en SØNDAG – forhandleren er normalt STENGT. Ram det inn som en velfortjent hviledag for gladiatorene, ALDRI som en skuffende tørke.\n'
           : '- Forhandleren var åpen, men ingen signerte – stillheten før stormen.\n')
       + (torkeDager>0 ? '- Det er ' + torkeDager + ' dag' + (torkeDager>1?'er':'') + ' siden forrige signerte kontrakt' + (sisteSalgDato ? ' (' + norskDato(sisteSalgDato) + ')' : '') + '.\n' : '')
-      + '- ' + dagerIgjenS + ' dager igjen til sesongslutt 30. juni 2026.\n'
+      + '- ' + dagerIgjenS + ' dager igjen til sesongslutt 30. september 2026.\n'
       + 'SESONGSTILLING (bruk KUN disse tallene, aldri egne):\n'
       + '- Totalt signert i sesongen: ' + totalSesongen + ' kontrakter\n'
       + (totalLeder ? '- Sammenlagtleder: ' + totalLeder + ' (' + (totalSelger[totalLeder]||0) + ' kontrakter)\n' : '')
@@ -967,7 +971,7 @@ function genererTekst(salg, dato, alleSalg, forrige, spot) {
     ? '\n\nGÅRSDAGENS UTGAVE (kun for kontinuitet – du kan bygge videre på løpende historier og rivalisering, men IKKE gjenta gårsdagens innhold):\nOverskrift: ' + forrige.overskrift + '\n' + forrige.tekst + '\n'
     : '';
 
-  var seasonSlutt = '2026-06-30';
+  var seasonSlutt = '2026-09-30';
   var tidslinje = '';
   if (alleSalg && alleSalg.length) {
     var minTs = null;
@@ -977,7 +981,7 @@ function genererTekst(salg, dato, alleSalg, forrige, spot) {
       var d0 = new Date(fDato + 'T00:00:00Z'), dN = new Date(dato + 'T00:00:00Z'), dE = new Date(seasonSlutt + 'T00:00:00Z');
       var dagISesong = Math.round((dN - d0) / 86400000) + 1;
       var dagerIgjen = Math.max(0, Math.round((dE - dN) / 86400000));
-      tidslinje = '\n\nTIDSLINJE (bruk KUN disse tallene hvis du nevner tid – aldri regn ut eller finn på egne):\n- Utgaven dekker ' + norskDato(dato) + '\n- Dette er dag ' + dagISesong + ' av konkurransen (regnet fra første registrerte salg)\n- ' + dagerIgjen + ' dager igjen til sesongslutt 30. juni 2026';
+      tidslinje = '\n\nTIDSLINJE (bruk KUN disse tallene hvis du nevner tid – aldri regn ut eller finn på egne):\n- Utgaven dekker ' + norskDato(dato) + '\n- Dette er dag ' + dagISesong + ' av konkurransen (regnet fra første registrerte salg)\n- ' + dagerIgjen + ' dager igjen til sesongslutt 30. september 2026';
     }
   }
 
