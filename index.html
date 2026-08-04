@@ -2464,7 +2464,10 @@ function openPlayerCard(id) {
     + '<div class="fc-sec rv"><div class="fc-sec-h">Form \u2014 siste 5 salgsdager</div>'
       + '<div class="fc-form"><div class="fc-pills">'+pills+'</div>'
       + '<div class="fc-form-sum">'+formSum+'/5<span>dager m/ salg</span></div></div></div>'
-    + '<button class="fc-skjerf rv" onclick="closePlayerCard();visSkjerf('+skjerfArgs+')">\uD83E\uDDE3 Del skjerf</button>'
+    + '<div class="rv" style="display:flex;gap:8px">'
+      + '<button class="fc-skjerf" style="flex:1;margin:0" onclick="closePlayerCard();visSkjerf('+skjerfArgs+')">\uD83E\uDDE3 Del skjerf</button>'
+      + '<button class="fc-skjerf" style="flex:1;margin:0" onclick="dlSpillerkort(\''+sObj.id+'\',this)">\uD83D\uDCF8 Del kort</button>'
+    + '</div>'
     + '</div>';
 
   document.getElementById('pc-bd').classList.add('open');
@@ -2492,6 +2495,212 @@ function closePlayerCard(e){
   document.getElementById('pc-sheet').classList.remove('open');
 }
 document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closePlayerCard(); });
+
+// ─── DELBART SPILLERKORT (PNG) ─────────────────────────────────────
+var CARD_BRAND = { liga:'VCSO CHAMPIONSHIP', sesong:'SESONG 2 \u00b7 2026', bg1:'#101c33', bg2:'#060b14', gull:'#c9a84c', gray:false };
+
+function cardToast(msg){
+  var t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#0b1526;color:#f4e9c8;border:1px solid '+CARD_BRAND.gull+';padding:10px 18px;border-radius:8px;font-family:Barlow,sans-serif;font-size:14px;z-index:9999;box-shadow:0 6px 24px rgba(0,0,0,.5);opacity:0;transition:opacity .3s';
+  document.body.appendChild(t);
+  setTimeout(function(){ t.style.opacity='1'; }, 20);
+  setTimeout(function(){ t.style.opacity='0'; setTimeout(function(){ t.remove(); }, 350); }, 2600);
+}
+
+function rrect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+}
+
+function dlSpillerkort(id, btn){
+  var sObj = SELGERE.find(function(x){ return x.id===id; });
+  if (!sObj) return;
+  if (btn){ btn.disabled = true; btn.textContent = '\u23f3 Lager kort\u2026'; }
+  var navn = sObj.navn, loc = sObj.loc, m = curMonth;
+  var ms = milestoneState(navn);
+  var poeng = ms.salgN*PTS + bonusFor(navn, 'all');
+  var fin = ms.finN;
+  var ht = (typeof hatTrickCount==='function') ? hatTrickCount(navn, 'all') : 0;
+  var streak = (typeof streakCount==='function') ? streakCount(navn) : 0;
+
+  var standings = SELGERE.map(function(s){
+    return { navn:s.navn,
+             pts: goalsFor(s.navn,m)*PTS + bonusFor(s.navn,m),
+             fin: sales.filter(function(x){ return x.selger===s.navn && x.finansiert && (m==='all'||x.mnd===m); }).length };
+  }).sort(function(a,b){ return b.pts-a.pts || b.fin-a.fin || a.navn.localeCompare(b.navn); });
+  var rank = 1;
+  for (var ri=0; ri<standings.length; ri++){ if(standings[ri].navn===navn){ rank=ri+1; break; } }
+
+  var dmap = {};
+  sales.forEach(function(s){ if(s.selger===navn){ var d=(s.ts||'').slice(0,10); dmap[d]=(dmap[d]||0)+1; } });
+  var form = [];
+  for (var i=4;i>=0;i--){ var dd=new Date(); dd.setDate(dd.getDate()-i);
+    form.push(dmap[dd.getFullYear()+'-'+pad(dd.getMonth()+1)+'-'+pad(dd.getDate())]>0); }
+  var formSum = form.filter(Boolean).length;
+
+  var tag = ms.fresh ? 'NY MILEP\u00c6L'
+    : rank===1 ? 'TABELLTOPP'
+    : (ms.salgN>=5 && fin/ms.salgN>=0.5) ? 'FINANSIERINGSKONGE'
+    : formSum>=3 ? 'I FORM'
+    : 'P\u00c5 JAKT';
+
+  var badgeTxt = [];
+  ms.achieved.slice(0,2).forEach(function(b){ badgeTxt.push(b.icon+' '+b.label); });
+  if (ht > 0) badgeTxt.push('\u26a1 ' + (ht>1 ? ht+' hat-tricks' : 'Hat-trick'));
+  if (streak >= 3) badgeTxt.push('\ud83d\udd25 ' + streak + '-dagers streak');
+  badgeTxt = badgeTxt.slice(0,3);
+
+  var rankCol = rank===1?'#c9a84c':rank===2?'#94a3b8':rank===3?'#cd7f32':'#7d94b5';
+
+  var photoSrc = (typeof SELGER_PHOTOS !== 'undefined' && SELGER_PHOTOS[id]) ? SELGER_PHOTOS[id] : null;
+  var img = null;
+
+  function draw(){
+    var W=1080, H=1440;
+    var cv = document.createElement('canvas'); cv.width=W; cv.height=H;
+    var ctx = cv.getContext('2d');
+    var G = CARD_BRAND.gull, AC = sObj.color || G;
+
+    rrect(ctx,0,0,W,H,44); ctx.save(); ctx.clip();
+    var bg = ctx.createLinearGradient(0,0,0,H);
+    bg.addColorStop(0, CARD_BRAND.bg1); bg.addColorStop(1, CARD_BRAND.bg2);
+    ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
+    var glow = ctx.createRadialGradient(W/2,430,60,W/2,430,640);
+    glow.addColorStop(0, AC.replace(')',' ').indexOf('rgb')===0 ? AC : AC);
+    ctx.globalAlpha = .16; glow.addColorStop(0,AC); glow.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = glow; ctx.fillRect(0,0,W,H); ctx.globalAlpha = 1;
+    // stadionlinje: svak sirkel bak foto
+    ctx.strokeStyle = 'rgba(255,255,255,.05)'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(W/2, 470, 330, 0, Math.PI*2); ctx.stroke();
+    ctx.restore();
+
+    // ramme
+    rrect(ctx,10,10,W-20,H-20,38); ctx.strokeStyle=G; ctx.lineWidth=6; ctx.stroke();
+    rrect(ctx,26,26,W-52,H-52,30); ctx.strokeStyle='rgba(201,168,76,.28)'; ctx.lineWidth=2; ctx.stroke();
+
+    ctx.textAlign='center';
+    try { ctx.letterSpacing = '8px'; } catch(e){}
+    ctx.fillStyle=G; ctx.font='42px Anton, sans-serif';
+    ctx.fillText(CARD_BRAND.liga, W/2, 118);
+    try { ctx.letterSpacing = '4px'; } catch(e){}
+    ctx.fillStyle='rgba(244,233,200,.55)'; ctx.font='600 26px "Barlow Condensed", sans-serif';
+    ctx.fillText(CARD_BRAND.sesong, W/2, 158);
+    try { ctx.letterSpacing = '0px'; } catch(e){}
+
+    // poeng venstre / rank h\u00f8yre
+    ctx.textAlign='left'; ctx.fillStyle=G; ctx.font='96px Anton, sans-serif';
+    ctx.fillText(String(poeng), 70, 320);
+    ctx.fillStyle='rgba(244,233,200,.5)'; ctx.font='600 24px "Barlow Condensed", sans-serif';
+    ctx.fillText('POENG', 72, 352);
+    ctx.textAlign='right'; ctx.fillStyle=rankCol; ctx.font='96px Anton, sans-serif';
+    ctx.fillText('#'+rank, W-70, 320);
+    ctx.fillStyle='rgba(244,233,200,.5)'; ctx.font='600 24px "Barlow Condensed", sans-serif';
+    ctx.fillText('PLASSERING', W-70, 352);
+
+    // foto
+    var cx=W/2, cy=470, r=210;
+    ctx.beginPath(); ctx.arc(cx,cy,r+14,0,Math.PI*2); ctx.strokeStyle=AC; ctx.lineWidth=10; ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx,cy,r+26,0,Math.PI*2); ctx.strokeStyle='rgba(201,168,76,.5)'; ctx.lineWidth=3; ctx.stroke();
+    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.clip();
+    if (img){
+      if (CARD_BRAND.gray) { try { ctx.filter='grayscale(100%)'; } catch(e){} }
+      var sc = Math.max((r*2)/img.width, (r*2)/img.height);
+      ctx.drawImage(img, cx-img.width*sc/2, cy-img.height*sc/2, img.width*sc, img.height*sc);
+      try { ctx.filter='none'; } catch(e){}
+    } else {
+      ctx.fillStyle = sObj.bg || '#1a2a44'; ctx.fillRect(cx-r,cy-r,r*2,r*2);
+      ctx.fillStyle = sObj.color || G; ctx.font='150px Anton, sans-serif'; ctx.textAlign='center';
+      ctx.fillText(sObj.initials || '', cx, cy+52);
+    }
+    ctx.restore();
+
+    // navn (autoskaler)
+    ctx.textAlign='center'; ctx.fillStyle='#f4f0e4';
+    var fs=68; ctx.font=fs+'px Anton, sans-serif';
+    while (ctx.measureText(navn.toUpperCase()).width > W-160 && fs>40){ fs-=4; ctx.font=fs+'px Anton, sans-serif'; }
+    ctx.fillText(navn.toUpperCase(), W/2, 790);
+    ctx.fillStyle=AC; ctx.font='600 30px "Barlow Condensed", sans-serif';
+    ctx.fillText('\u25cf  '+(LL[loc]||loc).toUpperCase(), W/2, 838);
+
+    // tag-chip
+    ctx.font='30px Anton, sans-serif';
+    var tw = ctx.measureText(tag).width + 70;
+    rrect(ctx, W/2-tw/2, 866, tw, 54, 27);
+    ctx.strokeStyle=G; ctx.lineWidth=2.5; ctx.stroke();
+    ctx.fillStyle='rgba(201,168,76,.12)'; ctx.fill();
+    ctx.fillStyle=G; ctx.fillText(tag, W/2, 904);
+
+    // statsstripe
+    var sy=1010;
+    ctx.strokeStyle='rgba(255,255,255,.1)'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(70,sy-46); ctx.lineTo(W-70,sy-46); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(70,sy+52); ctx.lineTo(W-70,sy+52); ctx.stroke();
+    var cols=[[String(ms.salgN),'SALG',W*0.22],[String(fin),'FINANSIERT',W*0.5],[formSum+'/5','FORM',W*0.78]];
+    cols.forEach(function(c){
+      ctx.fillStyle='#f4f0e4'; ctx.font='58px Anton, sans-serif'; ctx.fillText(c[0], c[2], sy+8);
+      ctx.fillStyle='rgba(244,233,200,.5)'; ctx.font='600 22px "Barlow Condensed", sans-serif'; ctx.fillText(c[1], c[2], sy+42);
+    });
+
+    // form-piller
+    var px0=W/2-140, py=1130;
+    form.forEach(function(f,i){
+      ctx.beginPath(); ctx.arc(px0+i*70, py, 21, 0, Math.PI*2);
+      if (f){ ctx.fillStyle=AC; ctx.fill(); }
+      else { ctx.strokeStyle='rgba(255,255,255,.22)'; ctx.lineWidth=2.5; ctx.stroke(); }
+    });
+    ctx.fillStyle='rgba(244,233,200,.45)'; ctx.font='600 22px "Barlow Condensed", sans-serif';
+    ctx.fillText('SISTE 5 DAGER', W/2, 1188);
+
+    // prestasjoner / neste milep\u00e6l
+    ctx.fillStyle=G; ctx.font='600 28px "Barlow Condensed", sans-serif';
+    if (badgeTxt.length){
+      ctx.fillText(badgeTxt.join('   \u00b7   '), W/2, 1256);
+    } else {
+      ctx.fillText('NESTE MILEP\u00c6L: '+ms.next.cur+' / '+ms.next.goal+' SALG', W/2, 1256);
+    }
+
+    // footer
+    var nd = new Date();
+    ctx.fillStyle='rgba(244,233,200,.4)'; ctx.font='600 24px "Barlow Condensed", sans-serif';
+    ctx.fillText('\u26bd  '+pad(nd.getDate())+'.'+pad(nd.getMonth()+1)+'.'+nd.getFullYear(), W/2, 1356);
+
+    cv.toBlob(function(blob){
+      if (!blob){ if(btn){btn.disabled=false;btn.textContent='\ud83d\udcf8 Del kort';} return; }
+      var fn = 'spillerkort_'+(sObj.id||'selger')+'.png';
+      var copied = false;
+      function finish(){
+        var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=fn; a.click();
+        setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+        cardToast(copied ? '\ud83d\udccb Kort kopiert \u2014 lim inn i chatten med Ctrl+V (og lastet ned)' : '\ud83d\udcbe Spillerkort lastet ned');
+        if(btn){ btn.disabled=false; btn.textContent='\ud83d\udcf8 Del kort'; }
+      }
+      if (navigator.clipboard && window.ClipboardItem){
+        navigator.clipboard.write([new ClipboardItem({'image/png':blob})])
+          .then(function(){ copied=true; finish(); })
+          .catch(function(){ finish(); });
+      } else { finish(); }
+    }, 'image/png');
+  }
+
+  function ready(){
+    if (document.fonts && document.fonts.ready){
+      Promise.all([
+        document.fonts.load('80px Anton'),
+        document.fonts.load('600 26px "Barlow Condensed"')
+      ]).then(draw).catch(draw);
+    } else { draw(); }
+  }
+
+  if (photoSrc){
+    img = new Image();
+    img.onload = ready;
+    img.onerror = function(){ img=null; ready(); };
+    img.src = photoSrc;
+  } else { ready(); }
+}
+
 
 // ─── SPOTLIGHT-MODELL ────────────────────────────────────────────────
 function spotModels(s){ return (s && s.modeller && s.modeller.length) ? s.modeller : (s && s.modell ? [s.modell] : []); }
@@ -2835,17 +3044,25 @@ function weekLeaderMsg() {
   var byName = {};
   sales.forEach(function(s) {
     if (getWeekNum(new Date(s.ts)) !== wk) return;
-    byName[s.selger] = (byName[s.selger]||0) + 1;
+    if (!byName[s.selger]) byName[s.selger] = { g:0, fin:0 };
+    byName[s.selger].g++;
+    if (s.finansiert) byName[s.selger].fin++;
   });
   var names = Object.keys(byName);
   if (!names.length) return '\uD83D\uDC51 Ukens vinner k\u00e5res s\u00f8ndag \u2014 f\u00f8rste scoring tar ledelsen!';
   var max = 0;
-  names.forEach(function(n) { if (byName[n] > max) max = byName[n]; });
-  var leaders = names.filter(function(n) { return byName[n] === max; });
+  names.forEach(function(n) { if (byName[n].g > max) max = byName[n].g; });
+  var topG = names.filter(function(n) { return byName[n].g === max; });
+  // Tiebreak: flest finansierte \u2014 samme regel som i konkurransen
+  var maxFin = 0;
+  topG.forEach(function(n) { if (byName[n].fin > maxFin) maxFin = byName[n].fin; });
+  var leaders = topG.filter(function(n) { return byName[n].fin === maxFin; });
   var who = leaders.length === 1 ? leaders[0].split(' ')[0]
           : leaders.length === 2 ? leaders[0].split(' ')[0] + ' og ' + leaders[1].split(' ')[0]
           : leaders.length + ' selgere';
-  return '\uD83D\uDC51 ' + who + ' leder uka med ' + max + ' m\u00e5l \u2014 k\u00e5ring s\u00f8ndag 23:59';
+  var finTxt = (leaders.length === 1 && topG.length > 1 && maxFin > 0)
+    ? ' (' + maxFin + ' finansiert avgj\u00f8r)' : '';
+  return '\uD83D\uDC51 ' + who + ' leder uka med ' + max + ' m\u00e5l' + finTxt + ' \u2014 k\u00e5ring s\u00f8ndag 23:59';
 }
 
 function updateHatTrick() {
@@ -2899,8 +3116,68 @@ function countdown() {
   updateHatTrick();
 }
 
+// ─── LEVENDE FANETITTEL + DESKTOPVARSLER ─────────────────────────────────
+var baseTitle = document.title;
+var goalUnseen = 0, blinkTimer = null, tabPollStarted = false;
+var knownGoalIds = {};
+
+function askNotifyPermission() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default') {
+    try { Notification.requestPermission(); } catch (e) {}
+  }
+}
+
+function startTabBlink() {
+  if (blinkTimer) return;
+  var on = false;
+  blinkTimer = setInterval(function() {
+    on = !on;
+    document.title = on ? '\u26BD (' + goalUnseen + ') M\u00c5L! \u2014 ' + baseTitle : baseTitle;
+  }, 1200);
+}
+function stopTabBlink() {
+  if (blinkTimer) { clearInterval(blinkTimer); blinkTimer = null; }
+  goalUnseen = 0;
+  document.title = baseTitle;
+}
+document.addEventListener('visibilitychange', function() {
+  if (!document.hidden) stopTabBlink();
+});
+
+function fireGoalNotify(s) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  var fornavn = (s.selger || '').split(' ')[0];
+  var body = (s.modell ? s.modell + ' \u2014 ' : '') + (LL[s.loc] || s.loc || '') + (s.finansiert ? ' \u00b7 \uD83D\uDCB0 finansiert' : '');
+  try { new Notification('\u26BD M\u00c5L! ' + fornavn, { body: body, tag: 'goal-' + s.id }); } catch (e) {}
+}
+
+function pollNewGoals() {
+  fetch(API + '?order=ts.desc&limit=10&deleted=is.false&select=id,selger,loc,modell,ts,finansiert', { headers: sbH() })
+    .then(function(r) { return r.json(); })
+    .then(function(rows) {
+      if (!Array.isArray(rows)) return;
+      if (!tabPollStarted) {
+        // F\u00f8rste poll: merk n\u00e5v\u00e6rende tilstand, ingen varsler
+        rows.forEach(function(s) { knownGoalIds[s.id] = true; });
+        tabPollStarted = true;
+        return;
+      }
+      var nye = rows.filter(function(s) { return !knownGoalIds[s.id]; });
+      nye.forEach(function(s) { knownGoalIds[s.id] = true; });
+      if (!nye.length || !document.hidden) return;
+      goalUnseen += nye.length;
+      startTabBlink();
+      nye.slice(0, 3).forEach(fireGoalNotify);
+    })
+    .catch(function() {});
+}
+setInterval(pollNewGoals, 45000);
+pollNewGoals();
+
 // ─── INNLOGGING ──────────────────────────────────────────────────────
 function closeIntro() {
+  askNotifyPermission();
   var ov = document.getElementById('intro-overlay');
   if (!ov) return;
   ov.style.opacity = '0';
