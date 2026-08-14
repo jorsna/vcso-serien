@@ -25,6 +25,27 @@
 html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);min-height:100vh}
 .page{max-width:800px;margin:0 auto}
 
+/* SEIERSSANNSYNLIGHET */
+.ss-row{display:grid;grid-template-columns:22px 1fr 50px;gap:8px;align-items:center;
+  padding:7px 8px;border-radius:6px;background:var(--card2);margin-bottom:4px;
+  border:1px solid transparent}
+.ss-row.ss-lead{border-color:var(--gold)}
+.ss-rk{font-size:12px;font-weight:700;color:var(--muted);text-align:center}
+.ss-row.ss-lead .ss-rk{color:var(--gold)}
+.ss-nm{font-size:13px;font-weight:600;line-height:1.2}
+.ss-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:1px}
+.ss-sub{font-size:10px;color:var(--muted);margin-top:2px;font-variant-numeric:tabular-nums}
+.ss-pc{font-family:Anton,sans-serif;font-size:17px;text-align:right;
+  font-variant-numeric:tabular-nums;line-height:1}
+.ss-pc small{font-size:10px;color:var(--muted);font-family:Barlow,sans-serif;font-weight:600}
+.ss-fan{grid-column:2 / 4;height:18px;margin-top:4px}
+.ss-fan canvas{width:100%;height:18px;display:block}
+.ss-leg{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);
+  margin-top:3px;font-variant-numeric:tabular-nums}
+.ss-note{font-size:10px;color:var(--muted);line-height:1.5;margin-top:8px;
+  border-left:2px solid var(--b2);padding-left:8px}
+.ss-empty{font-size:11px;color:var(--muted);font-style:italic;padding:6px 2px}
+
 /* INTRO/LOGIN OVERLAY */
 #intro-overlay{
   position:fixed;inset:0;z-index:999;background:var(--bg);
@@ -924,6 +945,8 @@ body{background:transparent !important}
 <!-- STATISTIKK VIEW -->
 <div class="view" id="view-stats">
   <div class="stats-grid">
+    <div class="stat-card full"><div class="stat-title">🎯 Sjanse for å vinne uka</div><div id="ss-uke"></div></div>
+    <div class="stat-card full"><div class="stat-title">🏆 Sjanse for å vinne sesongen</div><div id="ss-sesong"></div></div>
     <div class="stat-card full"><div class="stat-title">📈 Tempo-prognose</div><div id="prognose"></div></div>
     <div class="stat-card"><div class="stat-title">💰 Finansieringsgrad</div><div id="fin-gauge"></div></div>
     <div class="stat-card"><div class="stat-title">⚡ Momentum</div><div id="momentum"></div></div>
@@ -1940,7 +1963,203 @@ function _saleDate(s) {
   return isNaN(d.getTime()) ? null : d;
 }
 
+
+// ─── SEIERSSANNSYNLIGHET (Monte Carlo) ───────────────────────────────
+var SS_START='2026-08-03', SS_SLUTT='2026-09-30';
+var SS_SIMS=12000, SS_HALV=21;
+var ssCache=null, ssCacheN=-1;
+
+function ssGauss(){var u=0,v=0;while(u===0)u=Math.random();while(v===0)v=Math.random();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function ssGamma(sh){if(sh<1)return ssGamma(sh+1)*Math.pow(Math.random(),1/sh);
+  var d=sh-1/3,c=1/Math.sqrt(9*d);for(;;){var x=ssGauss(),v=1+c*x;if(v<=0)continue;v=v*v*v;
+  var u=Math.random();if(u<1-0.0331*x*x*x*x)return d*v;
+  if(Math.log(u)<0.5*x*x+d*(1-v+Math.log(v)))return d*v;}}
+function ssPois(l){if(l<=0)return 0;
+  if(l>30){var n=Math.round(l+Math.sqrt(l)*ssGauss());return n<0?0:n;}
+  var L=Math.exp(-l),k=0,p=1;do{k++;p*=Math.random();}while(p>L);return k-1;}
+function ssD(d){return d.toISOString().slice(0,10);}
+function ssTs(t){return String(t||'').slice(0,10);}
+function ssDiff(a,b){return Math.round((new Date(b)-new Date(a))/86400000);}
+function ssMandag(d){var x=new Date(d);x.setDate(x.getDate()-((x.getDay()+6)%7));return ssD(x);}
+function ssSondag(d){var x=new Date(ssMandag(d));x.setDate(x.getDate()+6);return ssD(x);}
+
+function ssBeregn(alleSalg){
+  var salg=alleSalg.filter(function(s){var d=ssTs(s.ts);return d>=SS_START&&d<=SS_SLUTT;});
+  if(!salg.length) return null;
+  var idag=ssD(new Date()), sisteD=idag<SS_SLUTT?idag:SS_SLUTT;
+  if(sisteD<SS_START) return null;
+  var gaatt=ssDiff(SS_START,sisteD)+1;
+
+  var perDow=[0,0,0,0,0,0,0], dowT=[0,0,0,0,0,0,0];
+  for(var d=new Date(SS_START);ssD(d)<=sisteD;d.setDate(d.getDate()+1)) dowT[d.getDay()]++;
+  salg.forEach(function(s){perDow[new Date(ssTs(s.ts)).getDay()]++;});
+  var snitt=salg.length/Math.max(1,gaatt), dowF=[], SS_W=4;
+  for(var i=0;i<7;i++){
+    var fu=snitt*dowT[i];
+    if(i===0){ dowF[0]=(fu>0)?perDow[0]/fu:0; }        // søndag: kun faktiske data
+    else { dowF[i]=(perDow[i]+SS_W)/(fu+SS_W); }        // krympes mot normal når data er tynt
+  }
+
+  function fakt(fra,til){var f=0,n=0;
+    for(var d=new Date(fra);ssD(d)<=til;d.setDate(d.getDate()+1)){
+      f+=dowF[d.getDay()]; if(dowF[d.getDay()]>0.15)n++;}
+    return {f:f,n:n};}
+
+  var etter=new Date(sisteD); etter.setDate(etter.getDate()+1);
+  var sRest=fakt(etter,SS_SLUTT);
+  var uSlutt=ssSondag(sisteD); if(uSlutt>SS_SLUTT)uSlutt=SS_SLUTT;
+  var uRest=fakt(etter,uSlutt<sisteD?sisteD:uSlutt);
+  var uStart=ssMandag(sisteD);
+
+  var st={}; SELGERE.forEach(function(s){
+    st[s.navn]={salg:0,poeng:0,k:0,fin:0,uSalg:0,uPoeng:0,uFin:0};});
+  salg.forEach(function(s){
+    var o=st[s.selger]; if(!o)return; var dag=ssTs(s.ts);
+    o.salg++; o.poeng+=PTS+(s.spotlight_bonus||0);
+    o.k+=Math.pow(0.5,ssDiff(dag,sisteD)/SS_HALV);
+    if(s.finansiert)o.fin++;
+    if(dag>=uStart&&dag<=sisteD){o.uSalg++;o.uPoeng+=PTS+(s.spotlight_bonus||0);
+      if(s.finansiert)o.uFin++;}});
+
+  var nV=0;
+  for(var d3=new Date(SS_START);ssD(d3)<=sisteD;d3.setDate(d3.getDate()+1))
+    nV+=Math.pow(0.5,ssDiff(ssD(d3),sisteD)/SS_HALV)*dowF[d3.getDay()];
+  var gRate=salg.length/Math.max(0.001,nV*SELGERE.length);
+
+  // Prior-styrken utledes av dataene (empirisk Bayes) i stedet for a gjettes.
+  // Er spredningen mellom selgere ikke storre enn ren tilfeldighet tilsier,
+  // krympes alle mot gjennomsnittet. Er forskjellene ekte, far dataene styre.
+  var ssRater=SELGERE.map(function(s){return st[s.navn].k/Math.max(0.001,nV);});
+  var ssSnitt=ssRater.reduce(function(a,b){return a+b;},0)/ssRater.length;
+  var ssVar=ssRater.reduce(function(a,b){return a+(b-ssSnitt)*(b-ssSnitt);},0)/Math.max(1,ssRater.length-1);
+  var ssStoy=ssSnitt/Math.max(0.001,nV);                 // forventet variasjon fra ren flaks
+  var ssEkte=Math.max(ssSnitt*ssSnitt*0.0025, ssVar-ssStoy); // reell forskjell mellom selgere
+  var SS_PRIOR=Math.min(60,Math.max(3,ssSnitt/ssEkte));
+  var gFin=salg.length?salg.filter(function(s){return s.finansiert;}).length/salg.length:0.4;
+
+  var navn=SELGERE.map(function(s){return s.navn;});
+  var A={},B={},F={};
+  navn.forEach(function(n){A[n]=SS_PRIOR*gRate+st[n].k;B[n]=SS_PRIOR+nV;
+    F[n]=(st[n].fin+6*gFin)/(st[n].salg+6);});
+  var dAnt={}; SELGERE.forEach(function(s){dAnt[s.loc]=(dAnt[s.loc]||0)+1;});
+
+  function sim(gjen,sP,sF,medAvd,lagreFord){
+    var v={},dv={},fo={};
+    navn.forEach(function(n){v[n]=0;fo[n]=[];});
+    TEAMS.forEach(function(t){dv[t.id]=0;});
+    for(var s=0;s<SS_SIMS;s++){
+      var best=-1,bFin=-1,led=[],dp={};
+      TEAMS.forEach(function(t){dp[t.id]=0;});
+      for(var j=0;j<navn.length;j++){
+        var n=navn[j];
+        var nye=gjen>0?ssPois((ssGamma(A[n])/B[n])*gjen):0;
+        var p=sP[n]+nye*PTS, f=sF[n];
+        for(var q=0;q<nye;q++) if(Math.random()<F[n]) f++;
+        if(lagreFord&&s<2500) fo[n].push(p);
+        dp[SELGERE[j].loc]+=p;
+        if(p>best||(p===best&&f>bFin)){best=p;bFin=f;led=[n];}
+        else if(p===best&&f===bFin) led.push(n);
+      }
+      var a=1/led.length; led.forEach(function(n){v[n]+=a;});
+      if(medAvd){var db=-1,dl=[];
+        Object.keys(dp).forEach(function(t){var x=dp[t]/dAnt[t];
+          if(x>db){db=x;dl=[t];}else if(x===db)dl.push(t);});
+        var da=1/dl.length; dl.forEach(function(t){dv[t]+=da;});}
+    }
+    return {v:v,dv:dv,fo:fo};
+  }
+
+  var sP={},sF={},uP={},uF={};
+  navn.forEach(function(n){sP[n]=st[n].poeng;sF[n]=st[n].fin;
+    uP[n]=st[n].uPoeng;uF[n]=st[n].uFin;});
+  var ses=sim(sRest.f,sP,sF,true,true), uke=sim(uRest.f,uP,uF,false,false);
+
+  return {st:st,vinn:ses.v,dept:ses.dv,ford:ses.fo,uke:uke.v,
+    ukeNr:getWeekNum(sisteD),ukeDager:uRest.n,gjenDager:sRest.n,dAnt:dAnt};
+}
+
+function ssVifte(cv,verdier,farge,mn,mx){
+  var w=cv.clientWidth||280,hh=18,dpr=window.devicePixelRatio||1;
+  cv.width=w*dpr;cv.height=hh*dpr;
+  var c=cv.getContext('2d');c.scale(dpr,dpr);
+  var sp=Math.max(1,mx-mn),bins=44,hist=[];
+  for(var i=0;i<bins;i++)hist[i]=0;
+  verdier.forEach(function(v){var b=Math.floor((v-mn)/sp*(bins-1));
+    hist[Math.max(0,Math.min(bins-1,b))]++;});
+  var mk=Math.max.apply(null,hist)||1,bw=w/bins;
+  for(var i2=0;i2<bins;i2++){if(!hist[i2])continue;
+    var bh=Math.max(1.5,(hist[i2]/mk)*hh);
+    c.fillStyle=farge;c.globalAlpha=0.22+0.55*(hist[i2]/mk);
+    c.fillRect(i2*bw,hh-bh,Math.max(1,bw-0.6),bh);}
+  c.globalAlpha=1;
+  var so=verdier.slice().sort(function(a,b){return a-b;});
+  var x=(so[Math.floor(so.length/2)]-mn)/sp*w;
+  c.strokeStyle='#e8f2ff';c.lineWidth=1.4;c.globalAlpha=.8;
+  c.beginPath();c.moveTo(x,0);c.lineTo(x,hh);c.stroke();
+}
+
+function renderSannsynlighet(){
+  var eU=document.getElementById('ss-uke'), eS=document.getElementById('ss-sesong');
+  if(!eU||!eS) return;
+  if(ssCacheN!==sales.length){ ssCache=ssBeregn(sales); ssCacheN=sales.length; }
+  var r=ssCache;
+  if(!r){ eU.innerHTML='<div class="ss-empty">Beregnes n\u00e5r f\u00f8rste bil er registrert.</div>';
+          eS.innerHTML=''; return; }
+  var navn=SELGERE.map(function(s){return s.navn;});
+  function farge(n){var s=SELGERE.filter(function(x){return x.navn===n;})[0];
+    var t=TEAMS.filter(function(t2){return t2.id===s.loc;})[0];
+    return t?t.color:'#5a7898';}
+  function pct(p){return p>=10?Math.round(p):p>=1?p.toFixed(1):'<1';}
+
+  // UKE
+  var uR=navn.slice().sort(function(a,b){
+    return r.uke[b]-r.uke[a]||r.st[b].uPoeng-r.st[a].uPoeng;})
+    .filter(function(n){return r.uke[n]/SS_SIMS>0.005||r.st[n].uPoeng>0;}).slice(0,6);
+  var hu='';
+  if(!uR.length) hu='<div class="ss-empty">Ingen salg i uka enn\u00e5 \u2014 alle stiller likt.</div>';
+  uR.forEach(function(n,i){
+    hu+='<div class="ss-row'+(i===0?' ss-lead':'')+'"><div class="ss-rk">'+(i+1)+'</div>'
+      +'<div><div class="ss-nm"><span class="ss-dot" style="background:'+farge(n)+'"></span>'+n+'</div>'
+      +'<div class="ss-sub">'+r.st[n].uPoeng+' poeng i uka \u00b7 '+r.st[n].uSalg+' bil'
+      +(r.st[n].uSalg===1?'':'er')+'</div></div>'
+      +'<div class="ss-pc">'+pct(r.uke[n]/SS_SIMS*100)+'<small>%</small></div></div>';});
+  hu+='<div class="ss-note">'+r.ukeDager+' salgsdag'+(r.ukeDager===1?'':'er')
+    +' igjen i uke '+r.ukeNr+'. Ved poenglikhet avgj\u00f8r antall finansierte salg.</div>';
+  eU.innerHTML=hu;
+
+  // SESONG
+  var sR=navn.slice().sort(function(a,b){
+    return r.vinn[b]-r.vinn[a]||r.st[b].poeng-r.st[a].poeng;});
+  var alle=[]; navn.forEach(function(n){alle=alle.concat(r.ford[n]);});
+  alle.sort(function(a,b){return a-b;});
+  var mn=alle[Math.floor(alle.length*0.01)]||0, mx=alle[Math.floor(alle.length*0.99)]||1;
+  var hs='';
+  sR.slice(0,10).forEach(function(n,i){
+    hs+='<div class="ss-row'+(i===0?' ss-lead':'')+'"><div class="ss-rk">'+(i+1)+'</div>'
+      +'<div><div class="ss-nm"><span class="ss-dot" style="background:'+farge(n)+'"></span>'+n+'</div>'
+      +'<div class="ss-sub">'+r.st[n].poeng+' poeng \u00b7 '+r.st[n].salg+' bil'
+      +(r.st[n].salg===1?'':'er')+'</div></div>'
+      +'<div class="ss-pc">'+pct(r.vinn[n]/SS_SIMS*100)+'<small>%</small></div>'
+      +'<div class="ss-fan"><canvas data-n="'+n+'" data-c="'+farge(n)+'"></canvas></div></div>';});
+  hs+='<div class="ss-leg"><span>'+mn+' poeng</span><span>mulige sluttresultater</span><span>'+mx+' poeng</span></div>';
+  hs+='<div class="ss-note">Avdeling: '
+    +TEAMS.slice().sort(function(a,b){return r.dept[b.id]-r.dept[a.id];})
+      .map(function(t){return t.navn+' '+pct(r.dept[t.id]/SS_SIMS*100)+'%';}).join(' \u00b7 ')
+    +'<br>'+r.gjenDager+' salgsdager igjen. Sesongen simuleres '+SS_SIMS.toLocaleString('nb-NO')
+    +' ganger ut fra hver selgers tempo, der de siste ukene teller tyngst. '
+    +'Stripen viser hvilke sluttresultater som er mulige \u2014 bred stripe betyr at mye kan skje enn\u00e5.</div>';
+  eS.innerHTML=hs;
+
+  requestAnimationFrame(function(){
+    var cvs=eS.querySelectorAll('.ss-fan canvas');
+    for(var i=0;i<cvs.length;i++)
+      ssVifte(cvs[i],r.ford[cvs[i].getAttribute('data-n')],cvs[i].getAttribute('data-c'),mn,mx);
+  });
+}
+
 function renderStats() {
+  renderSannsynlighet();
   var m = curMonth;
   var fSales = sales.filter(function(s) { return m === 'all' || s.mnd === m; });
 
