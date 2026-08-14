@@ -25,21 +25,28 @@
 html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);min-height:100vh}
 .page{max-width:800px;margin:0 auto}
 
-/* VAERSTRIPE */
-.vbar{display:flex;gap:0;border-bottom:1px solid var(--b1);background:var(--card);
-  overflow-x:auto;-webkit-overflow-scrolling:touch}
-.vb{flex:1 0 auto;min-width:78px;padding:6px 10px;border-right:1px solid var(--b1);
-  display:flex;align-items:center;gap:7px;white-space:nowrap}
-.vb:last-child{border-right:0}
-.vb-ik{font-size:15px;line-height:1}
-.vb-dag{flex:0 0 auto;min-width:0;padding:6px 11px;border-right:1px solid var(--b1);
-  display:flex;flex-direction:column;justify-content:center;background:var(--card2)}
-.vb-dag b{font-family:'Anton',sans-serif;font-size:11px;letter-spacing:1px;
-  color:var(--gold);text-transform:uppercase;font-weight:400}
-.vb-dag span{font-size:9px;color:var(--muted);margin-top:1px}
-.vb-n{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
-.vb-t{font-family:'Anton',sans-serif;font-size:13px;color:var(--txt);line-height:1.1}
-.vb-r{font-size:9px;color:var(--muted);margin-top:1px}
+/* VAERSTRIPE - matcher Gazzetta-tickeren */
+#vbar{width:100%;height:32px;
+  background:linear-gradient(90deg,#0a0a0a 0%,#111 50%,#0a0a0a 100%);
+  border-top:1px solid rgba(201,168,76,.15);
+  display:flex;align-items:center;overflow-x:auto;overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none}
+#vbar::-webkit-scrollbar{display:none}
+#vbar .vb-dag{flex-shrink:0;padding:0 10px;height:100%;
+  font-family:Anton,sans-serif;font-size:9px;letter-spacing:2px;
+  color:#0a0a0a;background:linear-gradient(135deg,#8fa6c4,#4a5f7a);
+  display:flex;align-items:center;white-space:nowrap;
+  border-right:1px solid rgba(201,168,76,.2)}
+#vbar .vb{flex-shrink:0;display:flex;align-items:center;gap:5px;
+  padding:0 12px;height:100%;white-space:nowrap;
+  border-right:1px solid rgba(255,255,255,.05)}
+#vbar .vb:last-child{border-right:0}
+#vbar .vb-ik{font-size:12px;line-height:1}
+#vbar .vb-n{font-size:9px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.5px;color:rgba(255,255,255,.4)}
+#vbar .vb-t{font-family:Anton,sans-serif;font-size:11px;
+  color:rgba(255,255,255,.85);letter-spacing:.5px}
+#vbar .vb-r{font-size:9px;color:rgba(255,255,255,.3)}
 
 /* SEIERSSANNSYNLIGHET */
 .ss-row{display:grid;grid-template-columns:22px 1fr 50px;gap:8px;align-items:center;
@@ -912,6 +919,9 @@ body{background:transparent !important}
   </div>
 </div>
 
+<!-- VÆRSTRIPE -->
+<div class="vbar" id="vbar" style="display:none"></div>
+
 <!-- SPOTLIGHT BANNER (vises kun når aktiv) -->
 <div class="sp-banner" id="sp-banner" style="display:none"></div>
 
@@ -927,9 +937,6 @@ body{background:transparent !important}
     <button class="mt" onclick="setMonth('sep',this)">September</button>
   </div>
 </div>
-
-<!-- VÆRSTRIPE -->
-<div class="vbar" id="vbar" style="display:none"></div>
 
 <!-- MVP BANNER -->
 <div id="mvp-banner" style="display:none;padding:10px 16px;background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.04));border-bottom:1px solid rgba(201,168,76,.2);align-items:center;gap:12px">
@@ -2017,19 +2024,19 @@ function renderVaer() {
     { sted:'Lillestr\u00f8m', kort:'Lillestr\u00f8m' }
   ];
   var naa = new Date();
-  var ukedag = ['S\u00f8ndag','Mandag','Tirsdag','Onsdag','Torsdag','Fredag','L\u00f8rdag'][naa.getDay()];
-  var h = '<div class="vb-dag"><b>I dag</b><span>' + ukedag.toLowerCase() + '</span></div>';
+  var ukedag = ['s\u00f8n','man','tir','ons','tor','fre','l\u00f8r'][naa.getDay()];
+  var h = '<div class="vb-dag">I DAG \u00b7 ' + ukedag.toUpperCase() + '</div>';
   var antall = 0;
   rekke.forEach(function(r){
     var v = vaerData[r.sted];
-    if (!v) return;
+    if (!v || typeof v.temp_maks !== 'number') return;
     antall++;
     var ik = VAER_IKON[v.kategori] || '\u2014';
-    var nedbor = (v.nedbor_mm > 0) ? (v.nedbor_mm + ' mm') : v.kategori;
-    h += '<div class="vb"><div class="vb-ik">' + ik + '</div><div>'
-       + '<div class="vb-n">' + r.kort + '</div>'
-       + '<div class="vb-t">' + Math.round(v.temp_maks) + '\u00b0</div>'
-       + '<div class="vb-r">' + nedbor + '</div></div></div>';
+    h += '<div class="vb"><span class="vb-ik">' + ik + '</span>'
+       + '<span class="vb-n">' + r.kort + '</span>'
+       + '<span class="vb-t">' + Math.round(v.temp_maks) + '\u00b0</span>'
+       + (v.nedbor_mm > 0 ? '<span class="vb-r">' + v.nedbor_mm + ' mm</span>' : '')
+       + '</div>';
   });
   if (!antall) return;
   el.innerHTML = h;
