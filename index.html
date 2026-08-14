@@ -946,7 +946,7 @@ body{background:transparent !important}
 <div class="view" id="view-stats">
   <div class="stats-grid">
     <div class="stat-card full"><div class="stat-title">🎯 Sjanse for å vinne uka</div><div id="ss-uke"></div></div>
-    <div class="stat-card full"><div class="stat-title">🏆 Sjanse for å vinne sesongen</div><div id="ss-sesong"></div></div>
+    <div class="stat-card full"><div class="stat-title">🏆 Sjanse for topp 5 i sesongen</div><div id="ss-sesong"></div></div>
     <div class="stat-card full"><div class="stat-title">📈 Tempo-prognose</div><div id="prognose"></div></div>
     <div class="stat-card"><div class="stat-title">💰 Finansieringsgrad</div><div id="fin-gauge"></div></div>
     <div class="stat-card"><div class="stat-title">⚡ Momentum</div><div id="momentum"></div></div>
@@ -2045,16 +2045,16 @@ function ssBeregn(alleSalg){
   var dAnt={}; SELGERE.forEach(function(s){dAnt[s.loc]=(dAnt[s.loc]||0)+1;});
 
   function sim(gjen,sP,sF,medAvd,lagreFord){
-    var v={},dv={},fo={};
-    navn.forEach(function(n){v[n]=0;fo[n]=[];});
+    var v={},dv={},fo={},t5={};
+    navn.forEach(function(n){v[n]=0;fo[n]=[];t5[n]=0;});
     TEAMS.forEach(function(t){dv[t.id]=0;});
     for(var s=0;s<SS_SIMS;s++){
-      var best=-1,bFin=-1,led=[],dp={};
+      var best=-1,bFin=-1,led=[],dp={},pn={};
       TEAMS.forEach(function(t){dp[t.id]=0;});
       for(var j=0;j<navn.length;j++){
         var n=navn[j];
         var nye=gjen>0?ssPois((ssGamma(A[n])/B[n])*gjen):0;
-        var p=sP[n]+nye*PTS, f=sF[n];
+        var p=sP[n]+nye*PTS, f=sF[n]; pn[n]=p;
         for(var q=0;q<nye;q++) if(Math.random()<F[n]) f++;
         if(lagreFord&&s<2500) fo[n].push(p);
         dp[SELGERE[j].loc]+=p;
@@ -2062,12 +2062,18 @@ function ssBeregn(alleSalg){
         else if(p===best&&f===bFin) led.push(n);
       }
       var a=1/led.length; led.forEach(function(n){v[n]+=a;});
+      if(lagreFord){                       // sannsynlighet for topp 5
+        var sortert=[]; navn.forEach(function(n){sortert.push(pn[n]);});
+        sortert.sort(function(x,y){return y-x;});
+        var terskel=sortert[4];
+        navn.forEach(function(n){ if(pn[n]>=terskel) t5[n]+=1; });
+      }
       if(medAvd){var db=-1,dl=[];
         Object.keys(dp).forEach(function(t){var x=dp[t]/dAnt[t];
           if(x>db){db=x;dl=[t];}else if(x===db)dl.push(t);});
         var da=1/dl.length; dl.forEach(function(t){dv[t]+=da;});}
     }
-    return {v:v,dv:dv,fo:fo};
+    return {v:v,dv:dv,fo:fo,t5:t5};
   }
 
   var sP={},sF={},uP={},uF={};
@@ -2075,7 +2081,7 @@ function ssBeregn(alleSalg){
     uP[n]=st[n].uPoeng;uF[n]=st[n].uFin;});
   var ses=sim(sRest.f,sP,sF,true,true), uke=sim(uRest.f,uP,uF,false,false);
 
-  return {st:st,vinn:ses.v,dept:ses.dv,ford:ses.fo,uke:uke.v,
+  return {st:st,vinn:ses.v,dept:ses.dv,ford:ses.fo,topp5:ses.t5,uke:uke.v,
     ukeNr:getWeekNum(sisteD),ukeDager:uRest.n,gjenDager:sRest.n,dAnt:dAnt};
 }
 
@@ -2135,19 +2141,23 @@ function renderSannsynlighet(){
   alle.sort(function(a,b){return a-b;});
   var mn=alle[Math.floor(alle.length*0.01)]||0, mx=alle[Math.floor(alle.length*0.99)]||1;
   var hs='';
-  sR.slice(0,10).forEach(function(n,i){
+  sR.forEach(function(n,i){
+    var pSeier=r.vinn[n]/SS_SIMS*100, p5=r.topp5[n]/SS_SIMS*100;
     hs+='<div class="ss-row'+(i===0?' ss-lead':'')+'"><div class="ss-rk">'+(i+1)+'</div>'
       +'<div><div class="ss-nm"><span class="ss-dot" style="background:'+farge(n)+'"></span>'+n+'</div>'
       +'<div class="ss-sub">'+r.st[n].poeng+' poeng \u00b7 '+r.st[n].salg+' bil'
-      +(r.st[n].salg===1?'':'er')+'</div></div>'
-      +'<div class="ss-pc">'+pct(r.vinn[n]/SS_SIMS*100)+'<small>%</small></div>'
+      +(r.st[n].salg===1?'':'er')
+      +(i<3&&pSeier>=1?' \u00b7 <span style="color:var(--gold)">'+pct(pSeier)+'% for seier</span>':'')
+      +'</div></div>'
+      +'<div class="ss-pc">'+pct(p5)+'<small>%</small></div>'
       +'<div class="ss-fan"><canvas data-n="'+n+'" data-c="'+farge(n)+'"></canvas></div></div>';});
   hs+='<div class="ss-leg"><span>'+mn+' poeng</span><span>mulige sluttresultater</span><span>'+mx+' poeng</span></div>';
   hs+='<div class="ss-note">Avdeling: '
     +TEAMS.slice().sort(function(a,b){return r.dept[b.id]-r.dept[a.id];})
       .map(function(t){return t.navn+' '+pct(r.dept[t.id]/SS_SIMS*100)+'%';}).join(' \u00b7 ')
-    +'<br>'+r.gjenDager+' salgsdager igjen. Sesongen simuleres '+SS_SIMS.toLocaleString('nb-NO')
-    +' ganger ut fra hver selgers tempo, der de siste ukene teller tyngst. '
+    +'<br>'+r.gjenDager+' salgsdager igjen. Prosenten viser sjansen for \u00e5 ende blant de fem beste. '
+    +'Sesongen simuleres '+SS_SIMS.toLocaleString('nb-NO')+' ganger ut fra hver selgers tempo, '
+    +'der de siste ukene teller tyngst. '
     +'Stripen viser hvilke sluttresultater som er mulige \u2014 bred stripe betyr at mye kan skje enn\u00e5.</div>';
   eS.innerHTML=hs;
 
