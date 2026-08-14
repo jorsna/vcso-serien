@@ -29,24 +29,23 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 #vbar{width:100%;height:32px;
   background:linear-gradient(90deg,#0a0a0a 0%,#111 50%,#0a0a0a 100%);
   border-top:1px solid rgba(201,168,76,.15);
-  display:flex;align-items:center;overflow-x:auto;overflow-y:hidden;
-  -webkit-overflow-scrolling:touch;scrollbar-width:none}
-#vbar::-webkit-scrollbar{display:none}
-#vbar .vb-dag{flex-shrink:0;padding:0 10px;height:100%;
+  display:flex;align-items:center;overflow:hidden}
+#vbar .vb-dag{flex:0 0 auto;padding:0 10px;height:100%;
   font-family:Anton,sans-serif;font-size:9px;letter-spacing:2px;
   color:#0a0a0a;background:linear-gradient(135deg,#8fa6c4,#4a5f7a);
-  display:flex;align-items:center;white-space:nowrap;
+  display:flex;align-items:center;justify-content:center;white-space:nowrap;
   border-right:1px solid rgba(201,168,76,.2)}
-#vbar .vb{flex-shrink:0;display:flex;align-items:center;gap:5px;
-  padding:0 12px;height:100%;white-space:nowrap;
-  border-right:1px solid rgba(255,255,255,.05)}
+#vbar .vb-wrap{flex:1 1 auto;height:100%;display:flex;align-items:stretch;min-width:0}
+#vbar .vb{flex:1 1 0;min-width:0;display:flex;align-items:center;
+  justify-content:center;gap:5px;padding:0 6px;height:100%;white-space:nowrap;
+  border-right:1px solid rgba(255,255,255,.05);overflow:hidden}
 #vbar .vb:last-child{border-right:0}
-#vbar .vb-ik{font-size:12px;line-height:1}
+#vbar .vb-ik{font-size:12px;line-height:1;flex:0 0 auto}
 #vbar .vb-n{font-size:9px;font-weight:700;text-transform:uppercase;
-  letter-spacing:.5px;color:rgba(255,255,255,.4)}
+  letter-spacing:.5px;color:rgba(255,255,255,.4);overflow:hidden;text-overflow:ellipsis}
 #vbar .vb-t{font-family:Anton,sans-serif;font-size:11px;
-  color:rgba(255,255,255,.85);letter-spacing:.5px}
-#vbar .vb-r{font-size:9px;color:rgba(255,255,255,.3)}
+  color:rgba(255,255,255,.85);letter-spacing:.5px;flex:0 0 auto}
+#vbar .vb-r{font-size:9px;color:rgba(255,255,255,.3);flex:0 0 auto}
 
 /* SEIERSSANNSYNLIGHET */
 .ss-row{display:grid;grid-template-columns:22px 1fr 50px;gap:8px;align-items:center;
@@ -2023,9 +2022,7 @@ function renderVaer() {
     { sted:'Fornebu', kort:'Fornebu' },
     { sted:'Lillestr\u00f8m', kort:'Lillestr\u00f8m' }
   ];
-  var naa = new Date();
-  var ukedag = ['s\u00f8n','man','tir','ons','tor','fre','l\u00f8r'][naa.getDay()];
-  var h = '<div class="vb-dag">I DAG \u00b7 ' + ukedag.toUpperCase() + '</div>';
+  var h = '<div class="vb-dag">V\u00c6RET I DAG</div><div class="vb-wrap">';
   var antall = 0;
   rekke.forEach(function(r){
     var v = vaerData[r.sted];
@@ -2038,10 +2035,26 @@ function renderVaer() {
        + (v.nedbor_mm > 0 ? '<span class="vb-r">' + v.nedbor_mm + ' mm</span>' : '')
        + '</div>';
   });
+  h += '</div>';
   if (!antall) return;
   el.innerHTML = h;
   el.style.display = 'flex';
+  matchEtikettBredde();
 }
+
+// Fargefeltet skal vaere like bredt som Gazzettas gullfelt.
+// Maales i nettleseren fordi Anton lastes asynkront og bredden endrer seg.
+function matchEtikettBredde() {
+  var gaz = document.querySelector('#gazzetta-ticker .ticker-label');
+  var min = document.querySelector('#vbar .vb-dag');
+  if (!gaz || !min) return;
+  var b = gaz.offsetWidth;
+  if (b > 0) { min.style.width = b + 'px'; min.style.padding = '0'; }
+}
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(function(){ matchEtikettBredde(); });
+}
+window.addEventListener('resize', matchEtikettBredde);
 
 // ─── SEIERSSANNSYNLIGHET (Monte Carlo) ───────────────────────────────
 var SS_START='2026-08-03', SS_SLUTT='2026-09-30';
