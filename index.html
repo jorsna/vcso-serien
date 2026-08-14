@@ -25,6 +25,22 @@
 html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);min-height:100vh}
 .page{max-width:800px;margin:0 auto}
 
+/* VAERSTRIPE */
+.vbar{display:flex;gap:0;border-bottom:1px solid var(--b1);background:var(--card);
+  overflow-x:auto;-webkit-overflow-scrolling:touch}
+.vb{flex:1 0 auto;min-width:78px;padding:6px 10px;border-right:1px solid var(--b1);
+  display:flex;align-items:center;gap:7px;white-space:nowrap}
+.vb:last-child{border-right:0}
+.vb-ik{font-size:15px;line-height:1}
+.vb-dag{flex:0 0 auto;min-width:0;padding:6px 11px;border-right:1px solid var(--b1);
+  display:flex;flex-direction:column;justify-content:center;background:var(--card2)}
+.vb-dag b{font-family:'Anton',sans-serif;font-size:11px;letter-spacing:1px;
+  color:var(--gold);text-transform:uppercase;font-weight:400}
+.vb-dag span{font-size:9px;color:var(--muted);margin-top:1px}
+.vb-n{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.vb-t{font-family:'Anton',sans-serif;font-size:13px;color:var(--txt);line-height:1.1}
+.vb-r{font-size:9px;color:var(--muted);margin-top:1px}
+
 /* SEIERSSANNSYNLIGHET */
 .ss-row{display:grid;grid-template-columns:22px 1fr 50px;gap:8px;align-items:center;
   padding:7px 8px;border-radius:6px;background:var(--card2);margin-bottom:4px;
@@ -888,7 +904,7 @@ body{background:transparent !important}
 
 <!-- GAZZETTA TICKER -->
 <div id="gazzetta-ticker" style="display:none">
-  <div class="ticker-label">&#128240; LA GAZZETTA</div>
+  <div class="ticker-label">&#128240; LA GAZZETTA <span style="opacity:.55;font-weight:400">&middot; i går</span></div>
   <div class="ticker-track-wrap">
     <div class="ticker-track" id="ticker-track">
       <span style="font-size:10px;color:rgba(255,255,255,.3);padding:0 20px">Laster nyheter...</span>
@@ -911,6 +927,9 @@ body{background:transparent !important}
     <button class="mt" onclick="setMonth('sep',this)">September</button>
   </div>
 </div>
+
+<!-- VÆRSTRIPE -->
+<div class="vbar" id="vbar" style="display:none"></div>
 
 <!-- MVP BANNER -->
 <div id="mvp-banner" style="display:none;padding:10px 16px;background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.04));border-bottom:1px solid rgba(201,168,76,.2);align-items:center;gap:12px">
@@ -1264,6 +1283,7 @@ function fetchSales() {
       updateMVP();
       autoSaveWeeklyWinner();
       fetchSpotlight();
+      hentVaer();
     })
     .catch(function(e) { showStatus('Feil: ' + e.message, true); });
 }
@@ -1963,6 +1983,58 @@ function _saleDate(s) {
   return isNaN(d.getTime()) ? null : d;
 }
 
+
+// ─── VAERSTRIPE ──────────────────────────────────────────────────────
+// Leser kontekstlaget som ligger paa Selekt-prosjektet (felles for alle tre).
+var VAER_URL = 'https://resrjvztsqdxzqgiffeg.supabase.co/rest/v1/matchday_kontekst';
+var VAER_IKON = {
+  'sol':'\u2600\uFE0F','lettskyet':'\uD83C\uDF24\uFE0F','delvis skyet':'\u26C5',
+  'overskyet':'\u2601\uFE0F','regn':'\uD83C\uDF27\uFE0F','kraftig regn':'\uD83C\uDF27\uFE0F',
+  'torden':'\u26C8\uFE0F','sn\u00f8':'\uD83C\uDF28\uFE0F','t\u00e5ke':'\uD83C\uDF2B\uFE0F','ukjent':'\u2014'
+};
+var vaerData = null;
+
+function hentVaer() {
+  var idag = new Date().toISOString().slice(0,10);
+  fetch(VAER_URL + '?select=sted,data&kilde=eq.vaer&dato=eq.' + idag,
+    { headers: { apikey: NEWS_POST_KEY, Authorization: 'Bearer ' + NEWS_POST_KEY } })
+  .then(function(r){ return r.ok ? r.json() : []; })
+  .then(function(rows){
+    if (!Array.isArray(rows) || !rows.length) return;
+    vaerData = {};
+    rows.forEach(function(r){ vaerData[r.sted] = r.data; });
+    renderVaer();
+  })
+  .catch(function(){ /* vaer er pynt - feiler stille */ });
+}
+
+function renderVaer() {
+  var el = document.getElementById('vbar');
+  if (!el || !vaerData) return;
+  var rekke = [
+    { sted:'Ryen', kort:'Ryen' },
+    { sted:'Fornebu', kort:'Fornebu' },
+    { sted:'Lillestr\u00f8m', kort:'Lillestr\u00f8m' }
+  ];
+  var naa = new Date();
+  var ukedag = ['S\u00f8ndag','Mandag','Tirsdag','Onsdag','Torsdag','Fredag','L\u00f8rdag'][naa.getDay()];
+  var h = '<div class="vb-dag"><b>I dag</b><span>' + ukedag.toLowerCase() + '</span></div>';
+  var antall = 0;
+  rekke.forEach(function(r){
+    var v = vaerData[r.sted];
+    if (!v) return;
+    antall++;
+    var ik = VAER_IKON[v.kategori] || '\u2014';
+    var nedbor = (v.nedbor_mm > 0) ? (v.nedbor_mm + ' mm') : v.kategori;
+    h += '<div class="vb"><div class="vb-ik">' + ik + '</div><div>'
+       + '<div class="vb-n">' + r.kort + '</div>'
+       + '<div class="vb-t">' + Math.round(v.temp_maks) + '\u00b0</div>'
+       + '<div class="vb-r">' + nedbor + '</div></div></div>';
+  });
+  if (!antall) return;
+  el.innerHTML = h;
+  el.style.display = 'flex';
+}
 
 // ─── SEIERSSANNSYNLIGHET (Monte Carlo) ───────────────────────────────
 var SS_START='2026-08-03', SS_SLUTT='2026-09-30';
