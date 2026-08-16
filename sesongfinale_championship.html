@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VCSO Championship – Sesongfinale · Q2 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<script>
+/* ══════════════════════════════════════════════════════════════════════
+   MATCHDAY · MVP.JS  ·  v1.0
+   Kanonisk definisjon av «MVP-dag». Denne blokken er IDENTISK i alle
+   filer i alle tre konkurransene. Endres den ett sted, må den byttes
+   ut alle steder – den genereres fra én kilde.
+
+   DEFINISJONEN
+   ------------
+   1. Dagen avgjøres av OSLO-dato (Europe/Oslo), ikke UTC.
+   2. Høyest poeng den dagen tar MVP.
+   3. Står det likt: konkurransens tiebreaker (finansiert / 10-ere).
+   4. Fortsatt likt -> DELT MVP. Alle vinnerne får én hel MVP-dag hver.
+   5. Slettede rader (deleted) og ugyldige rader teller aldri.
+
+   Samme stige som ukesvinner og bruksanvisningen. Ett sted, én sannhet.
+   ══════════════════════════════════════════════════════════════════════ */
+(function (global) {
+  'use strict';
+
+  /* ── Oslo-dato fra ts (som er lagret som ISO-tekst, ikke timestamptz) ── */
+  function osloDato(ts) {
+    if (!ts) return null;
+    var d = new Date(ts);
+    if (isNaN(d.getTime())) return null;
+    return d.toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' }); // YYYY-MM-DD
+  }
+
+  /* ── Standardoppsett = Championship / Selekt ────────────────────────── */
+  var STANDARD = {
+    navnFelt: 'selger',
+    gyldig: function (r) { return !r.deleted; },
+    poeng: function (r) { return 3 + (r.spotlight_bonus || 0); },
+    tie: function (r) { return r.finansiert ? 1 : 0; },
+    tieNavn: 'finansierte salg'
+  };
+
+  /* ── Ferdig oppsett for OSAT ────────────────────────────────────────── */
+  var OSAT = {
+    navnFelt: 'pst',
+    gyldig: function (r) { return !r.deleted && (r.score === 9 || r.score === 10); },
+    poeng: function () { return 3; },
+    tie: function (r) { return r.score === 10 ? 1 : 0; },
+    tieNavn: '10-ere'
+  };
+
+  function medStandard(cfg) {
+    cfg = cfg || {};
+    return {
+      navnFelt: cfg.navnFelt || STANDARD.navnFelt,
+      gyldig: cfg.gyldig || STANDARD.gyldig,
+      poeng: cfg.poeng || STANDARD.poeng,
+      tie: cfg.tie || STANDARD.tie,
+      tieNavn: cfg.tieNavn || STANDARD.tieNavn
+    };
+  }
+
+  /* ══════════════════════════════════════════════════════════════════
+     KJERNE: grupperer rader per Oslo-dato og kårer dagens vinner(e).
+     ══════════════════════════════════════════════════════════════════ */
+  function grupper(rader, cfg) {
+    var dager = {};
+    (rader || []).forEach(function (r) {
+      if (!cfg.gyldig(r)) return;
+      var d = osloDato(r.ts);
+      if (!d) return;
+      var navn = r[cfg.navnFelt];
+      if (!navn) return;
+      if (!dager[d]) dager[d] = {};
+      if (!dager[d][navn]) dager[d][navn] = { poeng: 0, tie: 0, antall: 0, forsteTs: r.ts };
+      var p = dager[d][navn];
+      p.poeng += cfg.poeng(r);
+      p.tie += cfg.tie(r);
+      p.antall += 1;
+      if (r.ts && r.ts < p.forsteTs) p.forsteTs = r.ts;
+    });
+    return dager;
+  }
+
+  /* Kårer vinner(e) for ÉN dag. Returnerer null hvis ingen aktivitet. */
+  function karDag(spillere) {
+    var navn = Object.keys(spillere || {});
+    if (!navn.length) return null;
+
+    var maksPoeng = 0;
+    navn.forEach(function (n) { if (spillere[n].poeng > maksPoeng) maksPoeng = spillere[n].poeng; });
+    if (maksPoeng <= 0) return null;
+
+    var likt = navn.filter(function (n) { return spillere[n].poeng === maksPoeng; });
+
+    var maksTie = 0;
+    likt.forEach(function (n) { if (spillere[n].tie > maksTie) maksTie = spillere[n].tie; });
+    var vinnere = likt.filter(function (n) { return spillere[n].tie === maksTie; });
+
+    return {
+      vinnere: vinnere.sort(),
+      poeng: maksPoeng,
+      tie: maksTie,
+      antall: spillere[vinnere[0]].antall,
+      delt: vinnere.length > 1,
+      avgjortAvTie: vinnere.length < likt.length
+    };
+  }
+
+  /* ══════════════════════════════════════════════════════════════════
+     beregnMVPdager(rader, cfg)
+     Hovedfunksjonen. Ett kall gir alt noen visning trenger.
+     ══════════════════════════════════════════════════════════════════ */
+  function beregnMVPdager(rader, cfg) {
+    cfg = medStandard(cfg);
+    var gruppert = grupper(rader, cfg);
+    var dager = Object.keys(gruppert).sort();
+
+    var perDag = {};
+    var aktiveDager = [];
+    var telling = {};
+
+    dager.forEach(function (d) {
+      var res = karDag(gruppert[d]);
+      if (!res) return;
+      perDag[d] = res;
+      aktiveDager.push(d);
+      res.vinnere.forEach(function (n) { telling[n] = (telling[n] || 0) + 1; });
+    });
+
+    var perSpiller = {};
+    Object.keys(telling).forEach(function (n) {
+      perSpiller[n] = {
+        navn: n,
+        antall: telling[n],
+        dager: aktiveDager.filter(function (d) { return perDag[d].vinnere.indexOf(n) !== -1; }),
+        // parallell til aktiveDager – true på dagene spilleren tok MVP
+        maske: aktiveDager.map(function (d) { return perDag[d].vinnere.indexOf(n) !== -1; })
+      };
+    });
+
+    var rangert = Object.keys(perSpiller)
+      .map(function (n) { return perSpiller[n]; })
+      .sort(function (a, b) { return b.antall - a.antall || a.navn.localeCompare(b.navn, 'nb'); });
+
+    var topp = rangert.length
+      ? rangert.filter(function (x) { return x.antall === rangert[0].antall; })
+      : [];
+
+    return {
+      dager: aktiveDager,      // alle dager med aktivitet, sortert stigende
+      perDag: perDag,          // { '2026-08-03': {vinnere,poeng,tie,delt,...} }
+      perSpiller: perSpiller,  // { navn: {antall, dager, maske} }
+      rangert: rangert,        // hele topplista, synkende
+      topp: topp,              // leder(e) – flere ved likt
+      tieNavn: cfg.tieNavn
+    };
+  }
+
+  /* ══════════════════════════════════════════════════════════════════
+     forDag(rader, dato, cfg)
+     Kårer MVP for én bestemt Oslo-dato. Brukes av MVP-banneret.
+     Returnerer null hvis ingen aktivitet den dagen.
+     ══════════════════════════════════════════════════════════════════ */
+  function forDag(rader, dato, cfg) {
+    cfg = medStandard(cfg);
+    var gruppert = grupper(rader, cfg);
+    return karDag(gruppert[dato]);
+  }
+
+  /* Dagens Oslo-dato som YYYY-MM-DD. */
+  function iDag() {
+    return new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' });
+  }
+
+  global.MatchdayMVP = {
+    beregnMVPdager: beregnMVPdager,
+    forDag: forDag,
+    osloDato: osloDato,
+    iDag: iDag,
+    STANDARD: STANDARD,
+    OSAT: OSAT,
+    versjon: '1.0'
+  };
+})(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this));
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cinzel:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#c9a84c; --gold2:#f0c96e; --gold3:#8a6414; --gold-bright:#ffe98a;
+  --ryen:#4a8fff; --fornebu:#27c98a; --lillestrom:#e8a020;
+  --bg:#03080f;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);font-family:'Rajdhani',sans-serif;color:#fff;overflow-x:hidden;}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.bg-deep{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 120% 60% at 10% 10%,rgba(74,143,255,0.07) 0%,transparent 55%),
+    radial-gradient(ellipse 80% 80% at 90% 85%,rgba(201,168,76,0.08) 0%,transparent 55%),#03080f;}
+.bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(74,143,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(74,143,255,0.025) 1px,transparent 1px);
+  background-size:70px 70px;mask-image:radial-gradient(ellipse 90% 90% at 50% 40%,black,transparent);}
+.grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0.04;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+@keyframes shimmer{0%{background-position:200% center;}100%{background-position:-200% center;}}
+@keyframes crownFloat{0%,100%{transform:translateY(0) scale(1) rotate(-3deg);filter:drop-shadow(0 0 24px rgba(201,168,76,0.7));}50%{transform:translateY(-16px) scale(1.06) rotate(3deg);filter:drop-shadow(0 0 50px rgba(201,168,76,1));}}
+@keyframes revealUp{from{opacity:0;transform:translateY(60px) scale(0.95);}to{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes revealFade{from{opacity:0;}to{opacity:1;}}
+@keyframes scanDown{0%{top:-4px;opacity:1;}80%{opacity:1;}100%{top:100vh;opacity:0;}}
+@keyframes tickerMove{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes statPop{0%{transform:scale(0.6);opacity:0;}75%{transform:scale(1.06);}100%{transform:scale(1);opacity:1;}}
+@keyframes glowPulse{0%,100%{opacity:0.5;}50%{opacity:1;}}
+@keyframes orbitSpin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+@keyframes orbitSpinCCW{from{transform:rotate(0deg);}to{transform:rotate(-360deg);}}
+@keyframes trophyGlow{0%,100%{filter:drop-shadow(0 0 20px rgba(201,168,76,0.6));}50%{filter:drop-shadow(0 0 50px rgba(201,168,76,1));}}
+@keyframes playerDrop{from{opacity:0;transform:translateY(-30px) scale(0.85);}to{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes pitchGlow{0%,100%{opacity:0.5;}50%{opacity:0.8;}}
+
+.r1{animation:revealUp 1s cubic-bezier(.16,1,.3,1) 0.08s both;}
+.r2{animation:revealUp 1s cubic-bezier(.16,1,.3,1) 0.22s both;}
+.r3{animation:revealUp 1s cubic-bezier(.16,1,.3,1) 0.38s both;}
+.r4{animation:revealUp 1s cubic-bezier(.16,1,.3,1) 0.52s both;}
+.r5{animation:revealUp 1s cubic-bezier(.16,1,.3,1) 0.66s both;}
+.r6{animation:revealUp 1s cubic-bezier(.16,1,.3,1) 0.80s both;}
+.rf{animation:revealFade 1.4s ease 0.2s both;}
+
+.gold-text{background:linear-gradient(90deg,var(--gold3),var(--gold),var(--gold2),var(--gold-bright),var(--gold),var(--gold3));
+  background-size:300% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 4s linear infinite;}
+
+.scan{position:fixed;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,rgba(74,143,255,0.9),rgba(201,168,76,0.9),transparent);z-index:999;pointer-events:none;animation:scanDown 2s cubic-bezier(.4,0,.2,1) 0.05s forwards;}
+.spin-ring{width:44px;height:44px;border-radius:50%;border:2px solid rgba(74,143,255,0.1);border-top-color:var(--gold);animation:spin 0.85s linear infinite;}
+
+/* HEADER */
+.header{position:relative;text-align:center;padding:72px 24px 52px;overflow:hidden;}
+.header::after{content:'';position:absolute;bottom:0;left:5%;right:5%;height:1px;background:linear-gradient(90deg,transparent,rgba(74,143,255,0.3),rgba(201,168,76,0.7),rgba(74,143,255,0.3),transparent);}
+.eyebrow{font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.55em;text-transform:uppercase;color:rgba(201,168,76,0.4);margin-bottom:18px;}
+.header-trophy{font-size:70px;display:inline-block;margin-bottom:16px;animation:trophyGlow 3s ease-in-out infinite;}
+.header-title{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(38px,10vw,68px);line-height:0.95;letter-spacing:-0.02em;margin-bottom:8px;}
+.header-sub{font-family:'Playfair Display',serif;font-style:italic;font-weight:400;font-size:clamp(16px,4vw,26px);color:rgba(255,255,255,0.2);letter-spacing:0.06em;margin-bottom:28px;}
+.month-badge{display:inline-flex;align-items:center;gap:10px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.25);border-radius:100px;padding:10px 26px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.22em;color:rgba(201,168,76,0.7);}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold);animation:glowPulse 2s ease-in-out infinite;}
+
+/* TICKER */
+.ticker-wrap{overflow:hidden;white-space:nowrap;border-top:1px solid rgba(74,143,255,0.08);border-bottom:1px solid rgba(74,143,255,0.08);padding:12px 0;background:rgba(74,143,255,0.018);}
+.ticker-inner{display:inline-block;animation:tickerMove 50s linear infinite;}
+.ticker-chunk{display:inline-block;font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.28em;color:rgba(201,168,76,0.35);padding:0 40px;}
+
+/* FORHANDLER CARD */
+.fotm-wrap{margin:28px 16px 20px;}
+.fotm-card{background:linear-gradient(160deg,#080f1a,#04090e,#061210);border-radius:28px;padding:44px 28px 40px;position:relative;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(74,143,255,0.15),0 0 80px rgba(201,168,76,0.07),0 40px 80px rgba(0,0,0,0.6);}
+.fotm-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,rgba(74,143,255,0.4),rgba(201,168,76,1),rgba(240,201,110,1),rgba(201,168,76,1),rgba(74,143,255,0.4),transparent);}
+.fotm-trophy{font-size:52px;text-align:center;margin-bottom:8px;display:block;animation:crownFloat 3s ease-in-out infinite;}
+.fotm-eyebrow{font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.42em;text-transform:uppercase;color:rgba(201,168,76,0.5);text-align:center;margin-bottom:14px;display:flex;align-items:center;gap:12px;}
+.fotm-eyebrow::before,.fotm-eyebrow::after{content:'';flex:1;height:1px;}
+.fotm-eyebrow::before{background:linear-gradient(90deg,transparent,rgba(201,168,76,0.3));}
+.fotm-eyebrow::after{background:linear-gradient(90deg,rgba(201,168,76,0.3),transparent);}
+.fotm-name{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(32px,9vw,56px);line-height:1.1;letter-spacing:-0.01em;text-align:center;margin-bottom:16px;}
+.fotm-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:28px;}
+.fotm-stat{background:rgba(0,0,0,0.35);border-radius:18px;padding:20px 8px 16px;text-align:center;position:relative;overflow:hidden;animation:statPop 0.7s cubic-bezier(.16,1,.3,1) both;}
+.fotm-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.4),transparent);}
+.fotm-stat-num{font-family:'Playfair Display',serif;font-weight:900;font-size:44px;line-height:1;margin-bottom:5px;}
+.fotm-stat-lbl{font-family:'Cinzel',serif;font-size:7px;letter-spacing:0.28em;text-transform:uppercase;color:rgba(255,255,255,0.16);}
+
+/* RANK MINI */
+.rank-title{font-family:'Cinzel',serif;font-size:8px;letter-spacing:0.35em;color:rgba(201,168,76,0.32);text-align:center;display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.rank-title::before,.rank-title::after{content:'';flex:1;height:1px;background:rgba(201,168,76,0.1);}
+.rank-row{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:14px;margin-bottom:5px;background:rgba(255,255,255,0.018);border:1px solid rgba(255,255,255,0.03);transition:all 0.22s;}
+.rank-row:hover{background:rgba(74,143,255,0.04);border-color:rgba(74,143,255,0.12);transform:translateX(4px);}
+.rank-num{font-family:'Playfair Display',serif;font-weight:700;font-size:20px;color:rgba(255,255,255,0.1);width:24px;text-align:center;flex-shrink:0;}
+.rank-name{flex:1;font-size:14px;font-weight:600;color:rgba(255,255,255,0.7);}
+.rank-dept{font-family:'Cinzel',serif;font-size:8px;letter-spacing:0.1em;color:rgba(255,255,255,0.25);margin-top:1px;}
+.rank-pts{font-family:'Playfair Display',serif;font-weight:700;font-size:22px;}
+
+/* BESTE SELGER */
+.sec{margin:0 16px 14px;background:linear-gradient(160deg,#070d18,#030709);border-radius:24px;border:1px solid rgba(74,143,255,0.1);padding:28px 26px;position:relative;overflow:hidden;}
+.sec-top{position:absolute;top:0;left:0;right:0;height:2px;}
+.sec-title{font-family:'Cinzel',serif;font-size:12px;letter-spacing:0.22em;color:rgba(201,168,76,0.72);margin-bottom:22px;display:flex;align-items:center;gap:12px;font-weight:600;}
+.sec-title::after{content:'';flex:1;height:1px;background:rgba(74,143,255,0.1);}
+.sec-name{font-family:'Playfair Display',serif;font-weight:700;font-size:28px;line-height:1;}
+.sec-sub{font-size:11px;font-weight:600;letter-spacing:0.12em;margin-top:6px;}
+
+/* STATS GRID */
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 16px 14px;}
+.stat-tile{background:linear-gradient(160deg,#070d18,#030709);border:1px solid rgba(74,143,255,0.1);border-radius:18px;padding:18px 8px 14px;text-align:center;position:relative;overflow:hidden;animation:statPop 0.7s cubic-bezier(.16,1,.3,1) both;}
+.stat-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.3),transparent);}
+.stat-tile-num{font-family:'Playfair Display',serif;font-weight:900;font-size:32px;line-height:1;margin-bottom:5px;}
+.stat-tile-lbl{font-family:'Cinzel',serif;font-size:6px;letter-spacing:0.25em;text-transform:uppercase;color:rgba(255,255,255,0.18);}
+
+/* ── PITCH / FOTBALLBANE ── */
+.pitch-wrap{margin:0 16px 20px;}
+.pitch-header{background:linear-gradient(135deg,#0a1628,#050d1a);border-radius:24px 24px 0 0;padding:22px 24px 18px;
+  border:1px solid rgba(74,143,255,0.12);border-bottom:2px solid rgba(201,168,76,0.25);display:flex;align-items:center;gap:16px;}
+.pitch-badge{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2),var(--gold3));
+  display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;box-shadow:0 0 24px rgba(201,168,76,0.35);}
+.pitch-title{font-family:'Cinzel',serif;font-size:13px;letter-spacing:0.3em;color:var(--gold);font-weight:700;}
+.pitch-sub{font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:0.1em;margin-top:3px;}
+
+.pitch{
+  position:relative;
+  background:linear-gradient(180deg,#0d2b14 0%,#0f3318 30%,#0d2b14 60%,#0a2010 100%);
+  border:1px solid rgba(74,143,255,0.1);border-top:none;
+  border-radius:0 0 24px 24px;
+  padding:28px 16px 32px;
+  overflow:hidden;
+}
+/* Gress-tekstur */
+.pitch::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(180deg,rgba(255,255,255,0.018) 0px,rgba(255,255,255,0.018) 28px,transparent 28px,transparent 56px);
+  pointer-events:none;
+}
+/* Pitch-linjer SVG */
+.pitch-lines{position:absolute;inset:0;pointer-events:none;}
+
+/* Pitch-formasjon grid: 3 rader (spiss / midtlinje / forsvar) */
+.pitch-formation{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;align-items:center;
+  gap:20px;
+}
+.pitch-row{display:flex;justify-content:center;gap:14px;}
+
+/* Spillerkort på banen */
+.player-tile{
+  display:flex;flex-direction:column;align-items:center;
+  width:88px;
+  animation:playerDrop 0.6s cubic-bezier(.16,1,.3,1) both;
+  cursor:default;
+}
+.player-tile:hover .player-photo-ring{transform:scale(1.07);box-shadow:var(--ring-shadow),0 0 30px var(--ring-color);}
+.player-photo-ring{
+  width:64px;height:64px;border-radius:50%;
+  border:2.5px solid var(--ring-color,#c9a84c);
+  overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.5);
+  transition:transform 0.25s,box-shadow 0.25s;
+  box-shadow:0 0 16px var(--ring-color,rgba(201,168,76,0.4)),0 4px 20px rgba(0,0,0,0.6);
+  position:relative;
+}
+.player-photo-ring img{width:100%;height:100%;object-fit:cover;}
+.player-photo-ring .initials{font-family:'Playfair Display',serif;font-weight:700;font-size:22px;color:var(--ring-color,#c9a84c);}
+.player-rank-badge{
+  position:absolute;top:-4px;right:-4px;
+  width:22px;height:22px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  border:2px solid #03080f;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Cinzel',serif;font-size:9px;font-weight:700;color:#000;
+  box-shadow:0 0 8px rgba(201,168,76,0.7);
+  z-index:3;
+}
+.player-nameplate{
+  margin-top:8px;
+  background:rgba(0,0,0,0.65);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:8px;
+  padding:6px 8px 5px;
+  text-align:center;
+  width:100%;
+  backdrop-filter:blur(6px);
+}
+.player-nameplate-name{
+  font-family:'Rajdhani',sans-serif;font-weight:700;font-size:12px;
+  color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  line-height:1;
+}
+.player-nameplate-dept{
+  font-family:'Cinzel',serif;font-size:7px;letter-spacing:0.12em;
+  margin-top:2px;
+}
+.player-nameplate-stats{
+  display:flex;justify-content:center;gap:6px;margin-top:5px;
+}
+.player-stat-chip{
+  font-family:'Playfair Display',serif;font-weight:700;font-size:13px;
+  padding:1px 6px;border-radius:4px;
+  background:rgba(255,255,255,0.06);
+  line-height:1.4;
+}
+.player-stat-label{
+  font-family:'Cinzel',serif;font-size:6px;letter-spacing:0.15em;
+  color:rgba(255,255,255,0.3);margin-top:1px;text-align:center;
+}
+
+/* FOOTER */
+.footer{text-align:center;padding:44px 24px 28px;}
+.footer-line{height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.2),transparent);margin-bottom:22px;}
+.footer-txt{font-family:'Cinzel',serif;font-size:8px;letter-spacing:0.4em;color:rgba(201,168,76,0.18);}
+
+.loading{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;}
+.loading-lbl{font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.4em;color:rgba(201,168,76,0.28);}
+.page{position:relative;z-index:2;min-height:100vh;}
+.content{max-width:520px;margin:0 auto;}
+.spacer{height:24px;}
+
+/* ── Sesongfinale-tillegg ── */
+.ht-row{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;margin-bottom:8px;background:rgba(39,201,138,0.05);border:1px solid rgba(39,201,138,0.14);}
+.ht-dot{width:8px;height:8px;border-radius:50%;background:#27c98a;box-shadow:0 0 10px #27c98a;flex-shrink:0;}
+.ht-ct{color:#27c98a;font-weight:700;font-size:14px;}
+.ht-dt{color:rgba(255,255,255,0.38);font-size:12px;}
+.gz-cta{display:flex;align-items:center;justify-content:center;gap:12px;padding:16px;border-radius:16px;border:1px solid rgba(201,168,76,0.4);background:rgba(201,168,76,0.06);font-family:'Cinzel',serif;font-size:12px;letter-spacing:0.12em;color:#f0c96e;text-decoration:none;text-transform:uppercase;transition:all 0.2s;}
+.gz-cta:hover{background:rgba(201,168,76,0.12);border-color:rgba(201,168,76,0.7);}
+
+/* ── Elevert sesongmester ── */
+.champ-wrap{margin:24px 16px 18px;}
+.champ-card{position:relative;overflow:hidden;border-radius:28px;padding:42px 24px 26px;text-align:center;
+  background:radial-gradient(ellipse 90% 55% at 50% 0%,rgba(201,168,76,0.13),transparent 60%),linear-gradient(160deg,#080f1a,#04090e,#061210);
+  box-shadow:0 0 0 1px rgba(201,168,76,0.18),0 0 90px rgba(201,168,76,0.08),0 40px 80px rgba(0,0,0,0.6);}
+.champ-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,rgba(74,143,255,0.4),rgba(201,168,76,1),rgba(240,201,110,1),rgba(201,168,76,1),rgba(74,143,255,0.4),transparent);}
+.champ-beam{position:absolute;top:-12%;left:50%;transform:translateX(-50%);width:72%;height:64%;pointer-events:none;background:radial-gradient(ellipse 50% 100% at 50% 0%,rgba(240,201,110,0.16),transparent 70%);}
+.champ-burst{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3;}
+.champ-sweep{position:absolute;top:0;bottom:0;width:40%;left:-50%;transform:skewX(-18deg);pointer-events:none;z-index:4;background:linear-gradient(100deg,transparent,rgba(255,255,255,0.10),transparent);animation:champSweep 1.8s ease-out 0.4s 1 both;}
+@keyframes champSweep{from{left:-50%;}to{left:130%;}}
+.champ-yr{font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:6px;position:relative;z-index:2;}
+.champ-eyebrow{font-family:'Cinzel',serif;font-size:13px;font-weight:900;letter-spacing:0.5em;margin-bottom:18px;position:relative;z-index:2;}
+.champ-crown{font-size:42px;line-height:1;position:relative;z-index:2;animation:crownFloat 3s ease-in-out infinite;}
+.champ-portrait-wrap{position:relative;width:170px;height:170px;margin:6px auto 2px;z-index:2;}
+.champ-portrait-ring{position:absolute;inset:0;border-radius:50%;padding:4px;background:conic-gradient(#8a6414,#f0c96e,#c9a84c,#ffe98a,#8a6414);box-shadow:0 0 42px rgba(201,168,76,0.45);animation:trophyGlow 3.5s ease-in-out infinite;}
+.champ-portrait-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:#03080f;border:2px solid #04090f;display:flex;align-items:center;justify-content:center;}
+.champ-portrait-inner img{width:100%;height:100%;object-fit:cover;}
+.champ-portrait-inner span{font-family:'Playfair Display',serif;font-weight:900;font-size:56px;color:#f0c96e;}
+.champ-laurel{position:absolute;top:50%;font-size:36px;opacity:0.85;}
+.champ-laurel-l{left:-16px;transform:translateY(-50%);}
+.champ-laurel-r{right:-16px;transform:translateY(-50%) scaleX(-1);}
+.champ-name{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(38px,11vw,58px);line-height:1.02;margin-top:10px;position:relative;z-index:2;}
+.champ-honor{font-family:'Playfair Display',serif;font-style:italic;font-size:17px;color:rgba(255,255,255,0.5);margin-top:8px;position:relative;z-index:2;}
+.champ-pill{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:7px 20px;border-radius:100px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.18em;font-weight:600;position:relative;z-index:2;}
+.champ-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:28px;position:relative;z-index:2;}
+.champ-stat{background:rgba(0,0,0,0.4);border-radius:18px;padding:20px 8px 15px;text-align:center;border-top:1px solid rgba(201,168,76,0.35);animation:statPop 0.7s cubic-bezier(.16,1,.3,1) both;}
+.champ-stat-num{font-family:'Playfair Display',serif;font-weight:900;font-size:42px;line-height:1;margin-bottom:5px;}
+.champ-stat-lbl{font-family:'Cinzel',serif;font-size:8px;letter-spacing:0.28em;text-transform:uppercase;color:rgba(255,255,255,0.3);}
+.champ-down{margin-top:22px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.3em;color:rgba(255,255,255,0.25);position:relative;z-index:2;}
+
+/* ── Moment-band (fargetonede kåringer) ── */
+@keyframes momFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-9px);}}
+.mom{margin:18px 16px;position:relative;}
+.mom-card{position:relative;overflow:hidden;border-radius:28px;padding:40px 24px 26px;text-align:center;}
+.mom-bar{position:absolute;top:0;left:0;right:0;height:3px;}
+.mom-beam{position:absolute;top:-12%;left:50%;transform:translateX(-50%);width:72%;height:64%;pointer-events:none;}
+.mom-burst{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3;}
+.mom-sweep{position:absolute;top:0;bottom:0;width:40%;left:-50%;transform:skewX(-18deg);pointer-events:none;z-index:4;background:linear-gradient(100deg,transparent,rgba(255,255,255,0.10),transparent);animation:champSweep 1.8s ease-out 0.5s 1 both;}
+.mom-yr{font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:6px;position:relative;z-index:2;}
+.mom-eyebrow{font-family:'Cinzel',serif;font-size:13px;font-weight:900;letter-spacing:0.5em;margin-bottom:18px;position:relative;z-index:2;}
+.mom-shimmer{-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;background-size:300% auto;animation:shimmer 4.5s linear infinite;}
+.mom-icon{font-size:40px;line-height:1;position:relative;z-index:2;animation:momFloat 3s ease-in-out infinite;}
+.mom-name{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(38px,11vw,58px);line-height:1.02;margin-top:12px;position:relative;z-index:2;}
+.mom-honor{font-family:'Playfair Display',serif;font-style:italic;font-size:17px;color:rgba(255,255,255,0.5);margin-top:8px;position:relative;z-index:2;}
+.mom-hero{display:inline-block;border-radius:18px;padding:16px 34px;margin-top:20px;border:1px solid;position:relative;z-index:2;}
+.mom-hero-num{font-family:'Playfair Display',serif;font-weight:900;font-size:52px;line-height:1;}
+.mom-hero-lbl{font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.28em;text-transform:uppercase;margin-top:4px;}
+.mom-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:24px;position:relative;z-index:2;}
+.mom-tile{background:rgba(0,0,0,0.4);border-radius:16px;padding:18px 6px 13px;text-align:center;animation:statPop 0.7s cubic-bezier(.16,1,.3,1) both;}
+.mom-tile-num{font-family:'Playfair Display',serif;font-weight:900;font-size:28px;line-height:1;}
+.mom-tile-lbl{font-family:'Cinzel',serif;font-size:7px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-top:4px;}
+.mom-portrait{position:relative;width:150px;height:150px;margin:6px auto 2px;z-index:2;}
+.mom-portrait-ring{position:absolute;inset:0;border-radius:50%;padding:4px;}
+.mom-portrait-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:#03080f;border:2px solid #04090f;display:flex;align-items:center;justify-content:center;}
+.mom-portrait-inner img{width:100%;height:100%;object-fit:cover;}
+.mom-portrait-inner span{font-family:'Playfair Display',serif;font-weight:900;font-size:50px;}
+.mom-crest{position:relative;width:148px;height:148px;margin:10px auto 6px;z-index:2;}
+.mom-crest-ring{position:absolute;inset:0;border-radius:30px;padding:4px;transform:rotate(45deg);}
+.mom-crest-inner{width:100%;height:100%;border-radius:26px;display:flex;align-items:center;justify-content:center;transform:rotate(-45deg);}
+.mom-crest-inner span{font-family:'Cinzel',serif;font-weight:900;font-size:44px;}
+.mom-sub-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);margin-bottom:6px;}
+.mom-shared{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:16px;position:relative;z-index:2;}
+.gz-cta-sec{border-color:rgba(255,255,255,0.14);background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.7);}
+.gz-cta-sec:hover{border-color:rgba(255,255,255,0.3);background:rgba(255,255,255,0.06);}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div class="bg-deep"></div>
+<div class="bg-grid"></div>
+<div class="grain"></div>
+<div class="scan"></div>
+<div id="root" class="page"></div>
+
+<script>
+(function(){
+  const c=document.getElementById('particles'),ctx=c.getContext('2d');
+  let W,H,pts=[];
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  const COLS=[[74,143,255],[201,168,76],[240,201,110],[39,201,138],[255,215,0]];
+  for(let i=0;i<110;i++){
+    const col=COLS[Math.floor(Math.random()*COLS.length)];
+    pts.push({x:Math.random()*9999,y:Math.random()*9999,r:Math.random()*1.5+0.2,
+      vx:(Math.random()-0.5)*0.2,vy:-(Math.random()*0.35+0.05),
+      life:Math.random(),maxLife:Math.random()*0.6+0.4,col,
+      drift:Math.random()*Math.PI*2,driftS:Math.random()*0.01+0.003});
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.life+=0.0022;p.drift+=p.driftS;
+      if(p.life>p.maxLife){p.life=0;p.x=Math.random()*W;p.y=H+10;}
+      p.x+=p.vx+Math.sin(p.drift)*0.35;p.y+=p.vy;
+      const t=p.life/p.maxLife,a=t<0.15?t/0.15:t>0.8?(1-t)/0.2:1;
+      ctx.save();ctx.globalAlpha=a*0.5;
+      ctx.fillStyle=`rgb(${p.col.join(',')})`;
+      ctx.shadowBlur=10;ctx.shadowColor=`rgba(${p.col.join(',')},0.9)`;
+      ctx.beginPath();ctx.arc(p.x%W,p.y,p.r,0,Math.PI*2);ctx.fill();
+      ctx.restore();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+
+<script type="text/babel">
+const SB_URL="https://jffhdlmwvurnojoapcvs.supabase.co";
+const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmZmhkbG13dnVybm9qb2FwY3ZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MzIzNjcsImV4cCI6MjA5MzEwODM2N30.Mc_eKMsfR04kLmwfBeH5INn3NTYapv62Fnt0wMpBpMw";
+
+/* ── FROSSEN MODUS ──────────────────────────────────────────────────
+   Settes ÉN gang 1. juli etter Tacdis-avstemmingen: lim inn sesongens
+   salgsrader (samme format som /rest/v1/sales) i arrayet under. Når den
+   er satt henter siden ingenting fra Supabase – den blir et permanent
+   monument som overlever nullstilling og sommerpause. */
+const FROZEN_SALES = [{"id":"c382eefe-8026-491f-8f49-4f6fde4fdf2c","selger":"Ask Herlofsen","modell":"EX90","loc":"fornebu","mnd":"mai","ts":"2026-05-04T09:53:00","created_at":"2026-05-04T07:53:43.555643+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"33ed9886-3835-4c41-a80f-867e3efd5a66","selger":"Simen Olsen","modell":"EX30","loc":"lillestrom","mnd":"mai","ts":"2026-05-04T09:56:00","created_at":"2026-05-04T07:56:01.807758+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"e3bb85e7-feac-424b-b074-7793d4ccdb8c","selger":"William Østby","modell":"EX40","loc":"ryen","mnd":"mai","ts":"2026-05-04T09:58:00","created_at":"2026-05-04T07:58:42.127655+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"1c5d76c0-b30a-4482-a5a1-e5866447e998","selger":"Norman Elton","modell":"EC40","loc":"ryen","mnd":"mai","ts":"2026-05-04T10:19:00","created_at":"2026-05-04T08:19:05.565773+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"930f48b1-9aae-49b8-9fd6-3b4ba36c5de6","selger":"Odd Bjarne Bjørvik","modell":"EX40","loc":"fornebu","mnd":"mai","ts":"2026-05-04T10:20:00","created_at":"2026-05-04T08:20:26.262823+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"2dddd0e4-4bed-4eaa-b0cc-bfcb968f4bf9","selger":"William Østby","modell":"EX40","loc":"ryen","mnd":"mai","ts":"2026-05-05T09:52:00","created_at":"2026-05-05T07:52:13.437593+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"769e00e1-e154-46cc-a05b-3b2204feaede","selger":"Andreas Lydersen","modell":"EX40","loc":"lillestrom","mnd":"mai","ts":"2026-05-05T10:45:00","created_at":"2026-05-05T08:45:05.605502+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"f3bdda68-3bcf-4ad3-a31c-cbba2c93d17a","selger":"Simen Olsen","modell":"EX90","loc":"lillestrom","mnd":"mai","ts":"2026-05-05T14:50:00","created_at":"2026-05-05T12:50:03.538441+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"277b8056-8285-420e-89cf-defe52a2b18e","selger":"Thomas Dokken","modell":"EX30","loc":"ryen","mnd":"mai","ts":"2026-05-05T15:00:00","created_at":"2026-05-05T13:00:05.184028+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"300c4435-de9f-4227-bc1b-a12ab6c7bacd","selger":"Andreas Lydersen","modell":"EX40","loc":"lillestrom","mnd":"mai","ts":"2026-05-06T13:22:00","created_at":"2026-05-06T11:22:07.073765+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"f588d3d8-e230-49aa-94b5-d113c195b4a7","selger":"Alexander Karlsen","modell":"EX30","loc":"ryen","mnd":"mai","ts":"2026-05-06T14:17:00","created_at":"2026-05-06T12:17:18.927468+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"bdd8a749-9e69-430c-8a34-6bca4401980f","selger":"Ask Herlofsen","modell":"EX30","loc":"fornebu","mnd":"mai","ts":"2026-05-06T20:02:00","created_at":"2026-05-06T18:02:39.103576+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"b46f4027-ffbd-40d5-b099-22ecf1e8df4b","selger":"Alexander Karlsen","modell":"EX30","loc":"ryen","mnd":"mai","ts":"2026-05-07T11:32:00","created_at":"2026-05-07T09:32:06.763055+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"ff103adc-294e-4f3c-8a8e-5ba14f7213db","selger":"Daniel K. Johansen","modell":"EX30","loc":"lillestrom","mnd":"mai","ts":"2026-05-08T08:40:00","created_at":"2026-05-08T06:40:09.811154+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"c0538ee0-ba9a-4eb2-be3e-7ed00357c3df","selger":"Daniel K. Johansen","modell":"EX30","loc":"lillestrom","mnd":"mai","ts":"2026-05-08T08:42:00","created_at":"2026-05-08T06:42:29.515555+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"e34c3f4c-d6af-48d5-bb65-3e6ae43d4473","selger":"Norman Elton","modell":"EX90","loc":"ryen","mnd":"mai","ts":"2026-05-08T13:44:00","created_at":"2026-05-08T11:44:51.931148+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"5f354331-1aaf-43e4-93b1-bf7358fa7f2f","selger":"Linn Askmann-Olsen","modell":"EX40","loc":"lillestrom","mnd":"mai","ts":"2026-05-08T14:00:00","created_at":"2026-05-08T12:00:11.242513+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"0969ae17-fb9c-47c1-9f0b-b9568b4a1ea4","selger":"Linn Askmann-Olsen","modell":"EX40","loc":"lillestrom","mnd":"mai","ts":"2026-05-08T15:30:00","created_at":"2026-05-08T13:30:01.960797+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"fc966a5f-6446-45d9-b653-326e72e1be5b","selger":"Thomas Dokken","modell":"EX40","loc":"ryen","mnd":"mai","ts":"2026-05-11T08:38:00","created_at":"2026-05-11T06:38:30.19541+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"c6555231-6ce6-40ed-8fab-ecfbad0fd73e","selger":"Emma Valen","modell":"EX90","loc":"ryen","mnd":"mai","ts":"2026-05-11T08:38:00","created_at":"2026-05-11T06:38:31.138462+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"56fb57ba-9a78-4ee6-b13b-da54819a66ee","selger":"Johan Kalenius","modell":"EX30","loc":"fornebu","mnd":"mai","ts":"2026-05-11T10:28:00","created_at":"2026-05-11T08:28:16.336147+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"e19d3a4b-4fab-42f1-aa44-0408fe53be65","selger":"Johan Kalenius","modell":"EX30","loc":"fornebu","mnd":"mai","ts":"2026-05-11T10:28:00","created_at":"2026-05-11T08:28:36.379231+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"ac40d262-06d1-45b5-8734-9ab08a42edbf","selger":"Simen Olsen","modell":"EX30","loc":"lillestrom","mnd":"mai","ts":"2026-05-11T13:01:00","created_at":"2026-05-11T11:01:16.399431+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"9858120b-21ba-4ca6-80d7-ca7ebdf449bf","selger":"Alexander Karlsen","modell":"EX30","loc":"ryen","mnd":"mai","ts":"2026-05-12T10:31:00","created_at":"2026-05-12T08:31:55.702196+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"75188e87-c42e-416c-9aa5-c9c3b1ac4def","selger":"Odd Bjarne Bjørvik","modell":"EX90","loc":"fornebu","mnd":"mai","ts":"2026-05-12T10:32:00","created_at":"2026-05-12T08:32:03.198684+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"808dc4c7-1af6-40e2-b9cb-5fb7b0af53c3","selger":"Fabian Bredal-Jørgensen","modell":"EC40","loc":"fornebu","mnd":"mai","ts":"2026-05-12T10:40:00","created_at":"2026-05-12T08:40:32.610948+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"a91c945a-0fdf-4c6c-9165-19f1c50c3f67","selger":"William Østby","modell":"EC40","loc":"ryen","mnd":"mai","ts":"2026-05-12T10:53:00","created_at":"2026-05-12T08:53:57.973289+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"fb56422e-3481-4207-961e-c3f24d3a45fe","selger":"Emanuel Bereket","modell":"EX30","loc":"fornebu","mnd":"mai","ts":"2026-05-12T16:08:00","created_at":"2026-05-12T14:08:34.281269+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"796abfd0-05d4-468d-92b2-6ca99920ec72","selger":"Fabian Bredal-Jørgensen","modell":"EX30","loc":"fornebu","mnd":"mai","ts":"2026-05-13T14:43:00","created_at":"2026-05-13T12:43:40.453538+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"ea41722e-d4cd-4282-88e3-e551975c7262","selger":"Odd Bjarne Bjørvik","modell":"EX90","loc":"fornebu","mnd":"mai","ts":"2026-05-13T15:09:00","created_at":"2026-05-13T13:09:33.928343+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"aed7eb7d-1db0-4883-a9a9-7b87ac387e69","selger":"Daniel K. Johansen","modell":"EX40","loc":"lillestrom","mnd":"mai","ts":"2026-05-13T16:12:00","created_at":"2026-05-13T14:12:01.268409+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"eb5a99bd-343b-4c57-8d36-ae0d096f207e","selger":"Daniel K. Johansen","modell":"EX40","loc":"lillestrom","mnd":"mai","ts":"2026-05-13T16:12:00","created_at":"2026-05-13T14:12:15.526886+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"2d113522-d4e4-4350-8a53-bbb88a0087ed","selger":"Daniel K. Johansen","modell":"EX40","loc":"lillestrom","mnd":"mai","ts":"2026-05-13T16:12:00","created_at":"2026-05-13T14:12:27.092465+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"75cdb661-b852-4ab5-8ce1-c763b59cd0cb","selger":"Linn Askmann-Olsen","modell":"EX40","loc":"lillestrom","mnd":"mai","ts":"2026-05-13T16:36:00","created_at":"2026-05-13T14:36:54.724606+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"62a5a466-a1ff-40d5-94be-e9c8ecf55ad7","selger":"Alexander Karlsen","modell":"EX30","loc":"ryen","mnd":"mai","ts":"2026-05-15T08:14:00","created_at":"2026-05-15T06:14:34.191002+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"3fe2955c-bf86-4e05-86ee-cd7585a5042a","selger":"Daniel K. Johansen","modell":"EX90","loc":"lillestrom","mnd":"mai","ts":"2026-05-15T11:31:00","created_at":"2026-05-15T09:31:48.192415+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"7446580a-ad71-43f5-96c8-ca2fedb562be","selger":"Simen Olsen","modell":"EX30","loc":"lillestrom","mnd":"mai","ts":"2026-05-15T13:04:00","created_at":"2026-05-15T11:04:24.447137+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"986695e6-0b7f-4376-9f1e-1eb1e427c250","selger":"Linn Askmann-Olsen","modell":"EX40","loc":"lillestrom","mnd":"mai","ts":"2026-05-15T13:37:00","created_at":"2026-05-15T11:37:49.002533+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"aa8d98b7-1784-46eb-a2d4-acb3e1c697e8","selger":"Thomas Dokken","modell":"EX30","loc":"ryen","mnd":"mai","ts":"2026-05-15T13:47:00","created_at":"2026-05-15T11:47:20.31004+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"53b7348b-1d1a-4f8c-b351-bb735ad9f0f0","selger":"Alexander Karlsen","modell":"EX40","loc":"ryen","mnd":"mai","ts":"2026-05-15T15:16:00","created_at":"2026-05-15T13:16:59.655914+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"99dd4b50-f240-4927-ad41-7b4145a6b650","selger":"Emma Valen","modell":"EX30","loc":"ryen","mnd":"mai","ts":"2026-05-15T15:18:00","created_at":"2026-05-15T13:18:46.685766+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"47c2f2a2-298a-4924-86cd-5ad72bd62575","selger":"Fabian Bredal-Jørgensen","modell":"EX30","loc":"fornebu","mnd":"mai","ts":"2026-05-15T17:30:00","created_at":"2026-05-15T15:30:53.730692+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"80778c7c-d1e8-4cd7-aa9a-7b3fec368418","selger":"Andreas Lydersen","modell":"EX30","loc":"lillestrom","mnd":"mai","ts":"2026-05-18T10:44:00","created_at":"2026-05-18T08:44:24.557509+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"8334d5ca-9c9e-4441-87a6-781ecddea6c8","selger":"Norman Elton","modell":"EX30","loc":"ryen","mnd":"mai","ts":"2026-05-18T14:14:00","created_at":"2026-05-18T12:14:53.017812+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"3cec7b69-d190-4476-a0c6-3a44f5321448","selger":"Thomas Dokken","modell":"EX40","loc":"ryen","mnd":"mai","ts":"2026-05-19T09:57:00","created_at":"2026-05-19T07:57:45.715213+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"2fd0451c-b891-435c-9a46-644607ea1aba","selger":"Linn Askmann-Olsen","modell":"EX40","loc":"lillestrom","mnd":"mai","ts":"2026-05-19T15:05:00","created_at":"2026-05-19T13:05:51.01612+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"d2bf1672-cfde-4f5d-8045-61d9495892ca","selger":"Andreas Lydersen","modell":"EX30","loc":"lillestrom","mnd":"mai","ts":"2026-05-19T16:58:00","created_at":"2026-05-19T14:58:26.535895+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"978b2f07-ddff-4582-b6b8-5e53523e7094","selger":"Emma Valen","modell":"EX90","loc":"ryen","mnd":"mai","ts":"2026-05-19T17:17:00","created_at":"2026-05-19T15:17:26.860886+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"5c148229-699b-44ff-a28c-4e708ba06ca3","selger":"Andreas Lydersen","modell":"EX40","loc":"lillestrom","mnd":"mai","ts":"2026-05-20T09:41:00","created_at":"2026-05-20T07:41:34.764971+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"18386681-1b72-4690-8d0f-9e9983d9099e","selger":"Norman Elton","modell":"EX90","loc":"ryen","mnd":"mai","ts":"2026-05-20T10:17:00","created_at":"2026-05-20T08:17:14.042209+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"0a1e1492-6546-4e3f-9281-c8497d636061","selger":"Ask Herlofsen","modell":"EX30","loc":"fornebu","mnd":"mai","ts":"2026-05-20T11:58:00","created_at":"2026-05-20T09:58:21.140807+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"48e0cad0-31d2-4e5b-996e-2842b491611c","selger":"Henrik Østby","modell":"EX40","loc":"fornebu","mnd":"mai","ts":"2026-05-20T14:29:00","created_at":"2026-05-20T12:29:22.824976+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"751fb37e-1674-4eab-9fdf-7733c6bfab42","selger":"Andreas Lydersen","modell":"EX40","loc":"lillestrom","mnd":"mai","ts":"2026-05-20T14:43:00","created_at":"2026-05-20T12:43:11.846824+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"9e638dd0-1858-4439-b7f5-af2f5116600e","selger":"Norman Elton","modell":"EX40","loc":"ryen","mnd":"mai","ts":"2026-05-22T12:38:00","created_at":"2026-05-22T10:38:02.893266+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"128b8d13-16ef-4b62-a83d-1abd927ed584","selger":"Daniel K. Johansen","modell":"EX30","loc":"lillestrom","mnd":"mai","ts":"2026-05-22T13:52:00","created_at":"2026-05-22T11:52:52.276101+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"69639808-3a2b-4580-9679-ae58a3b8f743","selger":"Daniel K. Johansen","modell":"EX90","loc":"lillestrom","mnd":"mai","ts":"2026-05-22T13:53:00","created_at":"2026-05-22T11:53:49.52751+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"e1c4eaec-8da5-4198-ae71-8d8140111dea","selger":"Linn Askmann-Olsen","modell":"EX40","loc":"lillestrom","mnd":"mai","ts":"2026-05-26T15:10:00","created_at":"2026-05-26T13:10:37.368774+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"6aead975-9403-4d0e-b2da-47041e313310","selger":"Emma Valen","modell":"EX40","loc":"ryen","mnd":"mai","ts":"2026-05-27T16:19:00","created_at":"2026-05-27T14:19:25.545745+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"69fd8d06-7850-4405-84ba-38aa2c415014","selger":"Emma Valen","modell":"EX30","loc":"ryen","mnd":"mai","ts":"2026-05-27T16:19:00","created_at":"2026-05-27T14:19:34.825871+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"f28008cc-4127-4dbf-8849-b8082cb9105f","selger":"Daniel K. Johansen","modell":"EX90","loc":"lillestrom","mnd":"mai","ts":"2026-05-27T16:48:00","created_at":"2026-05-27T14:48:11.109964+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"a0ad958b-3352-4989-95fb-aa8487ddd8e7","selger":"Andreas Lydersen","modell":"EX30","loc":"lillestrom","mnd":"mai","ts":"2026-05-28T12:59:00","created_at":"2026-05-28T10:59:00.020205+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"6d4a9ab3-c0ec-45a3-b2cf-317239747f1d","selger":"Daniel K. Johansen","modell":"EX30","loc":"lillestrom","mnd":"mai","ts":"2026-05-28T12:59:00","created_at":"2026-05-28T10:59:04.461098+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"6a23a5ae-dcbc-47a9-915b-ec5358f74676","selger":"Alexander Karlsen","modell":"EX30","loc":"ryen","mnd":"mai","ts":"2026-05-28T15:27:00","created_at":"2026-05-28T13:27:24.972418+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"70f72561-f502-48ea-be24-0bf8de75ca10","selger":"Johan Kalenius","modell":"EX90","loc":"fornebu","mnd":"mai","ts":"2026-05-29T08:31:00","created_at":"2026-05-29T06:31:34.984856+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"acae8452-eb1a-4d21-b5d2-506f64d5d477","selger":"Alexander Karlsen","modell":"EX30","loc":"ryen","mnd":"mai","ts":"2026-05-29T11:25:00","created_at":"2026-05-29T09:25:02.761549+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"136626c4-7dd1-4495-b3ca-3dee2ef18f64","selger":"Linn Askmann-Olsen","modell":"EX30","loc":"lillestrom","mnd":"mai","ts":"2026-05-29T12:10:00","created_at":"2026-05-29T10:10:13.929223+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"b6f11d17-0510-404e-a5ae-15c20d94ccc5","selger":"Ask Herlofsen","modell":"EX40","loc":"fornebu","mnd":"mai","ts":"2026-05-29T13:58:00","created_at":"2026-05-29T11:58:45.785969+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"6e13eb1b-fc66-4f98-ac7e-962dc7263f9f","selger":"Thomas Dokken","modell":"EX30","loc":"ryen","mnd":"mai","ts":"2026-05-29T16:26:00","created_at":"2026-05-29T14:26:38.119176+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"283730bf-d45e-4d7a-b1c9-4a9a95ae0e16","selger":"Simen Olsen","modell":"EX30","loc":"lillestrom","mnd":"mai","ts":"2026-05-29T16:28:00","created_at":"2026-05-29T14:28:01.362808+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"08d22d29-cffe-43ed-88e5-299bd789a4b5","selger":"Linn Askmann-Olsen","modell":"EX30","loc":"lillestrom","mnd":"mai","ts":"2026-05-29T16:33:00","created_at":"2026-05-29T14:33:12.317208+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"3ef2deab-b282-406c-9eff-2d48f20a0ba0","selger":"Linn Askmann-Olsen","modell":"EX30","loc":"lillestrom","mnd":"mai","ts":"2026-05-29T16:33:00","created_at":"2026-05-29T14:33:32.177057+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"7e088999-7745-45c6-8705-8c3ee1476f48","selger":"Thomas Dokken","modell":"EX30","loc":"ryen","mnd":"mai","ts":"2026-05-30T10:49:00","created_at":"2026-05-30T08:49:43.627053+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"9a4332e8-e94d-45a0-acb5-dfac4675fd41","selger":"Ask Herlofsen","modell":"EX40","loc":"fornebu","mnd":"mai","ts":"2026-05-30T15:15:00","created_at":"2026-05-30T13:15:00.819075+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"675bd220-60d5-4d25-b81c-c070152f6cf5","selger":"Thomas Dokken","modell":"EX30","loc":"ryen","mnd":"mai","ts":"2026-05-30T15:16:00","created_at":"2026-05-30T13:16:40.290829+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"a89dadc6-ed09-4269-ab55-14916676f073","selger":"Norman Elton","modell":"EX40","loc":"ryen","mnd":"jun","ts":"2026-06-01T14:42:00","created_at":"2026-06-01T12:42:54.079551+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"c3c8fd1b-015a-4cf8-be03-bdecea382087","selger":"Norman Elton","modell":"EX30","loc":"ryen","mnd":"jun","ts":"2026-06-01T14:43:00","created_at":"2026-06-01T12:43:03.746294+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"54029029-bac4-4964-a0b0-adc952b81920","selger":"William Østby","modell":"EX30","loc":"ryen","mnd":"jun","ts":"2026-06-01T16:30:00","created_at":"2026-06-01T14:30:19.330143+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"9abd9a7a-43b0-49b9-9b25-a27a05217c47","selger":"Odd Bjarne Bjørvik","modell":"EX30","loc":"fornebu","mnd":"jun","ts":"2026-06-01T17:03:00","created_at":"2026-06-01T15:03:50.520616+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"d5bcac14-740b-4d86-806b-256a411ae8d3","selger":"Ask Herlofsen","modell":"EX30","loc":"fornebu","mnd":"jun","ts":"2026-06-02T11:53:00","created_at":"2026-06-02T09:53:51.920033+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"09732489-7ed4-4135-bbbe-6a4733dab30c","selger":"Fabian Bredal-Jørgensen","modell":"EX90","loc":"fornebu","mnd":"jun","ts":"2026-06-02T12:33:00","created_at":"2026-06-02T10:33:56.978626+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"27c46bcc-443b-44c9-8d77-335cf8e33b79","selger":"Fabian Bredal-Jørgensen","modell":"EX90","loc":"fornebu","mnd":"jun","ts":"2026-06-02T13:57:00","created_at":"2026-06-02T11:57:21.854236+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"43abc9f2-5627-454b-85b5-81c752838db7","selger":"Linn Askmann-Olsen","modell":"EX30","loc":"lillestrom","mnd":"jun","ts":"2026-06-03T10:37:00","created_at":"2026-06-03T08:37:16.540124+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"c3162c77-8a51-4594-9d4d-4112ca877f7f","selger":"Andreas Lydersen","modell":"EX30","loc":"lillestrom","mnd":"jun","ts":"2026-06-03T16:23:00","created_at":"2026-06-03T14:23:30.307192+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"42ff9b8a-7127-4d7d-b4ca-b0a9e10770b2","selger":"Ask Herlofsen","modell":"EX30","loc":"fornebu","mnd":"jun","ts":"2026-06-04T12:05:00","created_at":"2026-06-04T10:05:17.367581+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"06dba999-1863-4cd3-ba59-8ac6f2614a00","selger":"Linn Askmann-Olsen","modell":"EC40","loc":"lillestrom","mnd":"jun","ts":"2026-06-05T14:35:00","created_at":"2026-06-05T12:35:06.326228+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"89c1d1fc-c628-4bb2-b7a6-cd85b5f7d490","selger":"Norman Elton","modell":"EX30","loc":"ryen","mnd":"jun","ts":"2026-06-08T10:54:00","created_at":"2026-06-08T08:54:48.732486+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"66733401-fe59-4c6a-bc2d-fd9e26697fd4","selger":"Odd Bjarne Bjørvik","modell":"EX30","loc":"fornebu","mnd":"jun","ts":"2026-06-08T12:59:00","created_at":"2026-06-08T10:59:40.131258+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"ea39ce23-8ee2-4747-a76b-41c0940b3e97","selger":"William Østby","modell":"EX90","loc":"ryen","mnd":"jun","ts":"2026-06-08T13:42:00","created_at":"2026-06-08T11:42:35.774078+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"2927b6ed-2167-4a59-a4d1-da995d011e2a","selger":"Odd Bjarne Bjørvik","modell":"EX90","loc":"fornebu","mnd":"jun","ts":"2026-06-08T15:17:00","created_at":"2026-06-08T13:17:33.136909+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"f3da5291-3602-4592-b729-fca05686daa6","selger":"Thomas Dokken","modell":"EX30","loc":"ryen","mnd":"jun","ts":"2026-06-10T08:41:00","created_at":"2026-06-10T06:41:57.537892+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"56cb478b-1d4a-4595-b5e6-c6b02fb76fd8","selger":"Thomas Dokken","modell":"EX90","loc":"ryen","mnd":"jun","ts":"2026-06-10T08:41:00","created_at":"2026-06-10T06:41:39.750924+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"c27b6af2-312d-4a91-abe0-0248101ab80b","selger":"Odd Bjarne Bjørvik","modell":"EX30","loc":"fornebu","mnd":"jun","ts":"2026-06-10T11:14:00","created_at":"2026-06-10T09:14:03.200758+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"81a9a93e-08f1-4435-ad8f-616f6fb44532","selger":"Daniel K. Johansen","modell":"EX40","loc":"lillestrom","mnd":"jun","ts":"2026-06-10T13:30:00+02:00","created_at":"2026-06-12T14:51:21.472095+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"a9653124-8b15-40c4-8585-9755122390f7","selger":"Odd Bjarne Bjørvik","modell":"EX30","loc":"fornebu","mnd":"jun","ts":"2026-06-10T14:42:00","created_at":"2026-06-10T12:42:25.903651+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"9c153be9-ac15-4f6f-b4c1-3ca3aa45c27c","selger":"Thomas Dokken","modell":"EX60","loc":"ryen","mnd":"jun","ts":"2026-06-10T14:42:00","created_at":"2026-06-10T12:42:24.361761+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"3126633f-7c01-4337-8606-05f6d313ed5c","selger":"Norman Elton","modell":"EX90","loc":"ryen","mnd":"jun","ts":"2026-06-11T08:18:00","created_at":"2026-06-11T06:18:26.698932+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"9d2637d9-2536-434b-8929-d6c7118915c4","selger":"Norman Elton","modell":"EX40","loc":"ryen","mnd":"jun","ts":"2026-06-11T08:18:00","created_at":"2026-06-11T06:18:19.804153+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"0323ce2b-4b4c-4114-a543-ad14ed191f32","selger":"Daniel K. Johansen","modell":"EX30","loc":"lillestrom","mnd":"jun","ts":"2026-06-11T11:15:00+02:00","created_at":"2026-06-12T14:51:34.871571+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"2b13dabd-37c0-415f-a982-525c953e8b8f","selger":"Ask Herlofsen","modell":"EX30","loc":"fornebu","mnd":"jun","ts":"2026-06-11T11:59:00","created_at":"2026-06-11T09:59:02.773346+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"40d16bf1-d9fe-4452-a743-bb78539acd42","selger":"Alexander Karlsen","modell":"EX40","loc":"ryen","mnd":"jun","ts":"2026-06-11T12:20:00","created_at":"2026-06-11T10:20:13.781475+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"067d6737-998b-40a1-ad1c-ca1441e82c34","selger":"Johan Kalenius","modell":"EX60","loc":"fornebu","mnd":"jun","ts":"2026-06-11T13:16:00","created_at":"2026-06-11T11:16:55.935895+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"53d60b30-611f-42cc-b160-3182c8357f3d","selger":"Norman Elton","modell":"EX30","loc":"ryen","mnd":"jun","ts":"2026-06-11T16:35:00","created_at":"2026-06-11T14:35:03.853048+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"151e1141-f1d2-48ec-900b-5473fc5b2f53","selger":"Ask Herlofsen","modell":"EX40","loc":"fornebu","mnd":"jun","ts":"2026-06-11T22:07:00","created_at":"2026-06-11T20:07:56.729791+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"d9980acd-da1c-45d8-804a-d66c703d6e66","selger":"Ask Herlofsen","modell":"EX30","loc":"fornebu","mnd":"jun","ts":"2026-06-11T22:08:00","created_at":"2026-06-11T20:08:24.890921+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"ae336dd8-6bc7-44f2-a465-b819586ccd4c","selger":"Emma Valen","modell":"EX90","loc":"ryen","mnd":"jun","ts":"2026-06-12T09:57:00","created_at":"2026-06-12T07:57:15.515361+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"cbd05f84-7a79-4ba0-b9b8-b38cca41c30f","selger":"Fabian Bredal-Jørgensen","modell":"EX60","loc":"fornebu","mnd":"jun","ts":"2026-06-12T10:51:00","created_at":"2026-06-12T08:51:05.010098+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"53a68dd8-75d4-40e1-8951-ebdb5c27ce86","selger":"Norman Elton","modell":"EX30","loc":"ryen","mnd":"jun","ts":"2026-06-12T11:21:00","created_at":"2026-06-12T09:21:36.096767+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"301a7529-264c-46ed-bddb-e33c4128dd9f","selger":"Ask Herlofsen","modell":"EX30","loc":"fornebu","mnd":"jun","ts":"2026-06-12T14:22:00","created_at":"2026-06-12T12:22:19.553912+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"1c007a61-ef63-4687-817e-e8470a18bd03","selger":"Thomas Dokken","modell":"EX90","loc":"ryen","mnd":"jun","ts":"2026-06-12T16:46:00","created_at":"2026-06-12T14:46:57.542958+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"35c3a976-66d9-48f4-bfd2-87d873993db2","selger":"Daniel K. Johansen","modell":"EX30","loc":"lillestrom","mnd":"jun","ts":"2026-06-12T16:51:00","created_at":"2026-06-12T14:51:02.752173+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"9d570b47-a370-44b7-867e-ef75d865e5ac","selger":"Andreas Lydersen","modell":"EX90","loc":"lillestrom","mnd":"jun","ts":"2026-06-12T16:53:00","created_at":"2026-06-12T14:53:24.527678+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"5321697e-a15a-4ef6-a2e8-5b3f586cef0e","selger":"William Østby","modell":"EX90","loc":"ryen","mnd":"jun","ts":"2026-06-13T13:48:00","created_at":"2026-06-13T11:48:14.187417+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"99d53ade-9140-4ae6-a01c-4e5d092429d9","selger":"Fabian Bredal-Jørgensen","modell":"EX30","loc":"fornebu","mnd":"jun","ts":"2026-06-13T14:11:00","created_at":"2026-06-13T12:11:57.464613+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"fa48ff42-d266-49fc-a550-146be07d003b","selger":"Norman Elton","modell":"EX90","loc":"ryen","mnd":"jun","ts":"2026-06-13T15:06:00","created_at":"2026-06-13T13:06:37.20862+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"7c3dd3c8-0158-45ca-b320-88c2de82a846","selger":"William Østby","modell":"EX30","loc":"ryen","mnd":"jun","ts":"2026-06-13T16:24:00","created_at":"2026-06-13T14:24:38.235948+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"dfa7324d-498c-49ca-aff3-a6bbe79afdc0","selger":"Ask Herlofsen","modell":"EX60","loc":"fornebu","mnd":"jun","ts":"2026-06-15T16:56:00","created_at":"2026-06-15T14:56:30.654575+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"d8fbad80-8c5f-405a-8dcb-79d0c2fb5e1f","selger":"Thomas Dokken","modell":"EX60","loc":"ryen","mnd":"jun","ts":"2026-06-16T08:11:00","created_at":"2026-06-16T06:11:28.527248+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"c79abdea-2db5-4525-a902-6259662ecc62","selger":"Andreas Lydersen","modell":"EX30","loc":"lillestrom","mnd":"jun","ts":"2026-06-16T10:37:00","created_at":"2026-06-16T08:37:16.338244+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"579b39f9-734f-4c04-bc09-60b2d170eed2","selger":"Linn Askmann-Olsen","modell":"EX60","loc":"lillestrom","mnd":"jun","ts":"2026-06-17T11:05:00","created_at":"2026-06-17T09:05:49.061726+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"1e8c6055-fbec-4ab3-b245-328c4b020b0b","selger":"Daniel K. Johansen","modell":"EX30","loc":"lillestrom","mnd":"jun","ts":"2026-06-17T15:32:00","created_at":"2026-06-17T13:32:31.437487+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"88325660-2600-4cc4-bc55-79d77b24205c","selger":"Daniel K. Johansen","modell":"EX60","loc":"lillestrom","mnd":"jun","ts":"2026-06-17T16:23:00","created_at":"2026-06-17T14:23:40.565525+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"f2d1d46c-920e-4dda-8493-415a534c4635","selger":"Alexander Karlsen","modell":"EX30","loc":"ryen","mnd":"jun","ts":"2026-06-18T10:53:00","created_at":"2026-06-18T08:53:35.578518+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"0cd4fdec-4dcb-4242-9259-f481879ce7fe","selger":"Alexander Karlsen","modell":"EX60","loc":"ryen","mnd":"jun","ts":"2026-06-18T10:53:00","created_at":"2026-06-18T08:53:49.116566+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"30fddaea-e7d8-4e86-af12-fe476db92a6e","selger":"Ask Herlofsen","modell":"EX90","loc":"fornebu","mnd":"jun","ts":"2026-06-18T12:26:00","created_at":"2026-06-18T10:26:51.479593+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"d807eff8-bf92-41af-8c5d-8b806188d044","selger":"Fabian Bredal-Jørgensen","modell":"EX60","loc":"fornebu","mnd":"jun","ts":"2026-06-18T12:50:00","created_at":"2026-06-18T10:50:12.057946+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"05e47491-ea2e-4b5e-8889-162a970045a9","selger":"Fabian Bredal-Jørgensen","modell":"EX30","loc":"fornebu","mnd":"jun","ts":"2026-06-18T12:50:00","created_at":"2026-06-18T10:50:25.976585+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"ea127239-2ca3-48f8-8565-659015473d32","selger":"Ask Herlofsen","modell":"EX30","loc":"fornebu","mnd":"jun","ts":"2026-06-18T12:51:00","created_at":"2026-06-18T10:51:41.976476+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"4bcf1b8a-9bba-4fab-a3d9-037c5e9416d4","selger":"Thomas Dokken","modell":"EX90","loc":"ryen","mnd":"jun","ts":"2026-06-18T14:26:00","created_at":"2026-06-18T12:26:51.859406+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"dae4fcd1-0c06-4d36-af32-076bd53deb4b","selger":"Linn Askmann-Olsen","modell":"EX30","loc":"lillestrom","mnd":"jun","ts":"2026-06-18T16:22:00","created_at":"2026-06-18T14:22:36.441238+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"c1b0615c-eeff-4942-9804-db7f968bc0c6","selger":"Daniel K. Johansen","modell":"EX30","loc":"lillestrom","mnd":"jun","ts":"2026-06-18T18:39:00","created_at":"2026-06-18T16:39:57.607168+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"57b96ba6-7e16-4072-b84b-85aa4eed3f0d","selger":"Fabian Bredal-Jørgensen","modell":"EX40","loc":"fornebu","mnd":"jun","ts":"2026-06-18T22:38:00","created_at":"2026-06-18T20:37:59.7661+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"0aa74c1d-58a7-48b1-a9d6-9c6e2792fd56","selger":"Andreas Lydersen","modell":"EX30","loc":"lillestrom","mnd":"jun","ts":"2026-06-19T12:46:00","created_at":"2026-06-19T10:46:54.021866+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"efb72609-24f5-49b1-b8ce-ca73179ef4d0","selger":"Emma Valen","modell":"EX40","loc":"ryen","mnd":"jun","ts":"2026-06-19T14:14:00","created_at":"2026-06-19T12:14:44.815511+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"abafd042-198a-4f42-9376-869c408a8010","selger":"Emma Valen","modell":"EX40","loc":"ryen","mnd":"jun","ts":"2026-06-19T14:15:00","created_at":"2026-06-19T12:15:00.387481+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"7db4aea2-ff5e-435c-bbff-ef801a8803a3","selger":"Ask Herlofsen","modell":"EX90","loc":"fornebu","mnd":"jun","ts":"2026-06-19T16:46:00","created_at":"2026-06-19T14:46:23.1123+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"45f3ede2-4602-467f-b461-b3713c2ce891","selger":"Thomas Dokken","modell":"EX40","loc":"ryen","mnd":"jun","ts":"2026-06-19T16:58:00","created_at":"2026-06-19T14:58:48.530504+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"e2bc9d07-b510-4249-a2d5-2462bdd64026","selger":"Daniel K. Johansen","modell":"EX40","loc":"lillestrom","mnd":"jun","ts":"2026-06-20T14:25:00","created_at":"2026-06-20T12:25:19.730879+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"ad946a4b-0f65-495d-8fe5-beb03adbbe5b","selger":"Daniel K. Johansen","modell":"EX40","loc":"lillestrom","mnd":"jun","ts":"2026-06-20T14:26:00","created_at":"2026-06-20T12:26:48.784829+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"ccea99b5-c244-44a5-9a9b-006e39a4e6f8","selger":"Fabian Bredal-Jørgensen","modell":"EX30","loc":"fornebu","mnd":"jun","ts":"2026-06-22T09:49:00","created_at":"2026-06-22T07:49:10.759398+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"24eccbd1-ef09-4743-a060-500fffa33d59","selger":"Linn Askmann-Olsen","modell":"EX30","loc":"lillestrom","mnd":"jun","ts":"2026-06-22T10:26:00","created_at":"2026-06-22T08:26:28.148376+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"219e9de2-3336-46ee-b5e9-2a19b0f40d83","selger":"Ask Herlofsen","modell":"EX40","loc":"fornebu","mnd":"jun","ts":"2026-06-22T10:46:00","created_at":"2026-06-22T08:46:18.191032+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"c6ffc96d-1099-457e-8255-6a46478d08a0","selger":"Ask Herlofsen","modell":"EX40","loc":"fornebu","mnd":"jun","ts":"2026-06-22T13:28:00","created_at":"2026-06-22T11:28:14.576347+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"3818bbea-aae5-4164-915d-94bf7508541e","selger":"Daniel K. Johansen","modell":"EX60","loc":"lillestrom","mnd":"jun","ts":"2026-06-22T13:58:00","created_at":"2026-06-22T11:58:14.351627+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"b1e8f37a-36e2-4bf0-8f78-18c08194f78c","selger":"Andreas Lydersen","modell":"EX60","loc":"lillestrom","mnd":"jun","ts":"2026-06-23T12:31:00","created_at":"2026-06-23T10:31:23.966306+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"bf7440a9-647a-4133-a40d-fbc5fc749031","selger":"Andreas Lydersen","modell":"EX90","loc":"lillestrom","mnd":"jun","ts":"2026-06-23T12:31:00","created_at":"2026-06-23T10:31:43.567994+00:00","finansiert":false,"deleted":false,"spotlight_bonus":2},{"id":"e9665b1b-0341-49c0-abf6-4127a06a8d07","selger":"Fabian Bredal-Jørgensen","modell":"EX40","loc":"fornebu","mnd":"jun","ts":"2026-06-23T19:20:00","created_at":"2026-06-23T17:20:38.687638+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"a7b8976e-38bc-4f5f-9a60-fc68d8d48fba","selger":"Daniel K. Johansen","modell":"EX30","loc":"lillestrom","mnd":"jun","ts":"2026-06-24T11:10:00","created_at":"2026-06-24T09:10:43.128827+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"1930c355-7cbc-41df-85bd-debf00e72d03","selger":"Alexander Karlsen","modell":"EX90","loc":"ryen","mnd":"jun","ts":"2026-06-24T14:14:00","created_at":"2026-06-24T12:14:19.884666+00:00","finansiert":false,"deleted":false,"spotlight_bonus":2},{"id":"9ef36846-74d0-440f-8b7c-18e22ebbdc8a","selger":"Alexander Karlsen","modell":"EX30","loc":"ryen","mnd":"jun","ts":"2026-06-24T14:15:00","created_at":"2026-06-24T12:15:39.055823+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"20ac775e-5833-4e62-8bc6-a6528146777a","selger":"Daniel K. Johansen","modell":"EX40","loc":"lillestrom","mnd":"jun","ts":"2026-06-24T14:54:00","created_at":"2026-06-24T12:54:22.377053+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"4da6de5b-28d4-4b4b-891d-b4c625e09971","selger":"Thomas Dokken","modell":"EX30","loc":"ryen","mnd":"jun","ts":"2026-06-25T09:33:00","created_at":"2026-06-25T07:33:16.573382+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"42e4ca22-df3f-497f-8b58-695c048c3e20","selger":"Emma Valen","modell":"EX40","loc":"ryen","mnd":"jun","ts":"2026-06-25T10:15:00","created_at":"2026-06-25T08:15:12.560179+00:00","finansiert":false,"deleted":false,"spotlight_bonus":2},{"id":"f42f5839-6609-4986-851a-7cf7f722638a","selger":"Thomas Dokken","modell":"EX90","loc":"ryen","mnd":"jun","ts":"2026-06-25T17:40:00","created_at":"2026-06-25T15:40:05.419167+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"b6e42694-d838-4d10-8f7a-a37ba8d1eef5","selger":"William Østby","modell":"EX30","loc":"ryen","mnd":"jun","ts":"2026-06-26T10:29:00","created_at":"2026-06-26T08:30:00.960612+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"9ab17603-2284-4235-a79a-97e75347f76d","selger":"Daniel K. Johansen","modell":"EX40","loc":"lillestrom","mnd":"jun","ts":"2026-06-26T13:47:00","created_at":"2026-06-26T11:47:19.2564+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"e06b04ed-4d15-4874-8f41-cbef5c94d5e6","selger":"Odd Bjarne Bjørvik","modell":"EX40","loc":"fornebu","mnd":"jun","ts":"2026-06-29T10:20:00","created_at":"2026-06-29T08:20:25.632514+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"833f4328-2d2e-4f14-a00a-c16e08b0d4de","selger":"Alexander Karlsen","modell":"EX90","loc":"ryen","mnd":"jun","ts":"2026-06-29T12:49:00","created_at":"2026-06-29T10:49:48.86236+00:00","finansiert":true,"deleted":false,"spotlight_bonus":2},{"id":"12038edd-6945-47fb-864f-1c5edb0381cb","selger":"Alexander Karlsen","modell":"EX40","loc":"ryen","mnd":"jun","ts":"2026-06-29T17:14:00","created_at":"2026-06-29T15:14:52.182719+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"b9e7bb1f-b08d-43b3-a15d-f0653ae23be1","selger":"Daniel K. Johansen","modell":"EX60","loc":"lillestrom","mnd":"jun","ts":"2026-06-29T23:32:00","created_at":"2026-06-29T21:32:06.595041+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"88f1cee8-1943-4676-9b01-f266b55c14ee","selger":"William Østby","modell":"EX30","loc":"ryen","mnd":"jun","ts":"2026-06-30T09:02:00","created_at":"2026-06-30T07:03:02.770566+00:00","finansiert":true,"deleted":false,"spotlight_bonus":0},{"id":"03b9a15a-27f3-422d-9482-88a01dcbfdc6","selger":"Ask Herlofsen","modell":"EX30","loc":"fornebu","mnd":"jun","ts":"2026-06-30T13:52:00","created_at":"2026-06-30T11:52:47.325869+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"ffae266f-2a57-4879-8613-3e782a38bef5","selger":"Emma Valen","modell":"EX60","loc":"ryen","mnd":"jun","ts":"2026-06-30T14:09:00","created_at":"2026-06-30T12:09:35.783027+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"68787755-7e7b-4fd9-9d90-a4486c4fd6fa","selger":"Emma Valen","modell":"EX30","loc":"ryen","mnd":"jun","ts":"2026-06-30T14:12:00","created_at":"2026-06-30T12:12:25.301786+00:00","finansiert":false,"deleted":false,"spotlight_bonus":2},{"id":"c5d18096-8d04-4d5e-af39-b162d593ab91","selger":"Fabian Bredal-Jørgensen","modell":"EX40","loc":"fornebu","mnd":"jun","ts":"2026-06-30T14:15:00","created_at":"2026-06-30T12:15:51.911178+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"d40da766-7ec7-49cb-9771-511f71a72bf7","selger":"William Østby","modell":"EX60","loc":"ryen","mnd":"jun","ts":"2026-06-30T14:20:00","created_at":"2026-06-30T12:20:42.180515+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0},{"id":"e9272890-eb2e-43ff-8aa1-71823b4124c1","selger":"Daniel K. Johansen","modell":"EX30","loc":"lillestrom","mnd":"jun","ts":"2026-06-30T14:38:00","created_at":"2026-06-30T12:38:26.466708+00:00","finansiert":false,"deleted":false,"spotlight_bonus":0}];
+
+const SEASON_LABEL = "Sesong 1 · Q2 2026";
+const GAZZETTA_URL = "la_gazzetta_finale.html";
+const TABELL_URL = "tabell.html";
+
+const SELGER_PHOTOS={
+  "thomas_dokken":"photos/thomas_dokken.jpg","emma_valen":"photos/emma_valen.jpg",
+  "william_ostby":"photos/william_ostby.jpg","norman_elton":"photos/norman_elton.jpg",
+  "alexander_karlsen":"photos/alexander_karlsen.jpg","fabian_bredaljorgensen":"photos/fabian_bredaljorgensen.jpg",
+  "henrik_ostby":"photos/henrik_ostby.jpg","johan_kalenius":"photos/johan_kalenius.jpg",
+  "odd_bjarne_bjorvik":"photos/odd_bjarne_bjorvik.jpg","ask_herlofsen":"photos/ask_herlofsen.jpg",
+  "emanuel_bereket":"photos/emanuel_bereket.jpg","daniel_k_johansen":"photos/daniel_k_johansen.jpg",
+  "linn_askmannolsen":"photos/linn_askmannolsen.jpg","simen_olsen":"photos/simen_olsen.jpg",
+  "andreas_lydersen":"photos/andreas_lydersen.jpg",
+};
+
+const DEPT={
+  ryen:      {label:"Ryen",       color:"#4a8fff",soft:"#8fc0ff",dark:"#27508f",bg:"rgba(74,143,255,0.12)"},
+  fornebu:   {label:"Fornebu",    color:"#27c98a",soft:"#7fe3bf",dark:"#176f4f",bg:"rgba(39,201,138,0.12)"},
+  lillestrom:{label:"Lillestrøm", color:"#e8a020",soft:"#ffd27a",dark:"#9a6810",bg:"rgba(232,160,32,0.12)"},
+};
+/* Full stall – rettferdig poeng-per-selger (ulik bemanning) */
+const ROSTER={
+  "Thomas Dokken":"ryen","Emma Valen":"ryen","William Østby":"ryen","Norman Elton":"ryen","Alexander Karlsen":"ryen",
+  "Fabian Bredal-Jørgensen":"fornebu","Henrik Østby":"fornebu","Johan Kalenius":"fornebu","Odd Bjarne Bjørvik":"fornebu","Ask Herlofsen":"fornebu","Emanuel Bereket":"fornebu",
+  "Daniel K. Johansen":"lillestrom","Linn Askmann-Olsen":"lillestrom","Simen Olsen":"lillestrom","Andreas Lydersen":"lillestrom",
+};
+const PTS=3;
+const dc=loc=>DEPT[loc]?.color||"#c9a84c";
+const dl=loc=>DEPT[loc]?.label||loc;
+const {useState,useEffect,useRef}=React;
+
+function nameToId(n){
+  return n.toLowerCase().replace(/\s+/g,'_')
+    .replace(/æ/g,'ae').replace(/ø/g,'o').replace(/å/g,'aa').replace(/[^a-z0-9_]/g,'');
+}
+function hexA(hex,a){
+  const h=hex.replace('#','');
+  const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+const shimGrad=(dark,accent,soft)=>`linear-gradient(90deg,${dark},${accent},${soft},#ffffff,${accent},${dark})`;
+const ringGrad=(dark,accent,soft)=>`conic-gradient(${dark},${soft},${accent},#ffffff,${soft},${dark})`;
+
+function useBurst(ref,colors,enabled){
+  useEffect(()=>{
+    if(!enabled)return;const c=ref.current;if(!c)return;
+    const ctx=c.getContext&&c.getContext("2d");if(!ctx)return;
+    const w=c.width=c.offsetWidth||320,h=c.height=c.offsetHeight||440;
+    const ps=[];
+    for(let i=0;i<70;i++)ps.push({x:w/2+(Math.random()-0.5)*w*0.55,y:h*0.16+Math.random()*24,
+      vx:(Math.random()-0.5)*2.4,vy:Math.random()*1.3+0.4,r:Math.random()*2.2+0.6,
+      col:colors[(Math.random()*colors.length)|0],life:0,max:Math.random()*55+70});
+    let raf,frame=0;
+    function step(){
+      ctx.clearRect(0,0,w,h);frame++;let alive=false;
+      ps.forEach(p=>{p.life++;if(p.life>p.max)return;alive=true;p.x+=p.vx;p.y+=p.vy;p.vy+=0.022;
+        ctx.save();ctx.globalAlpha=Math.max(0,1-p.life/p.max);ctx.fillStyle=p.col;ctx.shadowBlur=8;ctx.shadowColor=p.col;
+        ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();ctx.restore();});
+      if(alive&&frame<210)raf=requestAnimationFrame(step);else ctx.clearRect(0,0,w,h);
+    }
+    step();return ()=>{if(raf)cancelAnimationFrame(raf);};
+  },[enabled]);
+}
+
+function AnimNum({value,color,suffix=""}){
+  const[n,setN]=useState(0);
+  useEffect(()=>{
+    if(!value)return;let start=null;
+    function step(ts){if(!start)start=ts;const p=Math.min((ts-start)/1100,1),e=1-Math.pow(1-p,4);setN(Math.round(e*value));if(p<1)requestAnimationFrame(step);}
+    requestAnimationFrame(step);
+  },[value]);
+  return <span style={{color}}>{n}{suffix}</span>;
+}
+
+function SmallAvatar({name,loc,size=38}){
+  const id=nameToId(name);const photo=SELGER_PHOTOS[id];
+  const init=name.split(" ").map(p=>p[0]).join("").slice(0,2).toUpperCase();const col=dc(loc);
+  return(
+    <div style={{width:size,height:size,borderRadius:'50%',overflow:'hidden',border:'1.5px solid '+col+'66',flexShrink:0,
+      background:DEPT[loc]?.bg||'rgba(74,143,255,0.1)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 0 12px '+col+'33'}}>
+      {photo?<img src={photo} style={{width:'100%',height:'100%',objectFit:'cover'}} alt={name}/>
+        :<span style={{fontFamily:"'Playfair Display',serif",fontSize:size*0.34,fontWeight:700,color:col}}>{init}</span>}
+    </div>
+  );
+}
+
+/* ── Sesongberegning ──────────────────────────────────────────────── */
+function rankSeason(sales){
+  const m={};
+  sales.forEach(x=>{
+    const n=x.selger;if(!n)return;
+    if(!m[n])m[n]={name:n,salg:0,finansiert:0,pts:0,loc:x.loc,lastTs:x.ts};
+    m[n].salg++;m[n].pts+=PTS+(x.spotlight_bonus||0);
+    if(x.finansiert)m[n].finansiert++;
+    if(x.ts>m[n].lastTs)m[n].lastTs=x.ts;
+  });
+  return Object.values(m).sort((a,b)=>b.pts-a.pts||b.finansiert-a.finansiert||a.lastTs.localeCompare(b.lastTs));
+}
+function deptStandings(sales){
+  const head={ryen:0,fornebu:0,lillestrom:0};
+  Object.values(ROSTER).forEach(loc=>{if(head[loc]!=null)head[loc]++;});
+  const pts={ryen:0,fornebu:0,lillestrom:0},salg={ryen:0,fornebu:0,lillestrom:0};
+  sales.forEach(s=>{const l=s.loc;if(pts[l]!=null){pts[l]+=PTS+(s.spotlight_bonus||0);salg[l]++;}});
+  return Object.keys(pts).map(loc=>({loc,pts:pts[loc],salg:salg[loc],head:head[loc],pps:head[loc]?pts[loc]/head[loc]:0}))
+    .sort((a,b)=>b.pps-a.pps);
+}
+function getMVPs(ws){
+  /* Felles definisjon - se MatchdayMVP øverst. Poeng -> finansiert -> delt. Oslo-dato. */
+  const r=MatchdayMVP.beregnMVPdager(ws);
+  return r.topp.map(p=>({
+    name:p.navn, count:p.antall,
+    loc:ws.find(s=>s.selger===p.navn)?.loc||"",
+    days:r.dager
+  }));
+}
+
+/* ── Byggekloss: badge-portrett og crest ──────────────────────────── */
+function Portrait({name,loc,accent,soft}){
+  const id=nameToId(name);const photo=SELGER_PHOTOS[id];
+  const init=name.split(" ").map(p=>p[0]).join("").slice(0,2).toUpperCase();
+  return(
+    <div className="mom-portrait">
+      <div className="mom-portrait-ring" style={{background:ringGrad(DEPT[loc]?.dark||"#5a4a14",accent,soft),boxShadow:`0 0 40px ${hexA(accent,0.45)}`}}>
+        <div className="mom-portrait-inner">
+          {photo?<img src={photo} alt={name}/>:<span style={{color:soft}}>{init}</span>}
+        </div>
+      </div>
+    </div>
+  );
+}
+function Crest({initials,accent,soft,dark}){
+  return(
+    <div className="mom-crest">
+      <div className="mom-crest-ring" style={{background:ringGrad(dark,accent,soft),boxShadow:`0 0 38px ${hexA(accent,0.45)}`}}>
+        <div className="mom-crest-inner"><span style={{color:soft}}>{initials}</span></div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Generisk moment-band ─────────────────────────────────────────── */
+function Moment(p){
+  const ref=useRef(null);
+  useBurst(ref,[p.soft,p.accent,"#ffffff"],!!p.particles);
+  const grad=shimGrad(p.dark,p.accent,p.soft);
+  return(
+    <div className={"mom "+(p.rkey||"")}>
+      <div className="mom-card" style={{
+        background:`radial-gradient(ellipse 90% 55% at 50% 0%,${hexA(p.accent,0.14)},transparent 60%),linear-gradient(160deg,#0a1322,#04090e,#06101c)`,
+        boxShadow:`0 0 0 1px ${hexA(p.accent,0.2)},0 0 90px ${hexA(p.accent,0.08)},0 40px 80px rgba(0,0,0,0.55)`}}>
+        <div className="mom-bar" style={{background:`linear-gradient(90deg,transparent,${hexA(p.accent,0.4)},${p.accent},${p.soft},${p.accent},${hexA(p.accent,0.4)},transparent)`}}/>
+        <div className="mom-beam" style={{background:`radial-gradient(ellipse 50% 100% at 50% 0%,${hexA(p.soft,0.16)},transparent 70%)`}}/>
+        {p.particles&&<canvas ref={ref} className="mom-burst"/>}
+        <div className="mom-sweep"/>
+        <div className="mom-yr">{SEASON_LABEL}</div>
+        <div className="mom-eyebrow mom-shimmer" style={{backgroundImage:grad}}>★ {p.eyebrow} ★</div>
+        <div className="mom-icon" style={{filter:`drop-shadow(0 0 18px ${hexA(p.soft,0.8)})`}}>{p.icon}</div>
+        {p.badge}
+        <div className="mom-name mom-shimmer" style={{backgroundImage:grad}}>{p.name}</div>
+        <div className="mom-honor">{p.honor}</div>
+        {p.hero!=null&&(
+          <div className="mom-hero" style={{borderColor:hexA(p.accent,0.3),background:hexA(p.accent,0.08)}}>
+            <div className="mom-hero-num mom-shimmer" style={{backgroundImage:grad}}>{p.hero}</div>
+            <div className="mom-hero-lbl" style={{color:hexA(p.soft,0.78)}}>{p.heroLabel}</div>
+          </div>
+        )}
+        {p.tiles&&(
+          <div className="mom-tiles">
+            {p.tiles.map((t,i)=>(
+              <div key={i} className="mom-tile" style={{borderTop:`1px solid ${hexA(p.accent,0.32)}`,animationDelay:(0.5+i*0.12)+'s'}}>
+                <div className="mom-tile-num"><AnimNum value={t.num} color={t.col}/></div>
+                <div className="mom-tile-lbl">{t.lbl}</div>
+              </div>
+            ))}
+          </div>
+        )}
+        {p.sub}
+      </div>
+    </div>
+  );
+}
+
+/* ── Sesongmester (gull-headliner) ────────────────────────────────── */
+function ChampionCard({champ}){
+  if(!champ)return null;
+  const col=dc(champ.loc);const pid=nameToId(champ.name);const photo=SELGER_PHOTOS[pid];
+  const init=champ.name.split(" ").map(p=>p[0]).join("").slice(0,2).toUpperCase();
+  const ref=useRef(null);
+  useBurst(ref,["#f0c96e","#c9a84c","#ffe98a","#ffffff"],true);
+  const stats=[
+    {val:champ.pts,lbl:"Poeng",c:"#f0c96e",delay:"0.55s"},
+    {val:champ.salg,lbl:"Biler",c:col,delay:"0.7s"},
+    {val:champ.finansiert,lbl:"Finansiert",c:"#5fb8d8",delay:"0.85s"},
+  ];
+  return(
+    <div className="champ-wrap r2">
+      <div className="champ-card">
+        <div className="champ-beam"/>
+        <canvas ref={ref} className="champ-burst"/>
+        <div className="champ-sweep"/>
+        <div className="champ-yr">{SEASON_LABEL}</div>
+        <div className="champ-eyebrow gold-text">★ SESONGMESTER ★</div>
+        <div className="champ-crown">👑</div>
+        <div className="champ-portrait-wrap">
+          <div className="champ-portrait-ring">
+            <div className="champ-portrait-inner">
+              {photo?<img src={photo} alt={champ.name}/>:<span>{init}</span>}
+            </div>
+          </div>
+          <span className="champ-laurel champ-laurel-l">🌿</span>
+          <span className="champ-laurel champ-laurel-r">🌿</span>
+        </div>
+        <div className="champ-name gold-text">{champ.name}</div>
+        <div className="champ-honor">Vinner {SEASON_LABEL}</div>
+        <div style={{textAlign:'center'}}>
+          <span className="champ-pill" style={{background:DEPT[champ.loc]?.bg,border:`1px solid ${col}44`,color:col}}>
+            <span style={{width:7,height:7,borderRadius:'50%',background:col,boxShadow:`0 0 8px ${col}`,display:'inline-block'}}/>
+            {dl(champ.loc)}
+          </span>
+        </div>
+        <div className="champ-stats">
+          {stats.map((s,i)=>(
+            <div key={i} className="champ-stat" style={{animationDelay:s.delay}}>
+              <div className="champ-stat-num"><AnimNum value={s.val} color={s.c}/></div>
+              <div className="champ-stat-lbl">{s.lbl}</div>
+            </div>
+          ))}
+        </div>
+        <div className="champ-down">▾ &nbsp; PALLEN · VINNERAVDELING · RENTEHAI · MVP · REKORDER &nbsp; ▾</div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Sesongpallen (kompakt bro) ───────────────────────────────────── */
+function PallCard({ranked}){
+  if(ranked.length<2)return null;
+  const top=ranked.slice(0,3);const medals=["🥇","🥈","🥉"];const mc=["#f0c96e","#c0c0c0","#cd7f32"];
+  return(
+    <div className="sec r3" style={{margin:'18px 16px'}}>
+      <div className="sec-top" style={{background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.7),transparent)'}}/>
+      <div className="sec-title">🏅 Sesongpallen</div>
+      {top.map((p,i)=>{const col=dc(p.loc);return(
+        <div key={p.name} className="rank-row">
+          <div className="rank-num" style={{color:mc[i],fontSize:i===0?22:18}}>{medals[i]}</div>
+          <SmallAvatar name={p.name} loc={p.loc} size={i===0?44:38}/>
+          <div style={{flex:1}}>
+            <div className="rank-name" style={{color:i===0?'#fff':'rgba(255,255,255,0.78)',fontSize:i===0?15:14}}>{p.name}</div>
+            <div className="rank-dept" style={{color:col+'cc'}}>{dl(p.loc)} · {p.salg} biler · {p.finansiert} fin</div>
+          </div>
+          <div style={{textAlign:'right'}}>
+            <div className="rank-pts" style={{color:mc[i]}}>{p.pts}</div>
+            <div style={{fontFamily:"'Cinzel',serif",fontSize:7,letterSpacing:'0.15em',color:'rgba(255,255,255,0.25)',marginTop:2}}>POENG</div>
+          </div>
+        </div>
+      );})}
+    </div>
+  );
+}
+
+/* ── Vinneravdeling (headliner #2, avdelingsfarget) ───────────────── */
+function VinneravdelingMoment({depts}){
+  if(!depts.length)return null;
+  const best=depts[0];const D=DEPT[best.loc]||{};
+  const accent=D.color||"#4a8fff",soft=D.soft||"#8fc0ff",dark=D.dark||"#27508f";
+  const sub=(
+    <div style={{margin:'18px 4px 2px',position:'relative',zIndex:2}}>
+      <div style={{fontFamily:"'Cinzel',serif",fontSize:9,letterSpacing:'0.3em',color:'rgba(255,255,255,0.25)',textAlign:'center',marginBottom:12}}>— AVDELINGSKAMPEN —</div>
+      {depts.map((d,i)=>{const c=dc(d.loc);return(
+        <div key={d.loc} className="mom-sub-row">
+          <span style={{fontFamily:"'Playfair Display',serif",fontWeight:700,width:22,textAlign:'center',color:i===0?soft:'rgba(255,255,255,0.5)'}}>{i+1}</span>
+          <span style={{flex:1,fontWeight:600,color:i===0?'#fff':'rgba(255,255,255,0.7)'}}>{dl(d.loc)}</span>
+          <span style={{fontSize:11,color:c+'aa',marginRight:8}}>{d.salg} biler · {d.head} selgere</span>
+          <span style={{fontFamily:"'Playfair Display',serif",fontWeight:700,color:i===0?soft:'rgba(255,255,255,0.6)'}}>{d.pps.toFixed(1).replace('.',',')}</span>
+        </div>
+      );})}
+    </div>
+  );
+  return <Moment rkey="r3" particles={true} accent={accent} soft={soft} dark={dark}
+    icon="🏆" eyebrow="VINNERAVDELING" name={dl(best.loc)} honor="Sesongens beste avdeling"
+    badge={<Crest initials={dl(best.loc).slice(0,2).toUpperCase()} accent={accent} soft={soft} dark={dark}/>}
+    hero={best.pps.toFixed(1).replace('.',',')} heroLabel="POENG PER SELGER"
+    tiles={[{num:best.pts,lbl:'Poeng totalt',col:soft},{num:best.salg,lbl:'Biler',col:accent},{num:best.head,lbl:'Selgere',col:'#cfe2ff'}]}
+    sub={sub}/>;
+}
+
+/* ── Sesongens Rentehai ───────────────────────────────────────────── */
+function RentehaiMoment({rentehaier}){
+  if(!rentehaier.length)return null;
+  const r=rentehaier[0];const accent="#5fb8d8",soft="#a8e0f0",dark="#2a7a96";
+  const sub=rentehaier.length>1?(
+    <div className="mom-shared">
+      {rentehaier.slice(1).map(x=>(
+        <span key={x.name} style={{display:'inline-flex',alignItems:'center',gap:8,color:'rgba(255,255,255,0.7)',fontWeight:600,fontSize:14}}>
+          <SmallAvatar name={x.name} loc={x.loc} size={30}/>{x.name}
+        </span>
+      ))}
+    </div>
+  ):null;
+  return <Moment rkey="r4" accent={accent} soft={soft} dark={dark}
+    icon="🦈" eyebrow={rentehaier.length>1?"DELT SESONGENS RENTEHAI":"SESONGENS RENTEHAI"}
+    name={r.name} honor="Flest finansierte salg i sesongen"
+    badge={<Portrait name={r.name} loc={r.loc} accent={accent} soft={soft}/>}
+    hero={r.finansiert} heroLabel="FINANSIERTE SALG" sub={sub}/>;
+}
+
+/* ── Flest MVP-dager ──────────────────────────────────────────────── */
+function MVPMoment({mvps}){
+  if(!mvps.length)return null;
+  const m=mvps[0];const accent="#f0b552",soft="#ffdd8f",dark="#8a5e14";
+  const sub=mvps.length>1?(
+    <div className="mom-shared">
+      {mvps.slice(1).map(x=>(
+        <span key={x.name} style={{display:'inline-flex',alignItems:'center',gap:8,color:'rgba(255,255,255,0.7)',fontWeight:600,fontSize:14}}>
+          <SmallAvatar name={x.name} loc={x.loc} size={30}/>{x.name}
+        </span>
+      ))}
+    </div>
+  ):null;
+  return <Moment rkey="r4" accent={accent} soft={soft} dark={dark}
+    icon="👑" eyebrow={mvps.length>1?"DELT FLEST MVP-DAGER":"FLEST MVP-DAGER"}
+    name={m.name} honor={`MVP ${m.count} av ${m.days.length} salgsdag${m.days.length>1?"er":""}`}
+    badge={<Portrait name={m.name} loc={m.loc} accent={accent} soft={soft}/>}
+    hero={m.count} heroLabel="MVP-DAGER" sub={sub}/>;
+}
+
+/* ── Flest hat-tricks ─────────────────────────────────────────────── */
+function HatTrickMoment({hatters,sales}){
+  if(!hatters.length)return null;
+  const h=hatters[0];const accent="#27c98a",soft="#7fe3bf",dark="#176f4f";
+  const days={};
+  sales.filter(s=>s.selger===h.name).forEach(s=>{const d=MatchdayMVP.osloDato(s.ts);days[d]=(days[d]||0)+1;});
+  const htDays=Object.entries(days).filter(([,c])=>c>=3).map(([d,c])=>({d,c})).sort((a,b)=>a.d.localeCompare(b.d));
+  const sub=(
+    <div style={{margin:'16px 2px 0',position:'relative',zIndex:2}}>
+      {htDays.map(({d,c})=>(
+        <div key={d} className="ht-row">
+          <div className="ht-dot"/><span className="ht-ct">{c} salg</span>
+          <span style={{color:'rgba(255,255,255,0.25)'}}>—</span>
+          <span className="ht-dt">{new Date(d).toLocaleDateString("no-NO",{weekday:"long",day:"numeric",month:"long"})}</span>
+        </div>
+      ))}
+      {hatters.length>1&&(
+        <div className="mom-shared" style={{marginTop:12}}>
+          {hatters.slice(1).map(x=>(
+            <span key={x.name} style={{display:'inline-flex',alignItems:'center',gap:8,color:'rgba(255,255,255,0.7)',fontWeight:600,fontSize:14}}>
+              <SmallAvatar name={x.name} loc={x.loc} size={30}/>{x.name} ({x.htCount})
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+  return <Moment rkey="r4" accent={accent} soft={soft} dark={dark}
+    icon="⭐" eyebrow="FLEST HAT-TRICKS" name={h.name}
+    honor={`${h.htCount} hat-trick-dag${h.htCount>1?"er":""} i sesongen`}
+    badge={<Portrait name={h.name} loc={h.loc} accent={accent} soft={soft}/>}
+    hero={h.htCount} heroLabel="HAT-TRICKS" sub={sub}/>;
+}
+
+/* ── Sesongen i tall ──────────────────────────────────────────────── */
+function SesongStats({sales}){
+  const totSalg=sales.length;
+  const totFin=sales.filter(s=>s.finansiert).length;
+  const finPct=totSalg?Math.round(totFin/totSalg*100):0;
+  const activeDays=new Set(sales.map(s=>MatchdayMVP.osloDato(s.ts))).size;
+  return(
+    <div className="r5" style={{margin:'18px 0 0'}}>
+      <div style={{margin:'0 16px 8px'}}><div className="rank-title">Sesongen i tall</div></div>
+      <div className="stats-bar">
+        {[
+          {val:totSalg,lbl:'Biler totalt',col:'var(--gold2)',delay:'0.6s'},
+          {val:totFin,lbl:'Finansiert',col:'#f0c96e',delay:'0.72s'},
+          {val:finPct,lbl:'Fin %',col:'#27c98a',delay:'0.84s',suffix:'%'},
+          {val:activeDays,lbl:'Salgsdager',col:'#4a8fff',delay:'0.96s'},
+        ].map(({val,lbl,col,delay,suffix},i)=>(
+          <div key={i} className="stat-tile" style={{animationDelay:delay}}>
+            <div className="stat-tile-num"><AnimNum value={val} color={col} suffix={suffix||""}/></div>
+            <div className="stat-tile-lbl">{lbl}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── Ticker ───────────────────────────────────────────────────────── */
+function Ticker({ranked,champ}){
+  const items=ranked.slice(0,5).map((r,i)=>`${i+1}. ${r.name} · ${r.pts} p`).join("   ✦   ");
+  const full=`✦ SESONGFINALE · ${SEASON_LABEL.toUpperCase()} · VCSO CHAMPIONSHIP ✦   ${champ?`👑 VINNER: ${champ.name}   ✦   `:""}${items}   `;
+  return(
+    <div className="ticker-wrap">
+      <div className="ticker-inner">
+        <span className="ticker-chunk">{full}</span>
+        <span className="ticker-chunk">{full}</span>
+      </div>
+    </div>
+  );
+}
+
+/* ── App ──────────────────────────────────────────────────────────── */
+function App(){
+  const[sales,setSales]=useState(null);
+  const[error,setError]=useState(null);
+  useEffect(()=>{
+    if(FROZEN_SALES){setSales(FROZEN_SALES);return;}
+    fetch(SB_URL+"/rest/v1/sales?select=*&deleted=eq.false&order=ts.asc",
+      {headers:{apikey:SB_KEY,Authorization:"Bearer "+SB_KEY}})
+    .then(r=>r.ok?r.json():Promise.reject(r.statusText))
+    .then(setSales).catch(e=>setError(String(e)));
+  },[]);
+
+  if(error)return(
+    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',color:'#ef4444',fontFamily:'Rajdhani',padding:24,textAlign:'center'}}>
+      <div><div style={{fontSize:36,marginBottom:12}}>⚠️</div>Feil: {error}</div>
+    </div>
+  );
+  if(!sales)return(
+    <div className="loading"><div className="spin-ring"/><div className="loading-lbl">Kroner sesongmesteren...</div></div>
+  );
+
+  const ranked=rankSeason(sales);
+  const champ=ranked[0]||null;
+  const depts=deptStandings(sales);
+  const mvps=getMVPs(sales);
+  const maxFin=Math.max(0,...ranked.map(r=>r.finansiert));
+  const rentehaier=maxFin>0?ranked.filter(r=>r.finansiert===maxFin):[];
+  const htMap={};
+  sales.forEach(s=>{const d=MatchdayMVP.osloDato(s.ts);if(!htMap[s.selger])htMap[s.selger]={};htMap[s.selger][d]=(htMap[s.selger][d]||0)+1;});
+  const hatters=Object.entries(htMap)
+    .filter(([,d])=>Object.values(d).some(c=>c>=3))
+    .map(([name])=>({name,loc:sales.find(s=>s.selger===name)?.loc||"",htCount:Object.values(htMap[name]).filter(c=>c>=3).length}))
+    .sort((a,b)=>b.htCount-a.htCount);
+
+  return(
+    <div>
+      <div className="header rf">
+        <div className="eyebrow">VCSO Championship · 2026</div>
+        <div className="header-trophy">🏆</div>
+        <div className="header-title gold-text">Sesongfinale</div>
+        <div className="header-sub">Den store kåringen</div>
+        <div className="month-badge"><div className="badge-dot"/>{SEASON_LABEL}</div>
+      </div>
+
+      {sales.length===0?(
+        <div style={{textAlign:'center',padding:'80px 24px',fontFamily:"'Playfair Display',serif",fontStyle:'italic',fontSize:18,color:'rgba(255,255,255,0.2)'}}>
+          Ingen salg registrert i sesongen.
+        </div>
+      ):(
+        <div className="content">
+          <Ticker ranked={ranked} champ={champ}/>
+          <div className="spacer"/>
+          <ChampionCard champ={champ}/>
+          <PallCard ranked={ranked}/>
+          <VinneravdelingMoment depts={depts}/>
+          <RentehaiMoment rentehaier={rentehaier}/>
+          <MVPMoment mvps={mvps}/>
+          <HatTrickMoment hatters={hatters} sales={sales}/>
+          <SesongStats sales={sales}/>
+          <div style={{margin:'18px 16px 24px',display:'flex',flexDirection:'column',gap:10}}>
+            <a className="gz-cta" href={GAZZETTA_URL}>
+              <span style={{fontSize:20}}>📰</span>
+              <span>Les La Gazzetta — sesongoppsummering</span>
+              <span style={{opacity:0.6}}>→</span>
+            </a>
+            <a className="gz-cta gz-cta-sec" href={TABELL_URL}>
+              <span style={{fontSize:18}}>📊</span>
+              <span>Se hele sluttabellen</span>
+              <span style={{opacity:0.6}}>→</span>
+            </a>
+          </div>
+          <div className="footer r6">
+            <div className="footer-line"/>
+            <div className="footer-txt">VCSO Championship · {SEASON_LABEL} · Sesongfinale</div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.render(<App/>,document.getElementById("root"));
+</script>
+</body>
+</html>

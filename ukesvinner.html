@@ -7,6 +7,187 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<script>
+/* ══════════════════════════════════════════════════════════════════════
+   MATCHDAY · MVP.JS  ·  v1.0
+   Kanonisk definisjon av «MVP-dag». Denne blokken er IDENTISK i alle
+   filer i alle tre konkurransene. Endres den ett sted, må den byttes
+   ut alle steder – den genereres fra én kilde.
+
+   DEFINISJONEN
+   ------------
+   1. Dagen avgjøres av OSLO-dato (Europe/Oslo), ikke UTC.
+   2. Høyest poeng den dagen tar MVP.
+   3. Står det likt: konkurransens tiebreaker (finansiert / 10-ere).
+   4. Fortsatt likt -> DELT MVP. Alle vinnerne får én hel MVP-dag hver.
+   5. Slettede rader (deleted) og ugyldige rader teller aldri.
+
+   Samme stige som ukesvinner og bruksanvisningen. Ett sted, én sannhet.
+   ══════════════════════════════════════════════════════════════════════ */
+(function (global) {
+  'use strict';
+
+  /* ── Oslo-dato fra ts (som er lagret som ISO-tekst, ikke timestamptz) ── */
+  function osloDato(ts) {
+    if (!ts) return null;
+    var d = new Date(ts);
+    if (isNaN(d.getTime())) return null;
+    return d.toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' }); // YYYY-MM-DD
+  }
+
+  /* ── Standardoppsett = Championship / Selekt ────────────────────────── */
+  var STANDARD = {
+    navnFelt: 'selger',
+    gyldig: function (r) { return !r.deleted; },
+    poeng: function (r) { return 3 + (r.spotlight_bonus || 0); },
+    tie: function (r) { return r.finansiert ? 1 : 0; },
+    tieNavn: 'finansierte salg'
+  };
+
+  /* ── Ferdig oppsett for OSAT ────────────────────────────────────────── */
+  var OSAT = {
+    navnFelt: 'pst',
+    gyldig: function (r) { return !r.deleted && (r.score === 9 || r.score === 10); },
+    poeng: function () { return 3; },
+    tie: function (r) { return r.score === 10 ? 1 : 0; },
+    tieNavn: '10-ere'
+  };
+
+  function medStandard(cfg) {
+    cfg = cfg || {};
+    return {
+      navnFelt: cfg.navnFelt || STANDARD.navnFelt,
+      gyldig: cfg.gyldig || STANDARD.gyldig,
+      poeng: cfg.poeng || STANDARD.poeng,
+      tie: cfg.tie || STANDARD.tie,
+      tieNavn: cfg.tieNavn || STANDARD.tieNavn
+    };
+  }
+
+  /* ══════════════════════════════════════════════════════════════════
+     KJERNE: grupperer rader per Oslo-dato og kårer dagens vinner(e).
+     ══════════════════════════════════════════════════════════════════ */
+  function grupper(rader, cfg) {
+    var dager = {};
+    (rader || []).forEach(function (r) {
+      if (!cfg.gyldig(r)) return;
+      var d = osloDato(r.ts);
+      if (!d) return;
+      var navn = r[cfg.navnFelt];
+      if (!navn) return;
+      if (!dager[d]) dager[d] = {};
+      if (!dager[d][navn]) dager[d][navn] = { poeng: 0, tie: 0, antall: 0, forsteTs: r.ts };
+      var p = dager[d][navn];
+      p.poeng += cfg.poeng(r);
+      p.tie += cfg.tie(r);
+      p.antall += 1;
+      if (r.ts && r.ts < p.forsteTs) p.forsteTs = r.ts;
+    });
+    return dager;
+  }
+
+  /* Kårer vinner(e) for ÉN dag. Returnerer null hvis ingen aktivitet. */
+  function karDag(spillere) {
+    var navn = Object.keys(spillere || {});
+    if (!navn.length) return null;
+
+    var maksPoeng = 0;
+    navn.forEach(function (n) { if (spillere[n].poeng > maksPoeng) maksPoeng = spillere[n].poeng; });
+    if (maksPoeng <= 0) return null;
+
+    var likt = navn.filter(function (n) { return spillere[n].poeng === maksPoeng; });
+
+    var maksTie = 0;
+    likt.forEach(function (n) { if (spillere[n].tie > maksTie) maksTie = spillere[n].tie; });
+    var vinnere = likt.filter(function (n) { return spillere[n].tie === maksTie; });
+
+    return {
+      vinnere: vinnere.sort(),
+      poeng: maksPoeng,
+      tie: maksTie,
+      antall: spillere[vinnere[0]].antall,
+      delt: vinnere.length > 1,
+      avgjortAvTie: vinnere.length < likt.length
+    };
+  }
+
+  /* ══════════════════════════════════════════════════════════════════
+     beregnMVPdager(rader, cfg)
+     Hovedfunksjonen. Ett kall gir alt noen visning trenger.
+     ══════════════════════════════════════════════════════════════════ */
+  function beregnMVPdager(rader, cfg) {
+    cfg = medStandard(cfg);
+    var gruppert = grupper(rader, cfg);
+    var dager = Object.keys(gruppert).sort();
+
+    var perDag = {};
+    var aktiveDager = [];
+    var telling = {};
+
+    dager.forEach(function (d) {
+      var res = karDag(gruppert[d]);
+      if (!res) return;
+      perDag[d] = res;
+      aktiveDager.push(d);
+      res.vinnere.forEach(function (n) { telling[n] = (telling[n] || 0) + 1; });
+    });
+
+    var perSpiller = {};
+    Object.keys(telling).forEach(function (n) {
+      perSpiller[n] = {
+        navn: n,
+        antall: telling[n],
+        dager: aktiveDager.filter(function (d) { return perDag[d].vinnere.indexOf(n) !== -1; }),
+        // parallell til aktiveDager – true på dagene spilleren tok MVP
+        maske: aktiveDager.map(function (d) { return perDag[d].vinnere.indexOf(n) !== -1; })
+      };
+    });
+
+    var rangert = Object.keys(perSpiller)
+      .map(function (n) { return perSpiller[n]; })
+      .sort(function (a, b) { return b.antall - a.antall || a.navn.localeCompare(b.navn, 'nb'); });
+
+    var topp = rangert.length
+      ? rangert.filter(function (x) { return x.antall === rangert[0].antall; })
+      : [];
+
+    return {
+      dager: aktiveDager,      // alle dager med aktivitet, sortert stigende
+      perDag: perDag,          // { '2026-08-03': {vinnere,poeng,tie,delt,...} }
+      perSpiller: perSpiller,  // { navn: {antall, dager, maske} }
+      rangert: rangert,        // hele topplista, synkende
+      topp: topp,              // leder(e) – flere ved likt
+      tieNavn: cfg.tieNavn
+    };
+  }
+
+  /* ══════════════════════════════════════════════════════════════════
+     forDag(rader, dato, cfg)
+     Kårer MVP for én bestemt Oslo-dato. Brukes av MVP-banneret.
+     Returnerer null hvis ingen aktivitet den dagen.
+     ══════════════════════════════════════════════════════════════════ */
+  function forDag(rader, dato, cfg) {
+    cfg = medStandard(cfg);
+    var gruppert = grupper(rader, cfg);
+    return karDag(gruppert[dato]);
+  }
+
+  /* Dagens Oslo-dato som YYYY-MM-DD. */
+  function iDag() {
+    return new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' });
+  }
+
+  global.MatchdayMVP = {
+    beregnMVPdager: beregnMVPdager,
+    forDag: forDag,
+    osloDato: osloDato,
+    iDag: iDag,
+    STANDARD: STANDARD,
+    OSAT: OSAT,
+    versjon: '1.0'
+  };
+})(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this));
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cinzel:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -292,16 +473,13 @@ function rankSales(s){
     .sort((a,b)=>b.poeng-a.poeng||b.finansiert-a.finansiert||a.firstTs.localeCompare(b.firstTs));
 }
 function getMVPs(ws){
-  const bd={};
-  ws.forEach(s=>{const day=s.ts.slice(0,10);if(!bd[day])bd[day]={};bd[day][s.selger]=(bd[day][s.selger]||0)+1;});
-  const days=Object.keys(bd).sort(),mc={};
-  days.forEach(day=>{const ds=bd[day],max=Math.max(...Object.values(ds));Object.entries(ds).forEach(([n,c])=>{if(c===max)mc[n]=(mc[n]||0)+1;});});
-  if(!Object.keys(mc).length)return[];
-  const sorted=Object.entries(mc).sort((a,b)=>b[1]-a[1]),top=sorted[0][1];
-  return sorted.filter(([,c])=>c===top).map(([name,count])=>{
-    const mvpDays=days.map(day=>{const ds=bd[day],max=Math.max(...Object.values(ds));return ds[name]===max&&max>0;});
-    return{name,count,loc:ws.find(s=>s.selger===name)?.loc||"",days,mvpDays};
-  });
+  /* Felles definisjon - se MatchdayMVP øverst. Poeng -> finansiert -> delt. Oslo-dato. */
+  const r=MatchdayMVP.beregnMVPdager(ws);
+  return r.topp.map(p=>({
+    name:p.navn, count:p.antall,
+    loc:ws.find(s=>s.selger===p.navn)?.loc||"",
+    days:r.dager, mvpDays:p.maske
+  }));
 }
 function getBestDept(ws){
   const ds={};ws.forEach(s=>{if(s.loc)ds[s.loc]=(ds[s.loc]||0)+1;});
@@ -514,7 +692,7 @@ function HatTrickCard({hatters,weekSales}){
       <div className="sec-title" style={{color:'rgba(39,201,138,0.45)'}}>⭐ Hat-trick denne uken</div>
       {hatters.map((h,idx)=>{
         const days={};
-        weekSales.filter(s=>s.selger===h.name).forEach(s=>{const d=s.ts.slice(0,10);days[d]=(days[d]||0)+1;});
+        weekSales.filter(s=>s.selger===h.name).forEach(s=>{const d=MatchdayMVP.osloDato(s.ts);days[d]=(days[d]||0)+1;});
         const htDays=Object.entries(days).filter(([,c])=>c>=3).map(([d,c])=>({d,c}));
         return(
           <div key={h.name}>
@@ -618,7 +796,7 @@ function App(){
   const mvps=getMVPs(sales);
   const bestDept=getBestDept(sales);
   const htMap={};
-  sales.forEach(s=>{const d=s.ts.slice(0,10);if(!htMap[s.selger])htMap[s.selger]={};htMap[s.selger][d]=(htMap[s.selger][d]||0)+1;});
+  sales.forEach(s=>{const d=MatchdayMVP.osloDato(s.ts);if(!htMap[s.selger])htMap[s.selger]={};htMap[s.selger][d]=(htMap[s.selger][d]||0)+1;});
   const hatters=Object.entries(htMap).filter(([,d])=>Object.values(d).some(c=>c>=3)).map(([name])=>({name,loc:sales.find(s=>s.selger===name)?.loc||""}));
   const maxFin=Math.max(0,...ranked.map(r=>r.finansiert));
   const rentehaier=maxFin>0?ranked.filter(r=>r.finansiert===maxFin):[];
