@@ -41,9 +41,6 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .mj-b{width:15px;height:9px;border:1px solid var(--b2);border-radius:2px;background:var(--faint);
   position:relative;flex-shrink:0}
 .mj-b.fill{background:var(--mjc,var(--muted));border-color:var(--mjc,var(--muted))}
-.mj-b.fourth{border-color:rgba(201,168,76,.55)}
-.mj-b.fourth:after{content:'';position:absolute;left:80%;top:-3px;bottom:-3px;width:2px;
-  background:var(--gold);box-shadow:0 0 5px rgba(201,168,76,.8)}
 .mj-b.fill.gold{background:var(--gold);border-color:var(--gold)}
 .mj-b.extra{background:var(--gold);border-color:var(--gold);width:7px}
 .mj-plus{font-family:Anton,sans-serif;font-size:9px;color:var(--gold);align-self:center}
@@ -57,7 +54,11 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .mj-chip .x.fl{color:#f97316}
 .mj-nmrow{display:flex;align-items:center;min-width:0}
 .mj-nmtxt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-/* målkonto i underlinja */
+/* bonusteller i underlinja — 20 biler = 10 000 kr */
+.mj-bon{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;margin-left:7px;
+  flex-shrink:0;color:var(--muted);letter-spacing:.3px}
+.mj-bon.naadd{color:var(--gold);font-family:Anton,sans-serif;font-size:9px;letter-spacing:.6px}
+/* målkonto i spillerkortet */
 .mj-kt{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;margin-left:7px;flex-shrink:0}
 .mj-kt.up{color:var(--g)}.mj-kt.dn{color:var(--r)}.mj-kt.ev{color:var(--muted)}
 /* gullring når selgeren er over streken - bildet blir aldri farget */
@@ -104,8 +105,26 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
   font-size:11.5px;color:var(--muted);line-height:1.55}
 .mj-wsum b{color:var(--txt)}
 .mj-wsum .up{color:var(--g)}.mj-wsum .dn{color:var(--r)}
-/* i tabellen skal ruta bære streken diskret */
-.name-sub .mj-b.fourth:after{top:-2px;bottom:-2px;box-shadow:none}
+/* 28-dagersvinduet i spillerkortet */
+.mj-vsek{margin-top:12px;padding-top:11px;border-top:1px solid var(--b1)}
+.mj-vh{font-family:'Barlow Condensed',sans-serif;font-size:9.5px;font-weight:700;letter-spacing:1.1px;
+  color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+.mj-vl{display:flex;flex-direction:column;gap:4px}
+.mj-vr{display:grid;grid-template-columns:38px 1fr 22px 82px;gap:7px;align-items:center;
+  font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--muted)}
+.mj-vd{font-size:10px;text-align:right;white-space:nowrap;color:var(--muted)}
+@media(max-width:420px){.mj-vr{grid-template-columns:34px 1fr 20px 66px}.mj-vd{font-size:9px}}
+.mj-vb{height:8px;background:var(--faint);border-radius:4px;overflow:hidden}
+.mj-vb i{display:block;height:100%;background:var(--muted);border-radius:4px;
+  transition:width .7s cubic-bezier(.16,1,.3,1)}
+.mj-vs{font-family:Anton,sans-serif;font-size:12px;text-align:right;color:var(--muted)}
+.mj-vr.aktiv{color:var(--txt)}
+.mj-vr.aktiv .mj-vb i{background:var(--gold)}
+.mj-vr.aktiv .mj-vs{color:var(--gold)}
+.mj-vr.naadd .mj-vb i{background:var(--g)}
+.mj-vr.naadd .mj-vs{color:var(--g)}
+.mj-vf{font-size:11px;color:var(--muted);line-height:1.5;margin-top:9px}
+.mj-vf b{color:var(--gold)}
 
 /* gullstempel — samme formspråk som FINANSIERT */
 .mj-stamp{display:inline-flex;align-items:center;gap:3px;background:var(--gold);color:#000;
@@ -133,6 +152,26 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
   font-size:11.5px;color:var(--muted);line-height:1.5}
 .mj-wfoot b{color:var(--txt)}
 @media(max-width:520px){.mj-big{font-size:44px}.mj-g{width:15px;height:15px;gap:3px}}
+
+/* PREMIER */
+.mj-pw{margin:12px 14px;background:var(--card);border:1px solid var(--b1);border-radius:12px;
+  padding:15px 15px 5px;position:relative;overflow:hidden}
+.mj-pw:before{content:'';position:absolute;inset:0 0 auto 0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.6}
+.mj-ph{font-family:Anton,sans-serif;font-size:13px;letter-spacing:2px;color:var(--gold);margin-bottom:13px}
+.mj-pr{display:flex;gap:12px;padding-bottom:14px;margin-bottom:12px;border-bottom:1px solid var(--faint)}
+.mj-pr:last-child{border-bottom:none}
+.mj-pi{font-size:22px;line-height:1;flex-shrink:0;width:26px;text-align:center}
+.mj-pb{min-width:0}
+.mj-pt{font-family:Anton,sans-serif;font-size:15px;letter-spacing:.4px;color:var(--txt);line-height:1.15}
+.mj-pd{font-size:12px;color:var(--muted);line-height:1.5;margin-top:4px}
+.mj-pd b{color:var(--txt)}
+.mj-ps{font-size:11.5px;color:var(--muted);line-height:1.55;margin-top:7px;padding-top:7px;
+  border-top:1px dashed var(--b1)}
+.mj-ps b{color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.2px}
+.mj-ps .ok{color:var(--g);font-weight:600}
+.mj-ps .mangler{color:var(--y);font-weight:600}
+
 
 /* BEDRIFTSMÅLET */
 .mj-sea{margin:12px 14px;background:var(--card);border:1px solid var(--b1);border-radius:12px;padding:16px}
@@ -1316,6 +1355,7 @@ body{background:transparent !important}
 
 <!-- AVDELINGER VIEW -->
 <div class="view" id="view-team">
+  <div id="mj-premier"></div>
   <div id="mj-uka"></div>
   <div id="mj-bedrift"></div>
   <div id="mj-forhandlere"></div>
@@ -1546,10 +1586,20 @@ var API = SUPABASE_URL + '/rest/v1/sales';
 
 var PTS = 3;
 // ─── MÅLJAKTEN ───────────────────────────────────────────────────────
-// Alt følger av ett tall: 3,2 biler per selger per uke.
+// Alt følger av bedriftsmålet. Ukesmålet per selger avledes av det.
 // GOALS / DAILY / WEEKLY_GOALS fylles av MJ_bygg() rett etter SELGERE.
-var MAL_UKE      = 3.2;
-var MJ_START     = '2026-08-03';
+// MAL_BEDRIFT_FAST er kilden til alt. MAL_UKE regnes ut av MJ_bygg() ut fra periodens
+// lengde og antall selgere, så tallene aldri kan komme i utakt med budsjettet.
+var MAL_BEDRIFT_FAST = 378;
+var MAL_UKE      = 0;
+// Provisjonsbonus — 20 biler innenfor et glidende 28-dagersvindu, fra 17. august.
+// Vinduet starter på din første bil, uansett dag. Alle 28-dagersspenn i perioden teller.
+// 28 dager rommer 20 salgsdager, så 20 biler er én bil hver salgsdag i en måned.
+var BONUS_START  = '2026-08-17';
+var BONUS_MAL    = 20;
+var BONUS_DAGER  = 28;
+var LAGPOTT      = 3000;
+var MJ_START     = '2026-08-17';   // målperioden starter i dag
 var MJ_SLUTT     = '2026-09-30';
 var GOALS  = { aug:{}, sep:{} };
 var DAILY  = { aug:{}, sep:{} };
@@ -1639,6 +1689,10 @@ function MJ_bygg() {
     d.setDate(d.getDate() + 1);
   }
   var dager = 0, gaatt = 0;
+  rekke.forEach(function(u){ dager += u.dager; });
+  // Ukesmålet følger av bedriftsmålet, ikke omvendt
+  MAL_UKE = dager > 0 ? MAL_BEDRIFT_FAST / SELGERE.length / (dager / 5) : 0;
+  dager = 0;
   rekke.forEach(function(u) {
     u.mal     = MAL_UKE * u.dager / 5;
     u.ferdig  = u.siste < idag;
@@ -1668,7 +1722,7 @@ function MJ_bygg() {
     gaatt: gaatt,
     igjen: dager - gaatt,
     malSelgerSesong: MAL_UKE * dager / 5,
-    malBedrift: Math.round(MAL_UKE * dager / 5 * SELGERE.length)
+    malBedrift: MAL_BEDRIFT_FAST
   };
   return MJ;
 }
@@ -1758,15 +1812,116 @@ function mjUkesrekke(navn) {
     +   '<span><i class="u">U</i> uavgjort &middot; 3 biler</span>'
     +   '<span><i class="t">T</i> tap &middot; under 3</span>'
     + '</div>'
+    + '<div class="mj-vsek">' + (function(){
+        var b = mjBonus(navn);
+        var rad = function(tit, n, sub, kls) {
+          return '<div class="mj-vr ' + kls + '"><span class="mj-vn">' + tit + '</span>'
+            + '<span class="mj-vb"><i style="width:'
+            + Math.min(n / BONUS_MAL * 100, 100).toFixed(0) + '%"></i></span>'
+            + '<span class="mj-vs">' + n + '</span>'
+            + '<span class="mj-vd">' + sub + '</span></div>';
+        };
+        var h = '<div class="mj-vh">28-dagersvinduet \u2014 20 biler gir 10 000 kr</div>';
+        if (!b.dager.length) {
+          return h + '<div class="mj-vf">Ingen biler registrert siden 17. august. '
+            + 'Vinduet starter p\u00e5 den f\u00f8rste.</div>';
+        }
+        h += '<div class="mj-vl">'
+          + rad('Beste', b.beste, mjKortDato(b.start) + ' \u2013 ' + mjKortDato(b.slutt),
+                b.naadd ? 'naadd' : '')
+          + (b.aktivStart && b.aktivN !== b.beste
+              ? rad('N\u00e5', b.aktivN, mjKortDato(b.aktivStart) + ' \u2013 ' + mjKortDato(b.aktivSlutt), 'aktiv')
+              : '')
+          + '</div>';
+        h += '<div class="mj-vf">' + (b.naadd
+          ? '<b>10 000 kr sikret</b> \u2014 ' + b.beste + ' biler mellom '
+            + mjKortDato(b.start) + ' og ' + mjKortDato(b.slutt) + '.'
+          : (b.aktivStart
+              ? 'Vinduet ditt startet <b>' + mjKortDato(b.aktivStart) + '</b> og lukkes <b>'
+                + mjKortDato(b.aktivSlutt) + '</b> \u2014 ' + b.dagerIgjen + ' dag'
+                + (b.dagerIgjen === 1 ? '' : 'er') + ' igjen. '
+                + Math.max(BONUS_MAL - b.aktivN, 0) + ' biler til 20.'
+              : 'Vinduet ditt er utl\u00f8pt. Neste bil starter et nytt.')
+          + ' Et nytt vindu starter p\u00e5 hver bil, s\u00e5 det er alltid flere som l\u00f8per samtidig.')
+          + '</div>';
+        return h;
+      })() + '</div>'
     + '<div class="mj-wsum">'
     +   (spilt === 0
-        ? 'Ingen uker er avsluttet enn\u00e5. F\u00f8rste kamp gj\u00f8res opp fredag.'
+        ? 'Ingen uker er avsluttet enn\u00e5. F\u00f8rste uke gj\u00f8res opp s\u00f8ndag kveld.'
         : '<b>' + V + '</b> seier' + (V === 1 ? '' : 'e') + ' &middot; <b>' + U + '</b> uavgjort'
           + ' &middot; <b>' + T + '</b> tap av <b>' + spilt + '</b> spilte uker'
-          + ' &middot; <b>' + poeng + '</b> poeng<br>'
+          + ' &middot; <b>' + poeng + '</b> poeng i ukeskampene<br>'
           + 'M&aring;lkonto <b class="' + k + '">' + (kt > 0 ? '+' : '') + mjNb(kt, 1) + '</b> biler '
           + (kt > 0.05 ? 'over' : kt < -0.05 ? 'under' : 'p&aring;') + ' egen strek.')
     + '</div>';
+}
+
+// Datohjelpere for bonusvinduet
+function mjPlussDager(iso, n) {
+  var d = new Date(iso + 'T12:00:00');
+  d.setDate(d.getDate() + n);
+  return d.toLocaleDateString('sv-SE');
+}
+function mjDagerMellom(a, b) {
+  return Math.round((new Date(b + 'T12:00:00') - new Date(a + 'T12:00:00')) / 86400000);
+}
+function mjKortDato(iso) {
+  var m = ['jan','feb','mar','apr','mai','jun','jul','aug','sep','okt','nov','des'];
+  return parseInt(iso.slice(8,10),10) + '. ' + m[parseInt(iso.slice(5,7),10)-1];
+}
+
+// Glidende 28-dagersvindu. Vinduet starter på en solgt bil — det er alltid
+// optimalt, siden en tidligere start bare gir færre dager til rådighet.
+function mjBonus(navn) {
+  var tom = { beste:0, naadd:false, start:null, slutt:null,
+              aktivN:0, aktivStart:null, aktivSlutt:null, dagerIgjen:0, dager:[] };
+  if (!MJ) return tom;
+
+  var dager = [];
+  sales.forEach(function(r) {
+    if (r.deleted || r.selger !== navn) return;
+    var d = mjOsloDato(r.ts);
+    if (d && d >= BONUS_START && d <= MJ_SLUTT) dager.push(d);
+  });
+  var idagF = mjIDag();
+  dager = dager.filter(function(d){ return d <= idagF; });
+  if (!dager.length) return tom;
+  dager.sort();
+
+  // Beste vindu: for hver salgsdag, tell salg i [d, d+27]
+  var beste = 0, bStart = null, j = 0;
+  for (var i = 0; i < dager.length; i++) {
+    var slutt = mjPlussDager(dager[i], BONUS_DAGER - 1);
+    if (j < i) j = i;
+    while (j + 1 < dager.length && dager[j + 1] <= slutt) j++;
+    var n = j - i + 1;
+    if (n > beste) { beste = n; bStart = dager[i]; }
+  }
+
+  // Aktivt vindu: det som fortsatt kan vokse — starter på første bil
+  // innenfor de siste 28 dagene, og lukkes 28 dager etter den.
+  var idag = idagF;
+  var grense = mjPlussDager(idag, -(BONUS_DAGER - 1));
+  var iVinduet = dager.filter(function(d){ return d >= grense && d <= idag; });
+  var aktivStart = iVinduet.length ? iVinduet[0] : null;
+  var aktivSlutt = aktivStart ? mjPlussDager(aktivStart, BONUS_DAGER - 1) : null;
+  if (aktivSlutt && aktivSlutt > MJ_SLUTT) aktivSlutt = MJ_SLUTT;
+
+  return {
+    beste: beste,
+    naadd: beste >= BONUS_MAL,
+    start: bStart,
+    slutt: bStart ? (function(){
+      var s = mjPlussDager(bStart, BONUS_DAGER - 1);
+      return s > MJ_SLUTT ? MJ_SLUTT : s;   // vinduet kan ikke strekke seg forbi sesongslutt
+    })() : null,
+    aktivN: iVinduet.length,
+    aktivStart: aktivStart,
+    aktivSlutt: aktivSlutt,
+    dagerIgjen: aktivSlutt ? Math.max(mjDagerMellom(idag, aktivSlutt), 0) : 0,
+    dager: dager
+  };
 }
 
 // Siste fem uker som bokstavrekke — samme språk som en tabellrekke i fotball
@@ -1795,14 +1950,13 @@ function mjUkeForm(navn, pu) {
 
 // Fire ruter — den fjerde bærer streken
 function mjRuter(n, mal) {
-  var h = '';
-  for (var i = 1; i <= 4; i++) {
+  var h = '', naadd = n > mal, ant = Math.max(Math.ceil(mal), 1);
+  for (var i = 1; i <= ant; i++) {
     var fylt = n >= i;
-    h += '<div class="mj-b' + (fylt ? ' fill' : '') + (i === 4 ? ' fourth' : '')
-       + (fylt && i === 4 ? ' gold' : '') + '"></div>';
+    h += '<div class="mj-b' + (fylt ? ' fill' : '') + (fylt && naadd ? ' gold' : '') + '"></div>';
   }
-  for (var j = 5; j <= n && j <= 8; j++) h += '<div class="mj-b fill extra"></div>';
-  if (n > 8) h += '<span class="mj-plus">+' + (n - 8) + '</span>';
+  for (var j = ant + 1; j <= n && j <= ant + 4; j++) h += '<div class="mj-b fill extra"></div>';
+  if (n > ant + 4) h += '<span class="mj-plus">+' + (n - ant - 4) + '</span>';
   return h;
 }
 
@@ -1844,7 +1998,7 @@ function fetchSales() {
     .then(function(data) {
       sales = Array.isArray(data) ? data : [];
       hideStatus();
-      try { MJ_bygg(); } catch(e) { MJ = null; console.error('M\u00e5ljakten: ' + e.message); }
+      try { MJ_bygg(); } catch(e) { MJ = null; console.error('Ukesm\u00e5l: ' + e.message); }
       renderAll();
       updateMVP();
       autoSaveWeeklyWinner();
@@ -2208,9 +2362,8 @@ function renderInd() {
       : r.initials;
     var ms = milestoneState(r.navn);
     var over = MJ && r.wk > MJ.naa.mal;
-    var uSt = 0, kt = 0;
-    if (MJ) { try { uSt = mjStreak(r.navn); kt = mjMalkonto(r.navn); } catch(e) {} }
-    var ktK  = kt > 0.05 ? 'up' : (kt < -0.05 ? 'dn' : 'ev');
+    var uSt = 0;
+    if (MJ) { try { uSt = mjStreak(r.navn); } catch(e) {} }
     return '<div class="trow zm" data-navn="'+r.navn+'" onclick="openPlayerCard(\''+r.id+'\')" style="animation-delay:'+(i*0.03)+'s;cursor:pointer">'
       + '<div class="pos-n" style="color:'+pc+';font-size:'+(isTied?'11px':'13px')+'">'+(rankLabel)+'</div>'
       + '<div><div class="av-wrap'+(ms.fresh?' fresh':'')+'"><div class="av'+(over?' mj-gull':'')+'" style="background:'+r.bg+';color:'+r.color+';overflow:hidden;padding:0">'+avHtml+'</div>'+(ms.fresh?'<span class="mile-dot">&#9733;</span>':'')+'</div></div>'
@@ -2221,8 +2374,18 @@ function renderInd() {
         + '<div class="name-sub">'+(LL[r.loc]||r.loc)
           + (MJ ? '<span class="mj-boxes" style="--mjc:'+r.color+'" title="Uke '+MJ.naa.uke
               +': '+r.wk+' av '+mjNb(MJ.naa.mal,1)+' denne uka">'+mjRuter(r.wk, MJ.naa.mal)+'</span>'
-              + '<span class="mj-kt '+ktK+'" title="M&aring;lkonto: biler over eller under egen strek">'
-              + (kt>0?'+':'')+mjNb(kt,1)+'</span>' : '')
+              + (function(){
+                  var b;
+                  try { b = mjBonus(r.navn); } catch(e) { return ''; }
+                  var tip = b.naadd
+                    ? '10 000 kr sikret \u2014 ' + b.beste + ' biler fra ' + mjKortDato(b.start)
+                    : (b.aktivStart
+                        ? 'Vinduet startet ' + mjKortDato(b.aktivStart) + ': ' + b.aktivN
+                          + ' av ' + BONUS_MAL + ', ' + b.dagerIgjen + ' dager igjen'
+                        : 'Beste 28-dagersvindu: ' + b.beste + ' av ' + BONUS_MAL);
+                  return '<span class="mj-bon'+(b.naadd?' naadd':'')+'" title="'+tip+'">'
+                    + (b.naadd ? '&#128176; 10K' : b.beste+'/'+BONUS_MAL) + '</span>';
+                })() : '')
           + '</div>'
       + '</div>'
       + '<div class="sc" style="line-height:1">'+r.g+(r.wk>0?'<br><span style="font-size:8px;opacity:.4;font-weight:400">('+r.wk+')</span>':'')+'</div>'
@@ -2960,12 +3123,14 @@ function renderStats() {
   // ─── SALG PER UKEDAG (man–lør, hele konkurransen) ──────────────────
   var elU = document.getElementById('ukedag-stats');
   if (elU) {
-    var WDFULL = { 1:'Mandag', 2:'Tirsdag', 3:'Onsdag', 4:'Torsdag', 5:'Fredag', 6:'Lørdag' };
-    var order = [1,2,3,4,5,6];
-    var wc = {1:0,2:0,3:0,4:0,5:0,6:0};
+    // Søndag (0) er ikke en åpningsdag, men et salg signert på søndag teller — så det skal vises.
+    var WDFULL = { 1:'Mandag', 2:'Tirsdag', 3:'Onsdag', 4:'Torsdag', 5:'Fredag',
+                   6:'L\u00f8rdag', 0:'S\u00f8ndag' };
+    var order = [1,2,3,4,5,6,0];
+    var wc = {1:0,2:0,3:0,4:0,5:0,6:0,0:0};
     fSales.forEach(function(s) {
       var d = _saleDate(s); if (!d) return;
-      var g = d.getDay(); if (g >= 1 && g <= 6) wc[g]++;
+      var g = d.getDay(); if (wc[g] !== undefined) wc[g]++;
     });
     var wtot = order.reduce(function(a,k){ return a + wc[k]; }, 0);
     var wmax = Math.max.apply(null, order.map(function(k){ return wc[k]; }).concat([1]));
@@ -2981,10 +3146,12 @@ function renderStats() {
       var p = Math.round(c / wmax * 100);
       var sp = wtot > 0 ? Math.round(c / wtot * 100) : 0;
       var isTop = (k === topDay && wtot > 0);
-      var fill = isTop ? 'var(--gold)' : 'var(--b2)';
+      var helg = (k === 6 || k === 0);
+      var fill = isTop ? 'var(--gold)' : (helg ? 'var(--b1)' : 'var(--b2)');
       var glow = isTop ? ';box-shadow:0 0 12px rgba(201,168,76,.45)' : '';
       var cCol = isTop ? '#000' : 'var(--txt)';
-      return '<div class="modell-bar-row"><div class="modell-bar-name">' + WDFULL[k] + '</div>'
+      return '<div class="modell-bar-row"'+(helg?' style="opacity:.82"':'')+'>'
+        + '<div class="modell-bar-name">' + WDFULL[k] + '</div>'
         + '<div class="modell-bar-bg"><div class="modell-bar-fill" style="width:' + Math.max(p,0) + '%;background:' + fill + glow + '">'
         + (c > 0 ? '<span class="modell-bar-count" style="color:' + cCol + '">' + c + '</span>' : '')
         + '</div></div><div class="modell-bar-pct">' + sp + '%</div></div>';
@@ -3097,7 +3264,7 @@ function renderBstripe() {
     + '<span class="bs-hide">' + t.dagerIgjen + ' '
     + (t.dagerIgjen === 1 ? 'dag' : 'dager') + ' av uka</span>'
     + '<span class="bs-sep">&#9670;</span>'
-    + '<span>SESONG ' + mjSesongSolgt() + ' / ' + MJ.malBedrift + '</span>';
+    + '<span>TOTALT ' + mjSesongSolgt() + ' / ' + MJ.malBedrift + '</span>';
 }
 
 function renderUka() {
@@ -3124,9 +3291,9 @@ function renderUka() {
     + '<div class="mj-grid">' + ruter + '</div>'
     + '<div class="mj-wfoot">'
     +   (igjen === 0
-        ? 'VCSO er over streken for uke ' + t.uke.uke + '. Alt etter den gylne ruta er overskudd.'
-        : 'Hver bil tenner &eacute;n rute. <b>Rute ' + t.mal + ' er streken</b> &mdash; '
-          + 'den som tenner den, bryter den for hele VCSO.')
+        ? 'VCSO er i m&aring;l for uke ' + t.uke.uke + '. Alt etter den gylne ruta er overskudd.'
+        : 'Hver bil tenner &eacute;n rute. <b>Rute ' + t.mal + ' er m&aring;let</b> &mdash; '
+          + 'den som tenner den, f&oslash;rer VCSO i m&aring;l for uka.')
     + '</div></div>';
 }
 
@@ -3142,8 +3309,9 @@ function renderBedriftsmal() {
   el.innerHTML = '<div class="mj-sea">'
     + '<div class="mj-eyebrow">DIT VI SKAL</div>'
     + '<div class="mj-num">' + MJ.malBedrift + '<small>BILER</small></div>'
-    + '<div class="mj-sub">' + SELGERE.length + ' selgere &times; 3,2 biler i uka &times; '
-    +   mjNb(MJ.dager / 5, 1) + ' uker. M&aring;let f&oslash;lger av hva &eacute;n selger skal levere.</div>'
+    + '<div class="mj-sub">' + MJ.malBedrift + ' biler fra 17. august til 30. september &mdash; '
+    +   mjNb(MJ.dager / 5, 1) + ' uker. Fordelt p&aring; ' + SELGERE.length + ' selgere blir det <b>'
+    +   mjNb(MAL_UKE, 1) + ' biler i uka</b> hver.</div>'
     + '<div class="mj-track">'
     +   '<div class="mj-fill" style="width:' + Math.min(solgt / MJ.malBedrift * 100, 100).toFixed(1) + '%"></div>'
     +   '<div class="mj-pace" style="left:' + Math.min(MJ.gaatt / MJ.dager * 100, 100).toFixed(1) + '%"></div>'
@@ -3163,6 +3331,95 @@ function mjCell(k, v, u, note, kls) {
   return '<div class="mj-cell ' + (kls || '') + '"><div class="mj-ck">' + k + '</div>'
     + '<div class="mj-cv">' + v + '<small>' + u + '</small></div>'
     + '<div class="mj-cn">' + note + '</div></div>';
+}
+
+function renderPremier() {
+  var el = document.getElementById('mj-premier');
+  if (!el || !MJ) return;
+  var pu = mjPerUke();
+
+  // 1 - beste 28-dagersvindu per selger
+  var bon = SELGERE.map(function(s) {
+    var b = mjBonus(s.navn);
+    return { navn:s.navn, b:b };
+  }).sort(function(a,b){ return b.b.beste - a.b.beste; });
+  var klare  = bon.filter(function(x){ return x.b.naadd; });
+  var naerme = bon.filter(function(x){ return !x.b.naadd && x.b.beste > 0; }).slice(0,3);
+  var sisteStart = mjPlussDager(MJ_SLUTT, -(BONUS_DAGER - 1));
+  var kanStarte  = mjIDag() <= sisteStart;
+
+  // 2 - ledende avdeling (poeng per selger) og om sesongmålet er nådd
+  var lag = TEAMS.map(function(t) {
+    var ant = mjAnt(t.id), solgt = 0;
+    SELGERE.filter(function(s){ return s.loc===t.id; }).forEach(function(s) {
+      Object.keys(pu[s.navn]).forEach(function(w){ solgt += pu[s.navn][w]; });
+    });
+    var pts = 0;
+    sales.forEach(function(r) {
+      if (r.deleted) return;
+      var so = SELGERE.filter(function(x){ return x.navn===r.selger; })[0];
+      if (so && so.loc===t.id) pts += PTS + (r.spotlight_bonus||0);
+    });
+    var mal = Math.round(MJ.malSelgerSesong * ant);
+    return { t:t, ant:ant, solgt:solgt, mal:mal, pps:pts/(ant||1), naadd:solgt>=mal };
+  }).sort(function(a,b){ return b.pps - a.pps; });
+  var leder = lag[0];
+
+  // 3 - championship-leder
+  var topp = SELGERE.map(function(s) {
+    return { navn:s.navn, pts:goalsFor(s.navn,'all')*PTS + bonusFor(s.navn,'all') };
+  }).sort(function(a,b){ return b.pts - a.pts; })[0];
+
+  el.innerHTML = '<div class="mj-pw">'
+    + '<div class="mj-ph">Premier</div>'
+
+    + '<div class="mj-pr">'
+    +   '<div class="mj-pi">&#128176;</div>'
+    +   '<div class="mj-pb"><div class="mj-pt">10 000 kr i provisjon</div>'
+    +     '<div class="mj-pd"><b>20 biler innenfor 28 dager</b> — et glidende vindu som '
+    +       'starter på din første bil, når som helst fra 17. august. '
+    +       '28 dager rommer 20 arbeidsdager, så dette er <b>&eacute;n bil hver '
+    +       'arbeidsdag i en måned</b>. Ingen øvre grense for hvor mange som kan '
+    +       'få den.</div>'
+    +     '<div class="mj-ps">' + (klare.length
+          ? '<b>' + klare.length + '</b> har sikret den: ' + klare.map(function(x){
+              return x.navn + ' (' + x.b.beste + ' fra ' + mjKortDato(x.b.start) + ')'; }).join(', ')
+          : 'Ingen har nådd 20 i et 28-dagersvindu ennå.')
+    +       (naerme.length ? '<br>Beste vinduer nå: ' + naerme.map(function(x){
+              return x.navn + ' <b>' + x.b.beste + '</b>'; }).join(' · ') : '')
+    +       '<br>' + (kanStarte
+            ? 'Et nytt vindu kan startes helt til <b>' + mjKortDato(sisteStart)
+              + '</b> og fortsatt få alle 28 dagene.'
+            : 'Siste fulle vindu startet ' + mjKortDato(sisteStart) + '.')
+    +     '</div></div></div>'
+
+    + '<div class="mj-pr">'
+    +   '<div class="mj-pi">&#127881;</div>'
+    +   '<div class="mj-pb"><div class="mj-pt">Sosial pott til avdelingen</div>'
+    +     '<div class="mj-pd">Avdelingen som <b>vinner avdelingsracet</b> og som '
+    +       '<b>når sesongmålet sitt</b> får en felles pott på '
+    +       LAGPOTT.toLocaleString('nb-NO') + ' kr per selger. Begge krav må oppfylles.<br>'
+    +       'Potten brukes på <b>noe sosialt sammen</b> — middag, tur, aktivitet. '
+    +       'Den utbetales ikke, og deles ikke ut i kontanter.</div>'
+    +     '<div class="mj-ps">Leder nå: <b>' + leder.t.navn + '</b> · '
+    +       leder.solgt + ' / ' + leder.mal + ' biler · '
+    +       (leder.naadd
+          ? '<span class="ok">sesongmålet er nådd</span>'
+          : '<span class="mangler">' + (leder.mal - leder.solgt) + ' biler igjen til målet</span>')
+    +       '<br>Potten hvis de vinner: ' + lag.map(function(l){
+              return l.t.navn + ' <b>' + (l.ant*LAGPOTT).toLocaleString('nb-NO') + ' kr</b>'
+                + ' (' + l.ant + ' selgere)'; }).join(' · ')
+    +     '</div></div></div>'
+
+    + '<div class="mj-pr">'
+    +   '<div class="mj-pi">&#127870;</div>'
+    +   '<div class="mj-pb"><div class="mj-pt">Magnumflaske champagne</div>'
+    +     '<div class="mj-pd">Til vinneren av hele Championship — pluss permanent plass '
+    +       'i Hall of Fame.</div>'
+    +     '<div class="mj-ps">Leder nå: <b>' + (topp ? topp.navn : '–') + '</b>'
+    +       (topp ? ' · ' + topp.pts + ' poeng' : '') + '</div></div></div>'
+
+    + '</div>';
 }
 
 function renderForhandlere() {
@@ -3192,10 +3449,10 @@ function renderForhandlere() {
       +   '<span class="mj-dh">' + n + ' selgere</span></div>'
       + '<div class="mj-dw" style="color:' + (over ? 'var(--gold)' : 'var(--txt)') + '">' + solgtUke
       +   '<small> / ' + ukeMal + '</small></div>'
-      + '<div class="mj-dl">biler denne uka' + (over ? ' &middot; over streken' : '') + '</div>'
+      + '<div class="mj-dl">biler denne uka' + (over ? ' &middot; over m&aring;let' : '') + '</div>'
       + '<div class="mj-dgrid">' + g + '</div>'
-      + '<div class="mj-ds">Sesong: <b>' + sesong + ' / ' + sesongMal + '</b> &middot; '
-      +   Math.round(sesong / sesongMal * 100) + ' % &middot; 3,2 per selger</div>'
+      + '<div class="mj-ds">Perioden: <b>' + sesong + ' / ' + sesongMal + '</b> &middot; '
+      +   Math.round(sesong / sesongMal * 100) + ' % &middot; ' + mjNb(MAL_UKE,1) + ' per selger</div>'
       + '</div>';
   }).join('') + '</div>';
 }
@@ -3220,12 +3477,12 @@ function mjSjekkStreken() {
 }
 
 function renderAll() {
-  if (MJ) { try { renderBstripe(); mjSjekkStreken(); } catch(e) { console.error('M\u00e5ljakten: ' + e.message); } }
+  if (MJ) { try { renderBstripe(); mjSjekkStreken(); } catch(e) { console.error('Ukesm\u00e5l: ' + e.message); } }
   if      (curTab==='ind')     renderInd();
   else if (curTab==='team' || curTab==='hof') {
     renderTeam();
-    try { renderUka(); renderBedriftsmal(); renderForhandlere(); }
-    catch(e) { console.error('M\u00e5ljakten: ' + e.message); }
+    try { renderPremier(); renderUka(); renderBedriftsmal(); renderForhandlere(); }
+    catch(e) { console.error('Ukesm\u00e5l: ' + e.message); }
   }
   else if (curTab==='stats')   renderStats();
   else if (curTab==='scoring') renderScoring();
@@ -3574,9 +3831,10 @@ function openPlayerCard(id) {
     + (function(){
         if (!MJ) return '';
         try {
-          return '<div class="fc-sec rv"><div class="fc-sec-h">M&aring;ljakten \u2014 ni kamper mot '
-            + mjNb(MAL_UKE,1) + '</div>' + mjUkesrekke(navn) + '</div>';
-        } catch(e) { console.error('M\u00e5ljakten: ' + e.message); return ''; }
+          return '<div class="fc-sec rv"><div class="fc-sec-h">Ukesm&aring;let \u2014 '
+            + MJ.uker.length + ' uker mot ' + mjNb(MAL_UKE,1) + '</div>'
+            + mjUkesrekke(navn) + '</div>';
+        } catch(e) { console.error('Ukesm\u00e5l: ' + e.message); return ''; }
       })()
     + '<div class="fc-sec rv"><div class="fc-sec-h">Form \u2014 siste 5 salgsdager</div>'
       + '<div class="fc-form"><div class="fc-pills">'+pills+'</div>'

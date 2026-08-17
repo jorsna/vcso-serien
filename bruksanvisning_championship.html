@@ -48,6 +48,35 @@ a{color:inherit;text-decoration:none}
 .card{background:var(--card);border:1px solid var(--b1);border-radius:12px;padding:18px 18px 16px;margin-bottom:14px}
 .card-h{font-family:'Anton',sans-serif;font-size:15px;letter-spacing:1.5px;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:9px}
 .card-h .ic{font-size:17px}
+/* ── UKESMÅL OG PREMIER ── */
+.mj-uf{display:inline-flex;align-items:center;justify-content:center;width:22px;height:24px;
+ border-radius:4px;font-family:'Anton',sans-serif;font-size:13px;letter-spacing:.3px;
+ border:1px solid var(--b1);background:rgba(255,255,255,.04);color:var(--muted);flex-shrink:0}
+.mj-uf.v{background:rgba(34,197,94,.24);border-color:rgba(34,197,94,.6);color:#86efac}
+.mj-uf.u{background:rgba(148,163,184,.16);border-color:rgba(148,163,184,.4);color:#94a3b8}
+.mj-uf.t{background:rgba(239,68,68,.19);border-color:rgba(239,68,68,.5);color:#fca5a5}
+.mj-uf.na{background:rgba(201,168,76,.16);border-color:var(--gold);color:var(--gold)}
+.mj-row{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.mj-row:last-child{border-bottom:none}
+.mj-row-d{font-size:13px;line-height:1.5;color:var(--muted)}
+.mj-row-d b{color:var(--txt)}
+.mj-strek{display:flex;gap:5px;align-items:center;margin:14px 0 6px;justify-content:center}
+.mj-bx{width:44px;height:26px;border:1px solid rgba(255,255,255,.16);border-radius:4px;
+ background:rgba(255,255,255,.04);position:relative}
+.mj-bx.f{background:#3b82f6;border-color:#3b82f6}
+.mj-bx.g{background:var(--gold);border-color:var(--gold)}
+.mj-prem{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.mj-prem:last-child{border-bottom:none}
+.mj-prem-i{font-size:23px;line-height:1;flex-shrink:0;width:28px;text-align:center}
+.mj-prem-t{font-family:'Anton',sans-serif;font-size:15px;letter-spacing:.4px;color:var(--gold);line-height:1.2}
+.mj-prem-d{font-size:13px;color:var(--muted);line-height:1.55;margin-top:4px}
+.mj-prem-d b{color:var(--txt)}
+.mj-cap{text-align:center;font-size:11.5px;color:var(--muted);margin-bottom:4px;line-height:1.5}
+.mj-tall{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:12px}
+.mj-tc{background:rgba(255,255,255,.03);border:1px solid var(--b1);border-radius:8px;padding:10px 11px}
+.mj-tk{font-size:10px;font-weight:700;letter-spacing:1.1px;color:var(--muted);text-transform:uppercase}
+.mj-tv{font-family:'Anton',sans-serif;font-size:22px;line-height:1.1;margin-top:2px;color:var(--txt)}
+.mj-tv small{font-size:11px;font-family:'Barlow',sans-serif;font-weight:600;color:var(--muted);margin-left:4px}
 
 .step{display:flex;gap:12px;align-items:flex-start;padding:7px 0}
 .step-n{background:var(--gold);color:#000;font-family:'Anton',sans-serif;font-size:13px;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
@@ -159,6 +188,68 @@ a{color:inherit;text-decoration:none}
     </div>
 
     <div class="card">
+      <div class="card-h"><span class="ic">&#127919;</span>UKESM&Aring;LET</div>
+
+      <div class="note" style="margin-bottom:12px">Sesongtabellen er som f&oslash;r &mdash; poeng er poeng, og den som selger flest biler vinner Championship. I tillegg m&aring;les du n&aring; mot et <strong style="color:var(--txt)">ukesm&aring;l</strong>. Alle femten kan n&aring; sitt eget m&aring;l samme uke.<br><br>M&aring;let f&oslash;lger av bedriftsm&aring;let: <strong style="color:var(--txt)">378 biler fra 17. august til 30. september</strong>. Det er 6,6 uker, fordelt p&aring; 15 selgere &mdash; alts&aring; <strong style="color:var(--gold)">3,8 biler i uka</strong> hver.</div>
+
+      <div class="mj-cap">M&aring;let er <b style="color:var(--txt)">3,8 biler i uka</b>. Men du kan ikke selge 3,8 biler. Under navnet ditt st&aring;r fire ruter:</div>
+      <div class="mj-strek">
+        <div class="mj-bx f"></div><div class="mj-bx f"></div><div class="mj-bx f"></div><div class="mj-bx"></div>
+      </div>
+      <div class="mj-cap">Tre biler er tett p&aring;, men ikke i m&aring;l.</div>
+      <div class="mj-strek">
+        <div class="mj-bx g"></div><div class="mj-bx g"></div><div class="mj-bx g"></div><div class="mj-bx g"></div>
+      </div>
+      <div class="mj-cap" style="color:var(--gold)">Fire er m&aring;let n&aring;dd. Alle fire rutene blir gull.</div>
+
+      <div style="margin-top:16px">
+        <div class="mj-row"><span class="mj-uf v">V</span><div class="mj-row-d"><b>M&aring;l n&aring;dd &mdash; 4 biler eller mer.</b> Gullring rundt bildet, <b>&#9670; M&Aring;L</b> ved navnet, konfetti, og en gr&oslash;nn V som blir st&aring;ende i <b>Siste 5 uker</b>.</div></div>
+        <div class="mj-row"><span class="mj-uf u">U</span><div class="mj-row-d"><b>Uavgjort &mdash; 3 biler.</b> Godt levert, men ikke i m&aring;l. Over syv uker havner du 5,7 biler bak.</div></div>
+        <div class="mj-row"><span class="mj-uf t">T</span><div class="mj-row-d"><b>Under m&aring;l &mdash; f&aelig;rre enn 3 biler.</b> Uka er ny p&aring; mandag, men differansen f&oslash;lger deg.</div></div>
+        <div class="mj-row"><span class="mj-uf na">2</span><div class="mj-row-d"><b>Uka som p&aring;g&aring;r.</b> Gullrute med antall biler s&aring; langt. Hold over den for &aring; se hvor mange som mangler.</div></div>
+      </div>
+
+      <div class="mj-tall">
+        <div class="mj-tc"><div class="mj-tk">Deg, per uke</div><div class="mj-tv">3,8<small>biler</small></div></div>
+        <div class="mj-tc"><div class="mj-tk">Deg, hele perioden</div><div class="mj-tv">25,2<small>biler</small></div></div>
+        <div class="mj-tc"><div class="mj-tk">VCSO, per uke</div><div class="mj-tv">57<small>biler</small></div></div>
+        <div class="mj-tc"><div class="mj-tk">VCSO, perioden</div><div class="mj-tv">378<small>biler</small></div></div>
+      </div>
+
+      <div class="note" style="margin-top:12px">Avdelingsm&aring;let er 3,8 ganget med antall selgere: <strong style="color:var(--txt)">Ryen 19</strong>, <strong style="color:var(--txt)">Fornebu 23</strong>, <strong style="color:var(--txt)">Lillestr&oslash;m 15</strong> biler i uka &mdash; 126, 151 og 101 for perioden. Ingen avdeling har tyngre krav per hode enn en annen.</div>
+
+      <div class="note" style="margin-top:10px">378 biler er m&aring;let for perioden. Det er 57 i uka, og 57 er knapt fire hver. &Oslash;verst p&aring; tavla st&aring;r det til enhver tid hvor mange biler VCSO mangler denne uka &mdash; og <strong style="color:var(--gold)">den som tar bilen som f&oslash;rer VCSO i m&aring;l for uka, st&aring;r med navn i La Gazzetta neste morgen</strong>.</div>
+
+      <div class="note" style="margin-top:10px"><strong style="color:var(--txt)">Uken g&aring;r mandag til s&oslash;ndag.</strong> Alle dager teller likt: signerer du p&aring; en l&oslash;rdag, teller den. Signerer du p&aring; en s&oslash;ndag &mdash; en dag ingen forlanger at du jobber &mdash; teller den ogs&aring;. Uken gj&oslash;res opp s&oslash;ndag kveld, og ny uke starter mandag.</div>
+
+      <div class="note" style="margin-top:10px">Siste uke i perioden er kortere enn de andre. Da er kravet <strong style="color:var(--txt)">2,3 biler</strong>, ikke 3,8 &mdash; og du ser bare tre ruter den uka. Ingen f&aring;r fullt krav p&aring; en kort uke.</div>
+
+      <div class="note" style="margin-top:10px">Trykk p&aring; navnet ditt i tabellen for <strong style="color:var(--txt)">hele ukesrekka</strong> med resultat og biler per uke.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><span class="ic">&#127942;</span>PREMIER</div>
+
+      <div class="mj-prem">
+        <div class="mj-prem-i">&#128176;</div>
+        <div><div class="mj-prem-t">10 000 kr ekstra i provisjon</div>
+        <div class="mj-prem-d">Selger du <b>20 biler innenfor 28 dager</b> f&aring;r du 10 000 kroner ekstra i provisjon. Ingen &oslash;vre grense: alle som klarer det, f&aring;r den. <b>Ordningen gjelder fra og med mandag 17. august</b> &mdash; salg f&oslash;r den datoen teller ikke.<br><br><b>Vinduet er glidende.</b> Det er ikke faste uker: vinduet starter p&aring; en bil du selger, og l&oslash;per 28 dager fra den dagen. Selger du din f&oslash;rste bil en torsdag, l&oslash;per vinduet fra den torsdagen. Og siden hver bil kan starte et nytt vindu, har du <b>flere vinduer i gang samtidig</b> &mdash; du trenger bare &eacute;tt av dem som n&aring;r 20.<br><br>Hva krever det? 28 dager rommer 20 arbeidsdager. 20 biler er alts&aring; <b>&eacute;n bil hver arbeidsdag i en m&aring;ned</b>. Det er rundt 20 % over ukesm&aring;let holdt i fire uker i str&oslash;kk &mdash; et strekk, men et n&aring;elig et.<br><br>Siste dato du kan starte et vindu og fortsatt f&aring; alle 28 dagene er <b>3. september</b>. Starter du senere, kappes vinduet av sesongslutt.<br><br>Telleren ved navnet ditt viser <b>ditt beste vindu s&aring; langt</b>. Trykk p&aring; navnet ditt for &aring; se b&aring;de det beste og det som l&oslash;per n&aring;, med datoer og dager igjen.</div></div>
+      </div>
+
+      <div class="mj-prem">
+        <div class="mj-prem-i">&#127881;</div>
+        <div><div class="mj-prem-t">Sosial pott til avdelingen</div>
+        <div class="mj-prem-d">Avdelingen som <b>vinner avdelingsracet</b> og som <b>n&aring;r sesongm&aring;let sitt</b> f&aring;r en felles pott p&aring; 3 000 kroner per selger. Begge krav m&aring; oppfylles &mdash; det holder ikke &aring; vinne racet hvis m&aring;let ikke er n&aring;dd.<br><br>Det gir <b>Ryen 15 000</b>, <b>Fornebu 18 000</b> eller <b>Lillestr&oslash;m 12 000</b> kroner.<br><br><b>Dette er ikke penger i lomma.</b> Potten er avdelingens felles kasse og brukes p&aring; noe sosialt sammen &mdash; middag, tur, aktivitet, det avdelingen selv blir enig om. Den utbetales ikke og deles ikke i kontanter. Status vises live under Avdelinger.</div></div>
+      </div>
+
+      <div class="mj-prem">
+        <div class="mj-prem-i">&#127870;</div>
+        <div><div class="mj-prem-t">Magnumflaske champagne</div>
+        <div class="mj-prem-d">Til vinneren av hele Championship &mdash; pluss <b>heder, &aelig;re og permanent plass i Hall of Fame</b>.</div></div>
+      </div>
+    </div>
+
+    <div class="card">
       <div class="card-h"><span class="ic">&#129309;</span>TILLITSREGLENE &mdash; SESONG 2</div>
       <div class="note" style="margin-bottom:10px">Dette er et tillitsbasert registreringssystem, og da er &aelig;rlighet alt. Vi skj&oslash;nner at man kan gj&oslash;re feil &mdash; det er nettopp derfor sletteknappen finnes. Det blir uansett tatt stikkpr&oslash;ver flere ganger i uken der DOIN-nummer i Tacdis kryssjekkes mot registrerte salg. Hovedsjekken gj&oslash;res s&oslash;ndag kveld &mdash; salg uten match mot Tacdis slettes.</div>
       <div class="step"><div class="step-n">&#10003;</div><div>En scoring teller fra det &oslash;yeblikket kunden har <strong>signert kontrakt</strong>.</div></div>
@@ -172,7 +263,7 @@ a{color:inherit;text-decoration:none}
 
     <div class="card">
       <div class="card-h"><span class="ic">&#10024;</span>SYMBOL-ORDBOKEN</div>
-      <div class="sym"><div class="sym-i">&#128293;</div><div><div class="sym-n">Flamme</div><div class="sym-d">Tre dager p&aring; rad med salg gir flamme-ikon. Bevares over helger.</div></div></div><div class="sym"><div class="sym-i">&#11088;</div><div><div class="sym-n">Hat-trick</div><div class="sym-d">Tre eller flere biler p&aring; &eacute;n dag. Gullstjerne bak navnet, vises umiddelbart i Hall of Fame.</div></div></div><div class="sym"><div class="sym-i">&#9670;</div><div><div class="sym-n">Finansiert</div><div class="sym-d">Kunden valgte finansiering. Gyllent stempel &mdash; og avgj&oslash;rende tiebreaker ved likt antall salg.</div></div></div><div class="sym"><div class="sym-i">&#128081;</div><div><div class="sym-n">Dagens MVP</div><div class="sym-d">Selgeren med flest salg i dag. Ved likt teller finansierte; fortsatt likt blir Delt MVP.</div></div></div><div class="sym"><div class="sym-i">&#127942;</div><div><div class="sym-n">Ukesvinner</div><div class="sym-d">Ukas beste. K&aring;res s&oslash;ndag kl. 23:59 og foreviges i Hall of Fame.</div></div></div>
+      <div class="sym"><div class="sym-i">&#128293;</div><div><div class="sym-n">Flamme</div><div class="sym-d">Tre dager p&aring; rad med salg gir flamme-ikon. Bevares over helger.</div></div></div><div class="sym"><div class="sym-i">&#11088;</div><div><div class="sym-n">Hat-trick</div><div class="sym-d">Tre eller flere biler p&aring; &eacute;n dag. Gullstjerne bak navnet, vises umiddelbart i Hall of Fame.</div></div></div><div class="sym"><div class="sym-i">&#9670;</div><div><div class="sym-n">&#9670; M&Aring;L</div><div class="sym-d">Gyllent stempel ved navnet: du har n&aring;dd ukesm&aring;let. Bildet ditt f&aring;r ogs&aring; gullring. Nullstilles mandag &mdash; ny kamp.</div></div></div><div class="sym"><div class="sym-i">&#11088;</div><div><div class="sym-n">&#11088;&times;4</div><div class="sym-d">Har du fire hat-tricks, vises de som &eacute;n stjerne med antall i stedet for fire stjerner. Samme for flammen: &#128293;&times;5. Det sparer plass i raden.</div></div></div><div class="sym"><div class="sym-i">&#9670;</div><div><div class="sym-n">Finansiert</div><div class="sym-d">Kunden valgte finansiering. Gyllent stempel &mdash; og avgj&oslash;rende tiebreaker ved likt antall salg.</div></div></div><div class="sym"><div class="sym-i">&#128081;</div><div><div class="sym-n">Dagens MVP</div><div class="sym-d">Selgeren med flest salg i dag. Ved likt teller finansierte; fortsatt likt blir Delt MVP.</div></div></div><div class="sym"><div class="sym-i">&#127942;</div><div><div class="sym-n">Ukesvinner</div><div class="sym-d">Ukas beste. K&aring;res s&oslash;ndag kl. 23:59 og foreviges i Hall of Fame.</div></div></div>
     </div>
 
     <div class="card">
