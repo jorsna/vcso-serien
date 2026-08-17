@@ -68,6 +68,15 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .ss-skala-m{font-size:9px;letter-spacing:.08em;text-transform:uppercase;opacity:.65}
 .ss-leg{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);
   margin-top:3px;font-variant-numeric:tabular-nums}
+.ss-tip{position:fixed;z-index:9999;pointer-events:none;opacity:0;
+  transition:opacity .12s;background:var(--card2);border:1px solid var(--b2);
+  border-radius:6px;padding:6px 9px;font-family:Barlow,sans-serif;
+  box-shadow:0 4px 14px rgba(0,0,0,.5);white-space:nowrap}
+.ss-tip.vis{opacity:1}
+.ss-tip b{display:block;font-family:Anton,sans-serif;font-size:13px;
+  color:var(--txt);letter-spacing:.5px;line-height:1.2}
+.ss-tip span{font-size:10px;color:var(--muted)}
+.ss-fan canvas{cursor:crosshair;touch-action:none}
 .ss-note{font-size:10px;color:var(--muted);line-height:1.5;margin-top:8px;
   border-left:2px solid var(--b2);padding-left:8px}
 .ss-empty{font-size:11px;color:var(--muted);font-style:italic;padding:6px 2px}
@@ -2372,6 +2381,54 @@ function ssVifte(cv,verdier,farge,mn,mx){
   var x=(so[Math.floor(so.length/2)]-mn)/sp*w;
   c.strokeStyle='#e8f2ff';c.lineWidth=1.4;c.globalAlpha=.8;
   c.beginPath();c.moveTo(x,0);c.lineTo(x,hh);c.stroke();
+  return {hist:hist,bins:bins,mn:mn,sp:sp,total:verdier.length};
+}
+
+
+// ── Detaljer per soyle: hold over (mus) eller trykk (mobil) ──────────
+var ssTip=null;
+function ssTipEl(){
+  if(!ssTip){ ssTip=document.createElement('div'); ssTip.className='ss-tip';
+    document.body.appendChild(ssTip); }
+  return ssTip;
+}
+function ssSkjulTip(){ if(ssTip) ssTip.classList.remove('vis'); }
+
+function ssKobleTip(cv,meta){
+  function vis(klientX,klientY){
+    var b=cv.getBoundingClientRect();
+    var rel=(klientX-b.left)/b.width;
+    var i=Math.floor(rel*meta.bins);
+    if(i<0)i=0; if(i>=meta.bins)i=meta.bins-1;
+    var antall=meta.hist[i];
+    if(!antall){ ssSkjulTip(); return; }
+    // poengintervallet denne soylen dekker
+    var pLav=Math.round(meta.mn + (i/(meta.bins-1))*meta.sp);
+    var pHoy=Math.round(meta.mn + ((i+1)/(meta.bins-1))*meta.sp);
+    var pTekst = (pHoy>pLav+1) ? (pLav+'\u2013'+pHoy+' poeng') : (pLav+' poeng');
+    var andel=antall/meta.total*100;
+    var aTekst = andel>=1 ? andel.toFixed(0)+' %' : andel>=0.1 ? andel.toFixed(1)+' %' : 'under 0,1 %';
+    var t=ssTipEl();
+    t.innerHTML='<b>'+pTekst+'</b><span>endte her i '+aTekst+' av utfallene</span>';
+    t.classList.add('vis');
+    var tb=t.getBoundingClientRect();
+    var x=klientX-tb.width/2;
+    if(x<6)x=6; if(x+tb.width>window.innerWidth-6)x=window.innerWidth-tb.width-6;
+    var y=b.top-tb.height-8;
+    if(y<6)y=b.bottom+8;
+    t.style.left=x+'px'; t.style.top=y+'px';
+  }
+  cv.addEventListener('mousemove',function(e){ vis(e.clientX,e.clientY); });
+  cv.addEventListener('mouseleave',ssSkjulTip);
+  cv.addEventListener('touchstart',function(e){
+    if(e.touches.length!==1)return;
+    e.preventDefault(); vis(e.touches[0].clientX,e.touches[0].clientY);
+  },{passive:false});
+  cv.addEventListener('touchmove',function(e){
+    if(e.touches.length!==1)return;
+    e.preventDefault(); vis(e.touches[0].clientX,e.touches[0].clientY);
+  },{passive:false});
+  cv.addEventListener('touchend',ssSkjulTip);
 }
 
 function renderSannsynlighet(){
@@ -2432,7 +2489,7 @@ function renderSannsynlighet(){
   requestAnimationFrame(function(){
     var cvs=eS.querySelectorAll('.ss-fan canvas');
     for(var i=0;i<cvs.length;i++)
-      ssVifte(cvs[i],r.ford[cvs[i].getAttribute('data-n')],cvs[i].getAttribute('data-c'),mn,mx);
+      ssKobleTip(cvs[i], ssVifte(cvs[i],r.ford[cvs[i].getAttribute('data-n')],cvs[i].getAttribute('data-c'),mn,mx));
   });
 }
 
