@@ -2357,9 +2357,9 @@ function ssBeregn(alleSalg){
   var sP={},sF={},uP={},uF={};
   navn.forEach(function(n){sP[n]=st[n].poeng;sF[n]=st[n].fin;
     uP[n]=st[n].uPoeng;uF[n]=st[n].uFin;});
-  var ses=sim(sRest.f,sP,sF,true,true), uke=sim(uRest.f,uP,uF,false,false);
+  var ses=sim(sRest.f,sP,sF,true,true), uke=sim(uRest.f,uP,uF,false,true);
 
-  return {st:st,vinn:ses.v,dept:ses.dv,ford:ses.fo,topp5:ses.t5,uke:uke.v,
+  return {st:st,vinn:ses.v,dept:ses.dv,ford:ses.fo,topp5:ses.t5,uke:uke.v,ukeFord:uke.fo,
     ukeNr:getWeekNum(sisteD),ukeDager:uRest.n,gjenDager:sRest.n,dAnt:dAnt};
 }
 
@@ -2455,10 +2455,26 @@ function renderSannsynlighet(){
       +'<div><div class="ss-nm"><span class="ss-dot" style="background:'+farge(n)+'"></span>'+n+'</div>'
       +'<div class="ss-sub">'+r.st[n].uPoeng+' poeng i uka \u00b7 '+r.st[n].uSalg+' bil'
       +(r.st[n].uSalg===1?'':'er')+'</div></div>'
-      +'<div class="ss-pc">'+pct(r.uke[n]/SS_SIMS*100)+'<small>%</small></div></div>';});
+      +'<div class="ss-pc">'+pct(r.uke[n]/SS_SIMS*100)+'<small>%</small></div>'
+      +'<div class="ss-fan"><canvas data-n="'+n+'" data-c="'+farge(n)+'"></canvas></div></div>';});
   hu+='<div class="ss-note">'+r.ukeDager+' salgsdag'+(r.ukeDager===1?'':'er')
     +' igjen i uke '+r.ukeNr+'. Ved poenglikhet avgj\u00f8r antall finansierte salg.</div>';
+  // Egen skala for uka - poengsummene er mye lavere enn sesongens
+  var uAlle=[]; navn.forEach(function(n){ if(r.ukeFord[n]) uAlle=uAlle.concat(r.ukeFord[n]); });
+  uAlle.sort(function(a,b){return a-b;});
+  var uMn=uAlle.length?uAlle[Math.floor(uAlle.length*0.01)]:0;
+  var uMx=uAlle.length?uAlle[Math.floor(uAlle.length*0.99)]:1;
+  if(uR.length) hu='<div class="ss-skala"><span>&larr; '+uMn+' poeng</span>'
+    +'<span class="ss-skala-m">mulige sluttsummer for uka</span>'
+    +'<span>'+uMx+' poeng &rarr;</span></div>'+hu;
   eU.innerHTML=hu;
+  requestAnimationFrame(function(){
+    var uc=eU.querySelectorAll('.ss-fan canvas');
+    for(var q=0;q<uc.length;q++){
+      var nv=uc[q].getAttribute('data-n');
+      if(r.ukeFord[nv]) ssKobleTip(uc[q], ssVifte(uc[q],r.ukeFord[nv],uc[q].getAttribute('data-c'),uMn,uMx));
+    }
+  });
 
   // SESONG
   var sR=navn.slice().sort(function(a,b){
