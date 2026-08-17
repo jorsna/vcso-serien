@@ -62,20 +62,46 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .mj-kt.up{color:var(--g)}.mj-kt.dn{color:var(--r)}.mj-kt.ev{color:var(--muted)}
 /* gullring når selgeren er over streken - bildet blir aldri farget */
 .av.mj-gull{box-shadow:0 0 0 2px var(--gold),0 0 9px rgba(201,168,76,.35)}
-/* ukesrekka i spillerkortet */
-.mj-wks{display:flex;gap:4px;flex-wrap:wrap}
-.mj-wk{width:34px;flex-shrink:0;text-align:center}
-.mj-wn{font-family:'Barlow Condensed',sans-serif;font-size:8.5px;font-weight:600;color:var(--muted);margin-bottom:2px}
-.mj-wc{height:28px;border-radius:5px;display:flex;align-items:center;justify-content:center;
-  font-family:Anton,sans-serif;font-size:13px;border:1px solid var(--b1)}
-.mj-wc.v{background:rgba(34,197,94,.2);border-color:rgba(34,197,94,.55);color:#86efac}
-.mj-wc.u{background:rgba(148,163,184,.14);border-color:var(--b2);color:var(--silver)}
-.mj-wc.t{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.45);color:#fca5a5}
-.mj-wc.na{background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.5);color:var(--gold)}
-.mj-wc.fr{background:var(--faint);border-style:dashed;color:var(--muted);font-size:10px}
-.mj-wr{font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:.4px;
-  color:var(--muted);margin-top:2px;text-transform:uppercase}
-.mj-wsum{margin-top:9px;font-size:11px;color:var(--muted);line-height:1.5}
+/* siste fem uker i tabellraden */
+.mj-ufrow{display:flex;gap:2px;justify-content:center;align-items:center}
+.mj-uf{display:inline-flex;align-items:center;justify-content:center;width:15px;height:17px;
+  border-radius:3px;font-family:Anton,sans-serif;font-size:9.5px;letter-spacing:.3px;
+  border:1px solid var(--b1);background:var(--faint);color:var(--muted);flex-shrink:0}
+.mj-uf.v{background:rgba(34,197,94,.24);border-color:rgba(34,197,94,.6);color:#86efac}
+.mj-uf.u{background:rgba(148,163,184,.16);border-color:var(--b2);color:var(--silver)}
+.mj-uf.t{background:rgba(239,68,68,.19);border-color:rgba(239,68,68,.5);color:#fca5a5}
+.mj-uf.na{background:rgba(201,168,76,.16);border-color:var(--gold);color:var(--gold)}
+.mj-uf-tom{color:var(--muted);font-size:11px}
+.form-legend .mj-uf{margin-right:5px}
+
+/* ukesrekka i spillerkortet — formguide */
+.mj-wks{display:flex;gap:3px;flex-wrap:wrap}
+.mj-wk{flex:1 1 30px;min-width:30px;max-width:46px;text-align:center}
+.mj-wn{font-family:'Barlow Condensed',sans-serif;font-size:8.5px;font-weight:600;
+  color:var(--muted);margin-bottom:3px;letter-spacing:.3px}
+.mj-wb{height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center;
+  font-family:Anton,sans-serif;font-size:14px;letter-spacing:.5px;border:1px solid var(--b1);
+  background:var(--faint);color:var(--muted)}
+.mj-wc{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
+  color:var(--muted);margin-top:3px}
+.mj-wk.v .mj-wb{background:rgba(34,197,94,.22);border-color:rgba(34,197,94,.6);color:#86efac}
+.mj-wk.v .mj-wc{color:#86efac}
+.mj-wk.u .mj-wb{background:rgba(148,163,184,.16);border-color:var(--b2);color:var(--silver)}
+.mj-wk.t .mj-wb{background:rgba(239,68,68,.17);border-color:rgba(239,68,68,.5);color:#fca5a5}
+.mj-wk.t .mj-wc{color:#fca5a5}
+.mj-wk.na .mj-wb{background:rgba(201,168,76,.14);border-color:var(--gold);color:var(--gold);font-size:9px}
+.mj-wk.na .mj-wc{color:var(--gold);font-size:13px}
+.mj-wk.fr{opacity:.4}
+.mj-wk.fr .mj-wb{border-style:dashed}
+.mj-wleg{display:flex;flex-wrap:wrap;gap:5px 13px;margin-top:11px;font-size:10.5px;color:var(--muted)}
+.mj-wleg i{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;
+  border-radius:3px;font-family:Anton,sans-serif;font-size:9px;font-style:normal;margin-right:5px;
+  vertical-align:middle}
+.mj-wleg i.v{background:rgba(34,197,94,.22);color:#86efac}
+.mj-wleg i.u{background:rgba(148,163,184,.16);color:var(--silver)}
+.mj-wleg i.t{background:rgba(239,68,68,.17);color:#fca5a5}
+.mj-wsum{margin-top:10px;padding-top:10px;border-top:1px solid var(--b1);
+  font-size:11.5px;color:var(--muted);line-height:1.55}
 .mj-wsum b{color:var(--txt)}
 .mj-wsum .up{color:var(--g)}.mj-wsum .dn{color:var(--r)}
 /* i tabellen skal ruta bære streken diskret */
@@ -1277,12 +1303,14 @@ body{background:transparent !important}
 <div class="view on" id="view-ind">
   <div class="tbl-head">
     <div>#</div><div></div><div>Spiller</div>
-    <div>M&#229;l</div><div>Poeng</div><div>Siste 5 dager</div>
+    <div>M&#229;l</div><div>Poeng</div><div>Siste 5 uker</div>
   </div>
   <div id="tbl-ind"></div>
   <div class="form-legend">
-    <div class="fl"><div class="fl-dot" style="background:var(--g)"></div>Solgt bil</div>
-    <div class="fl"><div class="fl-dot" style="background:var(--r)"></div>Ingen salg</div>
+    <div class="fl"><span class="mj-uf v">V</span>Seier &middot; 4 biler+</div>
+    <div class="fl"><span class="mj-uf u">U</span>Uavgjort &middot; 3</div>
+    <div class="fl"><span class="mj-uf t">T</span>Tap &middot; under 3</div>
+    <div class="fl"><span class="mj-uf na">2</span>Uka som p&aring;g&aring;r</div>
   </div>
 </div>
 
@@ -1695,27 +1723,74 @@ function mjMalkonto(navn, pu) {
 // Ni ukesresultater — brukes i spillerkortet
 function mjUkesrekke(navn) {
   if (!MJ) return '';
-  var pu = mjPerUke(), V = 0, U = 0, T = 0, kt = 0;
+  var pu = mjPerUke(), V = 0, U = 0, T = 0, kt = 0, spilt = 0;
   var celler = MJ.uker.map(function(u) {
     var n = pu[navn] ? (pu[navn][u.uke] || 0) : 0;
-    var kls, res;
-    if (!u.ferdig && !u.paagaar) { kls = 'fr'; res = '&ndash;'; }
-    else if (u.paagaar)          { kls = 'na'; res = 'n&aring;'; }
-    else if (n > u.mal)          { kls = 'v';  res = 'seier'; V++; }
-    else if (n >= Math.floor(u.mal)) { kls = 'u'; res = 'uavgj'; U++; }
-    else                         { kls = 't';  res = 'tap'; T++; }
-    if (u.ferdig) kt += n - u.mal;
-    return '<div class="mj-wk" title="Uke ' + u.uke + ': ' + n + ' av ' + mjNb(u.mal, 1)
-      + (u.ferdig ? ' \u2014 ' + res : '') + '">'
+    var kls, bok, tall, tip;
+    if (u.paagaar) {
+      kls = 'na'; bok = 'N&Aring;'; tall = n;
+      tip = 'Uke ' + u.uke + ' p\u00e5g\u00e5r: ' + n + ' av ' + mjNb(u.mal, 1)
+          + ' \u2014 ' + Math.max(Math.ceil(u.mal - n + 0.01), 0) + ' igjen for seier';
+    } else if (!u.ferdig) {
+      kls = 'fr'; bok = ''; tall = '';
+      tip = 'Uke ' + u.uke + ' ikke spilt \u2014 m\u00e5l ' + mjNb(u.mal, 1);
+    } else {
+      spilt++;
+      kt += n - u.mal;
+      if (n > u.mal)                   { kls = 'v'; bok = 'V'; V++; }
+      else if (n >= Math.floor(u.mal)) { kls = 'u'; bok = 'U'; U++; }
+      else                             { kls = 't'; bok = 'T'; T++; }
+      tall = n;
+      tip = 'Uke ' + u.uke + ': ' + n + ' av ' + mjNb(u.mal, 1) + ' \u2014 '
+          + (kls === 'v' ? 'seier' : kls === 'u' ? 'uavgjort' : 'tap');
+    }
+    return '<div class="mj-wk ' + kls + '" title="' + tip + '">'
       + '<div class="mj-wn">' + u.uke + '</div>'
-      + '<div class="mj-wc ' + kls + '">' + ((!u.ferdig && !u.paagaar) ? '&ndash;' : n) + '</div>'
-      + '<div class="mj-wr">' + res + '</div></div>';
+      + '<div class="mj-wb">' + bok + '</div>'
+      + '<div class="mj-wc">' + (tall === '' ? '&nbsp;' : tall) + '</div></div>';
   }).join('');
+
   var k = kt > 0.05 ? 'up' : (kt < -0.05 ? 'dn' : '');
+  var poeng = V * 3 + U;
   return '<div class="mj-wks">' + celler + '</div>'
-    + '<div class="mj-wsum"><b>' + V + '</b> seire &middot; <b>' + U + '</b> uavgjort &middot; '
-    + '<b>' + T + '</b> tap &middot; m&aring;lkonto <b class="' + k + '">'
-    + (kt > 0 ? '+' : '') + mjNb(kt, 1) + '</b> biler</div>';
+    + '<div class="mj-wleg">'
+    +   '<span><i class="v">V</i> seier &middot; 4 biler eller mer</span>'
+    +   '<span><i class="u">U</i> uavgjort &middot; 3 biler</span>'
+    +   '<span><i class="t">T</i> tap &middot; under 3</span>'
+    + '</div>'
+    + '<div class="mj-wsum">'
+    +   (spilt === 0
+        ? 'Ingen uker er avsluttet enn\u00e5. F\u00f8rste kamp gj\u00f8res opp fredag.'
+        : '<b>' + V + '</b> seier' + (V === 1 ? '' : 'e') + ' &middot; <b>' + U + '</b> uavgjort'
+          + ' &middot; <b>' + T + '</b> tap av <b>' + spilt + '</b> spilte uker'
+          + ' &middot; <b>' + poeng + '</b> poeng<br>'
+          + 'M&aring;lkonto <b class="' + k + '">' + (kt > 0 ? '+' : '') + mjNb(kt, 1) + '</b> biler '
+          + (kt > 0.05 ? 'over' : kt < -0.05 ? 'under' : 'p&aring;') + ' egen strek.')
+    + '</div>';
+}
+
+// Siste fem uker som bokstavrekke — samme språk som en tabellrekke i fotball
+function mjUkeForm(navn, pu) {
+  if (!MJ) return '';
+  pu = pu || mjPerUke();
+  var aktuelle = MJ.uker.filter(function(u){ return u.ferdig || u.paagaar; }).slice(-5);
+  if (!aktuelle.length) return '<span class="mj-uf-tom">&ndash;</span>';
+  return aktuelle.map(function(u) {
+    var n = pu[navn] ? (pu[navn][u.uke] || 0) : 0;
+    var kls, tegn, tip;
+    if (u.paagaar) {
+      kls = 'na'; tegn = n;
+      tip = 'Uke ' + u.uke + ' p\u00e5g\u00e5r: ' + n + ' av ' + mjNb(u.mal,1)
+          + ' \u2014 ' + Math.max(Math.ceil(u.mal - n + 0.01), 0) + ' igjen for seier';
+    } else if (n > u.mal) {
+      kls = 'v'; tegn = 'V'; tip = 'Uke ' + u.uke + ': ' + n + ' biler \u2014 seier';
+    } else if (n >= Math.floor(u.mal)) {
+      kls = 'u'; tegn = 'U'; tip = 'Uke ' + u.uke + ': ' + n + ' biler \u2014 uavgjort';
+    } else {
+      kls = 't'; tegn = 'T'; tip = 'Uke ' + u.uke + ': ' + n + ' biler \u2014 tap';
+    }
+    return '<span class="mj-uf ' + kls + '" title="' + tip + '">' + tegn + '</span>';
+  }).join('');
 }
 
 // Fire ruter — den fjerde bærer streken
@@ -2152,7 +2227,9 @@ function renderInd() {
       + '</div>'
       + '<div class="sc" style="line-height:1">'+r.g+(r.wk>0?'<br><span style="font-size:8px;opacity:.4;font-weight:400">('+r.wk+')</span>':'')+'</div>'
       + '<div class="sc pts">'+r.pts+'</div>'
-      + '<div><div class="form-dots">'+selgerDots(r.navn)+'</div></div>'
+      + '<div>' + (MJ
+          ? '<div class="mj-ufrow">'+mjUkeForm(r.navn)+'</div>'
+          : '<div class="form-dots">'+selgerDots(r.navn)+'</div>') + '</div>'
     + '</div>';
   }).join('');
 }
