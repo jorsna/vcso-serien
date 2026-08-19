@@ -48,10 +48,14 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .name-sub{display:flex;align-items:center}
 /* merittstripe — fast bredde, kan aldri vokse ut av raden */
 .mj-mer{display:inline-flex;align-items:center;gap:4px;margin-left:5px;vertical-align:middle;flex-shrink:0}
-.mj-chip{display:inline-flex;align-items:center;gap:1px;line-height:1;white-space:nowrap}
-.mj-chip .ic{font-size:11px;line-height:1}
-.mj-chip .x{font-family:Anton,sans-serif;font-size:9.5px;color:var(--gold);margin-left:1px}
-.mj-chip .x.fl{color:#f97316}
+.mj-chip{display:inline-flex;align-items:center;gap:3px;line-height:1;white-space:nowrap;
+  padding:2px 7px 2px 5px;border-radius:4px 4px 7px 7px;border:1px solid #e6c76a;
+  background:linear-gradient(180deg,#e6c76a,#c9a84c);box-shadow:0 0 12px rgba(201,168,76,.5)}
+.mj-chip .ic{font-size:10px;line-height:1;filter:brightness(0) saturate(0) invert(6%)}
+.mj-chip .n{font-family:Anton,sans-serif;font-size:12px;line-height:1;letter-spacing:.4px;color:#0b1220}
+.mj-chip.fl{border-color:#fb923c;background:linear-gradient(180deg,#fb923c,#ea580c);
+  box-shadow:0 0 12px rgba(249,115,22,.45)}
+.mj-chip.fl .n{color:#180a02}
 .mj-nmrow{display:flex;align-items:center;min-width:0}
 .mj-nmtxt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 /* bonusteller i underlinja — 20 biler = 10 000 kr */
@@ -148,6 +152,9 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .mj-g.on{background:linear-gradient(180deg,#3b82f6,#1d4ed8);border-color:#3b82f6}
 .mj-g.last{border-color:var(--gold);box-shadow:0 0 0 1px rgba(201,168,76,.5)}
 .mj-g.on.over,.mj-g.on.last{background:linear-gradient(180deg,#e6c76a,#c9a84c);border-color:var(--gold)}
+.mj-wleg{display:flex;gap:13px;flex-wrap:wrap;margin-top:11px;font-size:10.5px;color:var(--muted);
+  font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.7px;text-transform:uppercase}
+.mj-wleg i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
 .mj-wfoot{margin-top:10px;padding-top:10px;border-top:1px solid var(--b1);
   font-size:11.5px;color:var(--muted);line-height:1.5}
 .mj-wfoot b{color:var(--txt)}
@@ -1737,10 +1744,12 @@ function mjStreak(navn, pu) {
 // Merittstripe: 1 vises alene, 2+ trekkes sammen til ikon x antall
 function mjMerit(ht, st) {
   var h = '';
-  if (ht === 1)      h += '<span class="mj-chip"><span class="ic">&#11088;</span></span>';
-  else if (ht > 1)   h += '<span class="mj-chip"><span class="ic">&#11088;</span><span class="x">&times;' + ht + '</span></span>';
-  if (st === 3)      h += '<span class="mj-chip"><span class="ic">&#128293;</span></span>';
-  else if (st > 3)   h += '<span class="mj-chip"><span class="ic">&#128293;</span><span class="x fl">&times;' + st + '</span></span>';
+  if (ht > 0) h += '<span class="mj-chip" title="' + ht + ' hat-trick'
+    + (ht === 1 ? '' : 's') + ' \u2014 dager med 3 biler eller mer">'
+    + '<span class="ic">&#11088;</span><span class="n">' + ht + '</span></span>';
+  if (st >= 3) h += '<span class="mj-chip fl" title="' + st
+    + ' uker over streken p\u00e5 rad">'
+    + '<span class="ic">&#128293;</span><span class="n">' + st + '</span></span>';
   return h ? '<span class="mj-mer">' + h + '</span>' : '';
 }
 
@@ -3246,17 +3255,50 @@ function renderBstripe() {
     + '<span>TOTALT ' + mjSesongSolgt() + ' / ' + MJ.malBedrift + '</span>';
 }
 
+// Salg i inneværende uke, kronologisk sortert, med avdelingen til selgeren
+function mjUkeSalg() {
+  var u = MJ.naa, ut = [];
+  sales.forEach(function(r) {
+    if (r.deleted) return;
+    var d = mjOsloDato(r.ts);
+    if (!d || d < MJ_START || d > MJ_SLUTT) return;
+    if (getWeekNum(new Date(d + 'T12:00:00')) !== u.uke) return;
+    var so = SELGERE.filter(function(x){ return x.navn === r.selger; })[0];
+    if (!so) return;
+    ut.push({ loc: so.loc, ts: r.ts });
+  });
+  ut.sort(function(a, b){ return a.ts < b.ts ? -1 : a.ts > b.ts ? 1 : 0; });
+  return ut;
+}
+function mjTeam(id) {
+  return TEAMS.filter(function(x){ return x.id === id; })[0] || null;
+}
+function mjMork(hex, f) {
+  var n = parseInt(hex.slice(1), 16);
+  return 'rgb(' + Math.round((n >> 16 & 255) * f) + ',' + Math.round((n >> 8 & 255) * f)
+    + ',' + Math.round((n & 255) * f) + ')';
+}
+
 function renderUka() {
   var el = document.getElementById('mj-uka');
   if (!el || !MJ) return;
   var t = mjTallUke();
   var igjen = Math.max(t.mal - t.tot, 0);
+  var uSalg = mjUkeSalg();
   var ruter = '';
   for (var i = 1; i <= Math.max(t.mal, t.tot); i++) {
-    var k = 'mj-g';
-    if (i <= t.tot) k += i > t.mal ? ' on over' : ' on';
+    var k = 'mj-g', st = '', tt = '', lag = null;
+    if (i <= t.tot) {
+      k += i > t.mal ? ' on over' : ' on';
+      lag = uSalg[i - 1] ? mjTeam(uSalg[i - 1].loc) : null;
+      var c = lag ? lag.color : '#3b82f6';
+      st = 'background:linear-gradient(180deg,' + c + ',' + mjMork(c, .62) + ');';
+      if (i !== t.mal) st += 'border-color:' + c + ';';
+      if (i > t.mal) st += 'box-shadow:0 0 0 1px rgba(201,168,76,.55);';
+      if (lag) tt = ' title="Bil ' + i + ' \u2013 ' + lag.navn + '"';
+    }
     if (i === t.mal) k += ' last';
-    ruter += '<div class="' + k + '"></div>';
+    ruter += '<div class="' + k + '"' + (st ? ' style="' + st + '"' : '') + tt + '></div>';
   }
   el.innerHTML = '<div class="mj-wall">'
     + '<div class="mj-wtop">'
@@ -3268,6 +3310,9 @@ function renderUka() {
     +     t.dagerIgjen + ' ' + (t.dagerIgjen === 1 ? 'salgsdag' : 'salgsdager') + ' igjen</div>'
     + '</div>'
     + '<div class="mj-grid">' + ruter + '</div>'
+    + '<div class="mj-wleg">' + TEAMS.map(function(tm) {
+        return '<span><i style="background:' + tm.color + '"></i>' + tm.navn + '</span>';
+      }).join('') + '</div>'
     + '<div class="mj-wfoot">'
     +   (igjen === 0
         ? 'VCSO er i m&aring;l for uke ' + t.uke.uke + '. Alt etter den gylne ruta er overskudd.'
