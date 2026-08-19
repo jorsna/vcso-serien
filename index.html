@@ -153,26 +153,6 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .mj-wfoot b{color:var(--txt)}
 @media(max-width:520px){.mj-big{font-size:44px}.mj-g{width:15px;height:15px;gap:3px}}
 
-/* PREMIER */
-.mj-pw{margin:12px 14px;background:var(--card);border:1px solid var(--b1);border-radius:12px;
-  padding:15px 15px 5px;position:relative;overflow:hidden}
-.mj-pw:before{content:'';position:absolute;inset:0 0 auto 0;height:2px;
-  background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.6}
-.mj-ph{font-family:Anton,sans-serif;font-size:13px;letter-spacing:2px;color:var(--gold);margin-bottom:13px}
-.mj-pr{display:flex;gap:12px;padding-bottom:14px;margin-bottom:12px;border-bottom:1px solid var(--faint)}
-.mj-pr:last-child{border-bottom:none}
-.mj-pi{font-size:22px;line-height:1;flex-shrink:0;width:26px;text-align:center}
-.mj-pb{min-width:0}
-.mj-pt{font-family:Anton,sans-serif;font-size:15px;letter-spacing:.4px;color:var(--txt);line-height:1.15}
-.mj-pd{font-size:12px;color:var(--muted);line-height:1.5;margin-top:4px}
-.mj-pd b{color:var(--txt)}
-.mj-ps{font-size:11.5px;color:var(--muted);line-height:1.55;margin-top:7px;padding-top:7px;
-  border-top:1px dashed var(--b1)}
-.mj-ps b{color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.2px}
-.mj-ps .ok{color:var(--g);font-weight:600}
-.mj-ps .mangler{color:var(--y);font-weight:600}
-
-
 /* BEDRIFTSMÅLET */
 .mj-sea{margin:12px 14px;background:var(--card);border:1px solid var(--b1);border-radius:12px;padding:16px}
 .mj-eyebrow{font-family:Anton,sans-serif;font-size:9px;letter-spacing:2.2px;color:var(--muted)}
@@ -1355,7 +1335,6 @@ body{background:transparent !important}
 
 <!-- AVDELINGER VIEW -->
 <div class="view" id="view-team">
-  <div id="mj-premier"></div>
   <div id="mj-uka"></div>
   <div id="mj-bedrift"></div>
   <div id="mj-forhandlere"></div>
@@ -3333,95 +3312,6 @@ function mjCell(k, v, u, note, kls) {
     + '<div class="mj-cn">' + note + '</div></div>';
 }
 
-function renderPremier() {
-  var el = document.getElementById('mj-premier');
-  if (!el || !MJ) return;
-  var pu = mjPerUke();
-
-  // 1 - beste 28-dagersvindu per selger
-  var bon = SELGERE.map(function(s) {
-    var b = mjBonus(s.navn);
-    return { navn:s.navn, b:b };
-  }).sort(function(a,b){ return b.b.beste - a.b.beste; });
-  var klare  = bon.filter(function(x){ return x.b.naadd; });
-  var naerme = bon.filter(function(x){ return !x.b.naadd && x.b.beste > 0; }).slice(0,3);
-  var sisteStart = mjPlussDager(MJ_SLUTT, -(BONUS_DAGER - 1));
-  var kanStarte  = mjIDag() <= sisteStart;
-
-  // 2 - ledende avdeling (poeng per selger) og om sesongmålet er nådd
-  var lag = TEAMS.map(function(t) {
-    var ant = mjAnt(t.id), solgt = 0;
-    SELGERE.filter(function(s){ return s.loc===t.id; }).forEach(function(s) {
-      Object.keys(pu[s.navn]).forEach(function(w){ solgt += pu[s.navn][w]; });
-    });
-    var pts = 0;
-    sales.forEach(function(r) {
-      if (r.deleted) return;
-      var so = SELGERE.filter(function(x){ return x.navn===r.selger; })[0];
-      if (so && so.loc===t.id) pts += PTS + (r.spotlight_bonus||0);
-    });
-    var mal = Math.round(MJ.malSelgerSesong * ant);
-    return { t:t, ant:ant, solgt:solgt, mal:mal, pps:pts/(ant||1), naadd:solgt>=mal };
-  }).sort(function(a,b){ return b.pps - a.pps; });
-  var leder = lag[0];
-
-  // 3 - championship-leder
-  var topp = SELGERE.map(function(s) {
-    return { navn:s.navn, pts:goalsFor(s.navn,'all')*PTS + bonusFor(s.navn,'all') };
-  }).sort(function(a,b){ return b.pts - a.pts; })[0];
-
-  el.innerHTML = '<div class="mj-pw">'
-    + '<div class="mj-ph">Premier</div>'
-
-    + '<div class="mj-pr">'
-    +   '<div class="mj-pi">&#128176;</div>'
-    +   '<div class="mj-pb"><div class="mj-pt">10 000 kr i provisjon</div>'
-    +     '<div class="mj-pd"><b>20 biler innenfor 28 dager</b> — et glidende vindu som '
-    +       'starter på din første bil, når som helst fra 17. august. '
-    +       '28 dager rommer 20 arbeidsdager, så dette er <b>&eacute;n bil hver '
-    +       'arbeidsdag i en måned</b>. Ingen øvre grense for hvor mange som kan '
-    +       'få den.</div>'
-    +     '<div class="mj-ps">' + (klare.length
-          ? '<b>' + klare.length + '</b> har sikret den: ' + klare.map(function(x){
-              return x.navn + ' (' + x.b.beste + ' fra ' + mjKortDato(x.b.start) + ')'; }).join(', ')
-          : 'Ingen har nådd 20 i et 28-dagersvindu ennå.')
-    +       (naerme.length ? '<br>Beste vinduer nå: ' + naerme.map(function(x){
-              return x.navn + ' <b>' + x.b.beste + '</b>'; }).join(' · ') : '')
-    +       '<br>' + (kanStarte
-            ? 'Et nytt vindu kan startes helt til <b>' + mjKortDato(sisteStart)
-              + '</b> og fortsatt få alle 28 dagene.'
-            : 'Siste fulle vindu startet ' + mjKortDato(sisteStart) + '.')
-    +     '</div></div></div>'
-
-    + '<div class="mj-pr">'
-    +   '<div class="mj-pi">&#127881;</div>'
-    +   '<div class="mj-pb"><div class="mj-pt">Sosial pott til avdelingen</div>'
-    +     '<div class="mj-pd">Avdelingen som <b>vinner avdelingsracet</b> og som '
-    +       '<b>når sesongmålet sitt</b> får en felles pott på '
-    +       LAGPOTT.toLocaleString('nb-NO') + ' kr per selger. Begge krav må oppfylles.<br>'
-    +       'Potten brukes på <b>noe sosialt sammen</b> — middag, tur, aktivitet. '
-    +       'Den utbetales ikke, og deles ikke ut i kontanter.</div>'
-    +     '<div class="mj-ps">Leder nå: <b>' + leder.t.navn + '</b> · '
-    +       leder.solgt + ' / ' + leder.mal + ' biler · '
-    +       (leder.naadd
-          ? '<span class="ok">sesongmålet er nådd</span>'
-          : '<span class="mangler">' + (leder.mal - leder.solgt) + ' biler igjen til målet</span>')
-    +       '<br>Potten hvis de vinner: ' + lag.map(function(l){
-              return l.t.navn + ' <b>' + (l.ant*LAGPOTT).toLocaleString('nb-NO') + ' kr</b>'
-                + ' (' + l.ant + ' selgere)'; }).join(' · ')
-    +     '</div></div></div>'
-
-    + '<div class="mj-pr">'
-    +   '<div class="mj-pi">&#127870;</div>'
-    +   '<div class="mj-pb"><div class="mj-pt">Magnumflaske champagne</div>'
-    +     '<div class="mj-pd">Til vinneren av hele Championship — pluss permanent plass '
-    +       'i Hall of Fame.</div>'
-    +     '<div class="mj-ps">Leder nå: <b>' + (topp ? topp.navn : '–') + '</b>'
-    +       (topp ? ' · ' + topp.pts + ' poeng' : '') + '</div></div></div>'
-
-    + '</div>';
-}
-
 function renderForhandlere() {
   var el = document.getElementById('mj-forhandlere');
   if (!el || !MJ) return;
@@ -3481,7 +3371,7 @@ function renderAll() {
   if      (curTab==='ind')     renderInd();
   else if (curTab==='team' || curTab==='hof') {
     renderTeam();
-    try { renderPremier(); renderUka(); renderBedriftsmal(); renderForhandlere(); }
+    try { renderUka(); renderBedriftsmal(); renderForhandlere(); }
     catch(e) { console.error('Ukesm\u00e5l: ' + e.message); }
   }
   else if (curTab==='stats')   renderStats();
