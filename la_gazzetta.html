@@ -1139,8 +1139,33 @@ function genererTekst(salg, dato, alleSalg, forrige, spot) {
       if ((umFor[nm] || 0) < umKrav) umNaadde.push(nm + ' (' + (SELGER_AVD[nm] || 'ukjent') + ', ' + umTom[nm] + ' biler i uke ' + umUke + ')');
       else umAlt.push(nm);
     });
+    // Avdelingene: ukesmål = ukesmål per selger x antall selgere i avdelingen
+    var umAvdTom = {ryen:0,fornebu:0,lillestrom:0}, umAvdFor = {ryen:0,fornebu:0,lillestrom:0};
+    (alleSalg||[]).forEach(function(s) {
+      if (!s.ts || umAvdTom[s.loc] === undefined) return;
+      var dd = osloDato(s.ts);
+      if (dd < UM_START || dd > dato) return;
+      if (umIsoUke(dd) !== umUke) return;
+      umAvdTom[s.loc]++;
+      if (dd < dato) umAvdFor[s.loc]++;
+    });
+    var umAvdNavn = {ryen:'Ryen', fornebu:'Fornebu', lillestrom:'Lillestr\u00f8m'};
+    var umAvdNaadde = [];
+    Object.keys(umAvdTom).forEach(function(k) {
+      var krav = Math.round(umMalUke * (avdHode[k]||0) * (umUkeDager[umUke] || 5) / 5);
+      if (krav <= 0) return;
+      if (umAvdTom[k] >= krav && umAvdFor[k] < krav) {
+        umAvdNaadde.push(umAvdNavn[k] + ' (' + umAvdTom[k] + ' av ' + krav + ' biler, ' + (avdHode[k]||0) + ' selgere)');
+      }
+    });
+    if (umAvdNaadde.length) {
+      ukesmalBlokk += '\n- AVDELING N\u00c5DDE UKESM\u00c5LET I DAG (uke ' + umUke + '): ' + umAvdNaadde.join('; ')
+        + '.\n  Dette er en KOLLEKTIV bragd og et av dagens aller st\u00f8rste poeng \u2013 hele avdelingen har n\u00e5dd ukekvoten sin samlet.'
+        + ' Den skal feires h\u00f8yt og gjerne l\u00f8ftes helt opp i overskrift eller ingress. Ram det inn som et lagarbeid der alle bidro,'
+        + ' ikke som \u00e9n enkeltselgers verk. De andre avdelingene er fortsatt i kampen \u2013 skriv aldri at de er sjansel\u00f8se.';
+    }
     if (umNaadde.length) {
-      ukesmalBlokk = '\n- UKESMÅL NÅDD I DAG (kravet er ' + umKrav + ' biler i uke ' + umUke + '): ' + umNaadde.join('; ')
+      ukesmalBlokk += '\n- UKESMÅL NÅDD I DAG (kravet er ' + umKrav + ' biler i uke ' + umUke + '): ' + umNaadde.join('; ')
         + '.\n  Dette er en av ukas største bragder. Du SKAL nevne HVER ENESTE av disse ved navn i artikkelen'
         + ' – ingen skal utelates, uansett hvor mange det er. Ram det inn som at de har krysset sin egen strek for uka'
         + ' og levert det som ble forventet av dem. Ikke bland det sammen med MVP eller hat-trick – dette er et eget'

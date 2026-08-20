@@ -66,7 +66,7 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .mj-kt{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;margin-left:7px;flex-shrink:0}
 .mj-kt.up{color:var(--g)}.mj-kt.dn{color:var(--r)}.mj-kt.ev{color:var(--muted)}
 /* gullring når selgeren er over streken - bildet blir aldri farget */
-.av.mj-gull{box-shadow:0 0 0 2px var(--gold),0 0 9px rgba(201,168,76,.35)}
+.av.mj-gull{box-shadow:0 0 0 2px #22c55e,0 0 9px rgba(34,197,94,.3)}
 /* siste fem uker i tabellraden */
 .mj-ufrow{display:flex;gap:2px;justify-content:center;align-items:center}
 .mj-uf{display:inline-flex;align-items:center;justify-content:center;width:15px;height:17px;
@@ -131,9 +131,11 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .mj-vf b{color:var(--gold)}
 
 /* gullstempel — samme formspråk som FINANSIERT */
-.mj-stamp{display:inline-flex;align-items:center;gap:3px;background:var(--gold);color:#000;
-  font-family:Anton,sans-serif;font-size:7.5px;letter-spacing:1.1px;padding:2px 5px;border-radius:3px;
-  vertical-align:middle;margin-left:5px}
+.mj-uketag{display:inline-flex;align-items:center;gap:4px;margin-left:5px;padding:2px 7px 2px 5px;
+  border-radius:3px;background:rgba(34,197,94,.16);border:1px solid rgba(34,197,94,.55);
+  vertical-align:middle;font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:9.5px;letter-spacing:1px;color:#86efac;flex-shrink:0;white-space:nowrap}
+.mj-uketag .h{font-size:9px;line-height:1}
 
 /* UKA — ruteveggen for hele VCSO */
 .mj-wall{margin:12px 14px;background:var(--card);border:1px solid var(--b1);border-radius:12px;
@@ -152,9 +154,9 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .mj-g.on{background:linear-gradient(180deg,#3b82f6,#1d4ed8);border-color:#3b82f6}
 .mj-g.last{border-color:var(--gold);box-shadow:0 0 0 1px rgba(201,168,76,.5)}
 .mj-g.on.over,.mj-g.on.last{background:linear-gradient(180deg,#e6c76a,#c9a84c);border-color:var(--gold)}
-.mj-wleg{display:flex;gap:13px;flex-wrap:wrap;margin-top:11px;font-size:10.5px;color:var(--muted);
+.mj-uleg{display:flex;gap:13px;flex-wrap:wrap;margin-top:11px;font-size:10.5px;color:var(--muted);
   font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.7px;text-transform:uppercase}
-.mj-wleg i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.mj-uleg i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
 .mj-wfoot{margin-top:10px;padding-top:10px;border-top:1px solid var(--b1);
   font-size:11.5px;color:var(--muted);line-height:1.5}
 .mj-wfoot b{color:var(--txt)}
@@ -460,6 +462,8 @@ body.tier-kritisk #urgency-stripe{background:rgba(239,68,68,.14);border:1px soli
 .fc-badges{display:flex;flex-wrap:wrap;gap:8px}
 .fc-badge{display:flex;align-items:center;gap:7px;background:var(--card2);border:1px solid var(--b1);border-radius:20px;padding:6px 12px 6px 7px;font-size:11.5px;font-weight:600;color:var(--txt)}
 .fc-badge .bi{width:23px;height:23px;border-radius:50%;background:rgba(201,168,76,.12);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.fc-badge.uke{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.45);color:#86efac}
+.fc-badge.uke .bi{background:rgba(34,197,94,.25);color:#86efac}
 .fc-badge.new{border-color:var(--gold);background:rgba(201,168,76,.09);animation:fcGlow 1.9s ease-in-out infinite}
 .fc-badge.new .bi{background:var(--gold)}
 .fc-empty{font-size:12px;color:var(--muted);font-style:italic;line-height:1.5}
@@ -2299,7 +2303,7 @@ function renderInd() {
   var m = curMonth;
   var rows = SELGERE.map(function(s) {
     var g = goalsFor(s.navn, m);
-    var thisWk = getWeekNum(new Date());
+    var thisWk = MJ ? MJ.naa.uke : getWeekNum(new Date());
       var wk = sales.filter(function(x){ return x.selger===s.navn && !x.deleted && getWeekNum(new Date(x.ts))===thisWk; }).length;
       return { navn:s.navn, loc:s.loc, id:s.id, initials:s.initials, color:s.color, bg:s.bg, g:g, pts:g*PTS + bonusFor(s.navn, m), wk:wk };
   }).map(function(s) {
@@ -2358,7 +2362,9 @@ function renderInd() {
       + '<div class="name-c">'
         + '<div class="name-main mj-nmrow"><span class="mj-nmtxt">'+r.navn+'</span>'
         + mjMerit(ht, uSt)
-        + (over ? '<span class="mj-stamp">&#9670; M&Aring;L</span>' : '')+'</div>'
+        + (over ? '<span class="mj-uketag" title="Ukesm&aring;let for uke ' + MJ.naa.uke
+            + ' er n&aring;dd: ' + r.wk + ' av ' + mjNb(MJ.naa.mal,1) + ' biler">'
+            + '<span class="h">&#10003;</span>UKE ' + MJ.naa.uke + '</span>' : '')+'</div>'
         + '<div class="name-sub">'+(LL[r.loc]||r.loc)
           + (MJ ? '<span class="mj-boxes" style="--mjc:'+r.color+'" title="Uke '+MJ.naa.uke
               +': '+r.wk+' av '+mjNb(MJ.naa.mal,1)+' denne uka">'+mjRuter(r.wk, MJ.naa.mal)+'</span>'
@@ -3310,7 +3316,7 @@ function renderUka() {
     +     t.dagerIgjen + ' ' + (t.dagerIgjen === 1 ? 'salgsdag' : 'salgsdager') + ' igjen</div>'
     + '</div>'
     + '<div class="mj-grid">' + ruter + '</div>'
-    + '<div class="mj-wleg">' + TEAMS.map(function(tm) {
+    + '<div class="mj-uleg">' + TEAMS.map(function(tm) {
         return '<span><i style="background:' + tm.color + '"></i>' + tm.navn + '</span>';
       }).join('') + '</div>'
     + '<div class="mj-wfoot">'
@@ -3396,14 +3402,6 @@ function renderForhandlere() {
 function mjSjekkStreken() {
   if (!MJ) return;
   var t = mjTallUke(), w = t.uke.uke;
-  SELGERE.forEach(function(s) {
-    var n = t.pu[s.navn][w] || 0;
-    var key = '_mjS_' + s.id + '_' + w;
-    if (n > t.uke.mal && !window[key]) {
-      window[key] = true;
-      setTimeout(function(){ launchKonfetti(s.color); }, 250);
-    }
-  });
   var vk = '_mjVCSO_' + w;
   if (t.tot >= t.mal && t.mal > 0 && !window[vk]) {
     window[vk] = true;
@@ -3731,11 +3729,27 @@ function openPlayerCard(id) {
   var avInner = hasPhoto ? '<img src="'+SELGER_PHOTOS[id]+'">' : sObj.initials;
 
   var badgeList = ms.achieved.slice();
+  // Ukesmål: hake for inneværende uke + opptelling av tidligere klarte uker
+  if (MJ) {
+    try {
+      var uPu = mjPerUke(), uMine = uPu[navn] || {}, uKlart = 0;
+      MJ.uker.forEach(function(u) {
+        if (u.ferdig && !u.paagaar && (uMine[u.uke] || 0) > u.mal) uKlart++;
+      });
+      if ((uMine[MJ.naa.uke] || 0) > MJ.naa.mal) {
+        badgeList.unshift({ icon:'\u2713', label:'Ukesm\u00e5l uke ' + MJ.naa.uke, fresh:false, uke:true });
+      }
+      if (uKlart > 0) {
+        badgeList.push({ icon:'\u2713', label: uKlart + (uKlart === 1 ? ' ukesm\u00e5l klart' : ' ukesm\u00e5l klart'),
+                         fresh:false, uke:true });
+      }
+    } catch(e) { console.error('Ukesm\u00e5l: ' + e.message); }
+  }
   if (ht > 0) badgeList.push({ icon:'\u26a1', label: ht>1 ? ht+' hat-tricks' : 'Hat-trick', fresh:false });
   var streak = (typeof streakCount==='function') ? streakCount(navn) : 0;
   if (streak >= 3) badgeList.push({ icon:'\uD83D\uDD25', label: streak+'-dagers streak', fresh:false });
   var badges = badgeList.length
-    ? badgeList.map(function(b){ return '<div class="fc-badge'+(b.fresh?' new':'')+'"><span class="bi">'+b.icon+'</span>'+b.label+'</div>'; }).join('')
+    ? badgeList.map(function(b){ return '<div class="fc-badge'+(b.fresh?' new':'')+(b.uke?' uke':'')+'"><span class="bi">'+b.icon+'</span>'+b.label+'</div>'; }).join('')
     : '<div class="fc-empty">Ingen prestasjoner enn\u00e5 \u2014 f\u00f8rste milep\u00e6l er '+ms.next.goal+' salg. Fremdriften vises under.</div>';
 
   var pct = Math.max(0, Math.min(100, Math.round(ms.next.cur/ms.next.goal*100)));
