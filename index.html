@@ -1675,10 +1675,11 @@ function MJ_bygg() {
     if (wd >= 1 && wd <= 5) {
       var iso = d.toLocaleDateString('sv-SE');
       var w = getWeekNum(d);
-      if (!uker[w]) { uker[w] = { uke:w, dager:0, gaatt:0, forste:iso, siste:iso }; rekke.push(uker[w]); }
+      if (!uker[w]) { uker[w] = { uke:w, dager:0, gaatt:0, igjen:0, forste:iso, siste:iso }; rekke.push(uker[w]); }
       uker[w].dager++;
       uker[w].siste = iso;
       if (iso <= idag) uker[w].gaatt++;
+      if (iso >= idag) uker[w].igjen++;   // i dag teller som en dag du fortsatt kan selge på
       mndDager[iso.slice(5,7) === '08' ? 'aug' : 'sep']++;
     }
     d.setDate(d.getDate() + 1);
@@ -3239,7 +3240,7 @@ function mjTallUke() {
   });
   return { pu:pu, uke:u, tot:tot, perLoc:perLoc,
            mal: Math.round(MAL_UKE * SELGERE.length * u.dager / 5),
-           dagerIgjen: u.dager - u.gaatt };
+           dagerIgjen: (u.igjen !== undefined ? u.igjen : u.dager - u.gaatt) };
 }
 function mjSesongSolgt() {
   return sales.filter(function(r) {
@@ -3320,7 +3321,8 @@ function renderUka() {
     +   '<div class="mj-wlbl">' + (igjen === 0 ? 'streken er brutt'
           : 'biler igjen<br>denne uka') + '</div>'
     +   '<div class="mj-wmeta"><b>' + t.tot + ' / ' + t.mal + '</b><br>'
-    +     t.dagerIgjen + ' ' + (t.dagerIgjen === 1 ? 'salgsdag' : 'salgsdager') + ' igjen</div>'
+    +     (t.dagerIgjen === 0 ? 'uka er ferdigspilt'
+            : t.dagerIgjen + ' ' + (t.dagerIgjen === 1 ? 'salgsdag' : 'salgsdager') + ' igjen') + '</div>'
     + '</div>'
     + '<div class="mj-grid">' + ruter + '</div>'
     + '<div class="mj-uleg">' + TEAMS.map(function(tm) {
