@@ -44,9 +44,9 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .mj-b.fill.gold,.mj-b.extra{background:var(--gold);border-color:var(--gold);overflow:hidden}
 .mj-b.extra{width:7px}
 .mj-b.fill.gold:after,.mj-b.extra:after{content:'';position:absolute;top:0;bottom:0;width:170%;
-  left:-170%;background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.9) 50%,transparent 80%);
-  animation:mjSkimmer 3.4s ease-in-out infinite}
-@keyframes mjSkimmer{0%{left:-170%}45%{left:170%}100%{left:170%}}
+  left:-170%;background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.92) 50%,transparent 80%);
+  animation:mjSkimmer 2.4s linear infinite;animation-delay:var(--sd,0s)}
+@keyframes mjSkimmer{0%{left:-170%}32%{left:170%}100%{left:170%}}
 @media(prefers-reduced-motion:reduce){.mj-b.fill.gold:after,.mj-b.extra:after{animation:none;opacity:0}}
 .mj-plus{font-family:Anton,sans-serif;font-size:9px;color:var(--gold);align-self:center}
 .mj-boxes{display:inline-flex;gap:2px;align-items:center;margin-left:6px;vertical-align:middle}
@@ -1950,9 +1950,11 @@ function mjRuter(n, mal) {
   var h = '', naadd = n > mal, ant = Math.max(Math.ceil(mal), 1);
   for (var i = 1; i <= ant; i++) {
     var fylt = n >= i;
-    h += '<div class="mj-b' + (fylt ? ' fill' : '') + (fylt && naadd ? ' gold' : '') + '"></div>';
+    h += '<div class="mj-b' + (fylt ? ' fill' : '') + (fylt && naadd ? ' gold' : '')
+      + '" style="--sd:' + (i * 0.09).toFixed(2) + 's"></div>';
   }
-  for (var j = ant + 1; j <= n && j <= ant + 4; j++) h += '<div class="mj-b fill extra"></div>';
+  for (var j = ant + 1; j <= n && j <= ant + 4; j++)
+    h += '<div class="mj-b fill extra" style="--sd:' + (j * 0.09).toFixed(2) + 's"></div>';
   if (n > ant + 4) h += '<span class="mj-plus">+' + (n - ant - 4) + '</span>';
   return h;
 }
@@ -3739,7 +3741,7 @@ function openPlayerCard(id) {
     try {
       var uPu = mjPerUke(), uMine = uPu[navn] || {}, uKlart = 0;
       MJ.uker.forEach(function(u) {
-        if (u.ferdig && !u.paagaar && (uMine[u.uke] || 0) > u.mal) uKlart++;
+        if (u.ferdig && u.uke !== MJ.naa.uke && (uMine[u.uke] || 0) > u.mal) uKlart++;
       });
       if ((uMine[MJ.naa.uke] || 0) > MJ.naa.mal) {
         badgeList.unshift({ icon:'\u2713', label:'Ukesm\u00e5l uke ' + MJ.naa.uke, fresh:false, uke:true });

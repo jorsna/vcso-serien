@@ -740,6 +740,64 @@ function genererUkesTekst(ukesSalg, win, forrige) {
   var htHelter=Object.keys(htPer).sort(function(a,b){ return htPer[b]-htPer[a]; });
   var htTekst = htHelter.slice(0,3).map(function(n){ return fornavn(n)+' ('+htPer[n]+')'; }).join(', ');
 
+  // ── OVERSKUDD: hvor langt over sitt eget ukesmål hver selger leverte ──
+  var UM_START = '2026-08-17', UM_SLUTT = '2026-09-30', UM_BUDSJETT = 378;
+  function umIsoUke(dStr) {
+    var dd = new Date(dStr + 'T12:00:00');
+    dd.setHours(0,0,0,0);
+    dd.setDate(dd.getDate() + 3 - (dd.getDay()+6)%7);
+    var w1 = new Date(dd.getFullYear(), 0, 4);
+    return 1 + Math.round(((dd.getTime()-w1.getTime())/86400000 - 3 + (w1.getDay()+6)%7)/7);
+  }
+  var umUkeDager = {}, umTotDager = 0;
+  var umD = new Date(UM_START + 'T12:00:00'), umSl = new Date(UM_SLUTT + 'T12:00:00');
+  while (umD <= umSl) {
+    var umWd = umD.getDay();
+    if (umWd >= 1 && umWd <= 5) {
+      umUkeDager[umIsoUke(umD.toLocaleDateString('sv-SE'))] = (umUkeDager[umIsoUke(umD.toLocaleDateString('sv-SE'))] || 0) + 1;
+      umTotDager++;
+    }
+    umD.setDate(umD.getDate() + 1);
+  }
+  var umAntSelgere = Object.keys(SELGER_AVD).length;
+  var umMalUke = (umTotDager > 0 && umAntSelgere > 0) ? UM_BUDSJETT / umAntSelgere / (umTotDager/5) : 0;
+  var overskuddBlokk = '';
+  if (umMalUke > 0 && win && win.week_nr) {
+    var umKrav = Math.ceil(umMalUke * (umUkeDager[win.week_nr] || 5) / 5 - 0.0001);
+    var umBiler = {};
+    ukesSalg.forEach(function(s) { var n = s.selger || 'ukjent'; umBiler[n] = (umBiler[n] || 0) + 1; });
+    var umKlarte = Object.keys(umBiler).filter(function(n) { return umBiler[n] >= umKrav; })
+      .sort(function(a, b) { return umBiler[b] - umBiler[a]; });
+    var vinnerBiler = umBiler[win.selger] || 0;
+    var vinnerOver = vinnerBiler - umKrav;
+    var toppNavn = umKlarte[0] || null;
+    var toppOver = toppNavn ? (umBiler[toppNavn] - umKrav) : 0;
+    var delt = umKlarte.filter(function(n) { return (umBiler[n] - umKrav) === toppOver; });
+
+    overskuddBlokk = '- UKESM\u00c5LET: ' + umKrav + ' biler per selger denne uka.\n';
+    if (vinnerBiler >= umKrav) {
+      overskuddBlokk += '- Ukens vinner leverte ' + vinnerBiler + ' biler, alts\u00e5 ' + vinnerOver
+        + ' over sitt eget ukesm\u00e5l.\n';
+    }
+    if (umKlarte.length) {
+      overskuddBlokk += '- Klarte ukesm\u00e5let: ' + umKlarte.map(function(n) {
+        return n + ' (' + umBiler[n] + ', +' + (umBiler[n] - umKrav) + ')'; }).join('; ') + '.\n';
+    }
+    if (toppNavn && delt.indexOf(win.selger) > -1) {
+      overskuddBlokk += '- ST\u00d8RSTE OVERSKUDD: ' + (delt.length > 1 ? 'delt mellom ' + delt.join(' og ') : 'ukens vinner selv')
+        + ', +' + toppOver + ' over ukesm\u00e5let. Vinneren er blant disse \u2013 dette er SAMME historie som seieren, skriv det som \u00e9n triumf'
+        + ' der marginen mot eget m\u00e5l forsterker kroningen, ALDRI som to separate utmerkelser.\n';
+    } else if (toppNavn && toppOver > 0) {
+      overskuddBlokk += '- ST\u00d8RSTE OVERSKUDD: ' + delt.join(' og ') + ' med +' + toppOver
+        + ' over ukesm\u00e5let (' + umBiler[toppNavn] + ' biler). Denne vant IKKE uka'
+        + ' \u2013 nevn det som en egen, mindre historie i vinnerens skygge, med respekt for begge.\n';
+    }
+    if (!umKlarte.length) {
+      overskuddBlokk += '- Ingen selgere n\u00e5dde ukesm\u00e5let denne uka. Skriv det n\u00f8kternt og uten h\u00e5n \u2013'
+        + ' og aldri som at noen sviktet.\n';
+    }
+  }
+
   var vinnerAvd = AVD_NAVN[AVD_KEY[SELGER_AVD[win.selger]]] || (win.loc||'');
   var stats = { totalt: totalt, sesong: null, mvp: fornavn(win.selger), mvpNavn: win.selger, mvpAvd: vinnerAvd, topAvd: AVD_NAVN[lederAvd]||null, hatTrick: htHelter.length>0, uke: win.week_nr };
 
@@ -752,6 +810,7 @@ function genererUkesTekst(ukesSalg, win, forrige) {
     + '- VINNERAVDELING (poeng per selger): ' + AVD_NAVN[lederAvd] + ' med ' + avdPpS[lederAvd].toFixed(1) + ' p/selger' + (toerAvd!=null ? ', foran ' + AVD_NAVN[toerAvd] + ' (' + avdPpS[toerAvd].toFixed(1) + '), margin ' + avdMargin + ' p/selger' : '') + '.\n'
     + (besteDag ? '- Ukens beste enkeltdag: ' + besteDagN + ' biler (' + norskDato(besteDag) + ').\n' : '')
     + (htTekst ? '- Hat-trick-helter denne uka: ' + htTekst + '.\n' : '')
+    + overskuddBlokk
     + '\nPROPORSJONALITET: La spr\u00e5ket matche marginene. En knapp seier er et nervepirrende fotofinish, ikke en massakre. Ydmyk ALDRI dem som ikke vant \u2013 hele feltet kjempet en hel uke, og den beseirede falt med \u00e6ren i behold.\n\n'
     + 'INNRAMMING: Dette handler om SIGNERTE KONTRAKTER. Skriv aldri at biler \u00abforlot\u00bb eller \u00abrullet ut\u00bb \u2013 skriv \u00absignerte kontrakter\u00bb, \u00absikret salget\u00bb, \u00ablandet avtalen\u00bb. Finansierte kontrakter er en triumf.\n\n'
     + 'Skriv en EPISK ukesoppsummering p\u00e5 feilfri norsk bokm\u00e5l, i \u00e5nden til La Gazzetta dello Sport \u2013 operadramatisk, h\u00f8ytidelig og lidenskapelig. Forankre all dramatikk i de ekte tallene og navnene over. Les korrektur p\u00e5 deg selv.\n\n'
