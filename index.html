@@ -41,8 +41,13 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .mj-b{width:15px;height:9px;border:1px solid var(--b2);border-radius:2px;background:var(--faint);
   position:relative;flex-shrink:0}
 .mj-b.fill{background:var(--mjc,var(--muted));border-color:var(--mjc,var(--muted))}
-.mj-b.fill.gold{background:var(--gold);border-color:var(--gold)}
-.mj-b.extra{background:var(--gold);border-color:var(--gold);width:7px}
+.mj-b.fill.gold,.mj-b.extra{background:var(--gold);border-color:var(--gold);overflow:hidden}
+.mj-b.extra{width:7px}
+.mj-b.fill.gold:after,.mj-b.extra:after{content:'';position:absolute;top:0;bottom:0;width:170%;
+  left:-170%;background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.9) 50%,transparent 80%);
+  animation:mjSkimmer 3.4s ease-in-out infinite}
+@keyframes mjSkimmer{0%{left:-170%}45%{left:170%}100%{left:170%}}
+@media(prefers-reduced-motion:reduce){.mj-b.fill.gold:after,.mj-b.extra:after{animation:none;opacity:0}}
 .mj-plus{font-family:Anton,sans-serif;font-size:9px;color:var(--gold);align-self:center}
 .mj-boxes{display:inline-flex;gap:2px;align-items:center;margin-left:6px;vertical-align:middle}
 .name-sub{display:flex;align-items:center}
@@ -66,7 +71,7 @@ html,body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--txt);
 .mj-kt{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;margin-left:7px;flex-shrink:0}
 .mj-kt.up{color:var(--g)}.mj-kt.dn{color:var(--r)}.mj-kt.ev{color:var(--muted)}
 /* gullring når selgeren er over streken - bildet blir aldri farget */
-.av.mj-gull{box-shadow:0 0 0 2px #22c55e,0 0 9px rgba(34,197,94,.3)}
+.av.mj-gull{box-shadow:0 0 0 2px var(--gold),0 0 9px rgba(201,168,76,.35)}
 /* siste fem uker i tabellraden */
 .mj-ufrow{display:flex;gap:2px;justify-content:center;align-items:center}
 .mj-uf{display:inline-flex;align-items:center;justify-content:center;width:15px;height:17px;
