@@ -1659,6 +1659,10 @@ var MAL_UKE      = 0;
 var BONUS_START  = '2026-08-17';
 var BONUS_MAL    = 20;
 var BONUS_DAGER  = 28;
+// Utvidelsen fra ledelsen: 30 biler innenfor 42 dager gir 5 000 kr i tillegg.
+// Samme motor, andre terskler — vinduet starter fortsatt på din første bil.
+var BONUS2_MAL   = 30;
+var BONUS2_DAGER = 42;
 var LAGPOTT      = 3000;
 var MJ_START     = '2026-08-17';   // målperioden starter i dag
 var MJ_SLUTT     = '2026-09-30';
@@ -1876,40 +1880,8 @@ function mjUkesrekke(navn) {
     +   '<span><i class="u">U</i> uavgjort &middot; 3 biler</span>'
     +   '<span><i class="t">T</i> tap &middot; under 3</span>'
     + '</div>'
-    + '<div class="mj-vsek">' + (function(){
-        var b = mjBonus(navn);
-        var rad = function(tit, n, sub, kls) {
-          return '<div class="mj-vr ' + kls + '"><span class="mj-vn">' + tit + '</span>'
-            + '<span class="mj-vb"><i style="width:'
-            + Math.min(n / BONUS_MAL * 100, 100).toFixed(0) + '%"></i></span>'
-            + '<span class="mj-vs">' + n + '</span>'
-            + '<span class="mj-vd">' + sub + '</span></div>';
-        };
-        var h = '<div class="mj-vh">28-dagersvinduet \u2014 20 biler gir 10 000 kr</div>';
-        if (!b.dager.length) {
-          return h + '<div class="mj-vf">Ingen biler registrert siden 17. august. '
-            + 'Vinduet starter p\u00e5 den f\u00f8rste.</div>';
-        }
-        h += '<div class="mj-vl">'
-          + rad('Beste', b.beste, mjKortDato(b.start) + ' \u2013 ' + mjKortDato(b.slutt),
-                b.naadd ? 'naadd' : '')
-          + (b.aktivStart && b.aktivN !== b.beste
-              ? rad('N\u00e5', b.aktivN, mjKortDato(b.aktivStart) + ' \u2013 ' + mjKortDato(b.aktivSlutt), 'aktiv')
-              : '')
-          + '</div>';
-        h += '<div class="mj-vf">' + (b.naadd
-          ? '<b>10 000 kr sikret</b> \u2014 ' + b.beste + ' biler mellom '
-            + mjKortDato(b.start) + ' og ' + mjKortDato(b.slutt) + '.'
-          : (b.aktivStart
-              ? 'Vinduet ditt startet <b>' + mjKortDato(b.aktivStart) + '</b> og lukkes <b>'
-                + mjKortDato(b.aktivSlutt) + '</b> \u2014 ' + b.dagerIgjen + ' dag'
-                + (b.dagerIgjen === 1 ? '' : 'er') + ' igjen. '
-                + Math.max(BONUS_MAL - b.aktivN, 0) + ' biler til 20.'
-              : 'Vinduet ditt er utl\u00f8pt. Neste bil starter et nytt.')
-          + ' Et nytt vindu starter p\u00e5 hver bil, s\u00e5 det er alltid flere som l\u00f8per samtidig.')
-          + '</div>';
-        return h;
-      })() + '</div>'
+    + mjBonusBlokk(navn, BONUS_MAL,  BONUS_DAGER,  '10 000 kr', true)
+    + mjBonusBlokk(navn, BONUS2_MAL, BONUS2_DAGER, '5 000 kr ekstra', false)
     + '<div class="mj-wsum">'
     +   (spilt === 0
         ? 'Ingen uker er avsluttet enn\u00e5. F\u00f8rste uke gj\u00f8res opp s\u00f8ndag kveld.'
@@ -1937,7 +1909,9 @@ function mjKortDato(iso) {
 
 // Glidende 28-dagersvindu. Vinduet starter på en solgt bil — det er alltid
 // optimalt, siden en tidligere start bare gir færre dager til rådighet.
-function mjBonus(navn) {
+function mjBonus(navn, mal, dagerN) {
+  mal    = mal    || BONUS_MAL;
+  dagerN = dagerN || BONUS_DAGER;
   var tom = { beste:0, naadd:false, start:null, slutt:null,
               aktivN:0, aktivStart:null, aktivSlutt:null, dagerIgjen:0, dager:[] };
   if (!MJ) return tom;
@@ -1956,7 +1930,7 @@ function mjBonus(navn) {
   // Beste vindu: for hver salgsdag, tell salg i [d, d+27]
   var beste = 0, bStart = null, j = 0;
   for (var i = 0; i < dager.length; i++) {
-    var slutt = mjPlussDager(dager[i], BONUS_DAGER - 1);
+    var slutt = mjPlussDager(dager[i], dagerN - 1);
     if (j < i) j = i;
     while (j + 1 < dager.length && dager[j + 1] <= slutt) j++;
     var n = j - i + 1;
@@ -1966,18 +1940,18 @@ function mjBonus(navn) {
   // Aktivt vindu: det som fortsatt kan vokse — starter på første bil
   // innenfor de siste 28 dagene, og lukkes 28 dager etter den.
   var idag = idagF;
-  var grense = mjPlussDager(idag, -(BONUS_DAGER - 1));
+  var grense = mjPlussDager(idag, -(dagerN - 1));
   var iVinduet = dager.filter(function(d){ return d >= grense && d <= idag; });
   var aktivStart = iVinduet.length ? iVinduet[0] : null;
-  var aktivSlutt = aktivStart ? mjPlussDager(aktivStart, BONUS_DAGER - 1) : null;
+  var aktivSlutt = aktivStart ? mjPlussDager(aktivStart, dagerN - 1) : null;
   if (aktivSlutt && aktivSlutt > MJ_SLUTT) aktivSlutt = MJ_SLUTT;
 
   return {
     beste: beste,
-    naadd: beste >= BONUS_MAL,
+    naadd: beste >= mal,
     start: bStart,
     slutt: bStart ? (function(){
-      var s = mjPlussDager(bStart, BONUS_DAGER - 1);
+      var s = mjPlussDager(bStart, dagerN - 1);
       return s > MJ_SLUTT ? MJ_SLUTT : s;   // vinduet kan ikke strekke seg forbi sesongslutt
     })() : null,
     aktivN: iVinduet.length,
@@ -1986,6 +1960,48 @@ function mjBonus(navn) {
     dagerIgjen: aktivSlutt ? Math.max(mjDagerMellom(idag, aktivSlutt), 0) : 0,
     dager: dager
   };
+}
+
+// Én bonusblokk. Samme motor for begge kampanjene — bare terskel og beløp skiller.
+function mjBonusBlokk(navn, mal, dagerN, krTekst, medForklaring) {
+  var b = mjBonus(navn, mal, dagerN);
+  var rad = function(tit, n, sub, kls) {
+    return '<div class="mj-vr ' + kls + '"><span class="mj-vn">' + tit + '</span>'
+      + '<span class="mj-vb"><i style="width:'
+      + Math.min(n / mal * 100, 100).toFixed(0) + '%"></i></span>'
+      + '<span class="mj-vs">' + n + '</span>'
+      + '<span class="mj-vd">' + sub + '</span></div>';
+  };
+  var h = '<div class="mj-vh">' + dagerN + '-dagersvinduet \u2014 ' + mal
+        + ' biler gir ' + krTekst + '</div>';
+  if (!b.dager.length) {
+    return '<div class="mj-vsek">' + h + '<div class="mj-vf">'
+      + (medForklaring
+          ? 'Ingen biler registrert siden 17. august. Vinduet starter p\u00e5 den f\u00f8rste.'
+          : 'Ingen biler registrert enn\u00e5.')
+      + '</div></div>';
+  }
+  h += '<div class="mj-vl">'
+    + rad('Beste', b.beste, mjKortDato(b.start) + ' \u2013 ' + mjKortDato(b.slutt),
+          b.naadd ? 'naadd' : '')
+    + (b.aktivStart && b.aktivN !== b.beste
+        ? rad('N\u00e5', b.aktivN, mjKortDato(b.aktivStart) + ' \u2013 ' + mjKortDato(b.aktivSlutt), 'aktiv')
+        : '')
+    + '</div>';
+  h += '<div class="mj-vf">' + (b.naadd
+    ? '<b>' + krTekst + ' sikret</b> \u2014 ' + b.beste + ' biler mellom '
+      + mjKortDato(b.start) + ' og ' + mjKortDato(b.slutt) + '.'
+    : (b.aktivStart
+        ? 'Vinduet ditt startet <b>' + mjKortDato(b.aktivStart) + '</b> og lukkes <b>'
+          + mjKortDato(b.aktivSlutt) + '</b> \u2014 ' + b.dagerIgjen + ' dag'
+          + (b.dagerIgjen === 1 ? '' : 'er') + ' igjen. '
+          + Math.max(mal - b.aktivN, 0) + ' biler til ' + mal + '.'
+        : 'Vinduet ditt er utl\u00f8pt. Neste bil starter et nytt.')
+    + (medForklaring
+        ? ' Et nytt vindu starter p\u00e5 hver bil, s\u00e5 det er alltid flere som l\u00f8per samtidig.'
+        : ''))
+    + '</div>';
+  return '<div class="mj-vsek">' + h + '</div>';
 }
 
 // Siste fem uker som bokstavrekke — samme språk som en tabellrekke i fotball
