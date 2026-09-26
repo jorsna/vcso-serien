@@ -12,6 +12,12 @@ on:
         type: boolean
         default: false
 
+# Hindrer at to kjøringer (Supabase-trigger + GitHub-schedule) går samtidig.
+# Den andre venter, ser at utgaven finnes, og hopper over.
+concurrency:
+  group: auto-gazzetta
+  cancel-in-progress: false
+
 jobs:
   gazzetta:
     runs-on: ubuntu-latest
