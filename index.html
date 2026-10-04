@@ -1349,6 +1349,94 @@ body[data-tab]:not([data-tab="ind"]):not([data-tab="team"]) .mbar{display:none !
 .md-maal-ekstra span{padding:4px 10px;border-radius:999px;border:1px solid rgba(201,168,76,.55);background:rgba(201,168,76,.12);
   color:#f4e9c8;font-size:13px;font-weight:600}
 </style>
+<style id="s3-drakt-css">
+/* ═══ SESONG 3-DRAKT ═══ */
+/* Innlogging: flomlys over banen */
+#intro-overlay{background:
+  radial-gradient(ellipse 60% 45% at 18% -5%,rgba(255,248,220,.20),transparent 70%),
+  radial-gradient(ellipse 60% 45% at 82% -5%,rgba(255,248,220,.20),transparent 70%),
+  radial-gradient(ellipse 120% 70% at 50% 110%,rgba(201,168,76,.16),transparent 60%),
+  repeating-linear-gradient(180deg,rgba(40,90,60,.10) 0 44px,transparent 44px 88px),
+  linear-gradient(180deg,#0b1730,#060b14);justify-content:flex-start;padding:max(28px,6vh) 20px 24px;overflow-y:auto}
+#intro-overlay:before{content:'';position:absolute;left:50%;top:58%;width:240px;height:240px;margin:-120px 0 0 -120px;
+  border:2px solid rgba(255,255,255,.06);border-radius:50%;pointer-events:none}
+#intro-overlay:after{content:'';position:absolute;left:0;right:0;top:58%;height:2px;background:rgba(255,255,255,.06);pointer-events:none}
+.s3-in-krest{width:84px;height:96px;margin:0 auto 10px;filter:drop-shadow(0 8px 26px rgba(201,168,76,.45));animation:s3Puls 3.2s ease-in-out infinite}
+@keyframes s3Puls{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.s3-in-org{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:12px;letter-spacing:.5em;padding-left:.5em;color:rgba(255,255,255,.55);text-transform:uppercase;text-align:center}
+.s3-in-navn{font-family:'Anton',sans-serif;font-size:clamp(44px,14vw,64px);line-height:1.05;letter-spacing:.02em;text-align:center;margin-top:4px;
+  background:linear-gradient(110deg,#fff 0%,var(--gold) 38%,#fff8d8 52%,var(--gold) 66%,#fff 100%);background-size:200% auto;
+  -webkit-background-clip:text;background-clip:text;color:transparent;animation:logoShine 4.5s linear infinite}
+.s3-in-sesong{display:inline-flex;gap:8px;align-items:center;margin:12px auto 0;padding:6px 14px;border-radius:999px;border:1px solid rgba(201,168,76,.55);
+  background:rgba(201,168,76,.12);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase}
+.s3-in-tag{font-family:'Anton',sans-serif;font-size:17px;letter-spacing:.12em;color:#fff;text-transform:uppercase;text-align:center;margin:18px 0 18px;opacity:.95}
+.s3-in-mester{position:relative;z-index:2;display:flex;align-items:center;gap:12px;width:100%;max-width:300px;margin:0 auto 18px;padding:10px 14px;border-radius:14px;
+  background:linear-gradient(135deg,rgba(201,168,76,.22),rgba(201,168,76,.06));border:1px solid rgba(201,168,76,.6);box-shadow:0 8px 30px rgba(0,0,0,.35)}
+.s3-in-mester-av{width:52px;height:52px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex:none;background:var(--card2);
+  display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--gold)}
+.s3-in-mester-av img{width:100%;height:100%;object-fit:cover}
+.s3-in-mester-l{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:.14em;color:var(--gold);text-transform:uppercase}
+.s3-in-mester-n{font-family:'Anton',sans-serif;font-size:20px;color:#fff;line-height:1.1}
+.s3-in-mester-s{font-size:12px;color:rgba(255,255,255,.65)}
+.s3-in-krone{position:absolute;top:-12px;left:30px;font-size:20px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))}
+#intro-overlay .login-section{background:rgba(6,11,20,.55);border:1px solid rgba(201,168,76,.25);border-radius:16px;padding:16px;max-width:300px;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#intro-overlay .btn-selger{box-shadow:0 6px 24px rgba(201,168,76,.35);border-radius:10px}
+#intro-overlay .btn-tilskuer{border-radius:10px;color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.25)}
+#intro-overlay .login-input{border-radius:10px}
+
+/* Sesongstripe */
+.s3-ses{margin:12px 14px 0;padding:12px 14px;border-radius:12px;background:linear-gradient(135deg,rgba(201,168,76,.14),rgba(201,168,76,.03));
+  border:1px solid rgba(201,168,76,.35)}
+.s3-ses-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.s3-ses-k{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:12px;letter-spacing:.14em;padding:2px 8px;border-radius:4px;background:var(--gold);color:#0b1526}
+.s3-ses-t{font-family:'Anton',sans-serif;font-size:18px;letter-spacing:.04em;color:var(--txt)}
+.s3-ses-s{font-size:12px;color:var(--muted);margin-left:auto}
+.s3-ses-bar{display:grid;gap:3px;margin-top:9px}
+.s3-ses-bar i{height:6px;border-radius:3px;background:rgba(255,255,255,.08)}
+.s3-ses-bar i.f{background:var(--gold)}
+.s3-ses-bar i.n{background:linear-gradient(90deg,var(--gold),rgba(201,168,76,.35));animation:s3Blink 1.6s ease-in-out infinite}
+@keyframes s3Blink{50%{opacity:.55}}
+
+/* Pall for topp 3 */
+.s3-pall{display:grid;grid-template-columns:1fr 1.18fr 1fr;align-items:end;gap:8px;margin:14px 12px 6px}
+.s3-p{position:relative;text-align:center;border-radius:14px;padding:12px 6px 10px;cursor:pointer;border:1px solid var(--b1);
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.015));min-height:44px}
+.s3-p.r1{padding-top:16px;border-color:rgba(201,168,76,.7);background:linear-gradient(180deg,rgba(201,168,76,.26),rgba(201,168,76,.05));
+  box-shadow:0 10px 34px rgba(201,168,76,.18)}
+.s3-p.r2{border-color:rgba(148,163,184,.55)}.s3-p.r3{border-color:rgba(205,127,50,.55)}
+.s3-p-med{position:absolute;top:-11px;left:50%;transform:translateX(-50%);font-family:'Anton',sans-serif;font-size:13px;width:24px;height:24px;line-height:24px;
+  border-radius:50%;color:#0b1526;background:var(--silver)}
+.s3-p.r1 .s3-p-med{background:var(--gold)}.s3-p.r3 .s3-p-med{background:var(--bronze)}
+.s3-p-av{position:relative;width:58px;height:58px;margin:0 auto;border-radius:50%;overflow:hidden;border:2px solid var(--silver);background:var(--card2);
+  display:flex;align-items:center;justify-content:center;font-weight:700}
+.s3-p.r1 .s3-p-av{width:76px;height:76px;border:3px solid var(--gold);box-shadow:0 0 22px rgba(201,168,76,.5)}
+.s3-p.r3 .s3-p-av{border-color:var(--bronze)}
+.s3-p-av img{width:100%;height:100%;object-fit:cover}
+.s3-p-n{font-weight:700;font-size:13px;margin-top:7px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s3-p-pts{font-family:'Anton',sans-serif;font-size:22px;color:var(--gold);line-height:1.1}
+.s3-p.r1 .s3-p-pts{font-size:28px}
+.s3-p-s{font-size:12px;color:var(--muted)}
+.s3-p .s3-pil{position:absolute;top:8px;right:8px}
+.s3-p .av-wrap{display:block;width:58px;margin:0 auto}.s3-p.r1 .av-wrap{width:76px}
+#tbl-ind .mj-nmrow{flex-wrap:wrap;row-gap:3px}
+.s3-p-tom{opacity:.55}
+
+/* Tabellrader */
+#tbl-ind .trow{margin:6px 10px;border:1px solid var(--b1);border-radius:12px;padding:9px 10px;
+  background:linear-gradient(90deg,rgba(255,255,255,.045),rgba(255,255,255,.012))}
+#tbl-ind .trow.s3-skjult{display:none}
+#view-ind .tbl-head{margin:4px 10px 0;border-radius:8px}
+#tbl-ind .av{width:40px;height:40px}
+.s3-pos{display:flex;flex-direction:column;align-items:center;gap:2px}
+.s3-pil{font-size:12px;font-weight:700;line-height:1;white-space:nowrap}
+.s3-pil.opp{color:#4ade80}.s3-pil.ned{color:#f87171}
+.av-wrap.s3-idag:after{content:'';position:absolute;inset:-3px;border-radius:50%;border:2px solid #4ade80;animation:s3Ring 1.8s ease-out infinite;pointer-events:none}
+@keyframes s3Ring{0%{transform:scale(.92);opacity:1}100%{transform:scale(1.22);opacity:0}}
+.s3-krone{position:absolute;top:-9px;left:-5px;font-size:15px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6));z-index:2}
+.md-tag.mester{background:linear-gradient(135deg,#f6e27a,#c9a84c);color:#1a1405;border:none}
+@media(prefers-reduced-motion:reduce){.av-wrap.s3-idag:after,.s3-in-krest,.s3-ses-bar i.n{animation:none}}
+</style>
 </head>
 <body data-tab="ind">
 <div class="atmo" aria-hidden="true">
@@ -1378,12 +1466,12 @@ body[data-tab]:not([data-tab="ind"]):not([data-tab="team"]) .mbar{display:none !
 
 <!-- INTRO / LOGIN -->
 <div id="intro-overlay">
-  <div class="intro-logo">VCSO</div>
-  <div class="intro-logo" style="font-size:30px;margin-top:-4px">CHAMPIONSHIP</div>
-  <div class="intro-sub">Volvo Car Stor Oslo &nbsp;&middot;&nbsp; Season 2026</div>
-  <div class="intro-divider"></div>
-  <div class="intro-tagline">La kampen om kontraktene begynne</div>
-
+  <svg class="s3-in-krest" viewBox="0 0 74 84" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="s3G" x1="0" y1="0" x2="74" y2="84"><stop offset="0" stop-color="#f3dc8e"/><stop offset=".5" stop-color="#c9a84c"/><stop offset="1" stop-color="#7a5f22"/></linearGradient><linearGradient id="s3B" x1="0" y1="0" x2="74" y2="84"><stop offset="0" stop-color="#1a2a44"/><stop offset="1" stop-color="#0a1222"/></linearGradient></defs><path d="M37 2 L70 12 V44 C70 63 56 76 37 82 C18 76 4 63 4 44 V12 Z" fill="url(#s3B)" stroke="url(#s3G)" stroke-width="2.5"/><path d="M37 20 l4.7 9.5 10.5 1.5 -7.6 7.4 1.8 10.4 -9.4 -4.9 -9.4 4.9 1.8 -10.4 -7.6 -7.4 10.5 -1.5 Z" fill="url(#s3G)"/><path d="M18 62 q19 11 38 0" stroke="url(#s3G)" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+  <div class="s3-in-org">Volvo Car Stor Oslo</div>
+  <div class="s3-in-navn">CHAMPIONSHIP</div>
+  <div style="text-align:center"><span class="s3-in-sesong">Sesong 3 &middot; Nybil &middot; Okt&ndash;Des 2026</span></div>
+  <div class="s3-in-tag">La kampen om kontraktene begynne</div>
+  <div id="s3-in-mester"></div>
   <div class="login-section">
     <input class="login-input" type="password" id="pw-input"
       placeholder="Skriv inn passord"
@@ -1498,8 +1586,10 @@ body[data-tab]:not([data-tab="ind"]):not([data-tab="team"]) .mbar{display:none !
 
 <!-- SELGERE VIEW -->
 <div class="view on" id="view-ind">
+  <div id="s3-ses"></div>
   <div id="md-mp"></div>
   <div id="md-jul"></div>
+  <div id="s3-pall"></div>
   <div class="tbl-head">
     <div>#</div><div></div><div>Spiller</div>
     <div>M&#229;l</div><div>Poeng</div><div>Siste 5 uker</div>
@@ -1784,7 +1874,7 @@ function mndFraDato(d) {
   return m ? m.id : '';
 }
 function mndInfo(id) { return SESONG.maaneder.find(function(x) { return x.id === id; }) || null; }
-function harMaal() { return !!MAL_BEDRIFT_FAST; }
+function harMaal() { return !!(MAL_UKE_FAST || MAL_BEDRIFT_FAST); }
 function tomMndMap() { var o = {}; SESONG.maaneder.forEach(function(m) { o[m.id] = {}; }); return o; }
 // ─── MÅLJAKTEN ───────────────────────────────────────────────────────
 // Alt følger av bedriftsmålet. Ukesmålet per selger avledes av det.
@@ -1792,6 +1882,7 @@ function tomMndMap() { var o = {}; SESONG.maaneder.forEach(function(m) { o[m.id]
 // MAL_BEDRIFT_FAST er kilden til alt. MAL_UKE regnes ut av MJ_bygg() ut fra periodens
 // lengde og antall selgere, så tallene aldri kan komme i utakt med budsjettet.
 var MAL_BEDRIFT_FAST = null;   // Q4-målet er ikke satt ennå. Sett tallet her når det kommer.
+var MAL_UKE_FAST     = 4;      // Ukesmålet: biler per selger per uke. Går foran bedriftsmålet.
 var MAL_UKE      = 0;
 // Provisjonsbonusen fra Sesong 2 er fjernet. Konstantene står igjen slik at gammel kode ikke feiler.
 var BONUS_START  = SESONG.start;
@@ -1891,7 +1982,7 @@ function MJ_bygg() {
   var dager = 0, gaatt = 0;
   rekke.forEach(function(u){ dager += u.dager; });
   // Ukesmålet følger av bedriftsmålet, ikke omvendt
-  MAL_UKE = dager > 0 ? MAL_BEDRIFT_FAST / SELGERE.length / (dager / 5) : 0;
+  MAL_UKE = MAL_UKE_FAST ? MAL_UKE_FAST : (dager > 0 ? MAL_BEDRIFT_FAST / SELGERE.length / (dager / 5) : 0);
   dager = 0;
   rekke.forEach(function(u) {
     u.mal     = MAL_UKE * u.dager / 5;
@@ -1928,6 +2019,10 @@ function MJ_bygg() {
 }
 
 // Salg per selger per uke, kun innenfor sesongen
+// V når ukesmålet er nådd, U når du er én bil unna (korte uker: forholdsmessig mål)
+function mjNaadd(n, mal) { return n >= mal - 1e-9; }
+function mjUavgjort(n, mal) { return n >= Math.ceil(mal - 1e-9) - 1; }
+
 function mjPerUke() {
   var ut = {};
   SELGERE.forEach(function(s){ ut[s.navn] = {}; });
@@ -1951,7 +2046,7 @@ function mjStreak(navn, pu) {
   var st = 0;
   for (var i = MJ.ferdige.length - 1; i >= 0; i--) {
     var u = MJ.ferdige[i];
-    if ((pu[navn][u.uke] || 0) > u.mal) st++; else break;
+    if (mjNaadd(pu[navn][u.uke] || 0, u.mal)) st++; else break;
   }
   return st;
 }
@@ -1993,8 +2088,8 @@ function mjUkesrekke(navn) {
     } else {
       spilt++;
       kt += n - u.mal;
-      if (n > u.mal)                   { kls = 'v'; bok = 'V'; V++; }
-      else if (n >= Math.floor(u.mal)) { kls = 'u'; bok = 'U'; U++; }
+      if (mjNaadd(n, u.mal))           { kls = 'v'; bok = 'V'; V++; }
+      else if (mjUavgjort(n, u.mal))   { kls = 'u'; bok = 'U'; U++; }
       else                             { kls = 't'; bok = 'T'; T++; }
       tall = n;
       tip = 'Uke ' + u.uke + ': ' + n + ' av ' + mjNb(u.mal, 1) + ' \u2014 '
@@ -2149,9 +2244,9 @@ function mjUkeForm(navn, pu) {
       kls = 'na'; tegn = n;
       tip = 'Uke ' + u.uke + ' p\u00e5g\u00e5r: ' + n + ' av ' + mjNb(u.mal,1)
           + ' \u2014 ' + Math.max(Math.ceil(u.mal - n + 0.01), 0) + ' igjen for seier';
-    } else if (n > u.mal) {
+    } else if (mjNaadd(n, u.mal)) {
       kls = 'v'; tegn = 'V'; tip = 'Uke ' + u.uke + ': ' + n + ' biler \u2014 seier';
-    } else if (n >= Math.floor(u.mal)) {
+    } else if (mjUavgjort(n, u.mal)) {
       kls = 'u'; tegn = 'U'; tip = 'Uke ' + u.uke + ': ' + n + ' biler \u2014 uavgjort';
     } else {
       kls = 't'; tegn = 'T'; tip = 'Uke ' + u.uke + ': ' + n + ' biler \u2014 tap';
@@ -2162,7 +2257,7 @@ function mjUkeForm(navn, pu) {
 
 // Fire ruter — den fjerde bærer streken
 function mjRuter(n, mal) {
-  var h = '', naadd = n > mal, ant = Math.max(Math.ceil(mal), 1);
+  var h = '', naadd = mjNaadd(n, mal), ant = Math.max(Math.ceil(mal - 1e-9), 1);
   for (var i = 1; i <= ant; i++) {
     var fylt = n >= i;
     h += '<div class="mj-b' + (fylt ? ' fill' : '') + (fylt && naadd ? ' gold' : '')
@@ -2576,7 +2671,7 @@ function renderInd() {
       ? '<img src="'+SELGER_PHOTOS[r.id]+'" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%)">'
       : r.initials;
     var ms = milestoneState(r.navn);
-    var over = MJ && r.wk > MJ.naa.mal;
+    var over = MJ && mjNaadd(r.wk, MJ.naa.mal);
     var uSt = 0;
     if (MJ) { try { uSt = mjStreak(r.navn); } catch(e) {} }
     return '<div class="trow zm" data-navn="'+r.navn+'" role="button" tabindex="0" onclick="openPlayerCard(\''+r.id+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openPlayerCard(\''+r.id+'\');}" style="animation-delay:'+(i*0.03)+'s;cursor:pointer">'
@@ -2603,6 +2698,7 @@ function renderInd() {
     + '</div>';
   }).join('');
   mdRenderInd();
+  try { s3RenderSesong(); s3EtterInd(); } catch (e) { console.error('Sesong 3: ' + e.message); }
 }
 
 // ─── RENDER: AVDELINGER ──────────────────────────────────────────────
@@ -3473,8 +3569,8 @@ function renderBstripe() {
     + '<span class="bs-sep bs-hide">&#9670;</span>'
     + '<span class="bs-hide">' + t.dagerIgjen + ' '
     + (t.dagerIgjen === 1 ? 'dag' : 'dager') + ' av uka</span>'
-    + '<span class="bs-sep">&#9670;</span>'
-    + '<span>TOTALT ' + mjSesongSolgt() + ' / ' + MJ.malBedrift + '</span>';
+    + (MJ.malBedrift ? '<span class="bs-sep">&#9670;</span>'
+    + '<span>TOTALT ' + mjSesongSolgt() + ' / ' + MJ.malBedrift + '</span>' : '');
 }
 
 // Salg i inneværende uke, kronologisk sortert, med avdelingen til selgeren
@@ -3546,7 +3642,8 @@ function renderUka() {
 
 function renderBedriftsmal() {
   var el = document.getElementById('mj-bedrift');
-  if (!el || !MJ) return;
+  if (!el) return;
+  if (!MJ || !MJ.malBedrift) { el.innerHTML = ''; return; }
   var solgt = mjSesongSolgt();
   var skulle = MJ.malBedrift * MJ.gaatt / MJ.dager;
   var etter = solgt - skulle;
@@ -3556,7 +3653,7 @@ function renderBedriftsmal() {
   el.innerHTML = '<div class="mj-sea">'
     + '<div class="mj-eyebrow">DIT VI SKAL</div>'
     + '<div class="mj-num">' + MJ.malBedrift + '<small>BILER</small></div>'
-    + '<div class="mj-sub">' + MJ.malBedrift + ' biler fra 17. august til 30. september &mdash; '
+    + '<div class="mj-sub">' + MJ.malBedrift + ' biler i ' + SESONG.periodeTekst.toLowerCase() + ' &mdash; '
     +   mjNb(MJ.dager / 5, 1) + ' uker. Fordelt p&aring; ' + SELGERE.length + ' selgere blir det <b>'
     +   mjNb(MAL_UKE, 1) + ' biler i uka</b> hver.</div>'
     + '<div class="mj-track">'
@@ -3860,6 +3957,124 @@ function toggleFin() {
   if (box)   box.classList.toggle('fin-box-active', on);
   if (badge) badge.style.opacity = on ? '1' : '0';
   if (label) label.classList.toggle('fin-active', on);
+}
+
+// ─── SESONG 3-DRAKT ──────────────────────────────────────────────────
+// Forrige sesongs mester (fra sesongfinalen). Vises på innlogging og ved navnet hele sesongen.
+var FORRIGE_MESTER = {"navn": "Ask Herlofsen", "sesong": "Sesong 2", "poeng": 168};
+
+function s3Foto(navn) {
+  var s = SELGERE.find(function(x) { return x.navn === navn; });
+  return s && typeof SELGER_PHOTOS !== 'undefined' && SELGER_PHOTOS[s.id] ? SELGER_PHOTOS[s.id] : '';
+}
+function s3InitMester() {
+  var el = document.getElementById('s3-in-mester');
+  if (!el || !FORRIGE_MESTER) return;
+  var f = s3Foto(FORRIGE_MESTER.navn);
+  var init = FORRIGE_MESTER.navn.split(' ').map(function(x) { return x[0]; }).join('').slice(0, 2);
+  el.innerHTML = '<div class="s3-in-mester"><span class="s3-in-krone">👑</span><div class="s3-in-mester-av">' + (f ? '<img src="' + f + '" alt="">' : init) + '</div>'
+    + '<div><div class="s3-in-mester-l">Regjerende mester</div><div class="s3-in-mester-n">' + FORRIGE_MESTER.navn + '</div>'
+    + '<div class="s3-in-mester-s">' + FORRIGE_MESTER.sesong + ' · ' + FORRIGE_MESTER.poeng + ' poeng</div></div></div>';
+}
+
+// Uker i sesongen (ISO-uker som overlapper start–slutt)
+function s3Uker() {
+  var ut = [], sett = {}, d = new Date(SESONG.start + 'T12:00:00'), slutt = new Date(SESONG.slutt + 'T12:00:00');
+  while (d <= slutt) {
+    var k = getIsoYear(d) + '-' + getIsoWeek(d);
+    if (!sett[k]) { sett[k] = 1; ut.push({ k: k, uke: getIsoWeek(d), forste: d.toLocaleDateString('sv-SE') }); }
+    d.setDate(d.getDate() + 1);
+  }
+  return ut;
+}
+function s3RenderSesong() {
+  var el = document.getElementById('s3-ses');
+  if (!el) return;
+  var uker = s3Uker(), idag = MatchdayMVP.iDag(), dI = new Date(idag + 'T12:00:00');
+  var naaK = getIsoYear(dI) + '-' + getIsoWeek(dI);
+  var nr = uker.findIndex(function(u) { return u.k === naaK; }) + 1;
+  if (idag < SESONG.start) nr = 0;
+  if (idag > SESONG.slutt) nr = uker.length + 1;
+  var kickoff = nr >= 1 && nr <= 2;
+  var tittel = nr === 0 ? SESONG.navn + ' starter ' + SESONG.startTekst
+             : nr > uker.length ? SESONG.navn + ' er ferdigspilt'
+             : 'Uke ' + nr + ' av ' + uker.length;
+  var igjen = Math.max(0, Math.round((new Date(SESONG.slutt + 'T12:00:00') - dI) / 86400000));
+  el.innerHTML = '<div class="s3-ses"><div class="s3-ses-top">'
+    + (kickoff ? '<span class="s3-ses-k">KICKOFF</span>' : '<span class="s3-ses-k">' + SESONG.navn.toUpperCase() + '</span>')
+    + '<span class="s3-ses-t">' + tittel + '</span>'
+    + (nr >= 1 && nr <= uker.length ? '<span class="s3-ses-s">' + igjen + ' dager igjen</span>' : '') + '</div>'
+    + '<div class="s3-ses-bar" style="grid-template-columns:repeat(' + uker.length + ',1fr)">'
+    + uker.map(function(u, i) { return '<i class="' + (i + 1 < nr ? 'f' : i + 1 === nr ? 'n' : '') + '" title="Uke ' + u.uke + '"></i>'; }).join('')
+    + '</div></div>';
+}
+
+// Plassering med samme regler som tabellen; utenIdag = slik tabellen så ut ved slutten av i går
+function s3Plasser(m, utenIdag) {
+  var idag = MatchdayMVP.iDag(), st = {};
+  SELGERE.forEach(function(s) { st[s.navn] = { navn: s.navn, pts: 0, fin: 0 }; });
+  sales.forEach(function(s) {
+    if (!st[s.selger] || s.deleted) return;
+    if (m !== 'all' && s.mnd !== m) return;
+    if (utenIdag && MatchdayMVP.osloDato(s.ts) >= idag) return;
+    st[s.selger].pts += PTS + (s.spotlight_bonus || 0);
+    if (s.finansiert) st[s.selger].fin++;
+  });
+  var r = Object.keys(st).map(function(k) { return st[k]; })
+    .sort(function(a, b) { return b.pts - a.pts || b.fin - a.fin || a.navn.localeCompare(b.navn); });
+  var plass = {};
+  r.forEach(function(x, i) { plass[x.navn] = { plass: i + 1, pts: x.pts }; });
+  return plass;
+}
+function s3Pil(navn, naa, igaar) {
+  var a = igaar[navn], b = naa[navn];
+  if (!a || !b || !b.pts) return '';
+  var d = a.plass - b.plass;
+  if (!d) return '';
+  return '<span class="s3-pil ' + (d > 0 ? 'opp' : 'ned') + '" title="' + (d > 0 ? 'Opp ' + d : 'Ned ' + (-d)) + ' siden i går">'
+    + (d > 0 ? '▲' + d : '▼' + (-d)) + '</span>';
+}
+function s3SolgtIdag() {
+  var idag = MatchdayMVP.iDag(), ut = {};
+  sales.forEach(function(s) { if (!s.deleted && MatchdayMVP.osloDato(s.ts) === idag) ut[s.selger] = (ut[s.selger] || 0) + 1; });
+  return ut;
+}
+
+// Etter at tabellen er tegnet: pall, piler, puls og mestermerke
+function s3EtterInd() {
+  var m = curMonth, naa = s3Plasser(m, false), igaar = s3Plasser(m, true), idag = s3SolgtIdag();
+  var rader = Array.prototype.slice.call(document.querySelectorAll('#tbl-ind .trow'));
+  rader.forEach(function(r) {
+    var navn = r.getAttribute('data-navn');
+    var pos = r.querySelector('.pos-n');
+    var pil = s3Pil(navn, naa, igaar);
+    if (pos && pil) { var w = document.createElement('div'); w.className = 's3-pos'; pos.parentNode.insertBefore(w, pos); w.appendChild(pos); w.insertAdjacentHTML('beforeend', pil); }
+    var av = r.querySelector('.av-wrap');
+    if (av && idag[navn]) av.classList.add('s3-idag');
+    if (av && FORRIGE_MESTER && FORRIGE_MESTER.navn === navn) {
+      av.insertAdjacentHTML('afterbegin', '<span class="s3-krone" title="Regjerende mester">👑</span>');
+      var nm = r.querySelector('.name-main');
+      if (nm) nm.insertAdjacentHTML('beforeend', '<span class="md-tag mester" title="' + FORRIGE_MESTER.sesong + '">MESTER S2</span>');
+    }
+  });
+  // Pallen: de tre første, bare når noen har poeng
+  var pall = document.getElementById('s3-pall');
+  if (!pall) return;
+  var topp = rader.slice(0, 3).filter(function(r) { return +(r.querySelector('.sc.pts') || {}).textContent > 0; });
+  if (topp.length < 3) { pall.innerHTML = ''; return; }
+  topp.forEach(function(r) { r.classList.add('s3-skjult'); });
+  var kort = topp.map(function(r, i) {
+    var navn = r.getAttribute('data-navn'), s = SELGERE.find(function(x) { return x.navn === navn; }) || {};
+    var f = s3Foto(navn), pts = r.querySelector('.sc.pts').textContent;
+    var maal = (r.querySelector('.sc') || {}).firstChild ? r.querySelector('.sc').firstChild.textContent : '';
+    var krone = FORRIGE_MESTER && FORRIGE_MESTER.navn === navn ? '<span class="s3-krone" style="left:calc(50% - 40px)">👑</span>' : '';
+    return '<div class="s3-p r' + (i + 1) + '" role="button" tabindex="0" onclick="openPlayerCard(\'' + s.id + '\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openPlayerCard(\'' + s.id + '\');}">'
+      + '<span class="s3-p-med">' + (((r.querySelector('.pos-n') || {}).textContent || String(i + 1)).replace('T', '')) + '</span>' + s3Pil(navn, naa, igaar) + krone
+      + '<div class="av-wrap' + (idag[navn] ? ' s3-idag' : '') + '"><div class="s3-p-av">' + (f ? '<img src="' + f + '" alt="">' : (s.initials || '')) + '</div></div>'
+      + '<div class="s3-p-n">' + navn.split(' ')[0] + '</div>'
+      + '<div class="s3-p-pts">' + pts + '</div><div class="s3-p-s">' + maal + ' biler</div></div>';
+  });
+  pall.innerHTML = '<div class="s3-pall">' + kort[1] + kort[0] + kort[2] + '</div>';
 }
 
 // ─── SESONG 3: HENDELSER ─────────────────────────────────────────────
@@ -4194,9 +4409,9 @@ function openPlayerCard(id) {
     try {
       var uPu = mjPerUke(), uMine = uPu[navn] || {}, uKlart = 0;
       MJ.uker.forEach(function(u) {
-        if (u.ferdig && u.uke !== MJ.naa.uke && (uMine[u.uke] || 0) > u.mal) uKlart++;
+        if (u.ferdig && u.uke !== MJ.naa.uke && mjNaadd(uMine[u.uke] || 0, u.mal)) uKlart++;
       });
-      if ((uMine[MJ.naa.uke] || 0) > MJ.naa.mal) {
+      if (mjNaadd(uMine[MJ.naa.uke] || 0, MJ.naa.mal)) {
         badgeList.unshift({ icon:'\u2713', label:'Ukesm\u00e5l uke ' + MJ.naa.uke, fresh:false, uke:true });
       }
       if (uKlart > 0) {
@@ -4942,6 +5157,7 @@ function updateHatTrick() {
 
 function countdown() {
   // Nedtellingen er fjernet i Sesong 3. Hat-trick-vakten oppdateres fortsatt hvert sekund.
+  if (!window._s3Mester) { window._s3Mester = 1; try { s3InitMester(); } catch (e) {} }
   updateHatTrick();
 }
 
