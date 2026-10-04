@@ -1531,6 +1531,34 @@ body[data-tab]:not([data-tab="ind"]):not([data-tab="team"]) .mbar{display:none !
   #pc-body .fc{transform:none!important}
 }
 </style>
+<style id="s3-admin-css">
+/* ═══ ADMIN ═══ */
+.adm-only{display:none!important}
+body.er-admin .adm-only{display:block!important}
+body.er-admin .adm-flex.adm-only{display:flex!important}
+.score-edit{display:block;width:calc(100% - 16px);margin:8px auto 10px;min-height:44px;border-radius:8px;border:1px solid var(--gold);
+  background:rgba(201,168,76,.12);color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:.1em;cursor:pointer}
+.score-nr{font-size:12px;color:var(--muted);margin-top:2px;font-variant-numeric:tabular-nums}
+.adm-sok{width:100%;margin:10px 0 0;padding:12px;min-height:44px;border-radius:8px;border:1px solid rgba(201,168,76,.5);background:var(--card2);color:var(--txt);font-size:14px;font-family:inherit}
+.adm-dato-rad{gap:8px;margin-top:8px}
+.adm-dato-rad input{flex:1;min-height:44px;padding:10px;border-radius:8px;border:1px solid rgba(201,168,76,.5);background:var(--card2);color:var(--txt);font-size:14px;font-family:inherit}
+.adm-bd{position:fixed;inset:0;z-index:100001;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:16px}
+.adm-bd.open{display:flex}
+.adm-box{width:100%;max-width:420px;max-height:92vh;overflow:auto;background:var(--card);border:1px solid rgba(201,168,76,.5);border-radius:14px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.adm-h{font-family:'Anton',sans-serif;font-size:20px;letter-spacing:.04em;color:var(--gold)}
+.adm-sub{font-size:12px;color:var(--muted);margin:2px 0 12px}
+.adm-f{display:block;margin-bottom:10px}
+.adm-f span{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.adm-f input,.adm-f select{width:100%;min-height:44px;padding:10px;border-radius:8px;border:1px solid var(--b1);background:var(--card2);color:var(--txt);font-size:14px;font-family:inherit}
+.adm-to{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.adm-chk{display:flex;align-items:center;gap:10px;min-height:44px;font-size:14px;color:var(--txt);cursor:pointer}
+.adm-chk input{width:22px;height:22px;accent-color:var(--gold)}
+.adm-msg{font-size:13px;color:#fca5a5;min-height:18px;margin:4px 0}
+.adm-knapper{display:flex;gap:8px;margin-top:6px}
+.adm-knapper button{flex:1;min-height:44px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:.06em;cursor:pointer}
+.adm-avbryt{background:transparent;border:1px solid var(--b2,var(--b1));color:var(--txt)}
+.adm-lagre{background:var(--gold);border:1px solid var(--gold);color:#111}
+</style>
 </head>
 <body data-tab="ind">
 <div class="atmo" aria-hidden="true">
@@ -1745,6 +1773,7 @@ body[data-tab]:not([data-tab="ind"]):not([data-tab="team"]) .mbar{display:none !
       <button class="lf-btn" onclick="setLocFilter('fornebu',this)">Fnbu</button>
     </div>
   </div>
+  <div class="adm-only" style="padding:0 12px"><input class="adm-sok" id="adm-sok" type="search" placeholder="S&oslash;k: navn, nummer, modell eller dato (admin)" aria-label="S&oslash;k i salg" oninput="renderScoring()"></div>
   <div class="scoring-grid" id="scoring-grid"></div>
 </div>
 
@@ -1764,10 +1793,15 @@ body[data-tab]:not([data-tab="ind"]):not([data-tab="team"]) .mbar{display:none !
     <div class="fg2">
       <input type="text" id="sel-kontrakt" inputmode="numeric" autocomplete="off" placeholder="DOIN-nummer (Tacdis)..."
         style="width:100%;padding:11px 12px;background:var(--card2);border:1px solid var(--b1);border-radius:8px;color:var(--txt);font-size:14px;font-family:inherit">
-      <select id="sel-dato">
+      <select id="sel-dato" onchange="admDatoValg()">
         <option value="0">Salgsdato: I dag</option>
         <option value="1">Salgsdato: I g&#229;r</option>
+        <option value="x" class="adm-opt" disabled hidden>Annen dato (admin)</option>
       </select>
+      <div class="adm-dato-rad adm-flex" id="adm-dato-rad" style="display:none">
+        <input type="date" id="sel-dato-adm" aria-label="Salgsdato (admin)">
+        <input type="time" id="sel-tid-adm" value="12:00" aria-label="Klokkeslett (admin)">
+      </div>
     </div>
     <div class="fin-label" id="fin-label" onclick="toggleFin()">
       <div class="fin-box" id="chk-box">
@@ -1880,6 +1914,28 @@ body[data-tab]:not([data-tab="ind"]):not([data-tab="team"]) .mbar{display:none !
   <div class="md-maal-ekstra" id="md-maal-ekstra"></div>
   <div class="md-maal-hint" id="md-maal-hint"></div>
   <button class="md-maal-lukk" onclick="closeMaal()">Lukk</button>
+</div>
+
+<!-- ADMIN: ENDRE SALG -->
+<div class="adm-bd" id="adm-bd" onclick="if(event.target===this)admLukk()">
+  <div class="adm-box" role="dialog" aria-modal="true" aria-labelledby="adm-h">
+    <div class="adm-h" id="adm-h">Endre salg</div>
+    <div class="adm-sub" id="adm-sub"></div>
+    <label class="adm-f"><span>Selger</span><select id="adm-selger"></select></label>
+    <label class="adm-f"><span>Modell</span><select id="adm-modell"></select></label>
+    <div class="adm-to">
+      <label class="adm-f"><span>Dato</span><input type="date" id="adm-dato"></label>
+      <label class="adm-f"><span>Klokkeslett</span><input type="time" id="adm-tid"></label>
+    </div>
+    <label class="adm-f"><span id="adm-nr-l">Nummer</span><input type="text" id="adm-nr" autocomplete="off"></label>
+    <label class="adm-f"><span>Spotlight-bonus (poeng)</span><input type="number" id="adm-bonus" min="0" max="20" step="1"></label>
+    <label class="adm-chk"><input type="checkbox" id="adm-fin"> Finansiert</label>
+    <div class="adm-msg" id="adm-msg" role="alert"></div>
+    <div class="adm-knapper">
+      <button class="adm-avbryt" onclick="admLukk()">Avbryt</button>
+      <button class="adm-lagre" id="adm-lagre" onclick="admLagre()">Lagre</button>
+    </div>
+  </div>
 </div>
 
 <!-- SLETT MODAL -->
@@ -3608,6 +3664,12 @@ function renderScoring() {
   if (!all.length) { grid.innerHTML = '<div class="scoring-empty">Ingen scoringer registrert enn\u00e5</div>'; return; }
   var today = todayStr();
   var sorted = all.slice().sort(function(a,b) { return (b.ts||'').localeCompare(a.ts||''); });
+  var sok = isAdmin ? ((document.getElementById('adm-sok') || {}).value || '').trim().toLowerCase() : '';
+  if (sok) sorted = sorted.filter(function(s) {
+    return [s.selger, s.modell, s.kontrakt_nr, (s.ts || '').slice(0, 10), admNorDato(s.ts)].join(' ').toLowerCase().indexOf(sok) !== -1;
+  });
+  if (cnt && sok) cnt.textContent = sorted.length + ' av ' + all.length;
+  if (!sorted.length) { grid.innerHTML = '<div class="scoring-empty">Ingen salg matcher s\u00f8ket</div>'; return; }
   grid.innerHTML = sorted.map(function(s, i) {
     var sObj = SELGERE.find(function(x) { return x.navn === s.selger; }) || {};
     var col = LC[sObj.loc] || '#3b82f6';
@@ -3628,6 +3690,8 @@ function renderScoring() {
       + ((s.spotlight_bonus||0)>0?'<div class="score-spot">+'+s.spotlight_bonus+'</div>':'')
       + '<div class="score-selger">'+s.selger+'</div>'
       + '<div class="score-tid">'+lbl+' &middot; '+dateShow+' '+tp+'</div>'
+      + (isAdmin && s.kontrakt_nr ? '<div class="score-nr">' + s.kontrakt_nr + '</div>' : '')
+      + (isAdmin ? '<button class="score-edit" onclick="admEndre(\''+s.id+'\')" aria-label="Endre salget til '+s.selger+'">Endre</button>' : '')
       + '<div class="score-loc-bar" style="background:'+col+'"></div>'
     + '</div>';
   }).join('');
@@ -4335,6 +4399,74 @@ function s3Holo(id) {
 var _s3OpenPC = openPlayerCard;
 openPlayerCard = function(id) { _s3OpenPC.apply(this, arguments); try { s3Holo(id); } catch (e) { console.error('Holo: ' + e.message); } };
 
+// ─── ADMIN: ENDRE SALG ──────────────────────────────────────────────
+var _admId = null;
+function admNorDato(ts) { var d = (ts || '').slice(0, 10).split('-'); return d.length === 3 ? d[2] + '.' + d[1] + '.' + d[0] : ''; }
+function admDatoValg() {
+  var v = document.getElementById('sel-dato').value, rad = document.getElementById('adm-dato-rad');
+  if (rad) rad.style.display = (isAdmin && v === 'x') ? 'flex' : 'none';
+}
+function admEndre(id) {
+  if (!isAdmin) return;
+  var s = sales.find(function(x) { return String(x.id) === String(id); });
+  if (!s) { toast('Fant ikke salget.'); return; }
+  _admId = s.id;
+  var sel = document.getElementById('adm-selger');
+  sel.innerHTML = SELGERE.map(function(x) { return '<option' + (x.navn === s.selger ? ' selected' : '') + '>' + x.navn + '</option>'; }).join('')
+    + (SELGERE.some(function(x) { return x.navn === s.selger; }) ? '' : '<option selected>' + s.selger + '</option>');
+  var mod = document.getElementById('adm-modell');
+  mod.innerHTML = Array.prototype.slice.call(document.querySelectorAll('#sel-modell option')).filter(function(o) { return o.value; })
+    .map(function(o) { return '<option' + (o.value === s.modell ? ' selected' : '') + '>' + o.value + '</option>'; }).join('');
+  if (!mod.value || mod.value !== s.modell) mod.insertAdjacentHTML('afterbegin', '<option selected>' + s.modell + '</option>');
+  var dato = document.getElementById('adm-dato');
+  dato.min = SESONG.start; dato.max = SESONG.slutt; dato.value = (s.ts || '').slice(0, 10);
+  document.getElementById('adm-tid').value = (s.ts || '').slice(11, 16) || '12:00';
+  document.getElementById('adm-nr').value = s.kontrakt_nr || '';
+  document.getElementById('adm-nr-l').textContent = (document.getElementById('sel-kontrakt').getAttribute('placeholder') || 'Nummer').replace(/\s*\(.*$/, '').replace(/\.+$/, '');
+  document.getElementById('adm-bonus').value = s.spotlight_bonus || 0;
+  document.getElementById('adm-fin').checked = !!s.finansiert;
+  document.getElementById('adm-sub').textContent = s.selger + ' · ' + s.modell + ' · registrert ' + admNorDato(s.ts) + ' ' + (s.ts || '').slice(11, 16);
+  document.getElementById('adm-msg').textContent = '';
+  document.getElementById('adm-bd').classList.add('open');
+  setTimeout(function() { document.getElementById('adm-fin').focus(); }, 30);
+}
+function admLukk() { document.getElementById('adm-bd').classList.remove('open'); _admId = null; }
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { var b = document.getElementById('adm-bd'); if (b && b.classList.contains('open')) admLukk(); } });
+function admLagre() {
+  if (!isAdmin || !_admId) return;
+  var s = sales.find(function(x) { return String(x.id) === String(_admId); });
+  var msg = document.getElementById('adm-msg');
+  if (!s) { msg.textContent = 'Fant ikke salget.'; return; }
+  var selger = document.getElementById('adm-selger').value, modell = document.getElementById('adm-modell').value;
+  var dato = document.getElementById('adm-dato').value, tid = (document.getElementById('adm-tid').value || '12:00').slice(0, 5);
+  var nr = (document.getElementById('adm-nr').value || '').trim();
+  var bonus = Math.max(0, parseInt(document.getElementById('adm-bonus').value || '0', 10) || 0);
+  if (!dato) { msg.textContent = 'Velg dato.'; return; }
+  if (dato < SESONG.start || dato > SESONG.slutt) { msg.textContent = 'Datoen må være i ' + SESONG.navn.toLowerCase() + ' (' + SESONG.periodeTekst + ').'; return; }
+  if (!nr) { msg.textContent = 'Nummeret kan ikke være tomt.'; return; }
+  if (sales.some(function(x) { return x.id !== s.id && !x.deleted && String(x.kontrakt_nr) === nr; })) { msg.textContent = 'Nummeret ' + nr + ' er allerede registrert på et annet salg.'; return; }
+  var sObj = SELGERE.find(function(x) { return x.navn === selger; }) || {};
+  var endring = { selger: selger, loc: sObj.loc || s.loc, modell: modell, ts: dato + 'T' + tid + ':00', mnd: mndFraDato(dato),
+                  finansiert: document.getElementById('adm-fin').checked, kontrakt_nr: nr, spotlight_bonus: bonus };
+  var knapp = document.getElementById('adm-lagre');
+  knapp.disabled = true; knapp.textContent = 'Lagrer...';
+  fetch(API + '?id=eq.' + encodeURIComponent(s.id), { method: 'PATCH', headers: Object.assign({}, sbH(), { Prefer: 'return=minimal' }), body: JSON.stringify(endring) })
+    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); })
+    .then(function() {
+      var gammelUke = getWeekNum(new Date((s.ts || '').slice(0, 10) + 'T12:00:00')), nyUke = getWeekNum(new Date(dato + 'T12:00:00'));
+      Object.assign(s, endring);
+      knapp.disabled = false; knapp.textContent = 'Lagre';
+      admLukk();
+      try { MJ_bygg(); } catch (e) {}
+      renderAll();
+      if (typeof renderScoring === 'function') renderScoring();
+      var naaUke = getWeekNum(new Date());
+      var lukket = [gammelUke, nyUke].filter(function(u, i, a) { return u < naaUke && a.indexOf(u) === i; });
+      toast('Salget er oppdatert.' + (lukket.length ? ' Ukesvinneren for uke ' + lukket.join(' og ') + ' er allerede kåret og endres ikke.' : ''));
+    })
+    .catch(function(e) { knapp.disabled = false; knapp.textContent = 'Lagre'; msg.textContent = 'Kunne ikke lagre: ' + e.message; });
+}
+
 // ─── SESONG 3: HENDELSER ─────────────────────────────────────────────
 // Forbikjøring, personlig rekord, dagens åpner, felles milepæler og trofeer.
 // Alt regnes ut fra salgslisten, så alle som har appen åpen ser det samme.
@@ -5011,6 +5143,11 @@ function renderSpotlightBanner() {
 }
 
 function applyAdminUI() {
+  document.body.classList.add('er-admin');
+  document.querySelectorAll('.adm-opt').forEach(function(o) { o.disabled = false; o.hidden = false; });
+  var di = document.getElementById('sel-dato-adm');
+  if (di) { di.min = SESONG.start; di.max = SESONG.slutt; }
+  if (typeof renderScoring === 'function') try { renderScoring(); } catch (e) {}
   var sa = document.getElementById('sp-admin');
   if (sa) sa.style.display = 'block';
   updateRoleBadge();
@@ -5132,18 +5269,21 @@ function reg() {
   // Salgsdato: i dag eller i g\u00e5r (etterregistrering, maks 1 dag tilbake)
   var back = parseInt(document.getElementById('sel-dato').value || '0', 10) === 1 ? 1 : 0;
   var now = new Date();
-  var d = new Date(); d.setDate(d.getDate() - back);
+  var _admValgt = isAdmin && document.getElementById('sel-dato').value === 'x';
+  var admDato = _admValgt ? (document.getElementById('sel-dato-adm').value || '') : '';
+  if (_admValgt && !admDato) { toast('Velg dato for salget.'); return; }
+  var d = admDato ? new Date(admDato + 'T12:00:00') : new Date(); if (!admDato) d.setDate(d.getDate() - back);
   var mo = d.getMonth() + 1;
   var isoD = d.toLocaleDateString('sv-SE');
   if (isoD < SESONG.start) { toast('Sesongen startet ' + SESONG.startTekst + ' \u2014 kan ikke registrere f\u00f8r det.'); return; }
   if (isoD > SESONG.slutt) { toast(SESONG.navn + ' er avsluttet.'); return; }
   var mnd = mndFraDato(isoD);
-  if (back === 1 && ((now.getDay()+6)%7) === 0) {
+  if (!admDato && back === 1 && ((now.getDay()+6)%7) === 0) {
     toast('Etterregistrering kan ikke g\u00e5 inn i en lukket uke \u2014 kontakt admin.'); return;
   }
 
   var sObj = SELGERE.find(function(x) { return x.navn === selger; }) || {};
-  var tid = back === 1 ? '12:00' : pad(now.getHours())+':'+pad(now.getMinutes());
+  var tid = admDato ? ((document.getElementById('sel-tid-adm').value || '12:00').slice(0, 5)) : (back === 1 ? '12:00' : pad(now.getHours())+':'+pad(now.getMinutes()));
   var ts = d.getFullYear()+'-'+pad(mo)+'-'+pad(d.getDate())+'T'+tid+':00';
   var finansiert = document.getElementById('chk-fin').checked;
 
