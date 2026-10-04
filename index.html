@@ -1426,10 +1426,10 @@ body[data-tab]:not([data-tab="ind"]):not([data-tab="team"]) .mbar{display:none !
 .s3-p-sokkel{position:relative;overflow:hidden;border-radius:12px 12px 4px 4px;padding:22px 6px 10px;
   border:1px solid rgba(148,163,184,.45);border-bottom:none;
   background:linear-gradient(180deg,rgba(148,163,184,.30),rgba(148,163,184,.06) 70%,rgba(0,0,0,.15))}
-.s3-p.r1 .s3-p-sokkel{border-color:rgba(201,168,76,.75);min-height:150px;
+.s3-p.r1 .s3-p-sokkel{border-color:rgba(201,168,76,.75);min-height:200px;
   background:linear-gradient(180deg,rgba(201,168,76,.42),rgba(201,168,76,.10) 70%,rgba(0,0,0,.15));box-shadow:0 -8px 40px rgba(201,168,76,.25)}
-.s3-p.r2 .s3-p-sokkel{min-height:118px}
-.s3-p.r3 .s3-p-sokkel{min-height:98px;border-color:rgba(205,127,50,.6);
+.s3-p.r2 .s3-p-sokkel{min-height:170px}
+.s3-p.r3 .s3-p-sokkel{min-height:148px;border-color:rgba(205,127,50,.6);
   background:linear-gradient(180deg,rgba(205,127,50,.32),rgba(205,127,50,.07) 70%,rgba(0,0,0,.15))}
 .s3-p-sokkel:after{content:'';position:absolute;top:0;bottom:0;left:0;width:40%;pointer-events:none;
   background:linear-gradient(100deg,transparent,rgba(255,255,255,.22),transparent);transform:translateX(-150%) skewX(-18deg)}
@@ -1437,7 +1437,21 @@ body[data-tab]:not([data-tab="ind"]):not([data-tab="team"]) .mbar{display:none !
 @keyframes s3Sveip{0%,55%{transform:translateX(-150%) skewX(-18deg)}100%{transform:translateX(330%) skewX(-18deg)}}
 .s3-p-nr{position:absolute;right:6px;bottom:-12px;font-family:'Anton',sans-serif;font-size:64px;line-height:1;color:rgba(255,255,255,.07);pointer-events:none}
 .s3-p.r1 .s3-p-nr{font-size:88px;color:rgba(255,236,170,.12)}
-.s3-p-n{position:relative;font-weight:700;font-size:14px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s3-p-n{position:relative;line-height:1}
+.s3-p-for{display:block;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+.s3-p-etter{display:block;margin-top:2px;font-family:'Anton',sans-serif;font-size:20px;line-height:1.05;letter-spacing:.03em;text-transform:uppercase;color:#fff;overflow-wrap:anywhere}
+.s3-p.r1 .s3-p-etter{font-size:24px;background:linear-gradient(110deg,#fff 0%,var(--gold) 40%,#fff8d8 55%,var(--gold) 70%,#fff 100%);background-size:200% auto;
+  -webkit-background-clip:text;background-clip:text;color:transparent;animation:logoShine 4.5s linear infinite}
+.s3-p-avd{position:relative;display:flex;align-items:center;justify-content:center;gap:2px;font-size:12px;color:var(--muted);margin:4px 0 2px}
+.s3-p-merker{position:relative;display:flex;flex-wrap:wrap;justify-content:center;gap:3px;margin-top:6px}
+.s3-p-merker>*{margin-left:0!important}
+.s3-p-merker .mj-uketag,.s3-p-merker .mj-uketag .h,.s3-p-merker .md-tag{font-size:12px}
+.s3-ht{display:inline-flex;align-items:center;gap:2px;padding:1px 7px;border-radius:999px;background:rgba(201,168,76,.18);border:1px solid rgba(201,168,76,.55);color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:12px;line-height:1.3}
+.s3-mester{display:inline-flex;align-items:center;margin-left:5px;padding:1px 6px;border-radius:4px;vertical-align:middle;
+  background:linear-gradient(135deg,#fbeaa0,#d9b65a 50%,#a5812f);color:#1a1405;font-family:'Barlow Condensed',sans-serif;font-weight:800;
+  font-size:12px;line-height:1.25;letter-spacing:.06em;box-shadow:0 0 0 1px rgba(255,236,170,.5),0 0 10px rgba(201,168,76,.45)}
+.s3-mester+.s3-mester{margin-left:3px}
+.s3-in-mester-l .s3-mester{margin-left:4px}
 .s3-p-pts{position:relative;font-family:'Anton',sans-serif;font-size:26px;color:var(--gold);line-height:1.1}
 .s3-p.r1 .s3-p-pts{font-size:36px;text-shadow:0 0 18px rgba(201,168,76,.6)}
 .s3-p-s{position:relative;font-size:12px;color:var(--muted)}
@@ -1445,7 +1459,8 @@ body[data-tab]:not([data-tab="ind"]):not([data-tab="team"]) .mbar{display:none !
 @media(max-width:420px){
   .s3-pall{padding:0 8px;gap:5px}
   .s3-p-av{width:66px;height:66px}.s3-p.r1 .s3-p-av{width:86px;height:86px}
-  .s3-p.r1 .s3-p-sokkel{min-height:132px}.s3-p.r2 .s3-p-sokkel{min-height:104px}.s3-p.r3 .s3-p-sokkel{min-height:88px}
+  .s3-p.r1 .s3-p-sokkel{min-height:186px}.s3-p.r2 .s3-p-sokkel{min-height:158px}.s3-p.r3 .s3-p-sokkel{min-height:138px}
+  .s3-p-etter{font-size:16px}.s3-p.r1 .s3-p-etter{font-size:19px}.s3-p-for{letter-spacing:.08em}
   .s3-p.r1 .s3-p-pts{font-size:30px}.s3-p-pts{font-size:22px}
 }
 @media(prefers-reduced-motion:reduce){.s3-p.r1 .s3-p-ring:before,.s3-p.r1 .s3-p-sokkel:after{animation:none}}
@@ -4046,7 +4061,13 @@ function toggleFin() {
 
 // ─── SESONG 3-DRAKT ──────────────────────────────────────────────────
 // Forrige sesongs mester (fra sesongfinalen). Vises på innlogging og ved navnet hele sesongen.
-var FORRIGE_MESTER = {"navn": "Ask Herlofsen", "sesong": "Sesong 2", "poeng": 168};
+var MESTRE = [{"navn": "Daniel K. Johansen", "sesong": 1, "poeng": 72}, {"navn": "Ask Herlofsen", "sesong": 2, "poeng": 168}];   // sesongmestere: { navn, sesong, poeng }
+var FORRIGE_MESTER = MESTRE.length ? MESTRE[MESTRE.length - 1] : null;
+function s3MesterMerker(navn) {
+  return MESTRE.filter(function(m) { return m.navn === navn; }).map(function(m) {
+    return '<span class="s3-mester" title="Sesongmester sesong ' + m.sesong + ' \u00b7 ' + m.poeng + ' poeng">S' + m.sesong + '</span>';
+  }).join('');
+}
 
 function s3Foto(navn) {
   var s = SELGERE.find(function(x) { return x.navn === navn; });
@@ -4057,9 +4078,9 @@ function s3InitMester() {
   if (!el || !FORRIGE_MESTER) return;
   var f = s3Foto(FORRIGE_MESTER.navn);
   var init = FORRIGE_MESTER.navn.split(' ').map(function(x) { return x[0]; }).join('').slice(0, 2);
-  el.innerHTML = '<div class="s3-in-mester"><span class="s3-in-krone">👑</span><div class="s3-in-mester-av">' + (f ? '<img src="' + f + '" alt="">' : init) + '</div>'
-    + '<div><div class="s3-in-mester-l">Regjerende mester</div><div class="s3-in-mester-n">' + FORRIGE_MESTER.navn + '</div>'
-    + '<div class="s3-in-mester-s">' + FORRIGE_MESTER.sesong + ' · ' + FORRIGE_MESTER.poeng + ' poeng</div></div></div>';
+  el.innerHTML = '<div class="s3-in-mester"><div class="s3-in-mester-av">' + (f ? '<img src="' + f + '" alt="">' : init) + '</div>'
+    + '<div><div class="s3-in-mester-l">Regjerende mester ' + s3MesterMerker(FORRIGE_MESTER.navn) + '</div><div class="s3-in-mester-n">' + FORRIGE_MESTER.navn + '</div>'
+    + '<div class="s3-in-mester-s">Sesong ' + FORRIGE_MESTER.sesong + ' · ' + FORRIGE_MESTER.poeng + ' poeng</div></div></div>';
 }
 
 // Uker i sesongen (ISO-uker som overlapper start–slutt)
@@ -4136,10 +4157,11 @@ function s3EtterInd() {
     if (pos && pil) { var w = document.createElement('div'); w.className = 's3-pos'; pos.parentNode.insertBefore(w, pos); w.appendChild(pos); w.insertAdjacentHTML('beforeend', pil); }
     var av = r.querySelector('.av-wrap');
     if (av && idag[navn]) av.classList.add('s3-idag');
-    if (av && FORRIGE_MESTER && FORRIGE_MESTER.navn === navn) {
-      av.insertAdjacentHTML('afterbegin', '<span class="s3-krone" title="Regjerende mester">👑</span>');
-      var nm = r.querySelector('.name-main');
-      if (nm) nm.insertAdjacentHTML('beforeend', '<span class="md-tag mester" title="' + FORRIGE_MESTER.sesong + '">MESTER S2</span>');
+    var mm = s3MesterMerker(navn), sub = r.querySelector('.name-sub');
+    if (mm && sub && !sub.querySelector('.s3-mester')) {
+      var forste = sub.firstChild;
+      if (forste && forste.nodeType === 3) { var sp = document.createElement('span'); sp.className = 's3-avd'; sp.textContent = forste.textContent; sub.replaceChild(sp, forste); sp.insertAdjacentHTML('afterend', mm); }
+      else sub.insertAdjacentHTML('afterbegin', mm);
     }
   });
   // Pallen: de tre første, bare når noen har poeng
@@ -4152,14 +4174,21 @@ function s3EtterInd() {
     var navn = r.getAttribute('data-navn'), s = SELGERE.find(function(x) { return x.navn === navn; }) || {};
     var f = s3Foto(navn), pts = r.querySelector('.sc.pts').textContent;
     var maal = (r.querySelector('.sc') || {}).firstChild ? r.querySelector('.sc').firstChild.textContent : '';
-    var krone = FORRIGE_MESTER && FORRIGE_MESTER.navn === navn ? '<span class="s3-krone">👑</span>' : '';
+    var deler = navn.split(' '), etter = deler.pop(), forn = deler.join(' ');
+    var merker = '';
+    var htN = typeof hatTrickCount === 'function' ? hatTrickCount(navn, curMonth) : 0;
+    if (htN > 0) merker += '<span class="s3-ht" title="' + htN + ' hat-trick' + (htN === 1 ? '' : 's') + '">\u2B50 ' + htN + '</span>';
+    r.querySelectorAll('.name-main .md-tag, .name-main .mj-uketag').forEach(function(x) { merker += x.outerHTML; });
+    if ((idag[navn] || 0) >= 3) merker += '<span class="s3-flamme" title="Hat-trick i dag">🔥</span>';
     var nr = ((r.querySelector('.pos-n') || {}).textContent || String(i + 1)).replace('T', '');
     return '<div class="s3-p r' + (i + 1) + '" data-navn="' + navn + '" role="button" tabindex="0" aria-label="Nr. ' + nr + ': ' + navn + ', ' + pts + ' poeng" onclick="openPlayerCard(\'' + s.id + '\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openPlayerCard(\'' + s.id + '\');}">'
-      + '<div class="s3-p-topp">' + krone + s3Pil(navn, naa, igaar)
+      + '<div class="s3-p-topp">' + s3Pil(navn, naa, igaar)
       + '<div class="av-wrap' + (idag[navn] ? ' s3-idag' : '') + '"><div class="s3-p-ring"><div class="s3-p-av">' + (f ? '<img src="' + f + '" alt="">' : (s.initials || '')) + '</div></div></div></div>'
       + '<div class="s3-p-sokkel"><span class="s3-p-nr" aria-hidden="true">' + nr + '</span>'
-      + '<div class="s3-p-n">' + navn.split(' ')[0] + '</div>'
-      + '<div class="s3-p-pts">' + pts + '</div><div class="s3-p-s">' + maal + ' biler</div></div></div>';
+      + '<div class="s3-p-n"><span class="s3-p-for">' + forn + '</span><span class="s3-p-etter">' + etter + '</span></div>'
+      + '<div class="s3-p-avd">' + (LL[s.loc] || s.loc || '') + s3MesterMerker(navn) + '</div>'
+      + '<div class="s3-p-pts">' + pts + '</div><div class="s3-p-s">' + maal + ' biler</div>'
+      + (merker ? '<div class="s3-p-merker">' + merker + '</div>' : '') + '</div></div>';
   });
   pall.innerHTML = '<div class="s3-pall">' + kort[1] + kort[0] + kort[2] + '</div>';
 }
@@ -4285,7 +4314,7 @@ function s3Holo(id) {
   var s = SELGERE.find(function(x) { return x.id === id; });
   if (!kort || !s || kort.querySelector('.s3-holo')) return;
   var plass = (s3Plasser(curMonth, false)[s.navn] || {}).plass || 99;
-  var skinn = plass <= 3 || (FORRIGE_MESTER && FORRIGE_MESTER.navn === s.navn);
+  var skinn = plass <= 3 || MESTRE.some(function(m) { return m.navn === s.navn; });
   kort.insertAdjacentHTML('beforeend', '<div class="s3-holo' + (skinn ? ' on' : '') + '"></div><div class="s3-holo-lys"></div>');
   if (_s3Stille()) return;
   var holo = kort.querySelector('.s3-holo');
