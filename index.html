@@ -1398,27 +1398,57 @@ body[data-tab]:not([data-tab="ind"]):not([data-tab="team"]) .mbar{display:none !
 .s3-ses-bar i.n{background:linear-gradient(90deg,var(--gold),rgba(201,168,76,.35));animation:s3Blink 1.6s ease-in-out infinite}
 @keyframes s3Blink{50%{opacity:.55}}
 
-/* Pall for topp 3 */
-.s3-pall{display:grid;grid-template-columns:1fr 1.18fr 1fr;align-items:end;gap:8px;margin:14px 12px 6px}
-.s3-p{position:relative;text-align:center;border-radius:14px;padding:12px 6px 10px;cursor:pointer;border:1px solid var(--b1);
-  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.015));min-height:44px}
-.s3-p.r1{padding-top:16px;border-color:rgba(201,168,76,.7);background:linear-gradient(180deg,rgba(201,168,76,.26),rgba(201,168,76,.05));
-  box-shadow:0 10px 34px rgba(201,168,76,.18)}
-.s3-p.r2{border-color:rgba(148,163,184,.55)}.s3-p.r3{border-color:rgba(205,127,50,.55)}
-.s3-p-med{position:absolute;top:-11px;left:50%;transform:translateX(-50%);font-family:'Anton',sans-serif;font-size:13px;width:24px;height:24px;line-height:24px;
-  border-radius:50%;color:#0b1526;background:var(--silver)}
-.s3-p.r1 .s3-p-med{background:var(--gold)}.s3-p.r3 .s3-p-med{background:var(--bronze)}
-.s3-p-av{position:relative;width:58px;height:58px;margin:0 auto;border-radius:50%;overflow:hidden;border:2px solid var(--silver);background:var(--card2);
-  display:flex;align-items:center;justify-content:center;font-weight:700}
-.s3-p.r1 .s3-p-av{width:76px;height:76px;border:3px solid var(--gold);box-shadow:0 0 22px rgba(201,168,76,.5)}
-.s3-p.r3 .s3-p-av{border-color:var(--bronze)}
-.s3-p-av img{width:100%;height:100%;object-fit:cover}
-.s3-p-n{font-weight:700;font-size:13px;margin-top:7px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.s3-p-pts{font-family:'Anton',sans-serif;font-size:22px;color:var(--gold);line-height:1.1}
-.s3-p.r1 .s3-p-pts{font-size:28px}
-.s3-p-s{font-size:12px;color:var(--muted)}
-.s3-p .s3-pil{position:absolute;top:8px;right:8px}
-.s3-p .av-wrap{display:block;width:58px;margin:0 auto}.s3-p.r1 .av-wrap{width:76px}
+/* Pall for topp 3: ekte pall med sokler, store bilder og lys på lederen */
+.s3-pall{position:relative;display:grid;grid-template-columns:1fr 1.15fr 1fr;align-items:end;gap:6px;
+  max-width:520px;margin:18px auto 10px;padding:0 12px}
+.s3-pall:before{content:'';position:absolute;left:50%;top:-30px;width:300px;height:330px;margin-left:-150px;pointer-events:none;
+  background:radial-gradient(ellipse 45% 60% at 50% 0%,rgba(255,240,190,.20),transparent 70%),
+             conic-gradient(from 160deg at 50% 0%,transparent 0deg,rgba(255,236,170,.10) 20deg,transparent 40deg);
+  filter:blur(2px)}
+.s3-p{position:relative;text-align:center;cursor:pointer;min-height:44px;-webkit-tap-highlight-color:transparent}
+.s3-p:focus-visible{outline:2px solid var(--gold);outline-offset:4px;border-radius:12px}
+.s3-p-topp{position:relative;margin:0 auto -14px;z-index:2;width:max-content}
+.s3-p-ring{position:relative;border-radius:50%;padding:4px;background:linear-gradient(145deg,#e5e7eb,#6b7280)}
+.s3-p.r1 .s3-p-ring{padding:5px;background:#7a5f22;box-shadow:0 0 30px rgba(201,168,76,.55),0 0 70px rgba(201,168,76,.25)}
+.s3-p.r1 .s3-p-ring:before{content:'';position:absolute;inset:0;border-radius:50%;
+  background:conic-gradient(from 0deg,#fff4c2,#c9a84c,#7a5f22,#f3dc8e,#c9a84c,#7a5f22,#fff4c2);animation:s3Rot 5s linear infinite}
+.s3-p.r3 .s3-p-ring{background:linear-gradient(145deg,#f0b27a,#8a4b1f)}
+@keyframes s3Rot{to{transform:rotate(360deg)}}
+.s3-p-av{position:relative;z-index:1;width:80px;height:80px;border-radius:50%;overflow:hidden;background:var(--card2);display:flex;align-items:center;justify-content:center;
+  font-weight:700;border:3px solid var(--bg)}
+.s3-p.r1 .s3-p-av{width:108px;height:108px}
+.s3-p-av img{width:100%;height:100%;object-fit:cover;filter:grayscale(15%) contrast(1.05)}
+.s3-p:hover .s3-p-av img{filter:none}
+.s3-p .av-wrap{display:block}
+.s3-p .av-wrap.s3-idag:after{inset:-6px}
+.s3-p .s3-krone{top:-16px;left:50%;transform:translateX(-50%) rotate(-8deg);font-size:24px}
+.s3-p .s3-pil{position:absolute;bottom:14px;right:-6px;z-index:3;padding:2px 6px;border-radius:999px;background:rgba(6,11,20,.85);border:1px solid currentColor}
+.s3-p-sokkel{position:relative;overflow:hidden;border-radius:12px 12px 4px 4px;padding:22px 6px 10px;
+  border:1px solid rgba(148,163,184,.45);border-bottom:none;
+  background:linear-gradient(180deg,rgba(148,163,184,.30),rgba(148,163,184,.06) 70%,rgba(0,0,0,.15))}
+.s3-p.r1 .s3-p-sokkel{border-color:rgba(201,168,76,.75);min-height:150px;
+  background:linear-gradient(180deg,rgba(201,168,76,.42),rgba(201,168,76,.10) 70%,rgba(0,0,0,.15));box-shadow:0 -8px 40px rgba(201,168,76,.25)}
+.s3-p.r2 .s3-p-sokkel{min-height:118px}
+.s3-p.r3 .s3-p-sokkel{min-height:98px;border-color:rgba(205,127,50,.6);
+  background:linear-gradient(180deg,rgba(205,127,50,.32),rgba(205,127,50,.07) 70%,rgba(0,0,0,.15))}
+.s3-p-sokkel:after{content:'';position:absolute;top:0;bottom:0;left:0;width:40%;pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.22),transparent);transform:translateX(-150%) skewX(-18deg)}
+.s3-p.r1 .s3-p-sokkel:after{animation:s3Sveip 4.5s ease-in-out infinite}
+@keyframes s3Sveip{0%,55%{transform:translateX(-150%) skewX(-18deg)}100%{transform:translateX(330%) skewX(-18deg)}}
+.s3-p-nr{position:absolute;right:6px;bottom:-12px;font-family:'Anton',sans-serif;font-size:64px;line-height:1;color:rgba(255,255,255,.07);pointer-events:none}
+.s3-p.r1 .s3-p-nr{font-size:88px;color:rgba(255,236,170,.12)}
+.s3-p-n{position:relative;font-weight:700;font-size:14px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s3-p-pts{position:relative;font-family:'Anton',sans-serif;font-size:26px;color:var(--gold);line-height:1.1}
+.s3-p.r1 .s3-p-pts{font-size:36px;text-shadow:0 0 18px rgba(201,168,76,.6)}
+.s3-p-s{position:relative;font-size:12px;color:var(--muted)}
+.s3-p-med{display:none}
+@media(max-width:420px){
+  .s3-pall{padding:0 8px;gap:5px}
+  .s3-p-av{width:66px;height:66px}.s3-p.r1 .s3-p-av{width:86px;height:86px}
+  .s3-p.r1 .s3-p-sokkel{min-height:132px}.s3-p.r2 .s3-p-sokkel{min-height:104px}.s3-p.r3 .s3-p-sokkel{min-height:88px}
+  .s3-p.r1 .s3-p-pts{font-size:30px}.s3-p-pts{font-size:22px}
+}
+@media(prefers-reduced-motion:reduce){.s3-p.r1 .s3-p-ring:before,.s3-p.r1 .s3-p-sokkel:after{animation:none}}
 #tbl-ind .mj-nmrow{flex-wrap:wrap;row-gap:3px}
 .s3-p-tom{opacity:.55}
 
@@ -1436,6 +1466,55 @@ body[data-tab]:not([data-tab="ind"]):not([data-tab="team"]) .mbar{display:none !
 .s3-krone{position:absolute;top:-9px;left:-5px;font-size:15px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6));z-index:2}
 .md-tag.mester{background:linear-gradient(135deg,#f6e27a,#c9a84c);color:#1a1405;border:none}
 @media(prefers-reduced-motion:reduce){.av-wrap.s3-idag:after,.s3-in-krest,.s3-ses-bar i.n{animation:none}}
+</style>
+<style id="s3-effekter-css">
+/* ═══ SESONG 3: EFFEKTER ═══ */
+/* Første tegning animeres; senere oppdateringer står stille unntatt det som har endret seg */
+#tbl-ind.s3-stille .trow{animation:none}
+/* Live scoring */
+.trow.s3-scoret,.s3-p.s3-scoret .s3-p-sokkel{animation:s3Blink2 1.6s ease-out 2}
+@keyframes s3Blink2{0%{box-shadow:0 0 0 0 rgba(201,168,76,0)}25%{box-shadow:0 0 0 2px var(--gold),0 0 26px rgba(201,168,76,.55);background-color:rgba(201,168,76,.16)}100%{box-shadow:0 0 0 0 rgba(201,168,76,0)}}
+.s3-pluss{position:absolute;right:52px;top:50%;font-family:'Anton',sans-serif;font-size:22px;color:var(--gold);pointer-events:none;z-index:5;
+  text-shadow:0 0 12px rgba(201,168,76,.8);animation:s3Opp 1.8s ease-out forwards}
+.s3-p .s3-pluss{right:auto;left:50%;top:40%}
+@keyframes s3Opp{0%{opacity:0;transform:translate(-50%,6px) scale(.6)}20%{opacity:1;transform:translate(-50%,-6px) scale(1.15)}100%{opacity:0;transform:translate(-50%,-38px) scale(1)}}
+/* Hat-trick i fyr */
+.trow.s3-fyr{border-color:rgba(249,115,22,.65)!important}
+.trow.s3-fyr:before,.s3-p.s3-fyr .s3-p-sokkel:before{content:'';position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;
+  box-shadow:0 0 24px rgba(249,115,22,.7),0 0 44px rgba(239,68,68,.25),inset 0 -12px 26px rgba(249,115,22,.18);animation:s3Fyr 1.4s ease-in-out infinite alternate}
+@keyframes s3Fyr{0%{opacity:.35}100%{opacity:1}}
+.s3-flamme{display:inline-block;margin-left:4px;animation:s3Flakk .5s ease-in-out infinite alternate;transform-origin:50% 100%}
+@keyframes s3Flakk{0%{transform:scale(1) rotate(-4deg)}100%{transform:scale(1.18) rotate(4deg)}}
+/* Ukesmål-stempel */
+#tbl-ind:not(.s3-stille) .mj-uketag,#tbl-ind .trow.s3-scoret .mj-uketag{animation:s3Stempel .55s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes s3Stempel{0%{opacity:0;transform:scale(2.6) rotate(-12deg)}70%{opacity:1;transform:scale(.92) rotate(2deg)}100%{transform:none}}
+/* Små glanser */
+.s3-glans{position:relative;overflow:hidden}
+.s3-glans:after{content:'';position:absolute;top:0;bottom:0;left:0;width:30%;pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.16),transparent);transform:translateX(-140%) skewX(-18deg);animation:s3Sveip2 7s ease-in-out infinite}
+@keyframes s3Sveip2{0%,70%{transform:translateX(-140%) skewX(-18deg)}100%{transform:translateX(440%) skewX(-18deg)}}
+.s3-ses-bar{position:relative}
+.s3-ses-bar{overflow:hidden}
+.s3-ses-bar:after{content:'';position:absolute;top:-2px;bottom:-2px;left:0;width:var(--s3-fylt,50%);pointer-events:none;
+  background:linear-gradient(90deg,transparent 0,transparent 40%,rgba(255,248,220,.9) 50%,transparent 60%,transparent 100%);
+  background-size:200% 100%;animation:s3Lop 4s linear infinite;opacity:.7}
+@keyframes s3Lop{0%{background-position:100% 0}100%{background-position:-100% 0}}
+.md-nytt-r.s3-ny{animation:s3Inn .7s cubic-bezier(.2,.9,.3,1.2) both}
+@keyframes s3Inn{0%{opacity:0;transform:translateX(-24px);background:rgba(201,168,76,.25)}100%{opacity:1;transform:none;background:transparent}}
+/* Holografisk spillerkort */
+#pc-body .fc{transition:transform .25s ease-out;transform-style:preserve-3d;will-change:transform}
+.s3-holo{position:absolute;inset:0;z-index:6;pointer-events:none;border-radius:inherit;opacity:0;transition:opacity .3s;mix-blend-mode:color-dodge;
+  background:linear-gradient(115deg,transparent 30%,rgba(255,0,128,.30) 40%,rgba(255,220,0,.30) 46%,rgba(0,255,170,.30) 52%,rgba(0,170,255,.30) 58%,transparent 68%);
+  background-size:250% 250%;background-position:var(--hx,50%) var(--hy,50%)}
+.s3-holo.on{opacity:.18}
+.s3-holo.on.aktiv{opacity:.38}
+.s3-holo-lys{position:absolute;inset:0;z-index:6;pointer-events:none;border-radius:inherit;
+  background:radial-gradient(circle at var(--lx,50%) var(--ly,30%),rgba(255,255,255,.18),transparent 45%)}
+@media(prefers-reduced-motion:reduce){
+  .trow.s3-scoret,.s3-p.s3-scoret .s3-p-sokkel,.trow.s3-fyr,.s3-p.s3-fyr .s3-p-sokkel,.s3-flamme,.mj-uketag,.s3-glans:after,.s3-ses-bar:after,.md-nytt-r.s3-ny{animation:none!important}
+  .s3-pluss{display:none}
+  #pc-body .fc{transform:none!important}
+}
 </style>
 </head>
 <body data-tab="ind">
@@ -2023,7 +2102,10 @@ function MJ_bygg() {
 function mjNaadd(n, mal) { return n >= mal - 1e-9; }
 function mjUavgjort(n, mal) { return n >= Math.ceil(mal - 1e-9) - 1; }
 
+var _mjPuCache = null;
 function mjPerUke() {
+  var _d = mjIDag();
+  if (_mjPuCache && _mjPuCache.ref === sales && _mjPuCache.n === sales.length && _mjPuCache.d === _d) return _mjPuCache.v;
   var ut = {};
   SELGERE.forEach(function(s){ ut[s.navn] = {}; });
   sales.forEach(function(r) {
@@ -2033,6 +2115,7 @@ function mjPerUke() {
     var w = getWeekNum(new Date(dato + 'T12:00:00'));
     if (ut[r.selger]) ut[r.selger][w] = (ut[r.selger][w] || 0) + 1;
   });
+  _mjPuCache = { ref: sales, n: sales.length, d: _d, v: ut };
   return ut;
 }
 function mjUkeMalSelger() { return MJ ? MJ.naa.mal : MAL_UKE; }
@@ -2617,6 +2700,7 @@ function hatTrickCount(navn, m) {
 function renderInd() {
   var el = document.getElementById('tbl-ind');
   if (!el) return;
+  var _s3Foer = s3Posisjoner();
   var m = curMonth;
   var rows = SELGERE.map(function(s) {
     var g = goalsFor(s.navn, m);
@@ -2699,6 +2783,7 @@ function renderInd() {
   }).join('');
   mdRenderInd();
   try { s3RenderSesong(); s3EtterInd(); } catch (e) { console.error('Sesong 3: ' + e.message); }
+  try { s3Effekter(_s3Foer); } catch (e) { console.error('Effekter: ' + e.message); }
 }
 
 // ─── RENDER: AVDELINGER ──────────────────────────────────────────────
@@ -4067,15 +4152,159 @@ function s3EtterInd() {
     var navn = r.getAttribute('data-navn'), s = SELGERE.find(function(x) { return x.navn === navn; }) || {};
     var f = s3Foto(navn), pts = r.querySelector('.sc.pts').textContent;
     var maal = (r.querySelector('.sc') || {}).firstChild ? r.querySelector('.sc').firstChild.textContent : '';
-    var krone = FORRIGE_MESTER && FORRIGE_MESTER.navn === navn ? '<span class="s3-krone" style="left:calc(50% - 40px)">👑</span>' : '';
-    return '<div class="s3-p r' + (i + 1) + '" role="button" tabindex="0" onclick="openPlayerCard(\'' + s.id + '\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openPlayerCard(\'' + s.id + '\');}">'
-      + '<span class="s3-p-med">' + (((r.querySelector('.pos-n') || {}).textContent || String(i + 1)).replace('T', '')) + '</span>' + s3Pil(navn, naa, igaar) + krone
-      + '<div class="av-wrap' + (idag[navn] ? ' s3-idag' : '') + '"><div class="s3-p-av">' + (f ? '<img src="' + f + '" alt="">' : (s.initials || '')) + '</div></div>'
+    var krone = FORRIGE_MESTER && FORRIGE_MESTER.navn === navn ? '<span class="s3-krone">👑</span>' : '';
+    var nr = ((r.querySelector('.pos-n') || {}).textContent || String(i + 1)).replace('T', '');
+    return '<div class="s3-p r' + (i + 1) + '" data-navn="' + navn + '" role="button" tabindex="0" aria-label="Nr. ' + nr + ': ' + navn + ', ' + pts + ' poeng" onclick="openPlayerCard(\'' + s.id + '\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openPlayerCard(\'' + s.id + '\');}">'
+      + '<div class="s3-p-topp">' + krone + s3Pil(navn, naa, igaar)
+      + '<div class="av-wrap' + (idag[navn] ? ' s3-idag' : '') + '"><div class="s3-p-ring"><div class="s3-p-av">' + (f ? '<img src="' + f + '" alt="">' : (s.initials || '')) + '</div></div></div></div>'
+      + '<div class="s3-p-sokkel"><span class="s3-p-nr" aria-hidden="true">' + nr + '</span>'
       + '<div class="s3-p-n">' + navn.split(' ')[0] + '</div>'
-      + '<div class="s3-p-pts">' + pts + '</div><div class="s3-p-s">' + maal + ' biler</div></div>';
+      + '<div class="s3-p-pts">' + pts + '</div><div class="s3-p-s">' + maal + ' biler</div></div></div>';
   });
   pall.innerHTML = '<div class="s3-pall">' + kort[1] + kort[0] + kort[2] + '</div>';
 }
+
+// ─── SESONG 3: EFFEKTER ──────────────────────────────────────────────
+var _s3Kjente = null, _s3ForrigePts = {}, _s3SettHendelser = null;
+var _s3Stille = function() { return window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches; };
+
+// Posisjon til hver rad før tabellen tegnes på nytt (for at radene skal gli)
+function s3Posisjoner() {
+  var ut = {};
+  document.querySelectorAll('#tbl-ind .trow:not(.s3-skjult)').forEach(function(r) { ut[r.getAttribute('data-navn')] = r.getBoundingClientRect().top; });
+  return ut;
+}
+
+// Nye salg siden forrige tegning: { navn: poeng }
+function s3NyeSalg() {
+  var nye = {}, alle = {};
+  sales.forEach(function(s) {
+    if (s.deleted) return;
+    var k = String(s.id || s.kontrakt_nr || (s.selger + s.ts));
+    alle[k] = 1;
+    if (_s3Kjente && !_s3Kjente[k]) nye[s.selger] = (nye[s.selger] || 0) + PTS + (s.spotlight_bonus || 0);
+  });
+  var forste = !_s3Kjente || !Object.keys(_s3Kjente).length;
+  _s3Kjente = alle;
+  return forste ? null : nye;
+}
+
+function s3TellOpp(el, fra, til) {
+  if (!el || fra === til || _s3Stille()) return;
+  var t0 = null, dur = 900;
+  el.textContent = fra;
+  function steg(t) {
+    if (!t0) t0 = t;
+    var q = Math.min(1, (t - t0) / dur);
+    el.textContent = Math.round(fra + (til - fra) * (1 - Math.pow(1 - q, 3)));
+    if (q < 1) requestAnimationFrame(steg);
+  }
+  requestAnimationFrame(steg);
+}
+
+function s3Effekter(foer) {
+  var tabell = document.getElementById('tbl-ind');
+  if (!tabell) return;
+  var nye = s3NyeSalg(), idag = s3SolgtIdag();
+  var rader = Array.prototype.slice.call(tabell.querySelectorAll('.trow'));
+
+  // Hat-trick i fyr
+  rader.forEach(function(r) {
+    var navn = r.getAttribute('data-navn');
+    if ((idag[navn] || 0) >= 3) {
+      r.classList.add('s3-fyr');
+      var nm = r.querySelector('.name-main');
+      if (nm && !nm.querySelector('.s3-flamme')) nm.insertAdjacentHTML('beforeend', '<span class="s3-flamme" title="Hat-trick i dag">🔥</span>');
+    }
+  });
+  document.querySelectorAll('#s3-pall .s3-p').forEach(function(k) {
+    var navn = k.getAttribute('data-navn');
+    if ((idag[navn] || 0) >= 3) k.classList.add('s3-fyr');
+  });
+
+  // Live scoring: blink, +3 og tall som teller opp
+  if (nye) {
+    Object.keys(nye).forEach(function(navn) {
+      var mal = tabell.querySelector('.trow[data-navn="' + navn.replace(/"/g, '\\"') + '"]:not(.s3-skjult)')
+             || document.querySelector('#s3-pall .s3-p[data-navn="' + navn.replace(/"/g, '\\"') + '"]');
+      if (!mal) return;
+      mal.classList.add('s3-scoret');
+      if (!_s3Stille()) {
+        var pe = mal.querySelector('.sc.pts'), stil = '';
+        if (pe) { var rb = mal.getBoundingClientRect(), pb = pe.getBoundingClientRect(); stil = ' style="left:' + Math.round(pb.left - rb.left + pb.width / 2) + 'px;right:auto;top:' + Math.round(pb.top - rb.top - 18) + 'px"'; }
+        mal.insertAdjacentHTML('beforeend', '<span class="s3-pluss"' + stil + '>+' + nye[navn] + '</span>');
+        setTimeout(function() { var x = mal.querySelector('.s3-pluss'); if (x) x.remove(); }, 1900);
+      }
+    });
+  }
+  rader.concat(Array.prototype.slice.call(document.querySelectorAll('#s3-pall .s3-p'))).forEach(function(r) {
+    var navn = r.getAttribute('data-navn'), el = r.querySelector('.sc.pts') || r.querySelector('.s3-p-pts');
+    if (!el || r.classList.contains('s3-skjult')) return;
+    var naa = +el.textContent;
+    if (nye && nye[navn] && _s3ForrigePts[navn] !== undefined && _s3ForrigePts[navn] !== naa) s3TellOpp(el, _s3ForrigePts[navn], naa);
+  });
+  _s3ForrigePts = {};
+  rader.forEach(function(r) { var el = r.querySelector('.sc.pts'); if (el) _s3ForrigePts[r.getAttribute('data-navn')] = +el.textContent; });
+
+  // Radene glir til ny plass
+  if (foer && nye && !_s3Stille()) {
+    tabell.querySelectorAll('.trow:not(.s3-skjult)').forEach(function(r) {
+      var f = foer[r.getAttribute('data-navn')];
+      if (f === undefined) return;
+      var d = f - r.getBoundingClientRect().top;
+      if (Math.abs(d) < 2) return;
+      r.style.transition = 'none'; r.style.transform = 'translateY(' + d + 'px)';
+      requestAnimationFrame(function() { requestAnimationFrame(function() {
+        r.style.transition = 'transform .7s cubic-bezier(.2,.8,.2,1)'; r.style.transform = '';
+      }); });
+    });
+  }
+  if (sales.length) tabell.classList.add('s3-stille');
+
+  // Små glanser
+  ['mvp-banner'].forEach(function(id) { var e = document.getElementById(id); if (e) e.classList.add('s3-glans'); });
+  document.querySelectorAll('.md-mp, .s3-ses').forEach(function(e) { e.classList.add('s3-glans'); });
+  var bar = document.querySelector('.s3-ses-bar');
+  if (bar) {
+    var alle = bar.querySelectorAll('i').length, fylt = bar.querySelectorAll('i.f, i.n').length;
+    bar.style.setProperty('--s3-fylt', (alle ? Math.round(fylt / alle * 100) : 0) + '%');
+  }
+  // Nye linjer i Siste nytt glir inn
+  var linjer = document.querySelectorAll('#md-nytt .md-nytt-r'), sett = {};
+  linjer.forEach(function(l) {
+    var k = l.textContent;
+    sett[k] = 1;
+    if (_s3SettHendelser && !_s3SettHendelser[k]) l.classList.add('s3-ny');
+  });
+  _s3SettHendelser = sett;
+}
+
+// Holografisk spillerkort: vipper etter musa/fingeren, regnbueglans for topp 3 og mesteren
+function s3Holo(id) {
+  var kort = document.querySelector('#pc-body .fc');
+  var s = SELGERE.find(function(x) { return x.id === id; });
+  if (!kort || !s || kort.querySelector('.s3-holo')) return;
+  var plass = (s3Plasser(curMonth, false)[s.navn] || {}).plass || 99;
+  var skinn = plass <= 3 || (FORRIGE_MESTER && FORRIGE_MESTER.navn === s.navn);
+  kort.insertAdjacentHTML('beforeend', '<div class="s3-holo' + (skinn ? ' on' : '') + '"></div><div class="s3-holo-lys"></div>');
+  if (_s3Stille()) return;
+  var holo = kort.querySelector('.s3-holo');
+  function flytt(e) {
+    var b = kort.getBoundingClientRect();
+    var x = Math.min(1, Math.max(0, (e.clientX - b.left) / b.width)), y = Math.min(1, Math.max(0, (e.clientY - b.top) / b.height));
+    kort.style.transform = 'perspective(900px) rotateY(' + ((x - .5) * 14).toFixed(2) + 'deg) rotateX(' + ((.5 - y) * 10).toFixed(2) + 'deg)';
+    kort.style.setProperty('--hx', (x * 100).toFixed(1) + '%'); kort.style.setProperty('--hy', (y * 100).toFixed(1) + '%');
+    kort.style.setProperty('--lx', (x * 100).toFixed(1) + '%'); kort.style.setProperty('--ly', (y * 100).toFixed(1) + '%');
+    holo.style.setProperty('--hx', (x * 100).toFixed(1) + '%'); holo.style.setProperty('--hy', (y * 100).toFixed(1) + '%');
+    holo.classList.add('aktiv');
+  }
+  function slipp() { kort.style.transform = ''; holo.classList.remove('aktiv'); }
+  kort.addEventListener('pointermove', flytt);
+  kort.addEventListener('pointerleave', slipp);
+  kort.addEventListener('pointerup', slipp);
+}
+var _s3OpenPC = openPlayerCard;
+openPlayerCard = function(id) { _s3OpenPC.apply(this, arguments); try { s3Holo(id); } catch (e) { console.error('Holo: ' + e.message); } };
 
 // ─── SESONG 3: HENDELSER ─────────────────────────────────────────────
 // Forbikjøring, personlig rekord, dagens åpner, felles milepæler og trofeer.
@@ -4456,7 +4685,7 @@ function openPlayerCard(id) {
         if (!MJ) return '';
         try {
           return '<div class="fc-sec rv"><div class="fc-sec-h">Ukesm&aring;let \u2014 '
-            + MJ.uker.length + ' uker mot ' + mjNb(MAL_UKE,1) + '</div>'
+            + MJ.uker.length + ' uker mot ' + mjNb(MAL_UKE, MAL_UKE % 1 ? 1 : 0) + '</div>'
             + mjUkesrekke(navn) + '</div>';
         } catch(e) { console.error('Ukesm\u00e5l: ' + e.message); return ''; }
       })()
