@@ -35,6 +35,6 @@ jobs:
       - run: python -m playwright install --with-deps chromium
       - name: Generer Gazzetta (${{ matrix.konkurranse }})
         env:
-          SISTE_DATO: '2026-09-30'   # siste vanlige utgave dekker 29. september; 1. oktober er spesialutgaven
+          SISTE_DATO: '2027-01-01'   # Sesong 3 slutter 31. desember; utgaven 1. januar dekker siste sesongdag
           FORCE: ${{ github.event.inputs.force == 'true' && '1' || '0' }}
         run: python scripts/auto_gazzetta.py ${{ matrix.konkurranse }}
