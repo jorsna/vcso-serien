@@ -4450,8 +4450,18 @@ function admLagre() {
                   finansiert: document.getElementById('adm-fin').checked, kontrakt_nr: nr, spotlight_bonus: bonus };
   var knapp = document.getElementById('adm-lagre');
   knapp.disabled = true; knapp.textContent = 'Lagrer...';
-  fetch(API + '?id=eq.' + encodeURIComponent(s.id), { method: 'PATCH', headers: Object.assign({}, sbH(), { Prefer: 'return=minimal' }), body: JSON.stringify(endring) })
-    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); })
+  fetch(API + '?id=eq.' + encodeURIComponent(s.id), { method: 'PATCH', headers: Object.assign({}, sbH(), { Prefer: 'return=representation' }), body: JSON.stringify(endring) })
+    .then(function(r) {
+      return r.text().then(function(t) {
+        var j = null; try { j = JSON.parse(t); } catch (e) {}
+        if (!r.ok) {
+          var detalj = (j && (j.message || j.hint)) || t || '';
+          if (r.status === 401 || r.status === 403) throw new Error('databasen tillater ikke endring av salg (HTTP ' + r.status + '). Rettigheten må legges inn i Supabase.' + (detalj ? ' [' + detalj + ']' : ''));
+          throw new Error('HTTP ' + r.status + (detalj ? ' – ' + detalj : ''));
+        }
+        if (Array.isArray(j) && j.length === 0) throw new Error('ingen rader ble endret. Databasen avviste endringen stille (mangler regel for endring i Supabase).');
+      });
+    })
     .then(function() {
       var gammelUke = getWeekNum(new Date((s.ts || '').slice(0, 10) + 'T12:00:00')), nyUke = getWeekNum(new Date(dato + 'T12:00:00'));
       Object.assign(s, endring);
