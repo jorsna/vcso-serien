@@ -25,7 +25,8 @@ jobs:
     strategy:
       fail-fast: false   # én feilende konkurranse stopper ikke de andre
       matrix:
-        konkurranse: [champ, selekt, osat]
+        # osat tatt ut 10.10.2026 til OSAT S3 er live - legg tilbake da
+        konkurranse: [champ, selekt]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
